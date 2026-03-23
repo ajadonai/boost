@@ -21,6 +21,24 @@ export default function VerifyAccount(){
     return()=>clearInterval(iv);
   },[resendTimer]);
 
+
+  const submitCode=async(codeStr)=>{
+    setVerifying(true);setError("");
+    try{
+      const res=await fetch("/api/auth/verify",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({code:codeStr})});
+      const data=await res.json();
+      if(!res.ok){setError(data.error||"Invalid code");setVerifying(false);return;}
+      setVerified(true);
+    }catch{setError("Something went wrong. Please try again.");setVerifying(false);}
+  };
+  const resendCode=async()=>{
+    setResendTimer(60);
+    try{
+      const res=await fetch("/api/auth/verify",{method:"PUT"});
+      const data=await res.json();
+      if(!res.ok)setError(data.error||"Failed to resend");
+    }catch{setError("Failed to resend code");}
+  };
   const handleChange=(i,val)=>{
     if(!/^\d*$/.test(val))return; // digits only
     const next=[...code];
@@ -31,10 +49,7 @@ export default function VerifyAccount(){
     // Auto-submit when all 6 filled
     if(next.every(d=>d)&&next.join("").length===6){
       setVerifying(true);
-      setTimeout(()=>{
-        if(next.join("")==="123456"){setVerified(true);}
-        else{setError("Invalid code. Please try again.");setVerifying(false);}
-      },1200);
+      submitCode(next.join(""));
     }
   };
 
@@ -53,10 +68,7 @@ export default function VerifyAccount(){
     inputs.current[focusIdx]?.focus();
     if(next.every(d=>d)){
       setVerifying(true);
-      setTimeout(()=>{
-        if(next.join("")==="123456"){setVerified(true);}
-        else{setError("Invalid code. Please try again.");setVerifying(false);}
-      },1200);
+      submitCode(next.join(""));
     }
   };
 

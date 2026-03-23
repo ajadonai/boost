@@ -29,6 +29,7 @@ export default function Landing(){
   const [scrolled,setScrolled]=useState(false);
   useEffect(()=>{if(mo)return;const iv=setInterval(()=>setDark(getAuto()),60000);return()=>clearInterval(iv);},[mo]);
   useEffect(()=>{const onScroll=()=>setScrolled(window.scrollY>20);window.addEventListener("scroll",onScroll);return()=>window.removeEventListener("scroll",onScroll);},[]);
+  useEffect(()=>{const p=new URLSearchParams(window.location.search);if(p.get("login"))setModal("login");if(p.get("signup"))setModal("signup");},[]);
   const toggleTheme=()=>{setMo(true);setDark(d=>!d);};
 
   const t={
@@ -314,8 +315,45 @@ function AuthModal({dark,t,mode,setMode,onClose}){
   const [step,setStep]=useState(1);
   const [remember,setRemember]=useState(false);
   const [authLoading,setAuthLoading]=useState(false);
-  const [signupPw,setSignupPw]=useState("");
-  useEffect(()=>{setStep(1);setAuthLoading(false);setSignupPw("");},[mode]);
+  const [error,setError]=useState("");
+  // Form fields
+  const [name,setName]=useState("");
+  const [email,setEmail]=useState("");
+  const [phone,setPhone]=useState("");
+  const [pw,setPw]=useState("");
+  const [pw2,setPw2]=useState("");
+  const [refCode,setRefCode]=useState("");
+  const [agree,setAgree]=useState(false);
+  useEffect(()=>{setStep(1);setAuthLoading(false);setError("");setPw("");setPw2("");setName("");setEmail("");setPhone("");},[mode]);
+
+  const handleLogin=async()=>{
+    setError("");
+    const contact=method==="email"?email:phone;
+    if(!contact||!pw){setError("Please fill in all fields");return;}
+    setAuthLoading(true);
+    try{
+      const res=await fetch("/api/auth/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:method==="email"?email:`+234${phone}`,password:pw})});
+      const data=await res.json();
+      if(!res.ok){setError(data.error||"Login failed");setAuthLoading(false);return;}
+      if(!data.user.emailVerified){window.location.href="/verify";return;}
+      window.location.href="/dashboard";
+    }catch{setError("Something went wrong. Please try again.");setAuthLoading(false);}
+  };
+
+  const handleSignup=async()=>{
+    setError("");
+    if(!name||!email||!pw){setError("Please fill in all fields");return;}
+    if(pw.length<6){setError("Password must be at least 6 characters");return;}
+    if(pw!==pw2){setError("Passwords don't match");return;}
+    if(!agree){setError("Please agree to the Terms of Service");return;}
+    setAuthLoading(true);
+    try{
+      const res=await fetch("/api/auth/signup",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name,email:method==="email"?email:`+234${phone}`,password:pw,referralCode:refCode||undefined})});
+      const data=await res.json();
+      if(!res.ok){setError(data.error||"Signup failed");setAuthLoading(false);return;}
+      window.location.href="/verify";
+    }catch{setError("Something went wrong. Please try again.");setAuthLoading(false);}
+  };
 
   const MethodToggle=()=>(
     <div style={{display:"flex",gap:0,marginBottom:6,background:dark?"rgba(255,255,255,0.04)":"rgba(0,0,0,0.03)",borderRadius:10,padding:3,border:`1px solid ${t.surfaceBorder}`}}>
@@ -323,71 +361,67 @@ function AuthModal({dark,t,mode,setMode,onClose}){
       <button onClick={()=>setMethod("phone")} style={{flex:1,padding:"8px 0",borderRadius:8,fontSize:13,fontWeight:500,background:method==="phone"?t.accentLight:"transparent",color:method==="phone"?t.accent:t.textMuted,border:"none"}}>📱 Phone</button>
     </div>
   );
-
   const ContactInput=()=>method==="email"?<>
     <Lbl t={t}>Email Address</Lbl>
-    <Inp t={t} dark={dark} ph="you@example.com" type="email"/>
+    <input value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com" type="email" style={{width:"100%",padding:"12px 14px",borderRadius:10,background:t.inputBg,border:`1px solid ${t.inputBorder}`,color:t.text,fontSize:14,outline:"none",marginBottom:16}}/>
   </>:<>
     <Lbl t={t}>Phone Number</Lbl>
     <div style={{display:"flex",gap:8,marginBottom:16}}>
       <div style={{padding:"12px 14px",borderRadius:10,background:t.inputBg,border:`1px solid ${t.inputBorder}`,color:t.textSoft,fontSize:14,flexShrink:0}}>🇳🇬 +234</div>
-      <input placeholder="8012345678" type="tel" style={{flex:1,padding:"12px 14px",borderRadius:10,background:t.inputBg,border:`1px solid ${t.inputBorder}`,color:t.text,fontSize:14,outline:"none"}}/>
+      <input value={phone} onChange={e=>setPhone(e.target.value)} placeholder="8012345678" type="tel" style={{flex:1,padding:"12px 14px",borderRadius:10,background:t.inputBg,border:`1px solid ${t.inputBorder}`,color:t.text,fontSize:14,outline:"none"}}/>
     </div>
   </>;
-
-  const PwInput=({ph="Enter password"})=>(
-    <div style={{position:"relative",marginBottom:16}}>
-      <input placeholder={ph} type={showPw?"text":"password"} style={{width:"100%",padding:"12px 44px 12px 14px",borderRadius:10,background:t.inputBg,border:`1px solid ${t.inputBorder}`,color:t.text,fontSize:14,outline:"none"}}/>
-      <button onClick={()=>setShowPw(!showPw)} style={{position:"absolute",right:12,top:"50%",transform:"translateY(-50%)",background:"none",color:t.textMuted,fontSize:14,padding:2}}>{showPw?"🙈":"👁️"}</button>
-    </div>
-  );
 
   return(
     <div onClick={onClose} style={{position:"fixed",inset:0,zIndex:100,background:t.overlay,backdropFilter:"blur(8px)",display:"flex",alignItems:"center",justifyContent:"center",padding:16,animation:"fi 0.2s ease"}}>
       <div onClick={e=>e.stopPropagation()} style={{width:"100%",maxWidth:420,maxHeight:'90vh',overflowY:'auto',background:dark?"rgba(15,18,30,0.98)":"rgba(255,255,255,0.98)",border:`1px solid ${t.surfaceBorder}`,borderRadius:24,padding:"32px 28px",boxShadow:dark?"0 20px 60px rgba(0,0,0,0.5)":"0 20px 60px rgba(0,0,0,0.1)",backdropFilter:"blur(20px)",position:"relative"}}>
-        <button onClick={onClose} style={{position:"absolute",top:14,right:14,background:"none",color:t.textMuted,fontSize:20,padding:4,lineHeight:1}}>✕</button>
+        <button onClick={onClose} style={{position:"absolute",top:14,right:14,background:"none",color:t.textMuted,fontSize:20,padding:4,lineHeight:1,border:"none",cursor:"pointer"}}>✕</button>
         <div style={{textAlign:"center",marginBottom:24}}>
           <div style={{width:42,height:42,borderRadius:12,background:t.logoGrad,display:"inline-flex",alignItems:"center",justifyContent:"center",fontSize:18,fontWeight:700,color:"#fff",marginBottom:10}}>B</div>
           <h2 className="serif" style={{fontSize:24,fontWeight:600,color:t.text}}>{mode==="login"?"Welcome Back":step===1?"Create Account":"Almost Done"}</h2>
           <p style={{fontSize:13,color:t.textSoft,marginTop:4}}>{mode==="login"?"Log in to your account":step===1?"Step 1 of 2 — Your details":"Step 2 of 2 — Secure your account"}</p>
         </div>
+        {error&&<div style={{padding:"10px 14px",borderRadius:10,background:dark?"rgba(220,38,38,0.1)":"#fef2f2",border:`1px solid ${dark?"rgba(220,38,38,0.2)":"#fecaca"}`,color:dark?"#fca5a5":"#dc2626",fontSize:13,marginBottom:16,animation:"fu .3s ease"}}>⚠️ {error}</div>}
         {mode==="login"&&<>
           <MethodToggle/>
           <ContactInput/>
           <Lbl t={t}>Password</Lbl>
-          <PwInput/>
+          <div style={{position:"relative",marginBottom:16}}>
+            <input value={pw} onChange={e=>setPw(e.target.value)} placeholder="Enter password" type={showPw?"text":"password"} onKeyDown={e=>e.key==="Enter"&&handleLogin()} style={{width:"100%",padding:"12px 44px 12px 14px",borderRadius:10,background:t.inputBg,border:`1px solid ${t.inputBorder}`,color:t.text,fontSize:14,outline:"none"}}/>
+            <button onClick={()=>setShowPw(!showPw)} style={{position:"absolute",right:12,top:"50%",transform:"translateY(-50%)",background:"none",color:t.textMuted,fontSize:14,padding:2,border:"none",cursor:"pointer"}}>{showPw?"🙈":"👁️"}</button>
+          </div>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:24}}>
             <label style={{display:"flex",alignItems:"center",gap:8,cursor:"pointer"}}><input type="checkbox" checked={remember} onChange={e=>setRemember(e.target.checked)} style={{accentColor:t.accent,width:15,height:15}}/><span style={{fontSize:12,color:t.textSoft}}>Remember me</span></label>
-            <button style={{background:"none",color:t.accent,fontSize:12,fontWeight:500}}>Forgot password?</button>
+            <button style={{background:"none",color:t.accent,fontSize:12,fontWeight:500,border:"none",cursor:"pointer"}}>Forgot password?</button>
           </div>
-          <button onClick={()=>setAuthLoading(true)} disabled={authLoading} style={{width:"100%",padding:"14px 0",borderRadius:12,background:authLoading?"#999":t.btnPrimary,color:"#fff",fontSize:15,fontWeight:700,marginBottom:16,display:"flex",alignItems:"center",justifyContent:"center",gap:8,opacity:authLoading?.7:1}}>{authLoading&&<span style={{width:16,height:16,border:"2px solid rgba(255,255,255,.3)",borderTopColor:"#fff",borderRadius:"50%",animation:"spin .6s linear infinite"}}/>}{authLoading?"Logging in...":"Log In"}</button>
-          <div style={{textAlign:"center",fontSize:13,color:t.textSoft}}>Don't have an account? <button onClick={()=>setMode("signup")} style={{background:"none",color:t.accent,fontWeight:600,fontSize:13}}>Sign Up Free</button></div>
+          <button onClick={handleLogin} disabled={authLoading} style={{width:"100%",padding:"14px 0",borderRadius:12,background:authLoading?"#999":t.btnPrimary,color:"#fff",fontSize:15,fontWeight:700,marginBottom:16,display:"flex",alignItems:"center",justifyContent:"center",gap:8,opacity:authLoading?.7:1,border:"none",cursor:"pointer"}}>{authLoading&&<span style={{width:16,height:16,border:"2px solid rgba(255,255,255,.3)",borderTopColor:"#fff",borderRadius:"50%",animation:"spin .6s linear infinite"}}/>}{authLoading?"Logging in...":"Log In"}</button>
+          <div style={{textAlign:"center",fontSize:13,color:t.textSoft}}>Don't have an account? <button onClick={()=>setMode("signup")} style={{background:"none",color:t.accent,fontWeight:600,fontSize:13,border:"none",cursor:"pointer"}}>Sign Up Free</button></div>
         </>}
         {mode==="signup"&&step===1&&<>
           <Lbl t={t}>Full Name</Lbl>
-          <Inp t={t} dark={dark} ph="Enter your full name" type="text"/>
+          <input value={name} onChange={e=>setName(e.target.value)} placeholder="Enter your full name" type="text" style={{width:"100%",padding:"12px 14px",borderRadius:10,background:t.inputBg,border:`1px solid ${t.inputBorder}`,color:t.text,fontSize:14,outline:"none",marginBottom:16}}/>
           <MethodToggle/>
           <ContactInput/>
-          <button onClick={()=>setStep(2)} style={{width:"100%",padding:"14px 0",borderRadius:12,background:t.btnPrimary,color:"#fff",fontSize:15,fontWeight:700,marginBottom:16}}>Continue →</button>
-          <div style={{textAlign:"center",fontSize:13,color:t.textSoft}}>Already have an account? <button onClick={()=>setMode("login")} style={{background:"none",color:t.accent,fontWeight:600,fontSize:13}}>Log In</button></div>
+          <button onClick={()=>{setError("");if(!name){setError("Please enter your name");return;}if(!email&&!phone){setError("Please enter your email or phone");return;}setStep(2);}} style={{width:"100%",padding:"14px 0",borderRadius:12,background:t.btnPrimary,color:"#fff",fontSize:15,fontWeight:700,marginBottom:16,border:"none",cursor:"pointer"}}>Continue →</button>
+          <div style={{textAlign:"center",fontSize:13,color:t.textSoft}}>Already have an account? <button onClick={()=>setMode("login")} style={{background:"none",color:t.accent,fontWeight:600,fontSize:13,border:"none",cursor:"pointer"}}>Log In</button></div>
         </>}
         {mode==="signup"&&step===2&&<>
           <Lbl t={t}>Password</Lbl>
           <div style={{position:"relative",marginBottom:4}}>
-            <input placeholder="Min. 8 characters" value={signupPw} onChange={e=>setSignupPw(e.target.value)} type={showPw?"text":"password"} style={{width:"100%",padding:"12px 44px 12px 14px",borderRadius:10,background:t.inputBg,border:`1px solid ${t.inputBorder}`,color:t.text,fontSize:14,outline:"none"}}/>
-            <button onClick={()=>setShowPw(!showPw)} style={{position:"absolute",right:12,top:"50%",transform:"translateY(-50%)",background:"none",color:t.textMuted,fontSize:14,padding:2}}>{showPw?"🙈":"👁️"}</button>
+            <input placeholder="Min. 6 characters" value={pw} onChange={e=>setPw(e.target.value)} type={showPw?"text":"password"} style={{width:"100%",padding:"12px 44px 12px 14px",borderRadius:10,background:t.inputBg,border:`1px solid ${t.inputBorder}`,color:t.text,fontSize:14,outline:"none"}}/>
+            <button onClick={()=>setShowPw(!showPw)} style={{position:"absolute",right:12,top:"50%",transform:"translateY(-50%)",background:"none",color:t.textMuted,fontSize:14,padding:2,border:"none",cursor:"pointer"}}>{showPw?"🙈":"👁️"}</button>
           </div>
-          <PwStrength pw={signupPw} t={t}/>
+          <PwStrength pw={pw} t={t}/>
           <Lbl t={t}>Confirm Password</Lbl>
-          <Inp t={t} dark={dark} ph="Re-enter password" type="password"/>
+          <input value={pw2} onChange={e=>setPw2(e.target.value)} placeholder="Re-enter password" type="password" style={{width:"100%",padding:"12px 14px",borderRadius:10,background:t.inputBg,border:`1px solid ${t.inputBorder}`,color:t.text,fontSize:14,outline:"none",marginBottom:16}}/>
           <Lbl t={t}>Referral Code <span style={{color:t.textMuted,fontWeight:400}}>(optional)</span></Lbl>
-          <Inp t={t} dark={dark} ph="e.g. BOOST-7X92" type="text"/>
+          <input value={refCode} onChange={e=>setRefCode(e.target.value)} placeholder="e.g. BOOST-7X92" type="text" style={{width:"100%",padding:"12px 14px",borderRadius:10,background:t.inputBg,border:`1px solid ${t.inputBorder}`,color:t.text,fontSize:14,outline:"none",marginBottom:16}}/>
           <label style={{display:"flex",alignItems:"flex-start",gap:10,marginBottom:24,cursor:"pointer"}}>
-            <input type="checkbox" style={{marginTop:3,accentColor:t.accent,width:16,height:16,flexShrink:0}}/>
+            <input type="checkbox" checked={agree} onChange={e=>setAgree(e.target.checked)} style={{marginTop:3,accentColor:t.accent,width:16,height:16,flexShrink:0}}/>
             <span style={{fontSize:12,color:t.textSoft,lineHeight:1.5}}>I agree to the <a href="/terms" style={{color:t.accent,textDecoration:"none"}}>Terms of Service</a> and <a href="/privacy" style={{color:t.accent,textDecoration:"none"}}>Privacy Policy</a></span>
           </label>
-          <button onClick={()=>setAuthLoading(true)} disabled={authLoading} style={{width:"100%",padding:"14px 0",borderRadius:12,background:authLoading?"#999":t.btnPrimary,color:"#fff",fontSize:15,fontWeight:700,marginBottom:12,display:"flex",alignItems:"center",justifyContent:"center",gap:8,opacity:authLoading?.7:1}}>{authLoading&&<span style={{width:16,height:16,border:"2px solid rgba(255,255,255,.3)",borderTopColor:"#fff",borderRadius:"50%",animation:"spin .6s linear infinite"}}/>}{authLoading?"Creating Account...":"Create Account"}</button>
-          <button onClick={()=>setStep(1)} style={{width:"100%",padding:"10px 0",borderRadius:10,background:"transparent",color:t.textSoft,fontSize:13,fontWeight:500}}>← Back to Step 1</button>
+          <button onClick={handleSignup} disabled={authLoading} style={{width:"100%",padding:"14px 0",borderRadius:12,background:authLoading?"#999":t.btnPrimary,color:"#fff",fontSize:15,fontWeight:700,marginBottom:12,display:"flex",alignItems:"center",justifyContent:"center",gap:8,opacity:authLoading?.7:1,border:"none",cursor:"pointer"}}>{authLoading&&<span style={{width:16,height:16,border:"2px solid rgba(255,255,255,.3)",borderTopColor:"#fff",borderRadius:"50%",animation:"spin .6s linear infinite"}}/>}{authLoading?"Creating Account...":"Create Account"}</button>
+          <button onClick={()=>setStep(1)} style={{width:"100%",padding:"10px 0",borderRadius:10,background:"transparent",color:t.textSoft,fontSize:13,fontWeight:500,border:"none",cursor:"pointer"}}>← Back to Step 1</button>
         </>}
         {mode==="signup"&&<div style={{display:"flex",justifyContent:"center",gap:6,marginTop:16}}>
           <div style={{width:8,height:8,borderRadius:"50%",background:step===1?t.accent:t.textMuted,transition:"background 0.3s ease"}}/>

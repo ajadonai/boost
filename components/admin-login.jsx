@@ -19,12 +19,17 @@ export default function AdminLogin(){
   useEffect(()=>{if(mo)return;const iv=setInterval(()=>setDark(getAuto()),60000);return()=>clearInterval(iv);},[mo]);
   const toggleTheme=()=>{setMo(true);setDark(d=>!d);};
 
-  const handleLogin=(e)=>{
+  const handleLogin=async(e)=>{
     e.preventDefault();
     setError("");
     if(!email||!pw){setError("Please fill in all fields");return;}
     setLoading(true);
-    setTimeout(()=>{setLoading(false);setError("Invalid credentials. Contact the super admin if you need access.");},1500);
+    try{
+      const res=await fetch("/api/auth/admin/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email,password:pw})});
+      const data=await res.json();
+      if(!res.ok){setError(data.error||"Login failed");setLoading(false);return;}
+      window.location.href="/admin";
+    }catch{setError("Something went wrong. Please try again.");setLoading(false);}
   };
 
   const t={
