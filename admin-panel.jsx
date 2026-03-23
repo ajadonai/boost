@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 
 const ROLES = {
-  superadmin: { label: "Super Admin", color: "#c47d8e", pages: ["overview","orders","users","services","api","paystack","payments","tickets","admins","activity","alerts"] },
-  admin: { label: "Admin", color: "#a5b4fc", pages: ["overview","orders","users","services","tickets","activity","alerts"] },
+  superadmin: { label: "Super Admin", color: "#c47d8e", pages: ["overview","orders","users","services","api","paystack","payments","tickets","admins","activity","alerts","maintenance"] },
+  admin: { label: "Admin", color: "#a5b4fc", pages: ["overview","orders","users","services","tickets","activity","alerts","maintenance"] },
   support: { label: "Support", color: "#6ee7b7", pages: ["overview","tickets","orders","activity"] },
   finance: { label: "Finance", color: "#fcd34d", pages: ["overview","orders","paystack","payments","activity"] },
 };
@@ -49,6 +49,7 @@ function ThemeToggle({dark,onToggle,compact}){return <button onClick={onToggle} 
 
 export default function AdminPanel(){
   const [pg,setPg]=useState("overview");const [alerts,setAlerts]=useState(MOCK_ALERTS);
+  const [maint,setMaint]=useState({enabled:false,message:"We're performing scheduled upgrades to improve your experience. Everything will be back to normal shortly.",estimatedReturn:"~30 minutes",showTwitter:true});
   const [gateways,setGateways]=useState([
     {id:"paystack",name:"Paystack",icon:"💳",desc:"Cards, Bank Transfer, USSD",enabled:true,priority:1},
     {id:"flutterwave",name:"Flutterwave",icon:"🦋",desc:"Cards, Bank Transfer, Mobile Money",enabled:true,priority:2},
@@ -63,7 +64,7 @@ export default function AdminPanel(){
   const logAction=(action,type)=>{setActivityLog(p=>[{id:Date.now(),admin:currentAdmin.name,action,type,time:new Date().toISOString()},...p]);};
   const dismissToast=()=>{setToast(null);if(toastTimer.current)clearTimeout(toastTimer.current);};
   const go=(p)=>{if(role.pages.includes(p)){setPg(p);setSb(false);}};
-  const ALL_NAV=[["overview","📊","Overview"],["orders","📋","Orders"],["users","👥","Users"],["tickets","💬","Tickets"],["services","📦","Services"],["api","🔌","API"],["paystack","💳","Paystack"],["payments","💰","Gateways"],["alerts","📢","Alerts"],["activity","📝","Activity"],["admins","🛡️","Admins"]];
+  const ALL_NAV=[["overview","📊","Overview"],["orders","📋","Orders"],["users","👥","Users"],["tickets","💬","Tickets"],["services","📦","Services"],["api","🔌","API"],["paystack","💳","Paystack"],["payments","💰","Gateways"],["alerts","📢","Alerts"],["maintenance","🔧","Maintenance"],["activity","📝","Activity"],["admins","🛡️","Admins"]];
   const NAV=ALL_NAV.filter(([id])=>role.pages.includes(id));
   const t={bg:dark?"#080b14":"#f4f1ed",text:dark?"#e8e4df":"#1a1a1a",textSoft:dark?"#8a8680":"#888580",textMuted:dark?"#555250":"#b0ada8",surface:dark?"rgba(15,18,30,0.97)":"rgba(255,255,255,0.97)",surfaceBorder:dark?"rgba(255,255,255,0.06)":"rgba(0,0,0,0.08)",inputBg:dark?"#0d1020":"#fff",inputBorder:dark?"rgba(255,255,255,0.08)":"rgba(0,0,0,0.1)",accent:"#c47d8e",accentLight:dark?"rgba(196,125,142,0.12)":"rgba(196,125,142,0.08)",accentBorder:dark?"rgba(196,125,142,0.3)":"rgba(196,125,142,0.25)",accentShadow:dark?"inset 0 0 0 1px rgba(196,125,142,0.35)":"inset 0 0 0 1px rgba(196,125,142,0.3)",green:dark?"#6ee7b7":"#059669",red:dark?"#fca5a5":"#dc2626",btnPrimary:"linear-gradient(135deg,#c47d8e,#a3586b)",btnSecondary:dark?"rgba(255,255,255,0.04)":"rgba(0,0,0,0.03)",btnSecBorder:dark?"rgba(255,255,255,0.08)":"rgba(0,0,0,0.08)",logoGrad:"linear-gradient(135deg,#c47d8e,#8b5e6b)",gradBg:dark?"radial-gradient(ellipse at 20% 0%,rgba(196,125,142,0.06) 0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(100,120,180,0.04) 0%,transparent 50%)":"radial-gradient(ellipse at 20% 0%,rgba(196,125,142,0.05) 0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(180,160,140,0.04) 0%,transparent 50%)"};
   const Btn=({children,primary,onClick,style:s})=><button onClick={onClick} style={{padding:"7px 14px",borderRadius:8,fontSize:12,fontWeight:600,color:primary?"#fff":t.textSoft,background:primary?t.btnPrimary:t.btnSecondary,border:`1px solid ${primary?"transparent":t.btnSecBorder}`,whiteSpace:"nowrap",...s}}>{children}</button>;
@@ -90,6 +91,7 @@ export default function AdminPanel(){
     {pg==="tickets"&&<TicketsPage t={t} dark={dark} tickets={MOCK_TICKETS} Btn={Btn} FilterBtn={FilterBtn} notify={notify}/>}
     {pg==="activity"&&<ActivityLog t={t} dark={dark} activity={activityLog}/>}
     {pg==="payments"&&<PaymentGateways t={t} dark={dark} gateways={gateways} setGateways={setGateways} Btn={Btn} notify={notify} logAction={logAction} isSuperAdmin={currentAdmin.role==="superadmin"}/>}
+    {pg==="maintenance"&&<MaintenancePage t={t} dark={dark} maint={maint} setMaint={setMaint} Btn={Btn} notify={notify} logAction={logAction} isSuperAdmin={currentAdmin.role==="superadmin"}/>}
     {pg==="alerts"&&<AlertsPage t={t} dark={dark} alerts={alerts} setAlerts={setAlerts} Btn={Btn} FilterBtn={FilterBtn} notify={notify} isSuperAdmin={currentAdmin.role==="superadmin"} currentAdmin={currentAdmin} logAction={logAction}/>}
     {pg==="admins"&&<AdminRoles t={t} dark={dark} admins={adminList} setAdmins={setAdminList} Btn={Btn} FilterBtn={FilterBtn} notify={notify} isSuperAdmin={currentAdmin.role==="superadmin"} logAction={logAction}/>}
     </ErrorBoundary>
@@ -153,6 +155,63 @@ function AdminRoles({t,dark,admins,setAdmins,Btn,FilterBtn,notify,isSuperAdmin,l
       </div>}
     </Card>)}</div>;}
 
+
+function MaintenancePage({t,dark,maint,setMaint,Btn,notify,logAction,isSuperAdmin}){
+  const [msg,setMsg]=useState(maint.message);
+  const [eta,setEta]=useState(maint.estimatedReturn);
+  const toggle=()=>{
+    const next=!maint.enabled;
+    setMaint(p=>({...p,enabled:next,message:msg,estimatedReturn:eta}));
+    logAction(next?"Enabled maintenance mode":"Disabled maintenance mode","settings");
+    notify(next?"🔧 Maintenance mode ON — site is now down for users":"✅ Maintenance mode OFF — site is live");
+  };
+  const save=()=>{setMaint(p=>({...p,message:msg,estimatedReturn:eta}));notify("Settings saved");};
+  return <div>
+    <Hdr title="Maintenance Mode" sub="Take the site offline for users" t={t}/>
+    {/* Status banner */}
+    <div style={{padding:"16px 20px",borderRadius:14,marginBottom:24,display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:12,background:maint.enabled?(dark?"rgba(252,165,165,0.08)":"#fef2f2"):(dark?"rgba(110,231,183,0.08)":"#ecfdf5"),border:`1px solid ${maint.enabled?(dark?"rgba(252,165,165,0.15)":"#fecaca"):(dark?"rgba(110,231,183,0.15)":"#a7f3d0")}`}}>
+      <div>
+        <div style={{fontSize:16,fontWeight:600,color:maint.enabled?t.red:t.green}}>{maint.enabled?"🔴 Site is OFFLINE":"🟢 Site is LIVE"}</div>
+        <div style={{fontSize:13,color:t.textSoft,marginTop:2}}>{maint.enabled?"Users see the maintenance page instead of the app":"Everything is running normally"}</div>
+      </div>
+      <button onClick={toggle} style={{padding:"10px 24px",borderRadius:10,fontSize:14,fontWeight:600,background:maint.enabled?t.btnPrimary:(dark?"rgba(252,165,165,0.1)":"#fef2f2"),color:maint.enabled?"#fff":t.red,border:maint.enabled?"none":`1px solid ${dark?"rgba(252,165,165,0.2)":"#fecaca"}`}}>{maint.enabled?"🟢 Go Live":"🔴 Enable Maintenance"}</button>
+    </div>
+    {/* Settings */}
+    <Card dark={dark} style={{marginBottom:20}}>
+      <h3 style={{fontSize:15,fontWeight:600,color:t.text,marginBottom:16}}>Maintenance Page Settings</h3>
+      <div style={{marginBottom:16}}>
+        <label style={{fontSize:10,color:t.textMuted,fontWeight:600,textTransform:"uppercase",letterSpacing:1.5,display:"block",marginBottom:6}}>Message shown to users</label>
+        <textarea value={msg} onChange={e=>setMsg(e.target.value)} rows={3} style={{width:"100%",padding:"12px 14px",borderRadius:10,background:t.inputBg,border:`1px solid ${t.inputBorder}`,color:t.text,fontSize:14,outline:"none",resize:"vertical"}}/>
+      </div>
+      <div style={{marginBottom:16}}>
+        <label style={{fontSize:10,color:t.textMuted,fontWeight:600,textTransform:"uppercase",letterSpacing:1.5,display:"block",marginBottom:6}}>Estimated Return Time</label>
+        <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+          {["~15 minutes","~30 minutes","~1 hour","~2 hours","No ETA"].map(v=><button key={v} onClick={()=>setEta(v)} style={{padding:"8px 14px",borderRadius:8,fontSize:12,fontWeight:500,background:eta===v?t.accentLight:"transparent",color:eta===v?t.accent:t.textMuted,border:`1px solid ${t.btnSecBorder}`,boxShadow:eta===v?t.accentShadow:"none"}}>{v}</button>)}
+        </div>
+      </div>
+      <Btn primary onClick={save}>Save Settings</Btn>
+    </Card>
+    {/* Preview */}
+    <Card dark={dark}>
+      <h3 style={{fontSize:15,fontWeight:600,color:t.text,marginBottom:16}}>Preview</h3>
+      <div style={{borderRadius:14,overflow:"hidden",border:`1px solid ${t.surfaceBorder}`}}>
+        <div style={{padding:"32px 24px",background:dark?"#060912":"#f0ece6",textAlign:"center"}}>
+          <div style={{width:40,height:40,borderRadius:"50%",border:`2px solid ${t.surfaceBorder}`,borderTopColor:t.accent,margin:"0 auto 16px"}}/>
+          <div style={{display:"inline-flex",alignItems:"center",gap:8,marginBottom:14}}>
+            <div style={{width:28,height:28,borderRadius:8,background:t.logoGrad,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:700,color:"#fff"}}>B</div>
+            <span className="serif" style={{fontSize:16,fontWeight:600,color:t.text}}>BoostPanel</span>
+          </div>
+          <h2 className="serif" style={{fontSize:22,fontWeight:600,color:t.text,marginBottom:6}}>Under Maintenance</h2>
+          <p style={{fontSize:13,color:t.textSoft,lineHeight:1.6,marginBottom:10,maxWidth:360,margin:"0 auto 10px"}}>{msg}</p>
+          <div style={{padding:10,borderRadius:8,background:dark?"#0a0d18":"#faf8f5",border:`1px solid ${t.surfaceBorder}`,display:"inline-block"}}>
+            <div style={{fontSize:9,color:t.textMuted,textTransform:"uppercase",letterSpacing:1.5,marginBottom:3}}>Estimated Return</div>
+            <div className="m" style={{fontSize:16,fontWeight:700,color:t.green}}>{eta}</div>
+          </div>
+        </div>
+      </div>
+    </Card>
+  </div>;
+}
 
 function PaymentGateways({t,dark,gateways,setGateways,Btn,notify,logAction,isSuperAdmin}){
   const toggleGateway=(id)=>{
