@@ -77,10 +77,12 @@ export default function AdminPanel(){
   <div className="mh"><button onClick={()=>setSb(true)} style={{background:"none",color:t.text,fontSize:22,padding:4}}>☰</button><button onClick={()=>window.scrollTo({top:0,behavior:"smooth"})} style={{display:"flex",alignItems:"center",gap:8,background:"none",padding:0,border:"none",outline:"none",cursor:"pointer"}}><div style={{width:28,height:28,borderRadius:8,background:t.logoGrad,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,color:"#fff",fontWeight:700}}>B</div><span className="serif" style={{fontSize:17,fontWeight:600,color:t.text}}>Admin</span></button><div style={{width:28}}></div></div>
   {sb&&<div className="ov" onClick={()=>setSb(false)}/>}
   <aside className={`sb${sb?" open":""}${mini?" collapsed":""}`}><div style={{padding:mini?"16px 10px 12px":"20px 16px 12px",borderBottom:`1px solid ${t.surfaceBorder}`,display:"flex",alignItems:"center",justifyContent:mini?"center":"space-between"}}>{!mini&&<button onClick={()=>window.scrollTo({top:0,behavior:"smooth"})} style={{display:"flex",alignItems:"center",gap:10,background:"none",padding:0,border:"none",outline:"none",cursor:"pointer"}}><div style={{width:32,height:32,borderRadius:10,background:t.logoGrad,display:"flex",alignItems:"center",justifyContent:"center",fontSize:15,fontWeight:700,color:"#fff"}}>B</div><div className="sb-hide"><div className="serif" style={{fontSize:16,fontWeight:600,color:t.text}}>BoostPanel</div><div style={{fontSize:9,color:t.textMuted,letterSpacing:2,textTransform:"uppercase"}}>Admin Panel</div></div></button>}{mini&&<button onClick={()=>window.scrollTo({top:0,behavior:"smooth"})} style={{background:"none",padding:0,border:"none",outline:"none",cursor:"pointer"}}><div style={{width:32,height:32,borderRadius:10,background:t.logoGrad,display:"flex",alignItems:"center",justifyContent:"center",fontSize:15,fontWeight:700,color:"#fff"}}>B</div></button>}<button className="sb-close" onClick={()=>setSb(false)} style={{background:"none",color:t.textMuted,fontSize:20,padding:4}}>✕</button>{!mini&&<button className="sb-collapse" onClick={()=>setMini(true)} style={{background:t.btnSecondary,color:t.textSoft,fontSize:14,padding:"6px 8px",borderRadius:6,border:`1px solid ${t.btnSecBorder}`}}>⟨⟨</button>}</div>
-  {!mini&&<div className="sb-hide" style={{margin:"10px 12px 4px",padding:"10px 12px",borderRadius:12,background:t.accentLight,border:`1px solid ${t.accentBorder}`}}><div style={{fontSize:10,color:t.textMuted,textTransform:"uppercase",letterSpacing:1.5}}>Logged in as</div><div style={{fontSize:13,fontWeight:600,color:t.text,marginTop:2}}>{currentAdmin.name}</div><div style={{marginTop:5}}><span style={{fontSize:11,fontWeight:600,padding:"2px 8px",borderRadius:4,background:role.color+"22",color:role.color,border:`1px solid ${role.color}44`}}>{role.label}</span></div></div>}
   {mini&&<div style={{padding:"10px 0",display:"flex",justifyContent:"center"}}><button onClick={()=>setMini(false)} style={{background:t.accentLight,color:t.accent,fontSize:14,padding:"8px 10px",borderRadius:6,border:`1px solid ${t.accentBorder}`}}>⟩⟩</button></div>}
-  <nav style={{flex:1,padding:mini?"6px 6px":"6px 10px",display:"flex",flexDirection:"column",gap:1,overflowY:"auto"}}>{NAV.map(([id,ic,lb])=>id.startsWith("---")?<div key={id} style={{height:1,background:t.surfaceBorder,margin:mini?"8px 4px":"8px 14px"}}/>:<button key={id} onClick={()=>go(id)} title={lb} style={{display:"flex",alignItems:"center",gap:12,padding:mini?"10px 0":"10px 14px",borderRadius:10,width:"100%",textAlign:"left",justifyContent:mini?"center":"flex-start",background:pg===id?t.accentLight:"transparent",color:pg===id?t.accent:t.textSoft,fontSize:13,fontWeight:500,border:"1px solid transparent",boxShadow:pg===id?t.accentShadow:"none"}}><span style={{fontSize:15,width:20,textAlign:"center"}}>{ic}</span><span className="sb-nav-label">{lb}</span></button>)}</nav>
-  <div style={{padding:mini?"10px 6px":"10px 14px",borderTop:`1px solid ${t.surfaceBorder}`,display:"flex",alignItems:"center",justifyContent:mini?"center":"space-between"}}>{!mini&&<span style={{fontSize:12,color:t.textMuted}}>{dark?"Night":"Day"}</span>}<ThemeToggle dark={dark} onToggle={toggleTheme} compact={mini}/></div></aside>
+  <nav style={{flex:1,padding:mini?"4px 6px":"4px 10px",display:"flex",flexDirection:"column",gap:0}}>{NAV.map(([id,ic,lb])=>id.startsWith("---")?<div key={id} style={{height:1,background:t.surfaceBorder,margin:mini?"6px 4px":"6px 14px"}}/>:<button key={id} onClick={()=>go(id)} title={lb} style={{display:"flex",alignItems:"center",gap:10,padding:mini?"8px 0":"8px 14px",borderRadius:8,width:"100%",textAlign:"left",justifyContent:mini?"center":"flex-start",background:pg===id?t.accentLight:"transparent",color:pg===id?t.accent:t.textSoft,fontSize:12,fontWeight:500,border:"1px solid transparent",boxShadow:pg===id?t.accentShadow:"none"}}><span style={{fontSize:14,width:18,textAlign:"center"}}>{ic}</span><span className="sb-nav-label">{lb}</span></button>)}</nav>
+  <div style={{padding:mini?"10px 6px":"10px 14px",borderTop:`1px solid ${t.surfaceBorder}`,display:"flex",alignItems:"center",justifyContent:mini?"center":"space-between",gap:8}}>
+    {!mini&&<div style={{display:"flex",alignItems:"center",gap:8,flex:1,minWidth:0}}><div style={{width:28,height:28,borderRadius:"50%",background:role.color+"33",display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:700,color:role.color,flexShrink:0}}>{currentAdmin.name[0]}</div><div style={{minWidth:0}}><div style={{fontSize:11,fontWeight:600,color:t.text,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{currentAdmin.name}</div><span style={{fontSize:9,fontWeight:600,color:role.color}}>{role.label}</span></div></div>}
+    <ThemeToggle dark={dark} onToggle={toggleTheme} compact/>
+  </div></aside>
   <main className={`mn${mini?" shifted":""}`}>
     <div style={{position:"sticky",top:0,zIndex:40,paddingBottom:alerts.filter(a=>a.active&&(a.target==="both"||a.target==="dashboard")).length?4:0}}>
     {alerts.filter(a=>a.active&&(a.target==="both"||a.target==="dashboard")).map(a=><div key={a.id} style={{padding:"12px 20px",marginBottom:12,borderRadius:12,display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,fontSize:13,fontWeight:500,animation:"fu .3s ease",background:a.type==="warning"?(dark?"rgba(217,119,6,0.1)":"#fffbeb"):a.type==="critical"?(dark?"rgba(220,38,38,0.1)":"#fef2f2"):(dark?"rgba(99,102,241,0.1)":"#eef2ff"),color:a.type==="warning"?(dark?"#fcd34d":"#92400e"):a.type==="critical"?(dark?"#fca5a5":"#dc2626"):(dark?"#a5b4fc":"#4f46e5"),border:`1px solid ${a.type==="warning"?(dark?"rgba(217,119,6,0.2)":"#fde68a"):a.type==="critical"?(dark?"rgba(220,38,38,0.2)":"#fecaca"):(dark?"rgba(99,102,241,0.2)":"#c7d2fe")}`,backdropFilter:"blur(12px)"}}><span>{a.type==="warning"?"⚠️":a.type==="critical"?"🚨":"ℹ️"} {a.message}</span></div>)}
@@ -441,13 +443,40 @@ function AnalyticsPage({t,dark,orders,users,Btn}){
   const [range,setRange]=useState("7d");
   const rev=orders.reduce((a,o)=>a+o.charge,0);const cost=orders.reduce((a,o)=>a+o.cost,0);const profit=rev-cost;
   const RangeBtn=({id,label})=><button onClick={()=>setRange(id)} style={{padding:"8px 14px",borderRadius:8,fontSize:12,fontWeight:500,background:range===id?t.accentLight:"transparent",color:range===id?t.accent:t.textSoft,border:`1px solid ${range===id?t.accentBorder:t.btnSecBorder}`}}>{label}</button>;
+  // Mock chart data
+  const days=range==="24h"?["6AM","9AM","12PM","3PM","6PM","9PM"]:range==="7d"?["Mon","Tue","Wed","Thu","Fri","Sat","Sun"]:range==="30d"?["Week 1","Week 2","Week 3","Week 4"]:["Jan","Feb","Mar"];
+  const revData=range==="24h"?[12,28,45,38,52,30]:range==="7d"?[65,48,72,85,55,90,78]:range==="30d"?[280,320,290,350]:[850,920,1050];
+  const ordData=range==="24h"?[3,7,12,9,14,8]:range==="7d"?[18,13,20,24,15,26,22]:range==="30d"?[78,88,82,95]:[240,260,295];
+  const maxRev=Math.max(...revData);const maxOrd=Math.max(...ordData);
   return <div>
-    <Hdr title="Analytics" sub="Revenue, orders, and growth" t={t} action={<div style={{display:"flex",gap:6}}><RangeBtn id="24h" label="24h"/><RangeBtn id="7d" label="7 days"/><RangeBtn id="30d" label="30 days"/><RangeBtn id="90d" label="90 days"/></div>}/>
+    <Hdr title="Analytics" sub="Revenue, orders, and growth" t={t} action={<div style={{display:"flex",gap:6,flexWrap:"wrap"}}><RangeBtn id="24h" label="24h"/><RangeBtn id="7d" label="7 days"/><RangeBtn id="30d" label="30 days"/><RangeBtn id="90d" label="90 days"/></div>}/>
     <div className="sg" style={{marginBottom:24}}>
       <Stat l="Revenue" v={fN(rev)} c={t.green} ic="💰" t={t} dark={dark}/>
       <Stat l="Profit" v={fN(profit)} sub={`${Math.round(profit/rev*100)}% margin`} c={t.accent} ic="📈" d={.05} t={t} dark={dark}/>
       <Stat l="Orders" v={orders.length} sub={`${orders.filter(o=>o.status==="Completed").length} completed`} c="#a5b4fc" ic="📋" d={.1} t={t} dark={dark}/>
       <Stat l="New Users" v={users.filter(u=>u.status==="Active").length} c="#6ee7b7" ic="👥" d={.15} t={t} dark={dark}/>
+    </div>
+    <div className="g2" style={{marginBottom:24}}>
+      <Card dark={dark}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}><h3 style={{fontSize:15,fontWeight:600,color:t.text}}>Revenue Trend</h3><div style={{display:"flex",alignItems:"center",gap:6}}><div style={{width:8,height:8,borderRadius:"50%",background:t.accent}}/><span style={{fontSize:11,color:t.textMuted}}>Revenue</span></div></div>
+        <div style={{display:"flex",alignItems:"flex-end",gap:range==="24h"?8:6,height:160,padding:"0 4px"}}>
+          {revData.map((v,i)=><div key={i} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:4}}>
+            <span className="m" style={{fontSize:9,color:t.textMuted}}>{Math.round(v/maxRev*100)}%</span>
+            <div style={{width:"100%",borderRadius:4,background:`linear-gradient(180deg,${t.accent},${t.accent}88)`,height:`${(v/maxRev)*120}px`,transition:"height 0.5s ease",minHeight:4}}/>
+            <span style={{fontSize:9,color:t.textMuted}}>{days[i]}</span>
+          </div>)}
+        </div>
+      </Card>
+      <Card dark={dark}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}><h3 style={{fontSize:15,fontWeight:600,color:t.text}}>Order Volume</h3><div style={{display:"flex",alignItems:"center",gap:6}}><div style={{width:8,height:8,borderRadius:"50%",background:"#a5b4fc"}}/><span style={{fontSize:11,color:t.textMuted}}>Orders</span></div></div>
+        <div style={{display:"flex",alignItems:"flex-end",gap:range==="24h"?8:6,height:160,padding:"0 4px"}}>
+          {ordData.map((v,i)=><div key={i} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:4}}>
+            <span className="m" style={{fontSize:9,color:t.textMuted}}>{v}</span>
+            <div style={{width:"100%",borderRadius:4,background:"linear-gradient(180deg,#a5b4fc,#a5b4fc88)",height:`${(v/maxOrd)*120}px`,transition:"height 0.5s ease",minHeight:4}}/>
+            <span style={{fontSize:9,color:t.textMuted}}>{days[i]}</span>
+          </div>)}
+        </div>
+      </Card>
     </div>
     <div className="g2">
       <Card dark={dark}>
@@ -475,41 +504,90 @@ function CouponsPage({t,dark,Btn,FilterBtn,notify,logAction}){
     {id:3,code:"VIP20",type:"percent",value:20,minOrder:1000000,maxUses:10,used:10,active:false,expires:"2026-03-01"},
   ]);
   const [f,setF]=useState("all");
+  const [modal,setModal]=useState(null); // null | "create" | coupon object for edit
+  const [del,setDel]=useState(null);
+  const empty={code:"",type:"percent",value:"",minOrder:"",maxUses:"",expires:""};
+  const [form,setForm]=useState(empty);
+  const upd=(k,v)=>setForm(p=>({...p,[k]:v}));
   const list=coupons.filter(c=>f==="all"||(f==="active"?c.active:!c.active));
   const toggle=(id)=>{setCoupons(p=>p.map(c=>c.id===id?{...c,active:!c.active}:c));notify("Coupon updated");logAction("Updated coupon","settings");};
+  const openCreate=()=>{setForm(empty);setModal("create");};
+  const openEdit=(c)=>{setForm({code:c.code,type:c.type,value:String(c.value),minOrder:String(c.minOrder||""),maxUses:String(c.maxUses),expires:c.expires});setModal(c);};
+  const saveCoupon=()=>{
+    if(!form.code||!form.value){notify("Code and value are required",true);return;}
+    if(modal==="create"){
+      setCoupons(p=>[...p,{id:Date.now(),code:form.code.toUpperCase(),type:form.type,value:Number(form.value),minOrder:Number(form.minOrder)||0,maxUses:Number(form.maxUses)||999,used:0,active:true,expires:form.expires||"2026-12-31"}]);
+      logAction(`Created coupon ${form.code.toUpperCase()}`,"settings");notify("Coupon created!");
+    } else {
+      setCoupons(p=>p.map(c=>c.id===modal.id?{...c,code:form.code.toUpperCase(),type:form.type,value:Number(form.value),minOrder:Number(form.minOrder)||0,maxUses:Number(form.maxUses)||999,expires:form.expires||c.expires}:c));
+      logAction(`Updated coupon ${form.code.toUpperCase()}`,"settings");notify("Coupon updated!");
+    }
+    setModal(null);
+  };
+  const deleteCoupon=(id)=>{const c=coupons.find(x=>x.id===id);setCoupons(p=>p.filter(x=>x.id!==id));logAction(`Deleted coupon ${c?.code}`,"settings");notify("Coupon deleted");setDel(null);};
+  const Field=({label,children})=><div style={{marginBottom:14}}><label style={{fontSize:11,color:t.textSoft,fontWeight:600,display:"block",marginBottom:5,textTransform:"uppercase",letterSpacing:1.5}}>{label}</label>{children}</div>;
   return <div>
-    <Hdr title="Coupons" sub="Manage promo codes and discounts" t={t} action={<Btn primary onClick={()=>notify("Create coupon modal — coming soon")}>+ Create Coupon</Btn>}/>
+    <Hdr title="Coupons" sub="Manage promo codes and discounts" t={t} action={<Btn primary onClick={openCreate}>+ Create Coupon</Btn>}/>
     <div style={{display:"flex",gap:8,marginBottom:16}}><FilterBtn active={f==="all"} onClick={()=>setF("all")}>All ({coupons.length})</FilterBtn><FilterBtn active={f==="active"} onClick={()=>setF("active")}>Active ({coupons.filter(c=>c.active).length})</FilterBtn><FilterBtn active={f==="expired"} onClick={()=>setF("expired")}>Inactive ({coupons.filter(c=>!c.active).length})</FilterBtn></div>
     {list.map(c=><Card key={c.id} dark={dark} style={{marginBottom:10,padding:16}}>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:10}}>
         <div style={{display:"flex",alignItems:"center",gap:12}}>
           <div style={{padding:"8px 14px",borderRadius:8,background:t.accentLight,border:`1px solid ${t.accentBorder}`}}><span className="m" style={{fontSize:14,fontWeight:700,color:t.accent}}>{c.code}</span></div>
           <div>
-            <div style={{fontSize:13,fontWeight:500,color:t.text}}>{c.type==="percent"?`${c.value}% off`:`₦${(c.value/100).toLocaleString()} off`}</div>
-            <div style={{fontSize:11,color:t.textMuted,marginTop:2}}>Min order: {c.minOrder?fN(c.minOrder):"None"} • Used: {c.used}/{c.maxUses} • Expires: {c.expires}</div>
+            <div style={{fontSize:13,fontWeight:500,color:t.text}}>{c.type==="percent"?`${c.value}% off`:`${fN(c.value)} off`}</div>
+            <div style={{fontSize:11,color:t.textMuted,marginTop:2}}>Min: {c.minOrder?fN(c.minOrder):"None"} · Used: {c.used}/{c.maxUses} · Exp: {c.expires}</div>
           </div>
         </div>
         <div style={{display:"flex",alignItems:"center",gap:8}}>
           <Badge s={c.active?"Active":"Inactive"} dark={dark}/>
           <button onClick={()=>toggle(c.id)} style={{width:44,height:24,borderRadius:12,background:c.active?t.accent:(dark?"rgba(255,255,255,0.08)":"rgba(0,0,0,0.08)"),position:"relative",border:"none",cursor:"pointer",transition:"background 0.2s"}}><div style={{width:20,height:20,borderRadius:"50%",background:"#fff",position:"absolute",top:2,left:c.active?22:2,transition:"left 0.2s",boxShadow:"0 1px 3px rgba(0,0,0,0.2)"}}/></button>
-          <Btn onClick={()=>notify("Edit modal — coming soon")}>Edit</Btn>
+          <Btn onClick={()=>openEdit(c)}>Edit</Btn>
+          <Btn onClick={()=>setDel(c)} style={{color:t.red}}>Delete</Btn>
         </div>
       </div>
     </Card>)}
+    {/* Create/Edit Modal */}
+    {modal&&<div onClick={()=>setModal(null)} style={{position:"fixed",inset:0,zIndex:200,background:"rgba(0,0,0,0.5)",backdropFilter:"blur(4px)",display:"flex",alignItems:"center",justifyContent:"center",padding:16}}>
+      <div onClick={e=>e.stopPropagation()} style={{width:"100%",maxWidth:440,background:dark?"rgba(15,18,30,0.98)":"rgba(255,255,255,0.98)",border:`1px solid ${t.surfaceBorder}`,borderRadius:20,padding:28}}>
+        <h3 style={{fontSize:18,fontWeight:600,color:t.text,marginBottom:20}}>{modal==="create"?"Create Coupon":"Edit Coupon"}</h3>
+        <Field label="Coupon Code"><input value={form.code} onChange={e=>upd("code",e.target.value.toUpperCase())} placeholder="e.g. WELCOME10" className="m" style={{width:"100%",padding:"12px 14px",borderRadius:10,background:t.inputBg,border:`1px solid ${t.inputBorder}`,color:t.text,fontSize:14,outline:"none"}}/></Field>
+        <Field label="Discount Type"><div style={{display:"flex",gap:8}}>{[["percent","% Percentage"],["flat","₦ Flat Amount"]].map(([v,lb])=><button key={v} onClick={()=>upd("type",v)} style={{flex:1,padding:"10px 0",borderRadius:10,fontSize:13,fontWeight:500,background:form.type===v?t.accentLight:t.btnSecondary,color:form.type===v?t.accent:t.textSoft,border:`1px solid ${t.btnSecBorder}`}}>{lb}</button>)}</div></Field>
+        <Field label={form.type==="percent"?"Discount (%)":"Discount Amount (₦)"}><input type="number" value={form.value} onChange={e=>upd("value",e.target.value)} placeholder={form.type==="percent"?"10":"500"} style={{width:"100%",padding:"12px 14px",borderRadius:10,background:t.inputBg,border:`1px solid ${t.inputBorder}`,color:t.text,fontSize:14,outline:"none"}}/></Field>
+        <div style={{display:"flex",gap:10}}>
+          <Field label="Min Order (₦)"><input type="number" value={form.minOrder} onChange={e=>upd("minOrder",e.target.value)} placeholder="0" style={{width:"100%",padding:"12px 14px",borderRadius:10,background:t.inputBg,border:`1px solid ${t.inputBorder}`,color:t.text,fontSize:14,outline:"none"}}/></Field>
+          <Field label="Max Uses"><input type="number" value={form.maxUses} onChange={e=>upd("maxUses",e.target.value)} placeholder="100" style={{width:"100%",padding:"12px 14px",borderRadius:10,background:t.inputBg,border:`1px solid ${t.inputBorder}`,color:t.text,fontSize:14,outline:"none"}}/></Field>
+        </div>
+        <Field label="Expiry Date"><input type="date" value={form.expires} onChange={e=>upd("expires",e.target.value)} style={{width:"100%",padding:"12px 14px",borderRadius:10,background:t.inputBg,border:`1px solid ${t.inputBorder}`,color:t.text,fontSize:14,outline:"none"}}/></Field>
+        <div style={{display:"flex",gap:10,marginTop:6}}><Btn primary onClick={saveCoupon} style={{flex:1}}>{modal==="create"?"Create":"Save Changes"}</Btn><Btn onClick={()=>setModal(null)} style={{flex:1}}>Cancel</Btn></div>
+      </div>
+    </div>}
+    {/* Delete Confirmation */}
+    {del&&<div onClick={()=>setDel(null)} style={{position:"fixed",inset:0,zIndex:200,background:"rgba(0,0,0,0.5)",backdropFilter:"blur(4px)",display:"flex",alignItems:"center",justifyContent:"center",padding:16}}>
+      <div onClick={e=>e.stopPropagation()} style={{width:"100%",maxWidth:380,background:dark?"rgba(15,18,30,0.98)":"rgba(255,255,255,0.98)",border:`1px solid ${t.surfaceBorder}`,borderRadius:20,padding:28,textAlign:"center"}}>
+        <div style={{fontSize:36,marginBottom:12}}>🗑️</div>
+        <h3 style={{fontSize:16,fontWeight:600,color:t.text,marginBottom:8}}>Delete coupon?</h3>
+        <p style={{fontSize:13,color:t.textSoft,marginBottom:20}}>This will permanently delete <strong className="m" style={{color:t.accent}}>{del.code}</strong>. This cannot be undone.</p>
+        <div style={{display:"flex",gap:10}}><Btn onClick={()=>deleteCoupon(del.id)} style={{flex:1,background:dark?"rgba(220,38,38,0.1)":"#fef2f2",color:t.red,border:`1px solid ${dark?"rgba(220,38,38,0.2)":"#fecaca"}`}}>Delete</Btn><Btn onClick={()=>setDel(null)} style={{flex:1}}>Cancel</Btn></div>
+      </div>
+    </div>}
   </div>;
 }
+
 
 function NotificationsPage({t,dark,Btn,notify,logAction,users}){
   const [method,setMethod]=useState("banner");
   const [target,setTarget]=useState("all");
   const [msg,setMsg]=useState("");
   const [subject,setSubject]=useState("");
-  const [history]=useState([
+  const [confirm,setConfirm]=useState(false);
+  const [history,setHistory]=useState([
     {id:1,method:"banner",target:"All users",message:"New TikTok services available!",sent:"2026-03-22T14:00:00",by:"David Ojo"},
     {id:2,method:"email",target:"All users",message:"Scheduled maintenance tonight",sent:"2026-03-21T10:00:00",by:"Owner"},
     {id:3,method:"banner",target:"Active users",message:"Referral bonus doubled this week!",sent:"2026-03-19T09:00:00",by:"Owner"},
   ]);
-  const send=()=>{if(!msg){notify("Message is required",true);return;}notify("Notification sent!");logAction(`Sent ${method} notification to ${target}`,"admin");setMsg("");setSubject("");};
+  const targetCount=target==="all"?users.length:target==="active"?users.filter(u=>u.status==="Active").length:Math.floor(users.length*0.3);
+  const targetLabel=target==="all"?"All users":target==="active"?"Active users":"New users (30d)";
+  const send=()=>{setHistory(p=>[{id:Date.now(),method,target:targetLabel,message:msg,sent:new Date().toISOString(),by:"You (Owner)"},...p]);notify("Notification sent!");logAction(`Sent ${method} notification to ${targetLabel}`,"admin");setMsg("");setSubject("");setConfirm(false);};
   return <div>
     <Hdr title="Notifications" sub="Send announcements to users" t={t}/>
     <div className="g2">
@@ -528,25 +606,46 @@ function NotificationsPage({t,dark,Btn,notify,logAction,users}){
           <input value={subject} onChange={e=>setSubject(e.target.value)} placeholder="Email subject line" style={{width:"100%",padding:"12px 14px",borderRadius:10,background:t.inputBg,border:`1px solid ${t.inputBorder}`,color:t.text,fontSize:14,outline:"none"}}/>
         </div>}
         <div style={{marginBottom:16}}>
-          <label style={{fontSize:11,color:t.textSoft,fontWeight:600,display:"block",marginBottom:5,textTransform:"uppercase",letterSpacing:1.5}}>Message</label>
-          <textarea rows={4} value={msg} onChange={e=>setMsg(e.target.value)} placeholder="Type your notification message..." style={{width:"100%",padding:"12px 14px",borderRadius:10,background:t.inputBg,border:`1px solid ${t.inputBorder}`,color:t.text,fontSize:14,outline:"none",resize:"vertical"}}/>
+          <div style={{display:"flex",justifyContent:"space-between",marginBottom:5}}>
+            <label style={{fontSize:11,color:t.textSoft,fontWeight:600,textTransform:"uppercase",letterSpacing:1.5}}>Message</label>
+            <span style={{fontSize:11,color:msg.length>200?t.red:t.textMuted}} className="m">{msg.length}/200</span>
+          </div>
+          <textarea rows={4} value={msg} onChange={e=>e.target.value.length<=200&&setMsg(e.target.value)} placeholder="Type your notification message..." style={{width:"100%",padding:"12px 14px",borderRadius:10,background:t.inputBg,border:`1px solid ${t.inputBorder}`,color:t.text,fontSize:14,outline:"none",resize:"vertical"}}/>
         </div>
+        {msg&&<div style={{marginBottom:16}}>
+          <label style={{fontSize:11,color:t.textSoft,fontWeight:600,display:"block",marginBottom:5,textTransform:"uppercase",letterSpacing:1.5}}>Preview</label>
+          {method==="banner"?<div style={{padding:"12px 16px",borderRadius:10,background:dark?"rgba(99,102,241,0.1)":"#eef2ff",color:dark?"#a5b4fc":"#4f46e5",fontSize:13,fontWeight:500,border:`1px solid ${dark?"rgba(99,102,241,0.2)":"#c7d2fe"}`}}>{"ℹ️"} {msg}</div>
+          :<div style={{padding:16,borderRadius:10,background:dark?"#0d1020":"#faf8f5",border:`1px solid ${t.surfaceBorder}`}}>
+            <div style={{fontSize:11,color:t.textMuted,marginBottom:4}}>From: BoostPanel</div>
+            <div style={{fontSize:13,fontWeight:600,color:t.text,marginBottom:8}}>{subject||"(No subject)"}</div>
+            <div style={{fontSize:13,color:t.textSoft,lineHeight:1.6}}>{msg}</div>
+          </div>}
+        </div>}
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-          <span style={{fontSize:12,color:t.textMuted}}>Sending to ~{target==="all"?users.length:target==="active"?users.filter(u=>u.status==="Active").length:Math.floor(users.length*0.3)} users</span>
-          <Btn primary onClick={send}>📣 Send Notification</Btn>
+          <span style={{fontSize:12,color:t.textMuted}}>Sending to ~{targetCount} users</span>
+          <Btn primary onClick={()=>{if(!msg){notify("Message is required",true);return;}setConfirm(true);}}>📣 Send</Btn>
         </div>
       </Card>
       <Card dark={dark}>
         <h3 style={{fontSize:15,fontWeight:600,color:t.text,marginBottom:16}}>Recent Notifications</h3>
-        {history.map((n,i)=><div key={n.id} style={{padding:"12px 0",borderBottom:i<history.length-1?`1px solid ${t.surfaceBorder}`:"none"}}>
+        {history.length===0?<div style={{textAlign:"center",padding:"30px 0",color:t.textMuted,fontSize:13}}>No notifications sent yet</div>:history.map((n,i)=><div key={n.id} style={{padding:"12px 0",borderBottom:i<history.length-1?`1px solid ${t.surfaceBorder}`:"none"}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:4,flexWrap:"wrap",gap:6}}>
             <span style={{fontSize:12,fontWeight:600,padding:"2px 8px",borderRadius:4,background:n.method==="email"?(dark?"rgba(99,102,241,0.1)":"#eef2ff"):(dark?"rgba(217,119,6,0.1)":"#fffbeb"),color:n.method==="email"?(dark?"#a5b4fc":"#4f46e5"):(dark?"#fcd34d":"#92400e")}}>{n.method==="email"?"📧 Email":"📢 Banner"}</span>
-            <span style={{fontSize:11,color:t.textMuted}}>{fD(n.sent)} • {n.by}</span>
+            <span style={{fontSize:11,color:t.textMuted}}>{fD(n.sent)} · {n.by}</span>
           </div>
           <div style={{fontSize:13,color:t.text}}>{n.message}</div>
           <div style={{fontSize:11,color:t.textMuted,marginTop:2}}>To: {n.target}</div>
         </div>)}
       </Card>
     </div>
+    {confirm&&<div onClick={()=>setConfirm(false)} style={{position:"fixed",inset:0,zIndex:200,background:"rgba(0,0,0,0.5)",backdropFilter:"blur(4px)",display:"flex",alignItems:"center",justifyContent:"center",padding:16}}>
+      <div onClick={e=>e.stopPropagation()} style={{width:"100%",maxWidth:400,background:dark?"rgba(15,18,30,0.98)":"rgba(255,255,255,0.98)",border:`1px solid ${t.surfaceBorder}`,borderRadius:20,padding:28,textAlign:"center"}}>
+        <div style={{fontSize:36,marginBottom:12}}>📣</div>
+        <h3 style={{fontSize:16,fontWeight:600,color:t.text,marginBottom:8}}>Send notification?</h3>
+        <p style={{fontSize:13,color:t.textSoft,marginBottom:6}}>Sending a <strong style={{color:t.text}}>{method==="banner"?"dashboard banner":"email"}</strong> to <strong style={{color:t.text}}>~{targetCount} {targetLabel.toLowerCase()}</strong>.</p>
+        <div style={{padding:12,borderRadius:10,background:dark?"#0d1020":"#faf8f5",border:`1px solid ${t.surfaceBorder}`,margin:"14px 0",textAlign:"left",fontSize:13,color:t.text,lineHeight:1.5}}>"{msg}"</div>
+        <div style={{display:"flex",gap:10}}><Btn primary onClick={send} style={{flex:1}}>Confirm & Send</Btn><Btn onClick={()=>setConfirm(false)} style={{flex:1}}>Cancel</Btn></div>
+      </div>
+    </div>}
   </div>;
 }
