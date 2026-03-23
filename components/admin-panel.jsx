@@ -98,6 +98,15 @@ export default function AdminPanel(){
     {pg==="alerts"&&<AlertsPage t={t} dark={dark} alerts={alerts} setAlerts={setAlerts} Btn={Btn} FilterBtn={FilterBtn} notify={notify} isSuperAdmin={currentAdmin.role==="superadmin"} currentAdmin={currentAdmin} logAction={logAction}/>}
     {pg==="admins"&&<AdminRoles t={t} dark={dark} admins={adminList} setAdmins={setAdminList} Btn={Btn} FilterBtn={FilterBtn} notify={notify} isSuperAdmin={currentAdmin.role==="superadmin"} logAction={logAction}/>}
     </ErrorBoundary>
+    <footer style={{borderTop:`1px solid ${t.surfaceBorder}`,marginTop:40,padding:"24px 0 16px"}}>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:12}}>
+        <div style={{fontSize:12,color:t.textMuted}}>© 2026 BoostPanel. All rights reserved.</div>
+        <div style={{display:"flex",flexDirection:"column",alignItems:"flex-end",gap:8}}>
+          <div style={{display:"flex",gap:16}}>{["Twitter","Instagram"].map(s=><a key={s} href="#" style={{fontSize:12,color:t.textSoft,textDecoration:"none"}}>{s}</a>)}</div>
+          <div style={{display:"flex",gap:16}}>{[["Terms","/terms"],["Privacy","/privacy"],["Refund","#"],["Cookie","#"]].map(([l,h])=><a key={l} href={h} style={{fontSize:11,color:t.textMuted,textDecoration:"none"}}>{l}</a>)}</div>
+        </div>
+      </div>
+    </footer>
   </main></div>);
 }
 

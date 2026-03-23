@@ -63,11 +63,13 @@ export default function NotFound(){
       </div>
 
       <footer style={{position:"absolute",bottom:0,left:0,right:0,borderTop:`1px solid ${t.surfaceBorder}`}}>
-        <div style={{maxWidth:800,margin:"0 auto",padding:"16px 24px",display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:12}}>
-          <div style={{fontSize:12,color:t.textMuted}}>© 2026 BoostPanel</div>
-          <div style={{display:"flex",gap:16}}>
-            <a href="/terms" style={{fontSize:12,color:t.textSoft,textDecoration:"none"}}>Terms</a>
-            <a href="/privacy" style={{fontSize:12,color:t.textSoft,textDecoration:"none"}}>Privacy</a>
+        <div style={{maxWidth:800,margin:"0 auto",padding:"16px 24px"}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:12}}>
+            <div style={{fontSize:12,color:t.textMuted}}>© 2026 BoostPanel. All rights reserved.</div>
+            <div style={{display:"flex",flexDirection:"column",alignItems:"flex-end",gap:8}}>
+              <div style={{display:"flex",gap:16}}>{["Twitter","Instagram"].map(s=><a key={s} href="#" style={{fontSize:12,color:t.textSoft,textDecoration:"none"}}>{s}</a>)}</div>
+              <div style={{display:"flex",gap:16}}>{[["Terms","/terms"],["Privacy","/privacy"],["Refund","#"],["Cookie","#"]].map(([l,h])=><a key={l} href={h} style={{fontSize:11,color:t.textMuted,textDecoration:"none"}}>{l}</a>)}</div>
+            </div>
           </div>
         </div>
       </footer>
