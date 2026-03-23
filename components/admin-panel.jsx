@@ -151,11 +151,19 @@ function ActivityLog({t,dark,activity}){
 
 function AdminRoles({t,dark,admins,setAdmins,Btn,FilterBtn,notify,isSuperAdmin,logAction}){
   const [editingId,setEditingId]=useState(null);
-  const allPages=["overview","orders","users","services","api","paystack","tickets","admins","activity","alerts"];
-  const togglePage=(adminId,page)=>{setAdmins(p=>p.map(a=>{if(a.id!==adminId)return a;const current=a.customPages||ROLES[a.role].pages;const next=current.includes(page)?current.filter(x=>x!==page):[...current,page];return{...a,customPages:next};}));};
-  const getPages=(a)=>a.customPages||ROLES[a.role].pages;
+  const allPages=["overview","orders","users","services","api","payments","tickets","team","activity","alerts","analytics","coupons","notifications","maintenance","settings"];
+  const togglePage=(adminId,page)=>{setAdmins(p=>p.map(a=>{if(a.id!==adminId)return a;const current=a.customPages||ROLES[a.role].pages.filter(x=>!x.startsWith("---"));const next=current.includes(page)?current.filter(x=>x!==page):[...current,page];return{...a,customPages:next};}));};
+  const getPages=(a)=>(a.customPages||ROLES[a.role].pages).filter(x=>!x.startsWith("---"));
   const resetPerms=(adminId)=>{const admin=admins.find(a=>a.id===adminId);setAdmins(p=>p.map(a=>a.id===adminId?{...a,customPages:null}:a));if(admin)logAction(`Reset permissions for ${admin.name} to ${ROLES[admin.role].label} defaults`,"admin");notify("Permissions reset to default");};
-  return <div><Hdr title="Admin Roles" sub="Manage access" t={t} action={isSuperAdmin?<Btn primary onClick={()=>notify("Invite sent!")}>+ Invite Admin</Btn>:null}/><Card dark={dark} style={{marginBottom:20}}><h3 style={{fontSize:15,fontWeight:600,color:t.text,marginBottom:14}}>Role Permissions</h3><div className="role-grid">{Object.entries(ROLES).map(([key,r])=><div key={key} style={{padding:14,borderRadius:14,background:dark?"#0d1020":"#faf8f5",border:`1px solid ${t.surfaceBorder}`}}><div style={{fontSize:14,fontWeight:600,color:r.color,marginBottom:8}}>{r.label}</div>{r.pages.map(p=><div key={p} style={{fontSize:12,color:t.textSoft,display:"flex",alignItems:"center",gap:6,marginBottom:3}}><span style={{color:t.green,fontSize:10}}>✓</span>{p[0].toUpperCase()+p.slice(1)}</div>)}</div>)}</div></Card>{!isSuperAdmin&&<div style={{padding:"14px 18px",borderRadius:12,background:t.accentLight,border:`1px solid ${t.accentBorder}`,marginBottom:20,fontSize:13,color:t.accent}}>🔒 Only the Super Admin can invite, remove, or reset passwords for admins.</div>}{admins.map(a=><Card key={a.id} dark={dark} style={{marginBottom:10,padding:16}}>
+  return <div><Hdr title="Team" sub={isSuperAdmin?"Manage admin access and roles":"Your team and permissions"} t={t} action={isSuperAdmin?<Btn primary onClick={()=>notify("Invite sent!")}>+ Invite Admin</Btn>:null}/>
+    {/* Non-superadmin: show their own permissions */}
+    {!isSuperAdmin&&<Card dark={dark} style={{marginBottom:20}}>
+      <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:14}}><span style={{fontSize:15}}>🔒</span><h3 style={{fontSize:15,fontWeight:600,color:t.text}}>Your Permissions</h3></div>
+      <p style={{fontSize:13,color:t.textSoft,marginBottom:14}}>Only the Super Admin can modify roles and permissions. You have access to the following pages:</p>
+      <div style={{display:"flex",flexWrap:"wrap",gap:6}}>{getPages({role:"admin",customPages:null}).map(pg=><span key={pg} style={{padding:"6px 14px",borderRadius:8,fontSize:12,fontWeight:500,background:dark?"rgba(110,231,183,0.1)":"#ecfdf5",color:t.green,border:`1px solid ${dark?"rgba(110,231,183,0.2)":"#a7f3d0"}`}}>✓ {pg[0].toUpperCase()+pg.slice(1)}</span>)}</div>
+    </Card>}
+    {/* Admin list */}
+    {admins.map(a=><Card key={a.id} dark={dark} style={{marginBottom:10,padding:16}}>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:12}}>
         <div style={{display:"flex",alignItems:"center",gap:12,flex:1,minWidth:180}}><div style={{width:38,height:38,borderRadius:"50%",background:ROLES[a.role].color+"33",display:"flex",alignItems:"center",justifyContent:"center",fontSize:15,fontWeight:700,color:ROLES[a.role].color,flexShrink:0}}>{a.name[0]}</div><div><div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}><span style={{fontSize:14,fontWeight:600,color:t.text}}>{a.name}</span><Badge s={a.status} dark={dark}/>{a.customPages&&<span style={{fontSize:10,fontWeight:600,padding:"2px 6px",borderRadius:4,background:dark?"rgba(217,119,6,0.1)":"#fffbeb",color:dark?"#fcd34d":"#92400e"}}>Custom</span>}</div><div style={{fontSize:12,color:t.textMuted,marginTop:2}}>{a.email}</div></div></div>
         <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
@@ -166,12 +174,14 @@ function AdminRoles({t,dark,admins,setAdmins,Btn,FilterBtn,notify,isSuperAdmin,l
           {isSuperAdmin&&a.id!==1&&<Btn onClick={()=>notify(`${a.name} removed`)} style={{color:t.red}}>Remove</Btn>}
         </div>
       </div>
-      {/* Permission editor — inline */}
       {isSuperAdmin&&editingId===a.id&&a.id!==1&&<div style={{marginTop:14,paddingTop:14,borderTop:`1px solid ${t.surfaceBorder}`}}>
-        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}><span style={{fontSize:12,fontWeight:600,color:t.text}}>Page Access</span>{a.customPages&&<button onClick={()=>resetPerms(a.id)} style={{background:"none",color:t.accent,fontSize:11,fontWeight:500}}>Reset to {ROLES[a.role].label} defaults</button>}</div>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}><span style={{fontSize:12,fontWeight:600,color:t.text}}>Page Access</span>{a.customPages&&<button onClick={()=>resetPerms(a.id)} style={{background:"none",color:t.accent,fontSize:11,fontWeight:500,border:"none",cursor:"pointer"}}>Reset to {ROLES[a.role].label} defaults</button>}</div>
         <div style={{display:"flex",flexWrap:"wrap",gap:6}}>{allPages.map(pg=>{const has=getPages(a).includes(pg);return <button key={pg} onClick={()=>togglePage(a.id,pg)} style={{padding:"7px 14px",borderRadius:8,fontSize:12,fontWeight:500,background:has?(dark?"rgba(110,231,183,0.1)":"#ecfdf5"):(dark?"rgba(255,255,255,0.03)":"rgba(0,0,0,0.02)"),color:has?t.green:t.textMuted,border:`1px solid ${has?(dark?"rgba(110,231,183,0.2)":"#a7f3d0"):t.btnSecBorder}`}}>{has?"✓":"✗"} {pg[0].toUpperCase()+pg.slice(1)}</button>})}</div>
       </div>}
-    </Card>)}</div>;}
+    </Card>)}
+    {/* Role permissions reference — after admin list */}
+    {isSuperAdmin&&<Card dark={dark} style={{marginTop:20}}><h3 style={{fontSize:15,fontWeight:600,color:t.text,marginBottom:14}}>Role Permissions Reference</h3><div className="role-grid">{Object.entries(ROLES).map(([key,r])=><div key={key} style={{padding:14,borderRadius:14,background:dark?"#0d1020":"#faf8f5",border:`1px solid ${t.surfaceBorder}`}}><div style={{fontSize:14,fontWeight:600,color:r.color,marginBottom:8}}>{r.label}</div>{r.pages.filter(p=>!p.startsWith("---")).map(p=><div key={p} style={{fontSize:12,color:t.textSoft,display:"flex",alignItems:"center",gap:6,marginBottom:3}}><span style={{color:t.green,fontSize:10}}>✓</span>{p[0].toUpperCase()+p.slice(1)}</div>)}</div>)}</div></Card>}
+  </div>;}
 
 
 function MaintenancePage({t,dark,maint,setMaint,Btn,notify,logAction,isSuperAdmin}){
