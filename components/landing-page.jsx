@@ -75,7 +75,7 @@ export default function Landing(){
       
       <style>{`
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-        .root{min-height:100vh;background:${t.bg};color:${t.text};font-family:'Outfit',sans-serif;transition:background 1.5s cubic-bezier(.4,0,.2,1),color 1.2s ease;overflow-x:hidden;scroll-behavior:smooth;scroll-snap-type:y proximity}
+        .root{min-height:100vh;background:${t.bg};color:${t.text};font-family:'Outfit',sans-serif;transition:background 1.5s cubic-bezier(.4,0,.2,1),color 1.2s ease;overflow-x:clip;scroll-behavior:smooth}
         .snap-section{min-height:100vh;display:flex;flex-direction:column;justify-content:center;scroll-snap-align:start}
         .m{font-family:'JetBrains Mono',monospace}.serif{font-family:'Cormorant Garamond',serif}
         button{cursor:pointer;font-family:inherit;border:none}input,textarea{font-family:inherit}
@@ -445,7 +445,7 @@ export function Footer({t,dark}){
         <div style={{height:1,background:t.surfaceBorder,marginBottom:20,transition:"background 1.5s ease"}}/>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:12}}>
           <div style={{fontSize:12,color:t.textMuted}}>© 2026 BoostPanel. All rights reserved.</div>
-          <div style={{display:"flex",gap:16}}>{["Twitter","Instagram","WhatsApp"].map(s=><a key={s} href="#" style={{fontSize:12,color:t.textSoft,textDecoration:"none"}}>{s}</a>)}</div>
+          <div style={{display:"flex",gap:16}}>{["Twitter","Instagram"].map(s=><a key={s} href="#" style={{fontSize:12,color:t.textSoft,textDecoration:"none"}}>{s}</a>)}</div>
         </div>
       </div>
     </footer>

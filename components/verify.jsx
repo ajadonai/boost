@@ -157,6 +157,16 @@ export default function VerifyAccount(){
           <a href="/" style={{fontSize:13,color:t.textMuted,textDecoration:"none"}}>← Back to home</a>
         </div>
       </div>
+
+      <footer style={{position:"absolute",bottom:0,left:0,right:0,borderTop:`1px solid ${t.surfaceBorder}`}}>
+        <div style={{maxWidth:800,margin:"0 auto",padding:"16px 24px",display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:12}}>
+          <div style={{fontSize:12,color:t.textMuted}}>© 2026 BoostPanel</div>
+          <div style={{display:"flex",gap:16}}>
+            <a href="/terms" style={{fontSize:12,color:t.textSoft,textDecoration:"none"}}>Terms</a>
+            <a href="/privacy" style={{fontSize:12,color:t.textSoft,textDecoration:"none"}}>Privacy</a>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
