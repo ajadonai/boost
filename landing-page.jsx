@@ -107,6 +107,7 @@ export default function Landing(){
         <div style={{position:"absolute",inset:0,backgroundImage:`linear-gradient(${dark?"rgba(255,255,255,0.015)":"rgba(0,0,0,0.015)"} 1px,transparent 1px),linear-gradient(90deg,${dark?"rgba(255,255,255,0.015)":"rgba(0,0,0,0.015)"} 1px,transparent 1px)`,backgroundSize:"60px 60px",opacity:0.5}}/>
       </div>
 
+      <div style={{position:"relative",zIndex:51}}>{[{message:"New! Sign up today and get 10% bonus on your first deposit.",type:"info"}].map((a,i)=><div key={i} style={{padding:"10px 16px",textAlign:"center",fontSize:13,fontWeight:500,background:a.type==="warning"?(dark?"rgba(217,119,6,0.15)":"#fffbeb"):(dark?"rgba(99,102,241,0.15)":"#eef2ff"),color:a.type==="warning"?(dark?"#fcd34d":"#92400e"):(dark?"#a5b4fc":"#4f46e5"),borderBottom:`1px solid ${a.type==="warning"?(dark?"rgba(217,119,6,0.2)":"#fde68a"):(dark?"rgba(99,102,241,0.2)":"#c7d2fe")}`}}>{a.type==="warning"?"⚠️":"✨"} {a.message}</div>)}</div>
       <nav style={{position:"sticky",top:0,zIndex:50,backdropFilter:"blur(20px)",background:dark?"rgba(8,11,20,0.8)":"rgba(244,241,237,0.8)",borderBottom:`1px solid ${t.surfaceBorder}`,transition:"background 1.5s ease"}}>
         <div className="sec" style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"14px 24px"}}>
           <div style={{display:"flex",alignItems:"center",gap:10}}>

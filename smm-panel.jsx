@@ -33,6 +33,10 @@ const TXS = [
   { id: "T4", type: "referral", amount: 3875, method: "Referral", date: "2026-03-21T16:00:00" },
   { id: "T5", type: "deposit", amount: 155000, method: "Paystack", date: "2026-03-20T10:00:00" },
 ];
+const ALERTS = [
+  {id:1,message:"Scheduled maintenance tonight 11PM - 1AM WAT. Orders may be delayed.",type:"warning"},
+  {id:2,message:"New! TikTok services now available with 30-day refill guarantee.",type:"info"},
+];
 const IC = { instagram: "📸", tiktok: "🎵", youtube: "▶️", twitter: "𝕏", facebook: "👤", telegram: "✈️", spotify: "🎧" };
 const fN = (a) => `₦${Math.abs(a).toLocaleString("en-NG")}`;
 const fD = (d) => new Date(d).toLocaleDateString("en-NG", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
@@ -68,6 +72,7 @@ export default function App() {
   const [sb, setSb] = useState(false);
   const [mini, setMini] = useState(false);
   const [toast, setToast] = useState(null);
+  const [dismissedAlerts, setDismissedAlerts] = useState([]);
   const getAutoTheme = () => {const h=new Date().getHours(),m=new Date().getMinutes();if(h>=7&&h<18)return false;if(h>=19||h<6)return true;if(h===6)return m<30;if(h===18)return m>=30;return true;};
   const [dark, setDark] = useState(getAutoTheme);
   const [manualOverride, setManualOverride] = useState(false);
@@ -99,6 +104,7 @@ export default function App() {
         <div style={{padding:mini?"14px 6px":"14px 18px",borderTop:`1px solid ${t.surfaceBorder}`,display:"flex",alignItems:"center",gap:10,justifyContent:mini?"center":"flex-start"}}><div style={{width:34,height:34,borderRadius:"50%",background:t.logoGrad,display:"flex",alignItems:"center",justifyContent:"center",fontSize:14,fontWeight:700,color:"#fff",flexShrink:0}}>{user.name[0]}</div><div className="sb-hide"><div style={{fontSize:13,fontWeight:600,color:t.text}}>{user.name}</div><div style={{fontSize:11,color:t.textMuted}}>{user.email}</div></div></div>
       </aside>
       <main className={`mn${mini?" shifted":""}`}>
+        {ALERTS.filter(a=>!dismissedAlerts.includes(a.id)).map(a=><div key={a.id} style={{padding:"12px 16px",marginBottom:10,borderRadius:12,display:"flex",alignItems:"center",justifyContent:"space-between",gap:10,fontSize:13,fontWeight:500,animation:"fu .3s ease",background:a.type==="warning"?(dark?"rgba(217,119,6,0.1)":"#fffbeb"):a.type==="critical"?(dark?"rgba(220,38,38,0.1)":"#fef2f2"):(dark?"rgba(99,102,241,0.1)":"#eef2ff"),color:a.type==="warning"?(dark?"#fcd34d":"#92400e"):a.type==="critical"?(dark?"#fca5a5":"#dc2626"):(dark?"#a5b4fc":"#4f46e5"),border:`1px solid ${a.type==="warning"?(dark?"rgba(217,119,6,0.2)":"#fde68a"):a.type==="critical"?(dark?"rgba(220,38,38,0.2)":"#fecaca"):(dark?"rgba(99,102,241,0.2)":"#c7d2fe")}`}}><span>{a.type==="warning"?"⚠️":a.type==="critical"?"🚨":"ℹ️"} {a.message}</span><button onClick={()=>setDismissedAlerts(p=>[...p,a.id])} style={{background:"none",color:"inherit",fontSize:16,padding:2,flexShrink:0,opacity:0.6}}>✕</button></div>)}
         <ErrorBoundary t={t} key={pg}>
         {pg==="dashboard"&&<Dash user={user} orders={orders} txs={txs} go={go} t={t} dark={dark}/>}
         {pg==="new-order"&&<NewOrd services={SERVICES} onPlace={placeOrder} bal={user.balance} t={t} dark={dark}/>}

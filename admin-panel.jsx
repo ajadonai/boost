@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 
 const ROLES = {
-  superadmin: { label: "Super Admin", color: "#c47d8e", pages: ["overview","orders","users","services","api","paystack","tickets","admins","activity"] },
-  admin: { label: "Admin", color: "#a5b4fc", pages: ["overview","orders","users","services","tickets","activity"] },
+  superadmin: { label: "Super Admin", color: "#c47d8e", pages: ["overview","orders","users","services","api","paystack","tickets","admins","activity","alerts"] },
+  admin: { label: "Admin", color: "#a5b4fc", pages: ["overview","orders","users","services","tickets","activity","alerts"] },
   support: { label: "Support", color: "#6ee7b7", pages: ["overview","tickets","orders","activity"] },
   finance: { label: "Finance", color: "#fcd34d", pages: ["overview","orders","paystack","activity"] },
 };
@@ -13,6 +13,12 @@ const MOCK_TICKETS=[{id:"TK-401",user:"Chidi Okafor",email:"chidi@gmail.com",sub
 const MOCK_SERVICES=[{id:1,name:"IG Followers [Real]",category:"Instagram",apiId:1001,costPer1k:2518,sellPer1k:3875,markup:54,enabled:true,refill:true},{id:2,name:"IG Likes [Instant]",category:"Instagram",apiId:1002,costPer1k:1209,sellPer1k:1860,markup:54,enabled:true,refill:false},{id:3,name:"TikTok Followers",category:"TikTok",apiId:2001,costPer1k:3023,sellPer1k:4650,markup:54,enabled:true,refill:true},{id:4,name:"TikTok Views",category:"TikTok",apiId:2002,costPer1k:302,sellPer1k:465,markup:54,enabled:true,refill:false},{id:5,name:"YT Subscribers",category:"YouTube",apiId:3001,costPer1k:8060,sellPer1k:12400,markup:54,enabled:true,refill:true},{id:6,name:"YT Views",category:"YouTube",apiId:3002,costPer1k:2015,sellPer1k:3100,markup:54,enabled:true,refill:false},{id:7,name:"Twitter/X Followers",category:"Twitter/X",apiId:4001,costPer1k:4030,sellPer1k:6200,markup:54,enabled:true,refill:true},{id:8,name:"FB Page Likes",category:"Facebook",apiId:5001,costPer1k:5038,sellPer1k:7750,markup:54,enabled:true,refill:true},{id:9,name:"Telegram Members",category:"Telegram",apiId:6001,costPer1k:3526,sellPer1k:5425,markup:54,enabled:false,refill:true},{id:10,name:"Spotify Plays",category:"Spotify",apiId:7001,costPer1k:1814,sellPer1k:2790,markup:54,enabled:true,refill:false}];
 const MOCK_ADMINS=[{id:1,name:"You (Owner)",email:"admin@boostpanel.ng",role:"superadmin",lastActive:"2026-03-23T10:30:00",status:"Active"},{id:2,name:"David Ojo",email:"david@boostpanel.ng",role:"admin",lastActive:"2026-03-23T09:15:00",status:"Active"},{id:3,name:"Grace Adebayo",email:"grace@boostpanel.ng",role:"support",lastActive:"2026-03-22T18:00:00",status:"Active"},{id:4,name:"Ibrahim Musa",email:"ibrahim@boostpanel.ng",role:"finance",lastActive:"2026-03-21T14:00:00",status:"Inactive"}];
 const MOCK_ACTIVITY=[{id:1,admin:"You (Owner)",action:"Credited N5,000 to Chidi Okafor",type:"credit",time:"2026-03-23T10:25:00"},{id:2,admin:"David Ojo",action:"Cancelled order ORD-28483",type:"cancel",time:"2026-03-23T09:10:00"},{id:3,admin:"Grace Adebayo",action:"Replied to ticket TK-399",type:"ticket",time:"2026-03-22T17:45:00"},{id:4,admin:"You (Owner)",action:"Suspended user Segun Akinola",type:"ban",time:"2026-03-22T15:30:00"},{id:5,admin:"David Ojo",action:"Synced 10 services from API",type:"sync",time:"2026-03-22T12:00:00"},{id:6,admin:"You (Owner)",action:"Updated exchange rate",type:"settings",time:"2026-03-22T10:00:00"},{id:7,admin:"Grace Adebayo",action:"Resolved ticket TK-398",type:"ticket",time:"2026-03-21T16:30:00"},{id:8,admin:"Ibrahim Musa",action:"Refilled order ORD-28475",type:"refill",time:"2026-03-21T14:00:00"},{id:9,admin:"You (Owner)",action:"Invited Ibrahim Musa as Finance admin",type:"admin",time:"2026-03-20T09:00:00"},{id:10,admin:"David Ojo",action:"Credited N20,000 to Amina Bello",type:"credit",time:"2026-03-19T11:30:00"}];
+
+const MOCK_ALERTS=[
+  {id:1,message:"Scheduled maintenance tonight 11PM - 1AM WAT. Orders may be delayed.",type:"warning",target:"both",active:true,createdBy:"You (Owner)",created:"2026-03-23T09:00:00"},
+  {id:2,message:"New! TikTok services now available with 30-day refill guarantee.",type:"info",target:"dashboard",active:true,createdBy:"David Ojo",created:"2026-03-22T14:00:00"},
+  {id:3,message:"Paystack maintenance completed. All payments are back to normal.",type:"info",target:"login",active:false,createdBy:"You (Owner)",created:"2026-03-21T08:00:00"},
+];
 
 const fN=(a)=>`₦${Math.abs(a).toLocaleString("en-NG")}`;
 const fD=(d)=>new Date(d).toLocaleDateString("en-NG",{month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"});
@@ -27,7 +33,7 @@ function ErrorBoundary({children}){return <>{children}</>;}
 function ThemeToggle({dark,onToggle,compact}){return <button onClick={onToggle} style={{display:"flex",alignItems:"center",background:dark?"rgba(255,255,255,0.06)":"rgba(0,0,0,0.06)",borderRadius:20,padding:3,width:compact?52:64,height:compact?28:32,border:`1px solid ${dark?"rgba(255,255,255,0.08)":"rgba(0,0,0,0.1)"}`,position:"relative",flexShrink:0,transition:"background 1.5s cubic-bezier(.4,0,.2,1),border-color 1.5s ease"}}><div style={{width:compact?22:26,height:compact?22:26,borderRadius:"50%",background:dark?"#c47d8e":"#e0a458",display:"flex",alignItems:"center",justifyContent:"center",fontSize:compact?12:14,position:"absolute",left:dark?3:(compact?27:35),transition:"left 0.4s cubic-bezier(.4,0,.2,1),background 1.5s cubic-bezier(.4,0,.2,1)",boxShadow:"0 1px 4px rgba(0,0,0,0.2)"}}>{dark?"🌙":"☀️"}</div></button>;}
 
 export default function AdminPanel(){
-  const [pg,setPg]=useState("overview");const [sb,setSb]=useState(false);const [mini,setMini]=useState(false);const [toast,setToast]=useState(null);const [currentAdmin]=useState(MOCK_ADMINS[0]);const role=ROLES[currentAdmin.role];
+  const [pg,setPg]=useState("overview");const [alerts,setAlerts]=useState(MOCK_ALERTS);const [sb,setSb]=useState(false);const [mini,setMini]=useState(false);const [toast,setToast]=useState(null);const [currentAdmin]=useState(MOCK_ADMINS[0]);const role=ROLES[currentAdmin.role];
   const getAutoTheme=()=>{const h=new Date().getHours(),m=new Date().getMinutes();if(h>=7&&h<18)return false;if(h>=19||h<6)return true;if(h===6)return m<30;if(h===18)return m>=30;return true;};
   const [dark,setDark]=useState(getAutoTheme);const [manualOverride,setManualOverride]=useState(false);
   useEffect(()=>{if(manualOverride)return;const iv=setInterval(()=>setDark(getAutoTheme()),60000);return()=>clearInterval(iv);},[manualOverride]);
@@ -35,7 +41,7 @@ export default function AdminPanel(){
   const notify=(m,e)=>{setToast({m,e});if(toastTimer.current)clearTimeout(toastTimer.current);toastTimer.current=setTimeout(()=>setToast(null),6000);};
   const dismissToast=()=>{setToast(null);if(toastTimer.current)clearTimeout(toastTimer.current);};
   const go=(p)=>{if(role.pages.includes(p)){setPg(p);setSb(false);}};
-  const ALL_NAV=[["overview","📊","Overview"],["orders","📋","Orders"],["users","👥","Users"],["services","📦","Services"],["api","🔌","API"],["paystack","💳","Paystack"],["tickets","💬","Tickets"],["activity","📝","Activity"],["admins","🛡️","Admins"]];
+  const ALL_NAV=[["overview","📊","Overview"],["orders","📋","Orders"],["users","👥","Users"],["services","📦","Services"],["api","🔌","API"],["paystack","💳","Paystack"],["tickets","💬","Tickets"],["activity","📝","Activity"],["admins","🛡️","Admins"],["alerts","📢","Alerts"]];
   const NAV=ALL_NAV.filter(([id])=>role.pages.includes(id));
   const t={bg:dark?"#080b14":"#f4f1ed",text:dark?"#e8e4df":"#1a1a1a",textSoft:dark?"#8a8680":"#888580",textMuted:dark?"#555250":"#b0ada8",surface:dark?"rgba(15,18,30,0.97)":"rgba(255,255,255,0.97)",surfaceBorder:dark?"rgba(255,255,255,0.06)":"rgba(0,0,0,0.08)",inputBg:dark?"#0d1020":"#fff",inputBorder:dark?"rgba(255,255,255,0.08)":"rgba(0,0,0,0.1)",accent:"#c47d8e",accentLight:dark?"rgba(196,125,142,0.12)":"rgba(196,125,142,0.08)",accentBorder:dark?"rgba(196,125,142,0.3)":"rgba(196,125,142,0.25)",accentShadow:dark?"inset 0 0 0 1px rgba(196,125,142,0.35)":"inset 0 0 0 1px rgba(196,125,142,0.3)",green:dark?"#6ee7b7":"#059669",red:dark?"#fca5a5":"#dc2626",btnPrimary:"linear-gradient(135deg,#c47d8e,#a3586b)",btnSecondary:dark?"rgba(255,255,255,0.04)":"rgba(0,0,0,0.03)",btnSecBorder:dark?"rgba(255,255,255,0.08)":"rgba(0,0,0,0.08)",logoGrad:"linear-gradient(135deg,#c47d8e,#8b5e6b)",gradBg:dark?"radial-gradient(ellipse at 20% 0%,rgba(196,125,142,0.06) 0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(100,120,180,0.04) 0%,transparent 50%)":"radial-gradient(ellipse at 20% 0%,rgba(196,125,142,0.05) 0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(180,160,140,0.04) 0%,transparent 50%)"};
   const Btn=({children,primary,onClick,style:s})=><button onClick={onClick} style={{padding:"7px 14px",borderRadius:8,fontSize:12,fontWeight:600,color:primary?"#fff":t.textSoft,background:primary?t.btnPrimary:t.btnSecondary,border:`1px solid ${primary?"transparent":t.btnSecBorder}`,whiteSpace:"nowrap",...s}}>{children}</button>;
@@ -51,6 +57,7 @@ export default function AdminPanel(){
   <nav style={{flex:1,padding:mini?"6px 6px":"6px 10px",display:"flex",flexDirection:"column",gap:1,overflowY:"auto"}}>{NAV.map(([id,ic,lb])=><button key={id} onClick={()=>go(id)} title={lb} style={{display:"flex",alignItems:"center",gap:12,padding:mini?"10px 0":"10px 14px",borderRadius:10,width:"100%",textAlign:"left",justifyContent:mini?"center":"flex-start",background:pg===id?t.accentLight:"transparent",color:pg===id?t.accent:t.textSoft,fontSize:13,fontWeight:500,border:"1px solid transparent",boxShadow:pg===id?t.accentShadow:"none"}}><span style={{fontSize:15,width:20,textAlign:"center"}}>{ic}</span><span className="sb-nav-label">{lb}</span></button>)}</nav>
   <div style={{padding:mini?"10px 6px":"10px 14px",borderTop:`1px solid ${t.surfaceBorder}`,display:"flex",alignItems:"center",justifyContent:mini?"center":"space-between"}}>{!mini&&<span style={{fontSize:12,color:t.textMuted}}>{dark?"Night":"Day"}</span>}<ThemeToggle dark={dark} onToggle={toggleTheme} compact={mini}/></div></aside>
   <main className={`mn${mini?" shifted":""}`}>
+    {alerts.filter(a=>a.active&&(a.target==="both"||a.target==="dashboard")).map(a=><div key={a.id} style={{padding:"12px 20px",marginBottom:12,borderRadius:12,display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,fontSize:13,fontWeight:500,animation:"fu .3s ease",background:a.type==="warning"?(dark?"rgba(217,119,6,0.1)":"#fffbeb"):a.type==="critical"?(dark?"rgba(220,38,38,0.1)":"#fef2f2"):(dark?"rgba(99,102,241,0.1)":"#eef2ff"),color:a.type==="warning"?(dark?"#fcd34d":"#92400e"):a.type==="critical"?(dark?"#fca5a5":"#dc2626"):(dark?"#a5b4fc":"#4f46e5"),border:`1px solid ${a.type==="warning"?(dark?"rgba(217,119,6,0.2)":"#fde68a"):a.type==="critical"?(dark?"rgba(220,38,38,0.2)":"#fecaca"):(dark?"rgba(99,102,241,0.2)":"#c7d2fe")}`}}><span>{a.type==="warning"?"⚠️":a.type==="critical"?"🚨":"ℹ️"} {a.message}</span></div>)}
     <ErrorBoundary t={t} key={pg}>
     {pg==="overview"&&<Overview t={t} dark={dark} orders={MOCK_ORDERS} users={MOCK_USERS} tickets={MOCK_TICKETS} activity={MOCK_ACTIVITY}/>}
     {pg==="orders"&&<AllOrders t={t} dark={dark} orders={MOCK_ORDERS} Btn={Btn} FilterBtn={FilterBtn} notify={notify}/>}
@@ -60,6 +67,7 @@ export default function AdminPanel(){
     {pg==="paystack"&&<PaystackSettings t={t} dark={dark} Btn={Btn} notify={notify}/>}
     {pg==="tickets"&&<TicketsPage t={t} dark={dark} tickets={MOCK_TICKETS} Btn={Btn} FilterBtn={FilterBtn} notify={notify}/>}
     {pg==="activity"&&<ActivityLog t={t} dark={dark} activity={MOCK_ACTIVITY}/>}
+    {pg==="alerts"&&<AlertsPage t={t} dark={dark} alerts={alerts} setAlerts={setAlerts} Btn={Btn} FilterBtn={FilterBtn} notify={notify} isSuperAdmin={currentAdmin.role==="superadmin"} currentAdmin={currentAdmin}/>}
     {pg==="admins"&&<AdminRoles t={t} dark={dark} admins={MOCK_ADMINS} Btn={Btn} notify={notify} isSuperAdmin={currentAdmin.role==="superadmin"}/>}
     </ErrorBoundary>
   </main></div>);
@@ -82,3 +90,54 @@ function TicketsPage({t,dark,tickets,Btn,FilterBtn,notify}){const [f,setF]=useSt
 function ActivityLog({t,dark,activity}){const [q,setQ]=useState("");const [af,setAf]=useState("all");const admins=[...new Set(activity.map(a=>a.admin))];const list=activity.filter(a=>(af==="all"||a.admin===af)&&(!q||a.action.toLowerCase().includes(q.toLowerCase())||a.admin.toLowerCase().includes(q.toLowerCase())));return <div><Hdr title="Activity Log" sub="Track all admin actions" t={t}/><input placeholder="Search actions, admins..." value={q} onChange={e=>setQ(e.target.value)} style={{width:"100%",maxWidth:400,padding:"10px 14px",borderRadius:10,background:t.inputBg,border:`1px solid ${t.inputBorder}`,color:t.text,fontSize:13,marginBottom:12,outline:"none"}}/><div style={{display:"flex",gap:8,marginBottom:16,flexWrap:"wrap"}}><button onClick={()=>setAf("all")} style={{padding:"8px 14px",borderRadius:8,fontSize:13,fontWeight:500,background:af==="all"?t.accentLight:"transparent",color:af==="all"?t.accent:t.textSoft,border:`1px solid ${t.btnSecBorder}`,boxShadow:af==="all"?t.accentShadow:"none"}}>All Admins</button>{admins.map(a=><button key={a} onClick={()=>setAf(a)} style={{padding:"8px 14px",borderRadius:8,fontSize:13,fontWeight:500,background:af===a?t.accentLight:"transparent",color:af===a?t.accent:t.textSoft,border:`1px solid ${t.btnSecBorder}`,boxShadow:af===a?t.accentShadow:"none"}}>{a}</button>)}</div><Card style={{padding:0,overflow:"hidden"}} dark={dark}>{list.length===0&&<div style={{padding:40,textAlign:"center",color:t.textMuted}}>No matching activity</div>}{list.map((a,i)=><div key={a.id} style={{display:"flex",alignItems:"flex-start",gap:12,padding:"16px 20px",borderBottom:i<list.length-1?`1px solid ${t.surfaceBorder}`:"none"}}><div style={{width:36,height:36,borderRadius:10,background:t.accentLight,display:"flex",alignItems:"center",justifyContent:"center",fontSize:16,flexShrink:0}}>{ATYPE[a.type]||"📝"}</div><div style={{flex:1}}><div style={{fontSize:14,color:t.text}}><span style={{fontWeight:600}}>{a.admin}</span></div><div style={{fontSize:13,color:t.textSoft,marginTop:2}}>{a.action}</div><div style={{fontSize:11,color:t.textMuted,marginTop:3}}>{fD(a.time)}</div></div></div>)}</Card></div>;}
 
 function AdminRoles({t,dark,admins,Btn,notify,isSuperAdmin}){return <div><Hdr title="Admin Roles" sub="Manage access" t={t} action={isSuperAdmin?<Btn primary onClick={()=>notify("Invite sent!")}>+ Invite Admin</Btn>:null}/><Card dark={dark} style={{marginBottom:20}}><h3 style={{fontSize:15,fontWeight:600,color:t.text,marginBottom:14}}>Role Permissions</h3><div className="role-grid">{Object.entries(ROLES).map(([key,r])=><div key={key} style={{padding:14,borderRadius:14,background:dark?"#0d1020":"#faf8f5",border:`1px solid ${t.surfaceBorder}`}}><div style={{fontSize:14,fontWeight:600,color:r.color,marginBottom:8}}>{r.label}</div>{r.pages.map(p=><div key={p} style={{fontSize:12,color:t.textSoft,display:"flex",alignItems:"center",gap:6,marginBottom:3}}><span style={{color:t.green,fontSize:10}}>✓</span>{p[0].toUpperCase()+p.slice(1)}</div>)}</div>)}</div></Card>{!isSuperAdmin&&<div style={{padding:"14px 18px",borderRadius:12,background:t.accentLight,border:`1px solid ${t.accentBorder}`,marginBottom:20,fontSize:13,color:t.accent}}>🔒 Only the Super Admin can invite, remove, or reset passwords for admins.</div>}{admins.map(a=><Card key={a.id} dark={dark} style={{marginBottom:10,padding:16}}><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:12}}><div style={{display:"flex",alignItems:"center",gap:12,flex:1,minWidth:180}}><div style={{width:38,height:38,borderRadius:"50%",background:ROLES[a.role].color+"33",display:"flex",alignItems:"center",justifyContent:"center",fontSize:15,fontWeight:700,color:ROLES[a.role].color,flexShrink:0}}>{a.name[0]}</div><div><div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}><span style={{fontSize:14,fontWeight:600,color:t.text}}>{a.name}</span><Badge s={a.status} dark={dark}/></div><div style={{fontSize:12,color:t.textMuted,marginTop:2}}>{a.email}</div></div></div><div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}><span style={{fontSize:11,fontWeight:600,padding:"3px 10px",borderRadius:4,background:ROLES[a.role].color+"22",color:ROLES[a.role].color}}>{ROLES[a.role].label}</span><span style={{fontSize:12,color:t.textMuted}}>{fD(a.lastActive)}</span>{isSuperAdmin&&a.id!==1&&<Btn onClick={()=>notify(`Password reset sent to ${a.name}`)}>🔑 Reset PW</Btn>}{isSuperAdmin&&a.id!==1&&<Btn onClick={()=>notify(`${a.name} removed`)} style={{color:t.red}}>Remove</Btn>}</div></div></Card>)}</div>;}
+
+
+function AlertsPage({t,dark,alerts,setAlerts,Btn,FilterBtn,notify,isSuperAdmin,currentAdmin}){
+  const [msg,setMsg]=useState("");const [type,setType]=useState("info");const [target,setTarget]=useState("both");const [f,setF]=useState("active");
+  const list=alerts.filter(a=>f==="all"||( f==="active"?a.active:!a.active));
+  const createAlert=()=>{if(!msg.trim())return;const newA={id:Date.now(),message:msg,type,target,active:true,createdBy:currentAdmin.name,created:new Date().toISOString()};setAlerts(p=>[newA,...p]);setMsg("");notify("Alert published!");};
+  const toggleAlert=(id)=>setAlerts(p=>p.map(a=>a.id===id?{...a,active:!a.active}:a));
+  const deleteAlert=(id)=>{setAlerts(p=>p.filter(a=>a.id!==id));notify("Alert deleted");};
+  const typeColors={info:{bg:dark?"rgba(99,102,241,0.1)":"#eef2ff",color:dark?"#a5b4fc":"#4f46e5",border:dark?"rgba(99,102,241,0.2)":"#c7d2fe",icon:"ℹ️"},warning:{bg:dark?"rgba(217,119,6,0.1)":"#fffbeb",color:dark?"#fcd34d":"#92400e",border:dark?"rgba(217,119,6,0.2)":"#fde68a",icon:"⚠️"},critical:{bg:dark?"rgba(220,38,38,0.1)":"#fef2f2",color:dark?"#fca5a5":"#dc2626",border:dark?"rgba(220,38,38,0.2)":"#fecaca",icon:"🚨"}};
+  return <div>
+    <Hdr title="Alerts" sub="Broadcast messages to users" t={t}/>
+    {/* Create new alert */}
+    <Card dark={dark} style={{marginBottom:24}}>
+      <h3 style={{fontSize:15,fontWeight:600,color:t.text,marginBottom:16}}>New Alert</h3>
+      <textarea value={msg} onChange={e=>setMsg(e.target.value)} placeholder="Write your alert message..." rows={2} style={{width:"100%",padding:"12px 14px",borderRadius:10,background:t.inputBg,border:`1px solid ${t.inputBorder}`,color:t.text,fontSize:14,marginBottom:14,outline:"none",resize:"vertical"}}/>
+      <div style={{display:"flex",gap:12,marginBottom:14,flexWrap:"wrap",alignItems:"center"}}>
+        <div>
+          <div style={{fontSize:10,color:t.textMuted,fontWeight:600,textTransform:"uppercase",letterSpacing:1.5,marginBottom:6}}>Type</div>
+          <div style={{display:"flex",gap:6}}>{["info","warning","critical"].map(tp=><button key={tp} onClick={()=>setType(tp)} style={{padding:"6px 14px",borderRadius:8,fontSize:12,fontWeight:600,background:type===tp?typeColors[tp].bg:"transparent",color:type===tp?typeColors[tp].color:t.textMuted,border:`1px solid ${type===tp?typeColors[tp].border:t.btnSecBorder}`}}>{typeColors[tp].icon} {tp[0].toUpperCase()+tp.slice(1)}</button>)}</div>
+        </div>
+        <div>
+          <div style={{fontSize:10,color:t.textMuted,fontWeight:600,textTransform:"uppercase",letterSpacing:1.5,marginBottom:6}}>Show On</div>
+          <div style={{display:"flex",gap:6}}>{[["both","🌐 Both"],["dashboard","📊 Dashboard"],["login","🔐 Login Page"]].map(([val,lb])=><button key={val} onClick={()=>setTarget(val)} style={{padding:"6px 14px",borderRadius:8,fontSize:12,fontWeight:500,background:target===val?t.accentLight:"transparent",color:target===val?t.accent:t.textMuted,border:`1px solid ${t.btnSecBorder}`,boxShadow:target===val?t.accentShadow:"none"}}>{lb}</button>)}</div>
+        </div>
+      </div>
+      {/* Preview */}
+      {msg&&<div style={{padding:"12px 16px",borderRadius:10,background:typeColors[type].bg,border:`1px solid ${typeColors[type].border}`,color:typeColors[type].color,fontSize:13,fontWeight:500,marginBottom:14}}>{typeColors[type].icon} {msg}</div>}
+      <Btn primary onClick={createAlert}>📢 Publish Alert</Btn>
+    </Card>
+    {/* Active alerts list */}
+    <div style={{display:"flex",gap:8,marginBottom:16}}><FilterBtn active={f==="active"} onClick={()=>setF("active")}>Active ({alerts.filter(a=>a.active).length})</FilterBtn><FilterBtn active={f==="all"} onClick={()=>setF("all")}>All ({alerts.length})</FilterBtn></div>
+    {list.length===0&&<Card dark={dark}><div style={{textAlign:"center",padding:"30px 0",color:t.textMuted}}>No alerts</div></Card>}
+    {list.map(a=>{const tc=typeColors[a.type]||typeColors.info;return <Card key={a.id} dark={dark} style={{marginBottom:10,padding:16}}>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",gap:12,flexWrap:"wrap"}}>
+        <div style={{flex:1,minWidth:200}}>
+          <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:6,flexWrap:"wrap"}}>
+            <span style={{fontSize:11,fontWeight:600,padding:"2px 8px",borderRadius:4,background:tc.bg,color:tc.color,border:`1px solid ${tc.border}`}}>{tc.icon} {a.type[0].toUpperCase()+a.type.slice(1)}</span>
+            <span style={{fontSize:11,fontWeight:600,padding:"2px 8px",borderRadius:4,background:t.accentLight,color:t.accent}}>{a.target==="both"?"🌐 Both":a.target==="dashboard"?"📊 Dashboard":"🔐 Login"}</span>
+            {a.active?<span style={{fontSize:11,fontWeight:600,padding:"2px 8px",borderRadius:4,background:dark?"rgba(110,231,183,0.1)":"#ecfdf5",color:t.green}}>● Live</span>:<span style={{fontSize:11,color:t.textMuted}}>Inactive</span>}
+          </div>
+          <div style={{fontSize:14,color:t.text,marginBottom:4}}>{a.message}</div>
+          <div style={{fontSize:11,color:t.textMuted}}>by {a.createdBy} • {fD(a.created)}</div>
+        </div>
+        <div style={{display:"flex",gap:6,flexShrink:0}}>
+          <Btn onClick={()=>{toggleAlert(a.id);notify(a.active?"Alert deactivated":"Alert activated")}}>{a.active?"⏸ Pause":"▶ Activate"}</Btn>
+          <Btn onClick={()=>deleteAlert(a.id)} style={{color:t.red}}>✕ Delete</Btn>
+        </div>
+      </div>
+    </Card>})}
+  </div>;
+}
