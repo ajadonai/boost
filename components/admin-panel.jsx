@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 
 const ROLES = {
-  superadmin: { label: "Super Admin", color: "#c47d8e", pages: ["overview","orders","users","services","api","paystack","payments","tickets","admins","activity","alerts","maintenance"] },
+  superadmin: { label: "Super Admin", color: "#c47d8e", pages: ["overview","orders","users","services","api","paystack","payments","tickets","admins","activity","alerts","maintenance","site-settings"] },
   admin: { label: "Admin", color: "#a5b4fc", pages: ["overview","orders","users","services","tickets","activity","alerts","maintenance"] },
   support: { label: "Support", color: "#6ee7b7", pages: ["overview","tickets","orders","activity"] },
   finance: { label: "Finance", color: "#fcd34d", pages: ["overview","orders","paystack","payments","activity"] },
@@ -57,6 +57,7 @@ export default function AdminPanel(){
     {id:"monnify",name:"Monnify",icon:"🏦",desc:"Bank Transfer, USSD",enabled:true,priority:3},
     {id:"korapay",name:"Korapay",icon:"💠",desc:"Cards, Bank Transfer",enabled:false,priority:4},
   ]);const [activityLog,setActivityLog]=useState(MOCK_ACTIVITY);const [adminList,setAdminList]=useState(MOCK_ADMINS.map(a=>({...a,customPages:null})));const [sb,setSb]=useState(false);const [mini,setMini]=useState(false);const [toast,setToast]=useState(null);const [currentAdmin]=useState(MOCK_ADMINS[0]);const role=ROLES[currentAdmin.role];
+  const [siteSettings,setSiteSettings]=useState({whatsapp:"2348012345678",twitter:"boostpanel",instagram:"boostpanel.ng",siteName:"BoostPanel",supportEmail:"support@boostpanel.ng",minDeposit:"500",defaultMarkup:"54",referralBonus:"500"});
   const getAutoTheme=()=>{const h=new Date().getHours(),m=new Date().getMinutes();if(h>=7&&h<18)return false;if(h>=19||h<6)return true;if(h===6)return m<30;if(h===18)return m>=30;return true;};
   const [dark,setDark]=useState(getAutoTheme);const [manualOverride,setManualOverride]=useState(false);
   useEffect(()=>{if(manualOverride)return;const iv=setInterval(()=>setDark(getAutoTheme()),60000);return()=>clearInterval(iv);},[manualOverride]);
@@ -65,7 +66,7 @@ export default function AdminPanel(){
   const logAction=(action,type)=>{setActivityLog(p=>[{id:Date.now(),admin:currentAdmin.name,action,type,time:new Date().toISOString()},...p]);};
   const dismissToast=()=>{setToast(null);if(toastTimer.current)clearTimeout(toastTimer.current);};
   const go=(p)=>{if(role.pages.includes(p)){setPg(p);setSb(false);}};
-  const ALL_NAV=[["overview","📊","Overview"],["orders","📋","Orders"],["users","👥","Users"],["tickets","💬","Tickets"],["services","📦","Services"],["api","🔌","API"],["paystack","💳","Paystack"],["payments","💰","Gateways"],["alerts","📢","Alerts"],["maintenance","🔧","Maintenance"],["activity","📝","Activity"],["admins","🛡️","Admins"]];
+  const ALL_NAV=[["overview","📊","Overview"],["orders","📋","Orders"],["users","👥","Users"],["tickets","💬","Tickets"],["services","📦","Services"],["api","🔌","API"],["paystack","💳","Paystack"],["payments","💰","Gateways"],["alerts","📢","Alerts"],["maintenance","🔧","Maintenance"],["activity","📝","Activity"],["admins","🛡️","Admins"],["site-settings","⚙️","Site Settings"]];
   const NAV=ALL_NAV.filter(([id])=>role.pages.includes(id));
   const t={bg:dark?"#080b14":"#f4f1ed",text:dark?"#e8e4df":"#1a1a1a",textSoft:dark?"#8a8680":"#888580",textMuted:dark?"#555250":"#b0ada8",surface:dark?"rgba(15,18,30,0.97)":"rgba(255,255,255,0.97)",surfaceBorder:dark?"rgba(255,255,255,0.06)":"rgba(0,0,0,0.08)",inputBg:dark?"#0d1020":"#fff",inputBorder:dark?"rgba(255,255,255,0.08)":"rgba(0,0,0,0.1)",accent:"#c47d8e",accentLight:dark?"rgba(196,125,142,0.12)":"rgba(196,125,142,0.08)",accentBorder:dark?"rgba(196,125,142,0.3)":"rgba(196,125,142,0.25)",accentShadow:dark?"inset 0 0 0 1px rgba(196,125,142,0.35)":"inset 0 0 0 1px rgba(196,125,142,0.3)",green:dark?"#6ee7b7":"#059669",red:dark?"#fca5a5":"#dc2626",btnPrimary:"linear-gradient(135deg,#c47d8e,#a3586b)",btnSecondary:dark?"rgba(255,255,255,0.04)":"rgba(0,0,0,0.03)",btnSecBorder:dark?"rgba(255,255,255,0.08)":"rgba(0,0,0,0.08)",logoGrad:"linear-gradient(135deg,#c47d8e,#8b5e6b)",gradBg:dark?"radial-gradient(ellipse at 20% 0%,rgba(196,125,142,0.06) 0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(100,120,180,0.04) 0%,transparent 50%)":"radial-gradient(ellipse at 20% 0%,rgba(196,125,142,0.05) 0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(180,160,140,0.04) 0%,transparent 50%)"};
   const Btn=({children,primary,onClick,style:s})=><button onClick={onClick} style={{padding:"7px 14px",borderRadius:8,fontSize:12,fontWeight:600,color:primary?"#fff":t.textSoft,background:primary?t.btnPrimary:t.btnSecondary,border:`1px solid ${primary?"transparent":t.btnSecBorder}`,whiteSpace:"nowrap",...s}}>{children}</button>;
@@ -97,6 +98,7 @@ export default function AdminPanel(){
     {pg==="maintenance"&&<MaintenancePage t={t} dark={dark} maint={maint} setMaint={setMaint} Btn={Btn} notify={notify} logAction={logAction} isSuperAdmin={currentAdmin.role==="superadmin"}/>}
     {pg==="alerts"&&<AlertsPage t={t} dark={dark} alerts={alerts} setAlerts={setAlerts} Btn={Btn} FilterBtn={FilterBtn} notify={notify} isSuperAdmin={currentAdmin.role==="superadmin"} currentAdmin={currentAdmin} logAction={logAction}/>}
     {pg==="admins"&&<AdminRoles t={t} dark={dark} admins={adminList} setAdmins={setAdminList} Btn={Btn} FilterBtn={FilterBtn} notify={notify} isSuperAdmin={currentAdmin.role==="superadmin"} logAction={logAction}/>}
+    {pg==="site-settings"&&<SiteSettingsPage t={t} dark={dark} settings={siteSettings} setSettings={setSiteSettings} Btn={Btn} notify={notify} logAction={logAction}/>}
     </ErrorBoundary>
     <footer style={{borderTop:`1px solid ${t.surfaceBorder}`,marginTop:40,padding:"24px 0 16px"}}>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:12}}>
@@ -334,5 +336,60 @@ function AlertsPage({t,dark,alerts,setAlerts,Btn,FilterBtn,notify,isSuperAdmin,c
         </div>
       </div>
     </Card>})}
+  </div>;
+}
+function SiteSettingsPage({t,dark,settings,setSettings,Btn,notify,logAction}){
+  const [form,setForm]=useState({...settings});
+  const upd=(k,v)=>setForm(p=>({...p,[k]:v}));
+  const save=()=>{setSettings({...form});notify("Settings saved!");logAction("Updated site settings","settings");};
+  const Field=({label,field,placeholder,type="text"})=><div style={{marginBottom:16}}>
+    <label style={{fontSize:11,color:t.textSoft,fontWeight:600,display:"block",marginBottom:5,textTransform:"uppercase",letterSpacing:1.5}}>{label}</label>
+    <input type={type} value={form[field]} onChange={e=>upd(field,e.target.value)} placeholder={placeholder} style={{width:"100%",padding:"12px 14px",borderRadius:10,background:t.inputBg,border:`1px solid ${t.inputBorder}`,color:t.text,fontSize:14,outline:"none"}}/>
+  </div>;
+  return <div>
+    <Hdr title="Site Settings" sub="Manage global platform settings — superadmin only" t={t} action={<Btn primary onClick={save}>💾 Save All</Btn>}/>
+    <div className="g2">
+      <div style={{display:"flex",flexDirection:"column",gap:16}}>
+        <Card dark={dark}>
+          <h3 style={{fontSize:15,fontWeight:600,color:t.text,marginBottom:20}}>Social & Contact</h3>
+          <Field label="WhatsApp Number" field="whatsapp" placeholder="2348012345678"/>
+          <div style={{fontSize:11,color:t.textMuted,marginTop:-10,marginBottom:16}}>Full number with country code, no + or spaces. Used for floating chat icon.</div>
+          <Field label="Twitter / X Handle" field="twitter" placeholder="boostpanel"/>
+          <Field label="Instagram Handle" field="instagram" placeholder="boostpanel.ng"/>
+          <Field label="Support Email" field="supportEmail" placeholder="support@boostpanel.ng"/>
+        </Card>
+        <Card dark={dark}>
+          <h3 style={{fontSize:15,fontWeight:600,color:t.text,marginBottom:20}}>General</h3>
+          <Field label="Site Name" field="siteName" placeholder="BoostPanel"/>
+          <Field label="Minimum Deposit (₦)" field="minDeposit" placeholder="500" type="number"/>
+          <Field label="Default Markup (%)" field="defaultMarkup" placeholder="54" type="number"/>
+          <Field label="Referral Bonus (₦)" field="referralBonus" placeholder="500" type="number"/>
+        </Card>
+      </div>
+      <div style={{display:"flex",flexDirection:"column",gap:16}}>
+        <Card dark={dark}>
+          <h3 style={{fontSize:15,fontWeight:600,color:t.text,marginBottom:16}}>Preview</h3>
+          <div style={{padding:16,borderRadius:12,background:dark?"#0d1020":"#faf8f5",border:`1px solid ${t.surfaceBorder}`}}>
+            <div style={{fontSize:12,color:t.textMuted,marginBottom:10,fontWeight:600,textTransform:"uppercase",letterSpacing:1}}>WhatsApp Link</div>
+            <a href={`https://wa.me/${form.whatsapp}`} target="_blank" rel="noopener" style={{fontSize:13,color:t.accent,wordBreak:"break-all"}}>wa.me/{form.whatsapp}</a>
+            <div style={{fontSize:12,color:t.textMuted,marginTop:16,marginBottom:10,fontWeight:600,textTransform:"uppercase",letterSpacing:1}}>Social Links</div>
+            <div style={{display:"flex",flexDirection:"column",gap:6}}>
+              <a href={`https://twitter.com/${form.twitter}`} target="_blank" rel="noopener" style={{fontSize:13,color:t.accent}}>twitter.com/{form.twitter}</a>
+              <a href={`https://instagram.com/${form.instagram}`} target="_blank" rel="noopener" style={{fontSize:13,color:t.accent}}>instagram.com/{form.instagram}</a>
+            </div>
+            <div style={{fontSize:12,color:t.textMuted,marginTop:16,marginBottom:10,fontWeight:600,textTransform:"uppercase",letterSpacing:1}}>Floating Icon Preview</div>
+            <div style={{display:"inline-flex",alignItems:"center",justifyContent:"center",width:52,height:52,borderRadius:"50%",background:"#25D366",boxShadow:"0 4px 16px rgba(37,211,102,0.35)",fontSize:26}}>💬</div>
+          </div>
+        </Card>
+        <Card dark={dark}>
+          <h3 style={{fontSize:15,fontWeight:600,color:t.text,marginBottom:12}}>Notes</h3>
+          <div style={{fontSize:13,color:t.textSoft,lineHeight:1.7}}>
+            <p style={{marginBottom:8}}>Changes here affect the entire platform immediately.</p>
+            <p style={{marginBottom:8}}>The <strong style={{color:t.text}}>WhatsApp number</strong> powers the floating chat icon on all pages. Enter the full number with country code (e.g. 2348012345678).</p>
+            <p>Social handles are shown in the footer across all pages and on the landing page.</p>
+          </div>
+        </Card>
+      </div>
+    </div>
   </div>;
 }
