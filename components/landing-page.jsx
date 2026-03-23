@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
 
 function ThemeToggle({dark,onToggle,compact}){
   return <button onClick={onToggle} style={{display:"flex",alignItems:"center",background:dark?"rgba(255,255,255,0.06)":"rgba(0,0,0,0.06)",borderRadius:20,padding:3,width:compact?52:64,height:compact?28:32,border:`1px solid ${dark?"rgba(255,255,255,0.08)":"rgba(0,0,0,0.1)"}`,position:"relative",flexShrink:0,transition:"background 1.5s cubic-bezier(.4,0,.2,1),border-color 1.5s ease"}}><div style={{width:compact?22:26,height:compact?22:26,borderRadius:"50%",background:dark?"#c47d8e":"#e0a458",display:"flex",alignItems:"center",justifyContent:"center",fontSize:compact?12:14,position:"absolute",left:dark?3:(compact?27:35),transition:"left 0.4s cubic-bezier(.4,0,.2,1),background 1.5s cubic-bezier(.4,0,.2,1)",boxShadow:"0 1px 4px rgba(0,0,0,0.2)"}}>{dark?"🌙":"☀️"}</div></button>;
@@ -30,9 +30,10 @@ export default function Landing(){
   useEffect(()=>{if(mo)return;const iv=setInterval(()=>setDark(getAuto()),60000);return()=>clearInterval(iv);},[mo]);
   useEffect(()=>{const onScroll=()=>setScrolled(window.scrollY>20);window.addEventListener("scroll",onScroll);return()=>window.removeEventListener("scroll",onScroll);},[]);
   useEffect(()=>{const p=new URLSearchParams(window.location.search);if(p.get("login"))setModal("login");if(p.get("signup"))setModal("signup");},[]);
+  const closeModal=useCallback(()=>setModal(null),[]);
   const toggleTheme=()=>{setMo(true);setDark(d=>!d);};
 
-  const t={
+  const t=useMemo(()=>({
     bg:dark?"#080b14":"#f4f1ed",text:dark?"#e8e4df":"#1a1a1a",textSoft:dark?"#8a8680":"#888580",textMuted:dark?"#555250":"#b0ada8",
     surface:dark?"rgba(15,18,30,0.85)":"rgba(255,255,255,0.9)",surfaceBorder:dark?"rgba(255,255,255,0.06)":"rgba(0,0,0,0.08)",
     inputBg:dark?"#0d1020":"#fff",inputBorder:dark?"rgba(255,255,255,0.08)":"rgba(0,0,0,0.1)",
@@ -43,7 +44,7 @@ export default function Landing(){
     logoGrad:"linear-gradient(135deg,#c47d8e,#8b5e6b)",
     overlay:dark?"rgba(0,0,0,0.7)":"rgba(0,0,0,0.4)",
     cardShadow:dark?"0 2px 20px rgba(0,0,0,0.4)":"0 2px 20px rgba(0,0,0,0.06)",
-  };
+  }),[dark]);
 
   const SECTIONS=["hero","features","pricing","social-proof","faq","cta-footer"];
   const currentSection=useRef(0);
@@ -304,7 +305,7 @@ export default function Landing(){
         <Footer t={t} dark={dark}/>
       </section>
 
-      {modal&&<AuthModal dark={dark} t={t} mode={modal} setMode={setModal} onClose={()=>setModal(null)}/>}
+      {modal&&<AuthModal dark={dark} t={t} mode={modal} setMode={setModal} onClose={closeModal}/>}
     </div>
   );
 }
