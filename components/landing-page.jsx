@@ -25,6 +25,7 @@ export default function Landing(){
   const [dark,setDark]=useState(getAuto);
   const [mo,setMo]=useState(false);
   const [modal,setModal]=useState(null);
+  const [faqOpen,setFaqOpen]=useState(null);
   useEffect(()=>{if(mo)return;const iv=setInterval(()=>setDark(getAuto()),60000);return()=>clearInterval(iv);},[mo]);
   const toggleTheme=()=>{setMo(true);setDark(d=>!d);};
 
@@ -268,17 +269,20 @@ export default function Landing(){
       <section id="faq" className="snap-section" style={{padding:"60px 24px",position:"relative",zIndex:1}}>
         <div className="sec" style={{maxWidth:800}}>
           <Reveal><h2 className="serif" style={{fontSize:"clamp(28px,4vw,42px)",fontWeight:600,color:t.text,marginBottom:32,textAlign:"center"}}>Frequently Asked Questions</h2></Reveal>
-          {[["How does BoostPanel work?","Sign up for free, add funds to your wallet via Paystack (cards, bank transfer, or USSD), choose a service from our catalog, paste your social media link, and place your order. Delivery starts within minutes and you can track progress in real-time."],["Is it safe to use?","Absolutely. We never ask for your passwords or login credentials. All services are delivered using your public profile URL only. Your accounts remain completely secure."],["How do I pay?","We accept Nigerian Naira payments via Paystack — debit cards, bank transfer, and USSD. Minimum deposit is ₦500 and you can top up any amount to your wallet."],["Will my followers drop?","Some natural fluctuation may occur. Services marked with refill guarantee will automatically replenish any drops within the guarantee period at no extra cost."],["Can I earn money with BoostPanel?","Yes! Every account gets a referral link. Share it and earn 5% commission on every order your referrals make — credited to your wallet automatically, forever."],["How fast is delivery?","Most services start delivering within minutes of placing your order. Typical completion time is 0-24 hours depending on the service type and quantity ordered."]].map(([q,a],i)=>
-            <Reveal key={i} delay={i*0.05}>
-              <details style={{marginBottom:10,borderRadius:14,background:t.surface,border:`1px solid ${t.surfaceBorder}`,transition:"background 1.5s ease",overflow:"hidden"}} className="faq-item">
-                <summary style={{padding:"18px 24px",fontSize:16,fontWeight:500,color:t.text,cursor:"pointer",listStyle:"none",display:"flex",justifyContent:"space-between",alignItems:"center",gap:12}}>
+          {[["How does BoostPanel work?","Sign up for free, add funds to your wallet via Paystack (cards, bank transfer, or USSD), choose a service from our catalog, paste your social media link, and place your order. Delivery starts within minutes and you can track progress in real-time."],["Is it safe to use?","Absolutely. We never ask for your passwords or login credentials. All services are delivered using your public profile URL only. Your accounts remain completely secure."],["How do I pay?","We accept Nigerian Naira payments via Paystack — debit cards, bank transfer, and USSD. Minimum deposit is ₦500 and you can top up any amount to your wallet."],["Will my followers drop?","Some natural fluctuation may occur. Services marked with refill guarantee will automatically replenish any drops within the guarantee period at no extra cost."],["Can I earn money with BoostPanel?","Yes! Every account gets a referral link. Share it and earn 5% commission on every order your referrals make — credited to your wallet automatically, forever."],["How fast is delivery?","Most services start delivering within minutes of placing your order. Typical completion time is 0-24 hours depending on the service type and quantity ordered."]].map(([q,a],i)=>{
+            const isOpen=faqOpen===i;
+            return <Reveal key={i} delay={i*0.05}>
+              <div style={{marginBottom:10,borderRadius:14,background:t.surface,border:`1px solid ${isOpen?"rgba(196,125,142,0.2)":t.surfaceBorder}`,transition:"background 1.5s ease, border-color 0.3s ease"}}>
+                <button onClick={()=>setFaqOpen(isOpen?null:i)} style={{width:"100%",padding:"18px 24px",fontSize:16,fontWeight:500,color:t.text,cursor:"pointer",background:"none",display:"flex",justifyContent:"space-between",alignItems:"center",gap:12,textAlign:"left"}}>
                   <span>{q}</span>
-                  <span className="faq-chevron" style={{fontSize:18,color:t.textMuted,flexShrink:0,transition:"transform 0.3s ease"}}>+</span>
-                </summary>
-                <div style={{padding:"0 24px 18px",fontSize:14,color:t.textSoft,lineHeight:1.8,borderTop:`1px solid ${t.surfaceBorder}`}}><div style={{paddingTop:14}}>{a}</div></div>
-              </details>
-            </Reveal>
-          )}
+                  <span style={{fontSize:18,color:isOpen?t.accent:t.textMuted,flexShrink:0,transition:"transform 0.3s ease, color 0.3s ease",transform:isOpen?"rotate(45deg)":"rotate(0deg)"}}>+</span>
+                </button>
+                <div style={{maxHeight:isOpen?300:0,overflow:"hidden",transition:"max-height 0.35s cubic-bezier(0.4,0,0.2,1)"}}>
+                  <div style={{padding:"0 24px 18px",fontSize:14,color:t.textSoft,lineHeight:1.8,borderTop:`1px solid ${t.surfaceBorder}`}}><div style={{paddingTop:14}}>{a}</div></div>
+                </div>
+              </div>
+            </Reveal>;
+          })}
         </div>
       </section>
 
