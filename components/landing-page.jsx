@@ -32,7 +32,7 @@ export default function Landing(){
   const [siteAlerts,setSiteAlerts]=useState([]);
   useEffect(()=>{if(mo)return;const iv=setInterval(()=>setDark(getAuto()),60000);return()=>clearInterval(iv);},[mo]);
   useEffect(()=>{const onScroll=()=>setScrolled(window.scrollY>20);window.addEventListener("scroll",onScroll);return()=>window.removeEventListener("scroll",onScroll);},[]);
-  useEffect(()=>{const p=new URLSearchParams(window.location.search);if(p.get("login"))setModal("login");if(p.get("signup"))setModal("signup");},[]);
+  useEffect(()=>{const p=new URLSearchParams(window.location.search);if(p.get("login"))setModal("login");if(p.get("signup"))setModal("signup");if(p.get("ref")){setModal("signup");}},[]);
   useEffect(()=>{(async()=>{try{const res=await fetch("/api/site-info");if(res.ok){const d=await res.json();if(d.stats)setSiteStats(d.stats);if(d.promo)setPromoBanner(d.promo);else setPromoBanner(null);if(d.alerts?.length)setSiteAlerts(d.alerts);}}catch{}})();},[]);
   const closeModal=useCallback(()=>setModal(null),[]);
   const toggleTheme=()=>{setMo(true);setDark(d=>!d);};
@@ -330,6 +330,7 @@ function AuthModal({dark,t,mode,setMode,onClose}){
   const [refCode,setRefCode]=useState("");
   const [agree,setAgree]=useState(false);
   useEffect(()=>{setStep(1);setAuthLoading(false);setError("");setPw("");setPw2("");setName("");setEmail("");setPhone("");},[mode]);
+  useEffect(()=>{const p=new URLSearchParams(window.location.search);const r=p.get("ref");if(r)setRefCode(r);},[]);
 
   const handleLogin=async()=>{
     setError("");
