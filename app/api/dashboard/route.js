@@ -22,7 +22,7 @@ export async function GET() {
         where: { userId: user.id },
         orderBy: { createdAt: 'desc' },
         take: 50,
-        include: { service: { select: { name: true, platform: true } } },
+        include: { service: { select: { name: true, category: true } } },
       });
     } catch (e) { console.error('[Dashboard] Orders query failed:', e.message); }
 
@@ -74,7 +74,7 @@ export async function GET() {
       orders: orders.map(o => ({
         id: o.orderId || o.id,
         service: o.service?.name || o.serviceId,
-        platform: o.service?.platform || 'unknown',
+        platform: o.service?.category || 'unknown',
         link: o.link, quantity: o.quantity,
         charge: o.charge / 100,
         status: o.status,
