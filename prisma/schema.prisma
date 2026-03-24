@@ -195,7 +195,7 @@ model ActivityLog {
   type      String
   createdAt DateTime @default(now())
 
-  @@index([adminId])
+  @@index([adminName])
   @@index([createdAt])
   @@map("activity_log")
 }
