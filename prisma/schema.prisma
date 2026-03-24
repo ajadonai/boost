@@ -100,6 +100,9 @@ model Order {
   user    User    @relation(fields: [userId], references: [id])
   service Service @relation(fields: [serviceId], references: [id])
 
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
   @@map("orders")
 }
 
@@ -120,6 +123,9 @@ model Transaction {
 
   user User @relation(fields: [userId], references: [id])
 
+  @@index([userId])
+  @@index([type])
+  @@index([createdAt])
   @@map("transactions")
 }
 
@@ -141,6 +147,8 @@ model Ticket {
   user    User          @relation(fields: [userId], references: [id])
   replies TicketReply[]
 
+  @@index([userId])
+  @@index([status])
   @@map("tickets")
 }
 
@@ -153,6 +161,7 @@ model TicketReply {
 
   ticket Ticket @relation(fields: [ticketId], references: [id])
 
+  @@index([ticketId])
   @@map("ticket_replies")
 }
 
@@ -170,6 +179,8 @@ model Alert {
   expiresAt DateTime?
   createdAt DateTime  @default(now())
 
+  @@index([active])
+  @@index([target])
   @@map("alerts")
 }
 
@@ -184,6 +195,8 @@ model ActivityLog {
   type      String
   createdAt DateTime @default(now())
 
+  @@index([adminId])
+  @@index([createdAt])
   @@map("activity_log")
 }
 

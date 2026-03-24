@@ -1,9 +1,12 @@
 import prisma from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/auth';
 import { generateVerifyCode, ok, error } from '@/lib/utils';
+import { rateLimit, tooManyRequests } from '@/lib/rate-limit';
 
 export async function POST(req) {
   try {
+    const { limited } = rateLimit(req, { maxAttempts: 10, windowMs: 5 * 60 * 1000 });
+    if (limited) return tooManyRequests('Too many attempts. Try again in 5 minutes.');
     const { code } = await req.json();
     const session = await getCurrentUser();
 

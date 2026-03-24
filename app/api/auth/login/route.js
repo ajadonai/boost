@@ -2,17 +2,24 @@ import prisma from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 import { signUserToken, setUserCookie } from '@/lib/auth';
 import { ok, error } from '@/lib/utils';
+import { rateLimit, tooManyRequests } from '@/lib/rate-limit';
+import { sanitizeEmail } from '@/lib/validate';
 
 export async function POST(req) {
   try {
-    const { email, password } = await req.json();
+    const { limited } = rateLimit(req, { maxAttempts: 10, windowMs: 60 * 1000 });
+    if (limited) return tooManyRequests('Too many login attempts. Try again in a minute.');
+
+    const body = await req.json();
+    const email = sanitizeEmail(body.email);
+    const password = body.password;
 
     if (!email || !password) {
       return error('Email and password are required');
     }
 
     const user = await prisma.user.findUnique({
-      where: { email: email.toLowerCase().trim() },
+      where: { email },
     });
 
     if (!user) {

@@ -2,18 +2,23 @@ import prisma from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 import { signUserToken, setUserCookie } from '@/lib/auth';
 import { generateReferralCode, generateVerifyCode, ok, error } from '@/lib/utils';
+import { rateLimit, tooManyRequests } from '@/lib/rate-limit';
+import { validateEmail, validatePassword, validateName, sanitizeEmail, sanitizeString } from '@/lib/validate';
 
 export async function POST(req) {
   try {
-    const { name, email, password, referralCode } = await req.json();
+    const { limited } = rateLimit(req, { maxAttempts: 5, windowMs: 60 * 1000 });
+    if (limited) return tooManyRequests('Too many signup attempts. Try again in a minute.');
 
-    // Validation
-    if (!name || !email || !password) {
-      return error('Name, email, and password are required');
-    }
-    if (password.length < 6) {
-      return error('Password must be at least 6 characters');
-    }
+    const body = await req.json();
+    const name = sanitizeString(body.name, 100);
+    const email = sanitizeEmail(body.email);
+    const password = body.password;
+    const referralCode = sanitizeString(body.referralCode, 20);
+
+    if (!validateName(name)) return error('Name must be 2-100 characters');
+    if (!validateEmail(email)) return error('Please enter a valid email address');
+    if (!validatePassword(password)) return error('Password must be 6-128 characters');
 
     // Check if user exists
     const existing = await prisma.user.findUnique({ where: { email: email.toLowerCase() } });
