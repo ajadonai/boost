@@ -16,7 +16,7 @@ export async function POST(req) {
     const password = body.password;
     const referralCode = sanitizeString(body.referralCode, 20);
 
-    if (!validateName(name)) return error('Name must be 2-100 characters');
+    if (!validateName(name)) return error('Name can only contain letters, spaces, hyphens, and apostrophes');
     if (!validateEmail(email)) return error('Please enter a valid email address');
     if (!validatePassword(password)) return error('Password must be 6-128 characters');
 
