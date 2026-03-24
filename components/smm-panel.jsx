@@ -106,13 +106,22 @@ export default function App() {
     async function load() {
       try {
         const res = await fetch('/api/dashboard');
-        if (!res.ok) { window.location.href = '/?login=1'; return; }
-        const data = await res.json();
-        setUser(data.user);
-        setOrders(data.orders.length ? data.orders : ORDERS);
-        setTxs(data.transactions.length ? data.transactions : TXS);
-        if (data.alerts.length) setAlerts(data.alerts);
-      } catch { /* fallback to mock data */ }
+        if (res.status === 401) { window.location.href = '/?login=1'; return; }
+        if (res.ok) {
+          const data = await res.json();
+          setUser(data.user);
+          if (data.orders?.length) setOrders(data.orders);
+          if (data.transactions?.length) setTxs(data.transactions);
+          if (data.alerts?.length) setAlerts(data.alerts);
+        } else {
+          // API error but user is authenticated — show dashboard with defaults
+          console.error('Dashboard API error:', res.status);
+          setUser({ name: "User", email: "", balance: 0, refCode: "—", refs: 0, earnings: 0 });
+        }
+      } catch (err) {
+        console.error('Dashboard fetch failed:', err);
+        setUser({ name: "User", email: "", balance: 0, refCode: "—", refs: 0, earnings: 0 });
+      }
       setLoading(false);
     }
     load();

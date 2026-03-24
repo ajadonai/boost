@@ -5,6 +5,7 @@ import { ok, error } from '@/lib/utils';
 export async function GET() {
   try {
     const payload = await getCurrentUser();
+    console.log('[Dashboard API] User payload:', payload ? `id=${payload.id}` : 'null');
     if (!payload) return error('Not authenticated', 401);
 
     const user = await prisma.user.findUnique({
@@ -91,7 +92,7 @@ export async function GET() {
       })),
     });
   } catch (err) {
-    console.error('Dashboard data error:', err);
-    return error('Failed to load dashboard data');
+    console.error('Dashboard data error:', err.message, err.stack);
+    return error('Failed to load dashboard data: ' + err.message);
   }
 }
