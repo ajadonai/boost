@@ -160,15 +160,15 @@ export default function Landing(){
         .tc:hover{transform:translateY(-4px);box-shadow:${dark?"0 16px 40px rgba(0,0,0,.3)":"0 16px 40px rgba(0,0,0,.07)"};border-color:${dark?"rgba(255,255,255,.12)":"rgba(0,0,0,.10)"}!important}
         @media(max-width:1024px){
           .test-grid{grid-template-columns:repeat(2,1fr)}
-          .test-hide-tablet{display:none}
+          .test-hide-tablet{display:none!important}
           .test-content{padding:0 28px}
           .test-title{font-size:32px}
           .test-title-accent{font-size:36px}
         }
         @media(max-width:768px){
           .test-grid{grid-template-columns:1fr}
-          .test-hide-mobile{display:none}
-          .test-hide-tablet{display:none}
+          .test-hide-mobile{display:none!important}
+          .test-hide-tablet{display:none!important}
           .test-content{padding:0 16px}
           .test-header{margin-bottom:20px}
           .test-title{font-size:24px}
