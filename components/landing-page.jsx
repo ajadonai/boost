@@ -53,32 +53,18 @@ export default function Landing(){
     heroBg:dark?"#060810":"#c49a93",heroText:dark?"#eae7e2":"#1c1b19",heroSoft:dark?"#b0aca8":"#4a4542",heroMuted:dark?"#7d7974":"#887f78",heroGlass:dark?"rgba(15,19,35,.5)":"rgba(255,255,255,.35)",heroGlassBrd:dark?"rgba(255,255,255,.08)":"rgba(255,255,255,.25)",heroAccentBadge:dark?"rgba(196,125,142,.15)":"rgba(255,255,255,.25)",
   }),[dark]);
 
-  const SECTIONS=["hero","features","pricing","social-proof","faq","cta-footer"];
-  const currentSection=useRef(0);
   useEffect(()=>{
     const handleKey=(e)=>{
       if(modal) return;
       if(e.target.tagName==="INPUT"||e.target.tagName==="TEXTAREA") return;
       if(e.code==="Space"){
         e.preventDefault();
-        const next=e.shiftKey
-          ? Math.max(0,currentSection.current-1)
-          : Math.min(SECTIONS.length-1,currentSection.current+1);
-        currentSection.current=next;
-        document.getElementById(SECTIONS[next])?.scrollIntoView({behavior:"smooth"});
+        const dir=e.shiftKey?-1:1;
+        scrollRef.current?.scrollBy({top:dir*window.innerHeight*0.85,behavior:"smooth"});
       }
     };
-    const obs=new IntersectionObserver((entries)=>{
-      entries.forEach(entry=>{
-        if(entry.isIntersecting){
-          const idx=SECTIONS.indexOf(entry.target.id);
-          if(idx>=0) currentSection.current=idx;
-        }
-      });
-    },{threshold:0.3});
-    SECTIONS.forEach(id=>{const el=document.getElementById(id);if(el)obs.observe(el);});
     window.addEventListener("keydown",handleKey);
-    return()=>{window.removeEventListener("keydown",handleKey);obs.disconnect();};
+    return()=>window.removeEventListener("keydown",handleKey);
   },[modal]);
 
   return(
