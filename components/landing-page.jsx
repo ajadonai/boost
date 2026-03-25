@@ -148,12 +148,41 @@ export default function Landing(){
           .pricing-glow-center{width:300px;height:300px}
           .pricing-glow-left,.pricing-glow-right{display:none}
         }
+
+        .test-sec{overflow:hidden}
+        .test-content{max-width:1140px;margin:0 auto;width:100%;padding:0 48px}
+        .test-header{text-align:center;margin-bottom:36px}
+        .test-title{font-size:40px;font-weight:800;color:${t.text};letter-spacing:-.5px;margin-bottom:8px}
+        .test-title-accent{font-weight:400;font-style:italic;color:${t.accent};font-size:46px}
+        .test-sub{font-size:16px;color:${t.textMuted};font-weight:430}
+        .test-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+        .tc{transition:all .35s cubic-bezier(.16,1,.3,1)}
+        .tc:hover{transform:translateY(-4px);box-shadow:${dark?"0 16px 40px rgba(0,0,0,.3)":"0 16px 40px rgba(0,0,0,.07)"};border-color:${dark?"rgba(255,255,255,.12)":"rgba(0,0,0,.10)"}!important}
+        @media(max-width:1024px){
+          .test-grid{grid-template-columns:repeat(2,1fr)}
+          .test-hide-tablet{display:none}
+          .test-content{padding:0 28px}
+          .test-title{font-size:32px}
+          .test-title-accent{font-size:36px}
+        }
+        @media(max-width:768px){
+          .test-grid{grid-template-columns:1fr}
+          .test-hide-mobile{display:none}
+          .test-hide-tablet{display:none}
+          .test-content{padding:0 16px}
+          .test-header{margin-bottom:20px}
+          .test-title{font-size:24px}
+          .test-title-accent{font-size:28px}
+          .test-sub{font-size:13px}
+          .tc{padding:20px 18px!important;border-radius:18px!important}
+        }
+
         .feat{transition:all .35s cubic-bezier(.16,1,.3,1)}
         .feat:hover{transform:translateY(-3px);box-shadow:${dark?"0 14px 36px rgba(0,0,0,.25)":"0 14px 36px rgba(0,0,0,.06)"}}
         .lift:hover{transform:translateY(-4px);box-shadow:${dark?"0 12px 32px rgba(0,0,0,.3)":"0 12px 32px rgba(0,0,0,.07)"};border-color:${dark?"rgba(255,255,255,.12)":"rgba(0,0,0,.10)"}!important}
         .sec{min-height:calc(100vh - 100px);display:flex;flex-direction:column;justify-content:center;position:relative}
         @media(max-width:1024px){.sec{min-height:calc(100vh - 100px)}.hero-stats{gap:32px!important}}
-        @media(max-width:768px){.sec{min-height:calc(100vh - 96px)}.nav-links{display:none!important}.nav-login{display:none!important}.test-grid{grid-template-columns:1fr!important}.test-hide{display:none!important}.hero-stats{gap:24px!important}.hero-content{padding:16px 24px 12px!important}.hero-badge{font-size:12px!important;margin-bottom:20px!important}.hero-h1{font-size:36px!important}.hero-refined{font-size:40px!important}.hero-sub{font-size:15px!important;margin-bottom:28px!important}.hero-btns{gap:10px!important}.hero-btn{padding:13px 28px!important;font-size:14px!important;border-radius:12px!important}.hero-stat-val{font-size:18px!important}.hero-carousel-item{padding:7px 14px!important;font-size:12px!important;border-radius:10px!important;gap:6px!important}.s2-features{grid-template-columns:1fr 1fr!important}.s2-features{gap:8px!important}.s2-features .feat{padding:14px!important;border-radius:14px!important}.feat-desc{display:none!important}.feat-row{gap:10px!important;margin-bottom:0!important}.feat-ic{width:32px!important;height:32px!important;min-width:32px!important;min-height:32px!important;border-radius:9px!important;font-size:15px!important}.s2-features .feat h3{font-size:13px!important}.s2-label{display:none!important}.s2-wrap{padding:16px 20px 10px!important}.s2-steps-wrap{padding:10px 20px 20px!important}.s2-wrap h2{font-size:22px!important}.s2-wrap h2 .serif{font-size:25px!important}.s2-steps-wrap h2{font-size:18px!important}.s2-steps{display:flex!important;flex-direction:row!important;gap:8px!important;grid-template-columns:none!important}.s2-step{flex:1!important;padding:16px 8px!important;text-align:center!important;flex-direction:column!important}.s2-step-icon{width:auto!important;height:auto!important;border-radius:0!important;margin-bottom:6px!important;background:none!important;border:none!important;box-shadow:none!important;transform:none!important;font-size:18px!important}.s2-step-emoji{display:none!important}.s2-step-num{display:inline!important}.s2-step-text{display:none!important}.s2-connector{display:none!important}}
+        @media(max-width:768px){.sec{min-height:calc(100vh - 96px)}.nav-links{display:none!important}.nav-login{display:none!important}.hero-stats{gap:24px!important}.hero-content{padding:16px 24px 12px!important}.hero-badge{font-size:12px!important;margin-bottom:20px!important}.hero-h1{font-size:36px!important}.hero-refined{font-size:40px!important}.hero-sub{font-size:15px!important;margin-bottom:28px!important}.hero-btns{gap:10px!important}.hero-btn{padding:13px 28px!important;font-size:14px!important;border-radius:12px!important}.hero-stat-val{font-size:18px!important}.hero-carousel-item{padding:7px 14px!important;font-size:12px!important;border-radius:10px!important;gap:6px!important}.s2-features{grid-template-columns:1fr 1fr!important}.s2-features{gap:8px!important}.s2-features .feat{padding:14px!important;border-radius:14px!important}.feat-desc{display:none!important}.feat-row{gap:10px!important;margin-bottom:0!important}.feat-ic{width:32px!important;height:32px!important;min-width:32px!important;min-height:32px!important;border-radius:9px!important;font-size:15px!important}.s2-features .feat h3{font-size:13px!important}.s2-label{display:none!important}.s2-wrap{padding:16px 20px 10px!important}.s2-steps-wrap{padding:10px 20px 20px!important}.s2-wrap h2{font-size:22px!important}.s2-wrap h2 .serif{font-size:25px!important}.s2-steps-wrap h2{font-size:18px!important}.s2-steps{display:flex!important;flex-direction:row!important;gap:8px!important;grid-template-columns:none!important}.s2-step{flex:1!important;padding:16px 8px!important;text-align:center!important;flex-direction:column!important}.s2-step-icon{width:auto!important;height:auto!important;border-radius:0!important;margin-bottom:6px!important;background:none!important;border:none!important;box-shadow:none!important;transform:none!important;font-size:18px!important}.s2-step-emoji{display:none!important}.s2-step-num{display:inline!important}.s2-step-text{display:none!important}.s2-connector{display:none!important}}
         @media(max-width:480px){.sec{min-height:calc(100vh - 92px)}}
       `}</style>
 
@@ -275,15 +304,36 @@ export default function Landing(){
           </div>
         </section>
 
-        {/* ━━━ SCREEN 4: TESTIMONIALS (9 on web, 3 on mobile) ━━━ */}
-        <section id="testimonials" className="sec" style={{background:dark?"rgba(255,255,255,.015)":"rgba(0,0,0,.012)",padding:"60px 40px"}}>
-          <div style={{maxWidth:1100,margin:"0 auto",width:"100%"}}>
-            <div style={{textAlign:"center",marginBottom:48}}>
-              <h2 style={{fontSize:"clamp(28px,4vw,40px)",fontWeight:700,color:t.text,marginBottom:10}}>Trusted by <span style={{color:t.accent}}>Creators</span></h2>
-              <p style={{fontSize:16,color:t.textSoft,fontWeight:430}}>Real people. Real results. Real growth.</p>
+        {/* ━━━ SCREEN 4: TESTIMONIALS ━━━ */}
+        <section id="testimonials" className="sec test-sec" style={{background:dark?"rgba(255,255,255,.015)":"rgba(0,0,0,.012)"}}>
+          <div className="test-content">
+            <div className="test-header">
+              <h2 className="test-title">Trusted by <span className="serif test-title-accent">Creators</span></h2>
+              <p className="test-sub">Real people. Real results. Real growth.</p>
             </div>
-            <div className="test-grid" style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:16}}>
-              {[["Chioma A.","Instagram Influencer","Nitro helped me hit 50K followers. The delivery is incredibly fast and the followers actually stay. Best panel in Nigeria by far."],["Tunde O.","Music Artist","I use Nitro for Spotify and YouTube promotion. Instant delivery, Naira payments, zero stress. My streams tripled in two months."],["Blessing E.","Business Owner","My boutique's Instagram went from 2K to 25K. Real engagement that converts to sales. I recommend Nitro to every business owner I know."],["David K.","Content Creator","I was skeptical at first but the results speak for themselves. My TikTok blew up after using Nitro's views service. 100K views overnight."],["Amara N.","Brand Manager","test-hide","Managing social growth for multiple brands is easy with Nitro. The dashboard is clean, delivery is fast, and the refill guarantee gives me peace of mind."],["Emeka C.","Student Entrepreneur","test-hide","Started a social media agency using Nitro as my backend. The API is solid, prices are competitive, and I earn 5% on every referral. Game changer."],["Fatima B.","Fashion Blogger","test-hide","The quality of followers on Instagram is what sold me. Not bots — real accounts that actually engage with my content. Worth every Naira."],["Uche M.","Podcast Host","test-hide","YouTube subscribers and watch time from Nitro helped me hit monetization. The support team is responsive and the platform just works."],["Grace O.","Fitness Coach","test-hide","I've tried every SMM panel in Nigeria. Nitro is the only one with consistent delivery, actual refills, and a dashboard that doesn't look like it's from 2010."]].map(([name,role,text,cls],i)=><div key={i} className={`lift ${cls||""}`} style={{padding:"24px 22px",borderRadius:18,background:t.surface,border:`1px solid ${t.surfaceBorder}`,backdropFilter:"blur(8px)",display:"flex",flexDirection:"column"}}><div style={{fontSize:13,color:"#e0a458",marginBottom:10,letterSpacing:1}}>★★★★★</div><p style={{fontSize:14,color:t.textSoft,lineHeight:1.7,fontWeight:430,fontStyle:"italic",flex:1,marginBottom:16}}>"{text}"</p><div style={{display:"flex",alignItems:"center",gap:10}}><div style={{width:36,height:36,borderRadius:"50%",background:t.logoGrad,display:"flex",alignItems:"center",justifyContent:"center",fontSize:14,fontWeight:700,color:"#fff"}}>{name[0]}</div><div><div style={{fontSize:14,fontWeight:600,color:t.text}}>{name}</div><div style={{fontSize:12,color:t.textMuted,fontWeight:430}}>{role}</div></div></div></div>)}
+            <div className="test-grid">
+              {[
+                ["Chioma A.","Instagram Influencer","Nitro helped me hit 50K followers. The delivery is incredibly fast and the followers actually stay. Best panel in Nigeria by far.","C","linear-gradient(135deg,#F58529,#DD2A7B)"],
+                ["Tunde O.","Music Artist","I use Nitro for Spotify and YouTube promotion. Instant delivery, Naira payments, zero stress. My streams tripled in two months.","T","linear-gradient(135deg,#1DB954,#148a3c)"],
+                ["Blessing E.","Business Owner","My boutique's Instagram went from 2K to 25K. Real engagement that converts to sales. I recommend Nitro to every business owner.","B","linear-gradient(135deg,#6366f1,#4f46e5)"],
+                ["David K.","Content Creator","I was skeptical at first but the results speak. My TikTok blew up after using Nitro's views service. 100K views overnight.","D","linear-gradient(135deg,#FE2C55,#25F4EE)","test-hide-mobile"],
+                ["Amara N.","Brand Manager","Managing social growth for multiple brands is easy with Nitro. Clean dashboard, fast delivery, and the refill guarantee is clutch.","A","linear-gradient(135deg,#c47d8e,#a3586b)","test-hide-mobile"],
+                ["Emeka C.","Student Entrepreneur","Started a social media agency using Nitro as my backend. Prices are competitive and I earn 5% on every referral. Game changer.","E","linear-gradient(135deg,#e0a458,#d4943e)","test-hide-mobile"],
+                ["Fatima B.","Fashion Blogger","The quality of followers on Instagram is what sold me. Not bots — real accounts that actually engage with my content. Worth every Naira.","F","linear-gradient(135deg,#DD2A7B,#8134AF)","test-hide-tablet"],
+                ["Uche M.","Podcast Host","YouTube subscribers and watch time from Nitro helped me hit monetization. Support team is responsive and the platform just works.","U","linear-gradient(135deg,#FF0000,#CC0000)","test-hide-tablet"],
+                ["Grace O.","Fitness Coach","I have tried every SMM panel in Nigeria. Nitro is the only one with consistent delivery, actual refills, and a dashboard that works.","G","linear-gradient(135deg,#059669,#34d399)","test-hide-tablet"]
+              ].map(([name,role,text,avatar,gradient,hideClass],i)=><div key={i} className={`tc fu fd${i+1} ${hideClass||""}`} style={{padding:"24px 22px",borderRadius:20,background:dark?"rgba(15,19,35,.55)":"rgba(255,255,255,.5)",border:`1px solid ${dark?"rgba(255,255,255,.07)":"rgba(0,0,0,.05)"}`,backdropFilter:"blur(16px)",display:"flex",flexDirection:"column",position:"relative",overflow:"hidden"}}>
+                <div style={{position:"absolute",top:-30,right:-30,width:80,height:80,borderRadius:"50%",background:gradient,opacity:.04,filter:"blur(20px)",pointerEvents:"none"}}/>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14}}>
+                  <div style={{display:"flex",gap:2}}>{[0,1,2,3,4].map(j=><svg key={j} width="14" height="14" viewBox="0 0 24 24" fill="#e0a458"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>)}</div>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={t.accent} strokeWidth="1" opacity=".25"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V21zm12 0c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V21z"/></svg>
+                </div>
+                <p style={{fontSize:14,color:t.textSoft,lineHeight:1.7,fontWeight:430,flex:1,marginBottom:18}}>"{text}"</p>
+                <div style={{display:"flex",alignItems:"center",gap:12}}>
+                  <div style={{width:38,height:38,borderRadius:12,background:gradient,display:"flex",alignItems:"center",justifyContent:"center",fontSize:15,fontWeight:700,color:"#fff",flexShrink:0,boxShadow:"0 3px 10px rgba(0,0,0,.15)"}}>{avatar}</div>
+                  <div><div style={{fontSize:14,fontWeight:650,color:t.text}}>{name}</div><div style={{fontSize:12,color:t.textMuted,fontWeight:430,marginTop:1}}>{role}</div></div>
+                </div>
+              </div>)}
             </div>
           </div>
         </section>
