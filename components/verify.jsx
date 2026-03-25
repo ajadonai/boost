@@ -12,7 +12,15 @@ export default function VerifyAccount(){
   const [error,setError]=useState("");
   const [resendTimer,setResendTimer]=useState(60);
   const [verified,setVerified]=useState(false);
+  const [userEmail,setUserEmail]=useState("");
   const inputs=useRef([]);
+
+  // Fetch user email on mount
+  useEffect(()=>{
+    fetch("/api/auth/me").then(r=>r.json()).then(d=>{
+      if(d.user?.email)setUserEmail(d.user.email);
+    }).catch(()=>{});
+  },[]);
 
   // Countdown timer for resend
   useEffect(()=>{
@@ -120,10 +128,10 @@ export default function VerifyAccount(){
 
           {!verified?<>
             {/* Logo */}
-            <div style={{width:48,height:48,borderRadius:14,background:t.logoGrad,display:"inline-flex",alignItems:"center",justifyContent:"center",fontSize:22,fontWeight:700,color:"#fff",marginBottom:16,boxShadow:"0 8px 24px rgba(196,125,142,0.2)"}}>B</div>
+            <div style={{width:48,height:48,borderRadius:14,background:t.logoGrad,display:"inline-flex",alignItems:"center",justifyContent:"center",fontSize:22,fontWeight:700,color:"#fff",marginBottom:16,boxShadow:"0 8px 24px rgba(196,125,142,0.2)"}}>N</div>
             <h1 className="serif" style={{fontSize:26,fontWeight:600,color:t.text,marginBottom:6}}>Verify Your Account</h1>
             <p style={{fontSize:14,color:t.textSoft,marginBottom:6}}>We sent a 6-digit code to</p>
-            <p style={{fontSize:14,color:t.accent,fontWeight:600,marginBottom:28}}>user@example.com</p>
+            <p style={{fontSize:14,color:t.accent,fontWeight:600,marginBottom:28}}>{userEmail||"your email"}</p>
 
             {/* Error */}
             {error&&<div style={{padding:"10px 14px",borderRadius:10,background:dark?"rgba(220,38,38,0.1)":"#fef2f2",border:`1px solid ${dark?"rgba(220,38,38,0.2)":"#fecaca"}`,color:t.red,fontSize:13,marginBottom:16,animation:"fu 0.2s ease"}}>⚠️ {error}</div>}
