@@ -50,7 +50,7 @@ export async function POST(req) {
           min: Number(svc.min) || 10,
           max: Number(svc.max) || 100000,
           refill: svc.refill === true || svc.refill === 'true',
-          avgTime: svc.average_time || null,
+          avgTime: svc.average_time || '0-2 hrs',
         };
 
         const ex = existingMap[apiId];
