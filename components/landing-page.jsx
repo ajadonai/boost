@@ -83,9 +83,9 @@ export default function Landing(){
       
       <style>{`
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-        .root{min-height:100vh;background:${t.bg};color:${t.text};font-family:'Outfit',sans-serif;transition:background 1.5s cubic-bezier(.4,0,.2,1),color 1.2s ease;overflow-x:clip;scroll-behavior:smooth}
+        .root{min-height:100vh;background:${t.bg};color:${t.text};font-family:'Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;transition:background 1.5s cubic-bezier(.4,0,.2,1),color 1.2s ease;overflow-x:clip;scroll-behavior:smooth}
         .snap-section{min-height:100vh;display:flex;flex-direction:column;justify-content:center;scroll-snap-align:start}
-        .m{font-family:'JetBrains Mono',monospace}.serif{font-family:'Cormorant Garamond',serif}
+        .m{font-family:'JetBrains Mono',monospace}.serif{font-family:'Plus Jakarta Sans',-apple-system,sans-serif}
         button{cursor:pointer;font-family:inherit;border:none}input,textarea{font-family:inherit}
         @keyframes fi{from{opacity:0}to{opacity:1}}@keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
         @keyframes float1{0%,100%{transform:translate(0,0) scale(1)}25%{transform:translate(30px,-20px) scale(1.05)}50%{transform:translate(-10px,15px) scale(0.95)}75%{transform:translate(20px,10px) scale(1.02)}}

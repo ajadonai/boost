@@ -22,8 +22,8 @@ export default function Maintenance(){
       
       <style>{`
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-        .root{min-height:100vh;background:${t.bg};font-family:'Outfit',sans-serif;display:flex;flex-direction:column;position:relative;overflow:hidden}
-        .serif{font-family:'Cormorant Garamond',serif}.m{font-family:'JetBrains Mono',monospace}
+        .root{min-height:100vh;background:${t.bg};font-family:'Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;display:flex;flex-direction:column;position:relative;overflow:hidden}
+        .serif{font-family:'Plus Jakarta Sans',-apple-system,sans-serif}.m{font-family:'JetBrains Mono',monospace}
         @keyframes float1{0%,100%{transform:translate(0,0)}50%{transform:translate(20px,-15px)}}
         @keyframes pulse{0%,100%{opacity:.4;transform:scale(1)}50%{opacity:.8;transform:scale(1.02)}}
         @keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}

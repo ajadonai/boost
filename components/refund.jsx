@@ -15,8 +15,8 @@ export default function Refund(){
   const S=({title,children})=><div style={{marginBottom:32}}><h2 className="serif" style={{fontSize:20,fontWeight:600,color:t.text,marginBottom:10}}>{title}</h2><div style={{fontSize:14,color:t.textSoft,lineHeight:1.9}}>{children}</div></div>;
 
   return(
-    <div style={{minHeight:"100vh",background:t.bg,fontFamily:"'Outfit',sans-serif",transition:"background 1.5s ease"}}>
-      <style>{`.serif{font-family:'Cormorant Garamond',serif}`}</style>
+    <div style={{minHeight:"100vh",background:t.bg,fontFamily:"'Plus Jakarta Sans',-apple-system,sans-serif",transition:"background 1.5s ease"}}>
+      <style>{`.serif{font-family:'Plus Jakarta Sans',-apple-system,sans-serif}`}</style>
 
       <div style={{padding:"24px 0",borderBottom:`1px solid ${t.surfaceBorder}`,position:"sticky",top:0,zIndex:50,background:t.bg,backdropFilter:"blur(20px)",transition:"background 1.5s ease"}}>
         <div style={{maxWidth:800,margin:"0 auto",padding:"0 24px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>

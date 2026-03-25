@@ -46,8 +46,8 @@ export default function AdminLogin(){
       
       <style>{`
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-        .root{min-height:100vh;background:${t.bg};font-family:'Outfit',sans-serif;display:flex;align-items:center;justify-content:center;transition:background 1.5s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden}
-        .serif{font-family:'Cormorant Garamond',serif}
+        .root{min-height:100vh;background:${t.bg};font-family:'Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;display:flex;align-items:center;justify-content:center;transition:background 1.5s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden}
+        .serif{font-family:'Plus Jakarta Sans',-apple-system,sans-serif}
         button{cursor:pointer;font-family:inherit;border:none}input{font-family:inherit}
         @keyframes fu{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
         @keyframes f1{0%,100%{transform:translate(0,0) scale(1)}25%{transform:translate(30px,-20px) scale(1.05)}50%{transform:translate(-10px,15px) scale(0.95)}75%{transform:translate(20px,10px) scale(1.02)}}

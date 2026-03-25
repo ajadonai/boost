@@ -22,8 +22,8 @@ export default function NotFound(){
       
       <style>{`
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-        .root{min-height:100vh;background:${t.bg};font-family:'Outfit',sans-serif;display:flex;flex-direction:column;transition:background 1.5s ease;position:relative;overflow:hidden}
-        .serif{font-family:'Cormorant Garamond',serif}
+        .root{min-height:100vh;background:${t.bg};font-family:'Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;display:flex;flex-direction:column;transition:background 1.5s ease;position:relative;overflow:hidden}
+        .serif{font-family:'Plus Jakarta Sans',-apple-system,sans-serif}
         .m{font-family:'JetBrains Mono',monospace}
         button,a{cursor:pointer;font-family:inherit;border:none;text-decoration:none}
         @keyframes float1{0%,100%{transform:translate(0,0) scale(1)}25%{transform:translate(30px,-20px) scale(1.05)}50%{transform:translate(-10px,15px) scale(0.95)}75%{transform:translate(20px,10px) scale(1.02)}}

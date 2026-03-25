@@ -88,8 +88,8 @@ export default function VerifyAccount(){
       
       <style>{`
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-        .root{min-height:100vh;background:${t.bg};font-family:'Outfit',sans-serif;display:flex;flex-direction:column;transition:background 1.5s ease;position:relative;overflow:hidden}
-        .serif{font-family:'Cormorant Garamond',serif}.m{font-family:'JetBrains Mono',monospace}
+        .root{min-height:100vh;background:${t.bg};font-family:'Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;display:flex;flex-direction:column;transition:background 1.5s ease;position:relative;overflow:hidden}
+        .serif{font-family:'Plus Jakarta Sans',-apple-system,sans-serif}.m{font-family:'JetBrains Mono',monospace}
         button{cursor:pointer;font-family:inherit;border:none}input{font-family:inherit}
         @keyframes fu{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
         @keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
