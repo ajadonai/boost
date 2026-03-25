@@ -53,15 +53,50 @@ const ATYPE={"credit":"💰","alert":"📢","cancel":"✕","ticket":"💬","ban"
 function ThemeToggle({dark,onToggle,compact}){return <button onClick={onToggle} style={{display:"flex",alignItems:"center",background:dark?"rgba(255,255,255,0.06)":"rgba(0,0,0,0.06)",borderRadius:20,padding:3,width:compact?52:64,height:compact?28:32,border:`1px solid ${dark?"rgba(255,255,255,0.08)":"rgba(0,0,0,0.1)"}`,position:"relative",flexShrink:0,transition:"background 1.5s cubic-bezier(.4,0,.2,1),border-color 1.5s ease"}}><div style={{width:compact?22:26,height:compact?22:26,borderRadius:"50%",background:dark?"#c47d8e":"#e0a458",display:"flex",alignItems:"center",justifyContent:"center",fontSize:compact?12:14,position:"absolute",left:dark?3:(compact?27:35),transition:"left 0.4s cubic-bezier(.4,0,.2,1),background 1.5s cubic-bezier(.4,0,.2,1)",boxShadow:"0 1px 4px rgba(0,0,0,0.2)"}}>{dark?"🌙":"☀️"}</div></button>;}
 
 export default function AdminPanel(){
-  const [pg,setPg]=useState("overview");const [alerts,setAlerts]=useState(MOCK_ALERTS);const [dismissedAlerts,setDismissedAlerts]=useState([]);
+  const [pg,setPg]=useState("overview");const [alerts,setAlerts]=useState([]);const [dismissedAlerts,setDismissedAlerts]=useState([]);
   const [maint,setMaint]=useState({enabled:false,message:"We're performing scheduled upgrades to improve your experience. Everything will be back to normal shortly.",estimatedReturn:"~30 minutes",showTwitter:true});
   const [gateways,setGateways]=useState([
     {id:"paystack",name:"Paystack",icon:"💳",desc:"Cards, Bank Transfer, USSD",enabled:true,priority:1},
     {id:"flutterwave",name:"Flutterwave",icon:"🦋",desc:"Cards, Bank Transfer, Mobile Money",enabled:true,priority:2},
     {id:"monnify",name:"Monnify",icon:"🏦",desc:"Bank Transfer, USSD",enabled:true,priority:3},
     {id:"korapay",name:"Korapay",icon:"💠",desc:"Cards, Bank Transfer",enabled:false,priority:4},
-  ]);const [activityLog,setActivityLog]=useState(MOCK_ACTIVITY);const [adminList,setAdminList]=useState(MOCK_ADMINS.map(a=>({...a,customPages:null})));const [sb,setSb]=useState(false);const [mini,setMini]=useState(false);const [toast,setToast]=useState(null);const [currentAdmin]=useState(MOCK_ADMINS[0]);const role=ROLES[currentAdmin.role];
+  ]);const [activityLog,setActivityLog]=useState([]);const [adminList,setAdminList]=useState([]);const [sb,setSb]=useState(false);const [mini,setMini]=useState(false);const [toast,setToast]=useState(null);const [currentAdmin,setCurrentAdmin]=useState({name:"Admin",role:"superadmin",email:"admin@boostpanel.ng",id:"temp"});const [loading,setLoading]=useState(true);
+  const [orders,setOrders]=useState([]);const [users,setUsers]=useState([]);const [services,setServices]=useState(MOCK_SERVICES);const [tickets,setTickets]=useState([]);
+  const [overview,setOverview]=useState({users:0,orders:0,openTickets:0,revenue:0,cost:0,profit:0,deposits:0,today:{orders:0,revenue:0,users:0}});
   const [siteSettings,setSiteSettings]=useState({whatsapp:"2348012345678",twitter:"boostpanel",instagram:"boostpanel.ng",siteName:"BoostPanel",supportEmail:"support@boostpanel.ng",minDeposit:"500",defaultMarkup:"54",promoEnabled:true,promoMessage:"Sign up today and get 10% bonus on your first deposit.",promoType:"info",refEnabled:true,refReferrerBonus:"500",refInviteeBonus:"500",refTrigger:"verify",refCommission:"5",refMaxPerUser:"0",refLinkExpiry:"0",refSelfPrevention:true});
+  const role=ROLES[currentAdmin.role]||ROLES.admin;
+
+  // Fetch admin identity + all data on mount
+  useEffect(()=>{
+    async function loadAdmin(){
+      try{
+        const res=await fetch("/api/auth/admin/me");
+        if(!res.ok){window.location.href="/admin/login";return;}
+        const d=await res.json();
+        if(d.admin)setCurrentAdmin(d.admin);
+      }catch{window.location.href="/admin/login";return;}
+    }
+    async function loadData(){
+      const fetches=[
+        fetch("/api/admin/overview").then(r=>r.ok?r.json():null).catch(()=>null),
+        fetch("/api/admin/orders").then(r=>r.ok?r.json():null).catch(()=>null),
+        fetch("/api/admin/users").then(r=>r.ok?r.json():null).catch(()=>null),
+        fetch("/api/admin/settings").then(r=>r.ok?r.json():null).catch(()=>null),
+      ];
+      const [ov,ord,usr,st]=await Promise.all(fetches);
+      if(ov)setOverview(ov);
+      if(ord?.orders)setOrders(ord.orders);
+      if(usr?.users)setUsers(usr.users);
+      if(st?.settings){
+        const s=st.settings;
+        setSiteSettings(prev=>({...prev,...Object.fromEntries(
+          Object.entries(s).map(([k,v])=>[k,v==="true"?true:v==="false"?false:v])
+        )}));
+      }
+      setLoading(false);
+    }
+    loadAdmin().then(loadData);
+  },[]);
   const getAutoTheme=()=>{const h=new Date().getHours(),m=new Date().getMinutes();if(h>=7&&h<18)return false;if(h>=19||h<6)return true;if(h===6)return m<30;if(h===18)return m>=30;return true;};
   const [dark,setDark]=useState(getAutoTheme);const [manualOverride,setManualOverride]=useState(false);
   useEffect(()=>{if(manualOverride)return;const iv=setInterval(()=>setDark(getAutoTheme()),60000);return()=>clearInterval(iv);},[manualOverride]);
@@ -112,19 +147,19 @@ export default function AdminPanel(){
       return <div key={a.id} style={{padding:"10px 16px",marginBottom:8,borderRadius:10,display:"flex",alignItems:"center",justifyContent:"space-between",gap:10,fontSize:13,fontWeight:500,animation:"fu .3s ease",flexWrap:"wrap",background:isAdmin?(dark?"rgba(127,119,221,0.1)":"#EEEDFE"):bgMap[a.type],color:isAdmin?(dark?"#AFA9EC":"#534AB7"):colorMap[a.type],border:`1px solid ${isAdmin?(dark?"rgba(175,169,236,0.3)":"#AFA9EC"):borderMap[a.type]}`,backdropFilter:"blur(12px)"}}><div style={{display:"flex",alignItems:"center",gap:8,flex:1,minWidth:0}}><span style={{fontSize:11,fontWeight:600,padding:"2px 8px",borderRadius:6,background:isAdmin?(dark?"rgba(127,119,221,0.15)":"#fff"):(dark?"rgba(255,255,255,0.08)":"rgba(255,255,255,0.8)"),border:`1px solid ${isAdmin?(dark?"rgba(175,169,236,0.3)":"#AFA9EC"):"transparent"}`,flexShrink:0}}>{isAdmin?"Admin":a.type==="warning"?"⚠️":a.type==="critical"?"🚨":"ℹ️"}</span><span style={{overflow:"hidden",textOverflow:"ellipsis"}}>{a.message}</span></div><button onClick={()=>setDismissedAlerts(p=>[...p,a.id])} style={{background:"none",color:"inherit",fontSize:14,padding:2,flexShrink:0,opacity:0.5,border:"none",cursor:"pointer"}}>✕</button></div>})}
     </div>
     <ErrorBoundary t={t} key={pg}>
-    {pg==="overview"&&<Overview t={t} dark={dark} orders={MOCK_ORDERS} users={MOCK_USERS} tickets={MOCK_TICKETS} activity={activityLog}/>}
-    {pg==="orders"&&<AllOrders t={t} dark={dark} orders={MOCK_ORDERS} Btn={Btn} FilterBtn={FilterBtn} notify={notify} role={currentAdmin.role}/>}
-    {pg==="users"&&<UsersPage t={t} dark={dark} users={MOCK_USERS} Btn={Btn} FilterBtn={FilterBtn} notify={notify} role={currentAdmin.role}/>}
-    {pg==="services"&&<ServiceMgmt t={t} dark={dark} services={MOCK_SERVICES} Btn={Btn} notify={notify}/>}
+    {pg==="overview"&&<Overview t={t} dark={dark} orders={orders} users={users} tickets={tickets} activity={activityLog} overview={overview}/>}
+    {pg==="orders"&&<AllOrders t={t} dark={dark} orders={orders} Btn={Btn} FilterBtn={FilterBtn} notify={notify} role={currentAdmin.role}/>}
+    {pg==="users"&&<UsersPage t={t} dark={dark} users={users} Btn={Btn} FilterBtn={FilterBtn} notify={notify} role={currentAdmin.role}/>}
+    {pg==="services"&&<ServiceMgmt t={t} dark={dark} services={services} Btn={Btn} notify={notify}/>}
     {pg==="api"&&<ApiSettings t={t} dark={dark} Btn={Btn} notify={notify}/>}
     {pg==="payments"&&<PaymentsPage t={t} dark={dark} gateways={gateways} setGateways={setGateways} Btn={Btn} FilterBtn={FilterBtn} notify={notify} logAction={logAction} isSuperAdmin={currentAdmin.role==="superadmin"}/>}
-    {pg==="tickets"&&<TicketsPage t={t} dark={dark} tickets={MOCK_TICKETS} Btn={Btn} FilterBtn={FilterBtn} notify={notify}/>}
+    {pg==="tickets"&&<TicketsPage t={t} dark={dark} tickets={tickets} Btn={Btn} FilterBtn={FilterBtn} notify={notify}/>}
     {pg==="activity"&&<ActivityLog t={t} dark={dark} activity={activityLog} role={currentAdmin.role} adminName={currentAdmin.name}/>}
-    {pg==="analytics"&&<AnalyticsPage t={t} dark={dark} orders={MOCK_ORDERS} users={MOCK_USERS} Btn={Btn} role={currentAdmin.role}/>}
+    {pg==="analytics"&&<AnalyticsPage t={t} dark={dark} orders={MOCK_ORDERS} users={users} Btn={Btn} role={currentAdmin.role}/>}
     {pg==="maintenance"&&<MaintenancePage t={t} dark={dark} maint={maint} setMaint={setMaint} Btn={Btn} notify={notify} logAction={logAction} isSuperAdmin={currentAdmin.role==="superadmin"}/>}
     {pg==="alerts"&&<AlertsPage t={t} dark={dark} alerts={alerts} setAlerts={setAlerts} Btn={Btn} FilterBtn={FilterBtn} notify={notify} isSuperAdmin={currentAdmin.role==="superadmin"} currentAdmin={currentAdmin} logAction={logAction}/>}
     {pg==="coupons"&&<CouponsPage t={t} dark={dark} Btn={Btn} FilterBtn={FilterBtn} notify={notify} logAction={logAction}/>}
-    {pg==="notifications"&&<NotificationsPage t={t} dark={dark} Btn={Btn} notify={notify} logAction={logAction} users={MOCK_USERS}/>}
+    {pg==="notifications"&&<NotificationsPage t={t} dark={dark} Btn={Btn} notify={notify} logAction={logAction} users={users}/>}
     {pg==="team"&&<AdminRoles t={t} dark={dark} admins={adminList} setAdmins={setAdminList} Btn={Btn} FilterBtn={FilterBtn} notify={notify} isSuperAdmin={currentAdmin.role==="superadmin"} logAction={logAction}/>}
     {pg==="settings"&&<SiteSettingsPage t={t} dark={dark} settings={siteSettings} setSettings={setSiteSettings} Btn={Btn} notify={notify} logAction={logAction}/>}
     </ErrorBoundary>
@@ -140,7 +175,7 @@ export default function AdminPanel(){
   </main></div>);
 }
 
-function Overview({t,dark,orders,users,tickets,activity}){const rev=orders.reduce((a,o)=>a+o.charge,0),cost=orders.reduce((a,o)=>a+o.cost,0),profit=rev-cost;return <div><Hdr title="Overview" sub="Business performance at a glance" t={t}/><div className="sg" style={{marginBottom:24}}><Stat l="Revenue" v={fN(rev)} c={t.green} ic="💰" t={t} dark={dark}/><Stat l="Profit" v={fN(profit)} sub={`${Math.round(profit/rev*100)}% margin`} c={t.accent} ic="📈" d={.05} t={t} dark={dark}/><Stat l="Users" v={users.length} sub={`${users.filter(u=>u.status==="Active").length} active`} c="#a5b4fc" ic="👥" d={.1} t={t} dark={dark}/><Stat l="Open Tickets" v={tickets.filter(x=>x.status==="Open").length} c="#fcd34d" ic="💬" d={.15} t={t} dark={dark}/></div><div className="g2"><Card d={.2} dark={dark}><h3 style={{fontSize:15,fontWeight:600,color:t.text,marginBottom:14}}>Recent Orders</h3>{orders.slice(0,5).map((o,i)=><div key={o.id} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"10px 0",borderBottom:i<4?`1px solid ${t.surfaceBorder}`:"none",gap:8,flexWrap:"wrap"}}><div style={{minWidth:0,flex:1}}><div style={{fontSize:13,fontWeight:500,color:t.text,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{o.user} — {o.service.split("[")[0].trim()}</div><div className="m" style={{fontSize:11,color:t.textMuted,marginTop:2}}>{o.id}</div></div><div style={{textAlign:"right",flexShrink:0}}><Badge s={o.status} dark={dark}/><div className="m" style={{fontSize:11,color:t.green,marginTop:3}}>{fN(o.charge)}</div></div></div>)}</Card><Card d={.25} dark={dark}><h3 style={{fontSize:15,fontWeight:600,color:t.text,marginBottom:14}}>Recent Admin Activity</h3>{activity.slice(0,6).map((a,i)=><div key={a.id} style={{display:"flex",alignItems:"flex-start",gap:10,padding:"10px 0",borderBottom:i<5?`1px solid ${t.surfaceBorder}`:"none"}}><span style={{fontSize:16,flexShrink:0,marginTop:1}}>{ATYPE[a.type]||"📝"}</span><div><div style={{fontSize:13,color:t.text}}><span style={{fontWeight:600}}>{a.admin}</span> {a.action}</div><div style={{fontSize:11,color:t.textMuted,marginTop:2}}>{fD(a.time)}</div></div></div>)}</Card></div></div>;}
+function Overview({t,dark,orders,users,tickets,activity,overview}){const ov=overview||{};const rev=ov.revenue||0,profit=ov.profit||0;return <div><Hdr title="Overview" sub="Business performance at a glance" t={t}/><div className="sg" style={{marginBottom:24}}><Stat l="Revenue" v={fN(rev)} c={t.green} ic="💰" t={t} dark={dark}/><Stat l="Profit" v={fN(profit)} sub={rev?`${Math.round(profit/rev*100)}% margin`:""} c={t.accent} ic="📈" d={.05} t={t} dark={dark}/><Stat l="Users" v={ov.users||users.length} sub={`${ov.today?.users||0} today`} c="#a5b4fc" ic="👥" d={.1} t={t} dark={dark}/><Stat l="Open Tickets" v={ov.openTickets||0} c="#fcd34d" ic="💬" d={.15} t={t} dark={dark}/></div><div className="g2"><Card d={.2} dark={dark}><h3 style={{fontSize:15,fontWeight:600,color:t.text,marginBottom:14}}>Recent Orders</h3>{orders.slice(0,5).map((o,i)=><div key={o.id} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"10px 0",borderBottom:i<4?`1px solid ${t.surfaceBorder}`:"none",gap:8,flexWrap:"wrap"}}><div style={{minWidth:0,flex:1}}><div style={{fontSize:13,fontWeight:500,color:t.text,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{o.user} — {o.service.split("[")[0].trim()}</div><div className="m" style={{fontSize:11,color:t.textMuted,marginTop:2}}>{o.id}</div></div><div style={{textAlign:"right",flexShrink:0}}><Badge s={o.status} dark={dark}/><div className="m" style={{fontSize:11,color:t.green,marginTop:3}}>{fN(o.charge)}</div></div></div>)}</Card><Card d={.25} dark={dark}><h3 style={{fontSize:15,fontWeight:600,color:t.text,marginBottom:14}}>Recent Admin Activity</h3>{activity.slice(0,6).map((a,i)=><div key={a.id} style={{display:"flex",alignItems:"flex-start",gap:10,padding:"10px 0",borderBottom:i<5?`1px solid ${t.surfaceBorder}`:"none"}}><span style={{fontSize:16,flexShrink:0,marginTop:1}}>{ATYPE[a.type]||"📝"}</span><div><div style={{fontSize:13,color:t.text}}><span style={{fontWeight:600}}>{a.admin}</span> {a.action}</div><div style={{fontSize:11,color:t.textMuted,marginTop:2}}>{fD(a.time)}</div></div></div>)}</Card></div></div>;}
 
 function AllOrders({t,dark,orders,Btn,FilterBtn,notify,role}){
   const canAct=role==="superadmin"||role==="admin";
@@ -422,7 +457,7 @@ function SiteSettingsPage({t,dark,settings,setSettings,Btn,notify,logAction}){
   const [tab,setTab]=useState("general");
   const [form,setForm]=useState({...settings});
   const upd=(k,v)=>setForm(p=>({...p,[k]:v}));
-  const save=()=>{setSettings({...form});notify("Settings saved!");logAction("Updated site settings","settings");};
+  const save=async()=>{try{const res=await fetch("/api/admin/settings",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({settings:form})});const d=await res.json();if(res.ok){setSettings({...form});notify("Settings saved!");logAction("Updated site settings","settings");}else{notify(d.error||"Failed to save",true);}}catch{notify("Failed to save settings",true);}};
   const field=(label,fld,placeholder,type="text")=>{
     const numOnly=e=>{const v=e.target.value.replace(/[^0-9]/g,"");upd(fld,v);};
     const pctOnly=e=>{const v=e.target.value.replace(/[^0-9]/g,"");if(Number(v)<=100||v==="")upd(fld,v);};
