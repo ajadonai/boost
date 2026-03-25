@@ -1,5 +1,4 @@
 'use client';
-import NitroLogo from './nitro-logo';
 import { useState, useEffect, useRef } from "react";
 import { ErrorBoundary } from './error-boundary';
 
@@ -220,7 +219,7 @@ export default function App() {
   if (loading || !user) return (
     <div style={{height:"100vh",display:"flex",alignItems:"center",justifyContent:"center",background:t.bg}}>
       <div style={{textAlign:"center"}}>
-        <div style={{marginBottom:20,animation:"pulse 1.5s ease infinite"}}><NitroLogo size={48} variant="mark"/></div>
+        <div style={{marginBottom:24,animation:"pulse 1.5s ease infinite"}}><div style={{width:64,height:64,borderRadius:16,background:"linear-gradient(135deg,#c47d8e,#8b5e6b)",display:"flex",alignItems:"center",justifyContent:"center"}}><svg width="28" height="28" viewBox="0 0 20 20" fill="none"><path d="M4,16 L4,4 L16,16 L16,4" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/></svg></div></div>
         <div style={{fontSize:14,fontWeight:500,color:t.textSoft}}>Loading your dashboard...</div>
       </div>
       <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}`}</style>
@@ -258,7 +257,7 @@ export default function App() {
       {/* ── TOP NAVBAR — full width ── */}
       <header className="desk-hdr" style={{display:"flex",alignItems:"center",padding:"0 24px",height:54,background:t.navBg,backdropFilter:"blur(16px)",borderBottom:`1px solid ${t.border}`,flexShrink:0,zIndex:100,gap:16}}>
         <div style={{width:206,display:"flex",alignItems:"center",gap:10,flexShrink:0}}>
-          <NitroLogo size={28} variant="mark"/>
+          <div style={{width:28,height:28,borderRadius:7,background:"linear-gradient(135deg,#c47d8e,#8b5e6b)",display:"flex",alignItems:"center",justifyContent:"center"}}><svg width="12" height="12" viewBox="0 0 20 20" fill="none"><path d="M4,16 L4,4 L16,16 L16,4" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
           <span style={{fontSize:16,fontWeight:700,color:t.text,letterSpacing:1.5}}>NITRO</span>
         </div>
         <div style={{flex:1,display:"flex",justifyContent:"center"}}>
@@ -278,7 +277,7 @@ export default function App() {
       <div className="mob-hdr" style={{display:"none",alignItems:"center",justifyContent:"space-between",padding:"12px 16px",background:t.navBg,backdropFilter:"blur(16px)",borderBottom:`1px solid ${t.border}`,flexShrink:0,zIndex:100}}>
         <button onClick={()=>setSb(true)} style={{background:"none",color:t.text,padding:4}}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
         <div style={{display:"flex",alignItems:"center",gap:8}}>
-          <NitroLogo size={24} variant="mark"/>
+          <div style={{width:24,height:24,borderRadius:6,background:"linear-gradient(135deg,#c47d8e,#8b5e6b)",display:"flex",alignItems:"center",justifyContent:"center"}}><svg width="10" height="10" viewBox="0 0 20 20" fill="none"><path d="M4,16 L4,4 L16,16 L16,4" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
           <span style={{fontSize:15,fontWeight:700,color:t.text,letterSpacing:1}}>NITRO</span>
         </div>
         <div style={{display:"flex",gap:6}}>
@@ -290,7 +289,7 @@ export default function App() {
       {/* ── MOBILE NAV DRAWER ── */}
       {sb&&<><div className="ov" onClick={()=>setSb(false)}/><aside style={{position:"fixed",top:0,left:0,bottom:0,width:280,background:t.sbBg,zIndex:200,animation:"slideL .3s cubic-bezier(.2,.8,.2,1)",display:"flex",flexDirection:"column",borderRight:`1px solid ${t.sbBorder}`}}>
         <div style={{padding:"16px 18px",display:"flex",justifyContent:"space-between",alignItems:"center",borderBottom:`1px solid ${t.sbBorder}`}}>
-          <div style={{display:"flex",alignItems:"center",gap:10}}><NitroLogo size={26} variant="mark"/><span style={{fontSize:16,fontWeight:700,color:t.text,letterSpacing:1.5}}>NITRO</span></div>
+          <div style={{display:"flex",alignItems:"center",gap:10}}><div style={{width:26,height:26,borderRadius:7,background:"linear-gradient(135deg,#c47d8e,#8b5e6b)",display:"flex",alignItems:"center",justifyContent:"center"}}><svg width="11" height="11" viewBox="0 0 20 20" fill="none"><path d="M4,16 L4,4 L16,16 L16,4" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/></svg></div><span style={{fontSize:16,fontWeight:700,color:t.text,letterSpacing:1.5}}>NITRO</span></div>
           <button onClick={()=>setSb(false)} style={{background:"none",color:t.textMuted,fontSize:20,padding:4}}>✕</button>
         </div>
         <div style={{padding:"14px 18px",borderBottom:`1px solid ${t.sbBorder}`,display:"flex",alignItems:"center",gap:10}}>

@@ -1,5 +1,5 @@
 'use client';
-import NitroLogo from './nitro-logo';
+// N-mark logo inline
 import { useState, useEffect, useRef } from "react";
 
 export default function VerifyAccount(){
@@ -97,7 +97,7 @@ export default function VerifyAccount(){
       
       <style>{`
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-        .root{min-height:100vh;background:${t.bg};font-family:'Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;display:flex;flex-direction:column;transition:background 1.5s ease;position:relative;overflow:hidden}
+        .root{min-height:100vh;background:${t.bg};font-family:'Outfit','Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;display:flex;flex-direction:column;transition:background 1.5s ease;position:relative;overflow:hidden}
         .serif{font-family:'Plus Jakarta Sans',-apple-system,sans-serif}.m{font-family:'JetBrains Mono',monospace}
         button{cursor:pointer;font-family:inherit;border:none}input{font-family:inherit}
         @keyframes fu{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
@@ -112,7 +112,7 @@ export default function VerifyAccount(){
       <div style={{padding:"14px 0",borderBottom:`1px solid ${t.surfaceBorder}`,position:"sticky",top:0,zIndex:50,background:dark?"rgba(8,11,20,0.8)":"rgba(244,241,237,0.8)",backdropFilter:"blur(20px)",transition:"background 1.5s ease"}}>
         <div style={{maxWidth:800,margin:"0 auto",padding:"0 24px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
           <button onClick={()=>window.scrollTo({top:0,behavior:"smooth"})} style={{display:"flex",alignItems:"center",gap:10,background:"none",padding:0,border:"none",outline:"none",cursor:"pointer"}}>
-            <NitroLogo size={32} variant="mark"/>
+            <div style={{width:32,height:32,borderRadius:9,background:"linear-gradient(135deg,#c47d8e,#8b5e6b)",display:"flex",alignItems:"center",justifyContent:"center"}}><svg width="14" height="14" viewBox="0 0 20 20" fill="none"><path d="M4,16 L4,4 L16,16 L16,4" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
             <span className="serif" style={{fontSize:18,fontWeight:600,color:t.text}}>Nitro</span>
           </button>
           <button onClick={toggleTheme} style={{display:"flex",alignItems:"center",background:dark?"rgba(255,255,255,0.06)":"rgba(0,0,0,0.06)",borderRadius:20,padding:3,width:52,height:28,border:`1px solid ${dark?"rgba(255,255,255,0.08)":"rgba(0,0,0,0.1)"}`,position:"relative",flexShrink:0,transition:"background 1.5s cubic-bezier(.4,0,.2,1),border-color 1.5s ease"}}><div style={{width:22,height:22,borderRadius:"50%",background:dark?"#c47d8e":"#e0a458",display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,position:"absolute",left:dark?3:27,transition:"left 0.4s cubic-bezier(.4,0,.2,1),background 1.5s cubic-bezier(.4,0,.2,1)",boxShadow:"0 1px 4px rgba(0,0,0,0.2)"}}>{dark?"🌙":"☀️"}</div></button>
@@ -129,7 +129,7 @@ export default function VerifyAccount(){
 
           {!verified?<>
             {/* Logo */}
-            <div style={{marginBottom:16}}><NitroLogo size={48} variant="mark"/></div>
+            <div style={{marginBottom:16}}><div style={{width:48,height:48,borderRadius:12,background:"linear-gradient(135deg,#c47d8e,#8b5e6b)",display:"flex",alignItems:"center",justifyContent:"center"}}><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4,16 L4,4 L16,16 L16,4" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/></svg></div></div>
             <h1 className="serif" style={{fontSize:26,fontWeight:600,color:t.text,marginBottom:6}}>Verify Your Account</h1>
             <p style={{fontSize:14,color:t.textSoft,marginBottom:6}}>We sent a 6-digit code to</p>
             <p style={{fontSize:14,color:t.accent,fontWeight:600,marginBottom:28}}>{userEmail||"your email"}</p>
