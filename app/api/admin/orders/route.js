@@ -53,18 +53,46 @@ export async function POST(req) {
     if (!order) return Response.json({ error: 'Order not found' }, { status: 404 });
 
     if (action === 'cancel') {
-      await prisma.order.update({
-        where: { id: order.id },
-        data: { status: 'Canceled' },
-      });
+      // Cancel on MTP if possible
+      if (order.apiOrderId && process.env.MTP_API_KEY) {
+        try {
+          const { cancelOrder } = await import('@/lib/mtp');
+          await cancelOrder(order.apiOrderId);
+        } catch (e) { console.warn('[Admin Cancel MTP]', e.message); }
+      }
+      await prisma.order.update({ where: { id: order.id }, data: { status: 'Canceled' } });
       await logActivity(admin.name, `Cancelled order ${orderId}`, 'order');
       return Response.json({ success: true, message: 'Order cancelled' });
     }
 
     if (action === 'refill') {
-      // Mark for refill — actual refill happens via MoreThanPanel API (future)
+      if (order.apiOrderId && process.env.MTP_API_KEY) {
+        try {
+          const { refillOrder } = await import('@/lib/mtp');
+          await refillOrder(order.apiOrderId);
+        } catch (e) { console.warn('[Admin Refill MTP]', e.message); }
+      }
       await logActivity(admin.name, `Requested refill for ${orderId}`, 'order');
       return Response.json({ success: true, message: 'Refill requested' });
+    }
+
+    if (action === 'check') {
+      if (order.apiOrderId && process.env.MTP_API_KEY) {
+        try {
+          const { checkOrder } = await import('@/lib/mtp');
+          const status = await checkOrder(order.apiOrderId);
+          const statusMap = { 'Completed': 'Completed', 'In progress': 'Processing', 'Processing': 'Processing', 'Pending': 'Pending', 'Partial': 'Partial', 'Canceled': 'Canceled', 'Refunded': 'Canceled' };
+          const newStatus = statusMap[status.status] || order.status;
+          if (newStatus !== order.status) {
+            await prisma.order.update({ where: { id: order.id }, data: { status: newStatus } });
+          }
+          await logActivity(admin.name, `Checked order ${orderId}: ${newStatus}`, 'order');
+          return Response.json({ success: true, status: newStatus, remains: status.remains });
+        } catch (e) {
+          return Response.json({ success: true, status: order.status, message: e.message });
+        }
+      }
+      return Response.json({ success: true, status: order.status, message: 'No MTP tracking' });
     }
 
     return Response.json({ error: 'Unknown action' }, { status: 400 });
