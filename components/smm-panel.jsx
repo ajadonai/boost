@@ -1,43 +1,6 @@
 'use client';
 import { useState, useEffect, useRef } from "react";
 
-const SERVICES = [
-  { id: 1, name: "Instagram Followers [Real • 30D Refill]", category: "Instagram", platform: "instagram", rate: 3875, min: 100, max: 50000, refill: true, avg_time: "0-2 hrs" },
-  { id: 2, name: "Instagram Likes [Instant • Non-Drop]", category: "Instagram", platform: "instagram", rate: 1860, min: 50, max: 100000, refill: false, avg_time: "0-30 min" },
-  { id: 3, name: "Instagram Reels Views [High Retention]", category: "Instagram", platform: "instagram", rate: 775, min: 100, max: 500000, refill: false, avg_time: "0-1 hr" },
-  { id: 4, name: "Instagram Story Views [Real Accounts]", category: "Instagram", platform: "instagram", rate: 1240, min: 100, max: 50000, refill: false, avg_time: "0-1 hr" },
-  { id: 5, name: "TikTok Followers [Premium • Refill 30D]", category: "TikTok", platform: "tiktok", rate: 4650, min: 100, max: 100000, refill: true, avg_time: "0-4 hrs" },
-  { id: 6, name: "TikTok Views [Real • Instant Start]", category: "TikTok", platform: "tiktok", rate: 465, min: 500, max: 1000000, refill: false, avg_time: "0-15 min" },
-  { id: 7, name: "TikTok Likes [High Quality]", category: "TikTok", platform: "tiktok", rate: 2325, min: 50, max: 50000, refill: true, avg_time: "0-1 hr" },
-  { id: 8, name: "YouTube Subscribers [Real • Lifetime]", category: "YouTube", platform: "youtube", rate: 12400, min: 50, max: 10000, refill: true, avg_time: "0-12 hrs" },
-  { id: 9, name: "YouTube Views [High Retention 70%+]", category: "YouTube", platform: "youtube", rate: 3100, min: 500, max: 100000, refill: false, avg_time: "0-6 hrs" },
-  { id: 10, name: "YouTube Watch Time [4000 hrs pkg]", category: "YouTube", platform: "youtube", rate: 77500, min: 1, max: 10, refill: false, avg_time: "1-7 days" },
-  { id: 11, name: "Twitter/X Followers [Real Profiles]", category: "Twitter/X", platform: "twitter", rate: 6200, min: 100, max: 50000, refill: true, avg_time: "0-4 hrs" },
-  { id: 12, name: "Twitter/X Likes [Fast Delivery]", category: "Twitter/X", platform: "twitter", rate: 3100, min: 50, max: 20000, refill: false, avg_time: "0-1 hr" },
-  { id: 13, name: "Facebook Page Likes [Real • Non-Drop]", category: "Facebook", platform: "facebook", rate: 7750, min: 100, max: 50000, refill: true, avg_time: "0-6 hrs" },
-  { id: 14, name: "Facebook Post Likes [Instant]", category: "Facebook", platform: "facebook", rate: 2325, min: 50, max: 20000, refill: false, avg_time: "0-1 hr" },
-  { id: 15, name: "Telegram Members [Real • Channel]", category: "Telegram", platform: "telegram", rate: 5425, min: 100, max: 100000, refill: true, avg_time: "0-6 hrs" },
-  { id: 16, name: "Spotify Plays [Premium • Royalty Eligible]", category: "Spotify", platform: "spotify", rate: 2790, min: 1000, max: 1000000, refill: false, avg_time: "0-12 hrs" },
-];
-const ORDERS = [
-  { id: "ORD-28491", service: "Instagram Followers [Real • 30D Refill]", link: "instagram.com/coolbrand", quantity: 5000, charge: 19375, status: "Completed", created: "2026-03-22T14:30:00" },
-  { id: "ORD-28490", service: "TikTok Views [Real • Instant Start]", link: "tiktok.com/@user/video/123", quantity: 50000, charge: 23250, status: "Processing", created: "2026-03-22T12:15:00" },
-  { id: "ORD-28489", service: "YouTube Subscribers [Real • Lifetime]", link: "youtube.com/@mychannel", quantity: 1000, charge: 12400, status: "Pending", created: "2026-03-21T22:00:00" },
-  { id: "ORD-28488", service: "Twitter/X Followers [Real Profiles]", link: "x.com/mybrand", quantity: 2000, charge: 12400, status: "Completed", created: "2026-03-21T10:45:00" },
-  { id: "ORD-28487", service: "Instagram Likes [Instant • Non-Drop]", link: "instagram.com/p/ABC123", quantity: 10000, charge: 18600, status: "Partial", created: "2026-03-20T18:00:00" },
-  { id: "ORD-28486", service: "Spotify Plays [Premium]", link: "open.spotify.com/track/xyz", quantity: 100000, charge: 279000, status: "Completed", created: "2026-03-19T09:00:00" },
-];
-const TXS = [
-  { id: "T1", type: "deposit", amount: 77500, method: "Paystack", date: "2026-03-22T14:00:00" },
-  { id: "T2", type: "order", amount: -19375, method: "Wallet", date: "2026-03-22T14:30:00" },
-  { id: "T3", type: "order", amount: -23250, method: "Wallet", date: "2026-03-22T12:15:00" },
-  { id: "T4", type: "referral", amount: 3875, method: "Referral", date: "2026-03-21T16:00:00" },
-  { id: "T5", type: "deposit", amount: 155000, method: "Paystack", date: "2026-03-20T10:00:00" },
-];
-const ALERTS = [
-  {id:1,message:"Scheduled maintenance tonight 11PM - 1AM WAT. Orders may be delayed.",type:"warning"},
-  {id:2,message:"New! TikTok services now available with 30-day refill guarantee.",type:"info"},
-];
 const GATEWAYS = [
   {id:"paystack",name:"Paystack",enabled:true},
   {id:"flutterwave",name:"Flutterwave",enabled:true},
@@ -90,7 +53,8 @@ export default function App() {
   const [user, setUser] = useState(null);
   const [orders, setOrders] = useState([]);
   const [txs, setTxs] = useState([]);
-  const [alerts, setAlerts] = useState(ALERTS);
+  const [alerts, setAlerts] = useState([]);
+  const [services, setServices] = useState([]);
   const [sb, setSb] = useState(false);
   const [toast, setToast] = useState(null);
   const [dismissedAlerts, setDismissedAlerts] = useState([]);
@@ -113,7 +77,6 @@ export default function App() {
           if (data.transactions?.length) setTxs(data.transactions);
           if (data.alerts?.length) setAlerts(data.alerts);
         } else {
-          // API error but user is authenticated — show dashboard with defaults
           console.error('Dashboard API error:', res.status);
           setUser({ name: "User", email: "", balance: 0, refCode: "—", refs: 0, earnings: 0 });
         }
@@ -121,17 +84,42 @@ export default function App() {
         console.error('Dashboard fetch failed:', err);
         setUser({ name: "User", email: "", balance: 0, refCode: "—", refs: 0, earnings: 0 });
       }
+      // Fetch services
+      try {
+        const sRes = await fetch('/api/services');
+        if (sRes.ok) { const sData = await sRes.json(); if (sData.services?.length) setServices(sData.services); }
+      } catch {}
       setLoading(false);
     }
     load();
   }, []);
+  const reloadDashboard = async () => {
+    try {
+      const res = await fetch('/api/dashboard');
+      if (res.ok) {
+        const data = await res.json();
+        setUser(data.user);
+        if (data.orders) setOrders(data.orders);
+        if (data.transactions) setTxs(data.transactions);
+      }
+    } catch {}
+  };
   const toggleTheme = () => {setManualOverride(true);setDark(d=>!d);};
   const toastTimer = useRef(null);
   const notify = (m, e) => { setToast({ m, e }); if (toastTimer.current) clearTimeout(toastTimer.current); toastTimer.current = setTimeout(() => setToast(null), 6000); };
   const dismissToast = () => { setToast(null); if (toastTimer.current) clearTimeout(toastTimer.current); };
   const go = (p) => { setPg(p); };
-  const placeOrder = (svc, link, qty) => {const ch=(svc.rate/1000)*qty;if(ch>user.balance)return notify("Insufficient balance. Add funds first.",true);const id=`ORD-${Math.floor(10000+Math.random()*90000)}`;setOrders(p=>[{id,service:svc.name,link,quantity:qty,charge:ch,status:"Pending",created:new Date().toISOString()},...p]);setUser(p=>({...p,balance:p.balance-ch}));setTxs(p=>[{id:`T${Date.now()}`,type:"order",amount:-ch,method:"Wallet",date:new Date().toISOString()},...p]);notify(`Order ${id} placed!`);go("orders");};
-  const addFunds = (a) => {setUser(p=>({...p,balance:p.balance+a}));setTxs(p=>[{id:`T${Date.now()}`,type:"deposit",amount:a,method:"Paystack",date:new Date().toISOString()},...p]);notify(`${fN(a)} added to wallet!`);};
+  const placeOrder = async (svc, link, qty) => {
+    try {
+      const res = await fetch('/api/orders', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({serviceId:svc.id,link,quantity:qty})});
+      const data = await res.json();
+      if (!res.ok) { notify(data.error || 'Order failed', true); return; }
+      notify(`Order ${data.order.id} placed!`);
+      await reloadDashboard();
+      go('orders');
+    } catch { notify('Failed to place order', true); }
+  };
+  const addFunds = (a) => { reloadDashboard(); notify(`₦${Number(a).toLocaleString()} added to wallet!`); };
 
   const handleLogout=async()=>{try{await fetch("/api/auth/logout",{method:"POST"});}catch{}window.location.href="/";};
   const NAV = [["dashboard","🏠","Dashboard"],["new-order","🛒","New Order"],["orders","📋","Orders"],["funds","💳","Add Funds"],["services","📦","Services"],["referrals","🔗","Referrals"],["support","💬","Support"],["settings","⚙️","Settings"]];
@@ -172,17 +160,17 @@ export default function App() {
         </div>
       </aside>
       <main className="mn">
-        <div style={{position:"sticky",top:0,zIndex:40,paddingBottom:ALERTS.filter(a=>!dismissedAlerts.includes(a.id)).length?4:0}}>
-        {ALERTS.filter(a=>!dismissedAlerts.includes(a.id)).map(a=><div key={a.id} style={{padding:"12px 16px",marginBottom:10,borderRadius:12,display:"flex",alignItems:"center",justifyContent:"space-between",gap:10,fontSize:13,fontWeight:500,animation:"fu .3s ease",background:a.type==="warning"?(dark?"rgba(217,119,6,0.1)":"#fffbeb"):a.type==="critical"?(dark?"rgba(220,38,38,0.1)":"#fef2f2"):(dark?"rgba(99,102,241,0.1)":"#eef2ff"),color:a.type==="warning"?(dark?"#fcd34d":"#92400e"):a.type==="critical"?(dark?"#fca5a5":"#dc2626"):(dark?"#a5b4fc":"#4f46e5"),border:`1px solid ${a.type==="warning"?(dark?"rgba(217,119,6,0.2)":"#fde68a"):a.type==="critical"?(dark?"rgba(220,38,38,0.2)":"#fecaca"):(dark?"rgba(99,102,241,0.2)":"#c7d2fe")}`,backdropFilter:"blur(12px)"}}><span>{a.type==="warning"?"⚠️":a.type==="critical"?"🚨":"ℹ️"} {a.message}</span><button onClick={()=>setDismissedAlerts(p=>[...p,a.id])} style={{background:"none",color:"inherit",fontSize:16,padding:2,flexShrink:0,opacity:0.6}}>✕</button></div>)}
+        <div style={{position:"sticky",top:0,zIndex:40,paddingBottom:alerts.filter(a=>!dismissedAlerts.includes(a.id)).length?4:0}}>
+        {alerts.filter(a=>!dismissedAlerts.includes(a.id)).map(a=><div key={a.id} style={{padding:"12px 16px",marginBottom:10,borderRadius:12,display:"flex",alignItems:"center",justifyContent:"space-between",gap:10,fontSize:13,fontWeight:500,animation:"fu .3s ease",background:a.type==="warning"?(dark?"rgba(217,119,6,0.1)":"#fffbeb"):a.type==="critical"?(dark?"rgba(220,38,38,0.1)":"#fef2f2"):(dark?"rgba(99,102,241,0.1)":"#eef2ff"),color:a.type==="warning"?(dark?"#fcd34d":"#92400e"):a.type==="critical"?(dark?"#fca5a5":"#dc2626"):(dark?"#a5b4fc":"#4f46e5"),border:`1px solid ${a.type==="warning"?(dark?"rgba(217,119,6,0.2)":"#fde68a"):a.type==="critical"?(dark?"rgba(220,38,38,0.2)":"#fecaca"):(dark?"rgba(99,102,241,0.2)":"#c7d2fe")}`,backdropFilter:"blur(12px)"}}><span>{a.type==="warning"?"⚠️":a.type==="critical"?"🚨":"ℹ️"} {a.message}</span><button onClick={()=>setDismissedAlerts(p=>[...p,a.id])} style={{background:"none",color:"inherit",fontSize:16,padding:2,flexShrink:0,opacity:0.6}}>✕</button></div>)}
         </div>
         <ErrorBoundary t={t} key={pg}>
         <div style={{maxWidth:720}}>
         {pg==="dashboard"&&<Dash user={user} orders={orders} txs={txs} go={go} t={t} dark={dark}/>}
-        {pg==="new-order"&&<NewOrd services={SERVICES} onPlace={placeOrder} bal={user.balance} t={t} dark={dark}/>}
+        {pg==="new-order"&&<NewOrd services={services} onPlace={placeOrder} bal={user.balance} t={t} dark={dark}/>}
         {pg==="orders"&&<Ords orders={orders} t={t} dark={dark}/>}
         {pg==="funds"&&<Fnds onAdd={addFunds} bal={user.balance} txs={txs} t={t} dark={dark}/>}
         {pg==="referrals"&&<Refs user={user} t={t} dark={dark}/>}
-        {pg==="services"&&<Svcs services={SERVICES} go={go} t={t} dark={dark}/>}
+        {pg==="services"&&<Svcs services={services} go={go} t={t} dark={dark}/>}
         {pg==="support"&&<Sup t={t} dark={dark}/>}
         {pg==="settings"&&<Settings user={user} t={t} dark={dark} toggleTheme={toggleTheme} manualOverride={manualOverride}/>}
         </div>

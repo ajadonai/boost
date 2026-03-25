@@ -324,12 +324,27 @@ function AuthModal({dark,t,mode,setMode,onClose}){
   // Form fields
   const [name,setName]=useState("");
   const [email,setEmail]=useState("");
+  const [emailTaken,setEmailTaken]=useState(false);
+  const [emailChecking,setEmailChecking]=useState(false);
+  const emailCheckTimer=useRef(null);
   const [phone,setPhone]=useState("");
   const [pw,setPw]=useState("");
   const [pw2,setPw2]=useState("");
   const [refCode,setRefCode]=useState("");
   const [agree,setAgree]=useState(false);
-  useEffect(()=>{setStep(1);setAuthLoading(false);setError("");setPw("");setPw2("");setName("");setEmail("");setPhone("");},[mode]);
+  useEffect(()=>{setStep(1);setAuthLoading(false);setError("");setPw("");setPw2("");setName("");setEmail("");setPhone("");setEmailTaken(false);},[mode]);
+  // Debounced email availability check
+  useEffect(()=>{
+    if(mode!=="signup"||!email||!validEmail){setEmailTaken(false);return;}
+    setEmailChecking(true);
+    if(emailCheckTimer.current)clearTimeout(emailCheckTimer.current);
+    emailCheckTimer.current=setTimeout(()=>{
+      fetch("/api/auth/check-email",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email})})
+        .then(r=>r.json()).then(d=>{setEmailTaken(!d.available);setEmailChecking(false);})
+        .catch(()=>setEmailChecking(false));
+    },600);
+    return()=>{if(emailCheckTimer.current)clearTimeout(emailCheckTimer.current);};
+  },[email,mode]);
   useEffect(()=>{const p=new URLSearchParams(window.location.search);const r=p.get("ref");if(r)setRefCode(r);},[]);
 
   const handleLogin=async()=>{
@@ -402,7 +417,7 @@ function AuthModal({dark,t,mode,setMode,onClose}){
             <button onClick={()=>setMethod("email")} style={{flex:1,padding:"8px 0",borderRadius:8,fontSize:13,fontWeight:500,background:method==="email"?t.accentLight:"transparent",color:method==="email"?t.accent:t.textMuted,border:"none",cursor:"pointer"}}>📧 Email</button>
             <button onClick={()=>setMethod("phone")} style={{flex:1,padding:"8px 0",borderRadius:8,fontSize:13,fontWeight:500,background:method==="phone"?t.accentLight:"transparent",color:method==="phone"?t.accent:t.textMuted,border:"none",cursor:"pointer"}}>📱 Phone</button>
           </div>
-          {method==="email"?<div key="email-signup"><Lbl t={t}>Email Address</Lbl><input value={email} onChange={e=>setEmail(e.target.value.trim().toLowerCase().slice(0,254))} placeholder="you@example.com" type="email" autoComplete="email" style={{width:"100%",padding:"12px 14px",borderRadius:10,background:t.inputBg,border:`1px solid ${t.inputBorder}`,color:t.text,fontSize:14,outline:"none",marginBottom:email&&!validEmail?4:16}}/>{email&&!validEmail&&<div style={{fontSize:11,color:dark?"#fca5a5":"#dc2626",marginBottom:12}}>Please enter a valid email address</div>}</div>:<div key="phone-signup"><Lbl t={t}>Phone Number</Lbl><div style={{display:"flex",gap:8,marginBottom:phone&&!validPhone?4:16}}><div style={{padding:"12px 14px",borderRadius:10,background:t.inputBg,border:`1px solid ${t.inputBorder}`,color:t.textSoft,fontSize:14,flexShrink:0}}>🇳🇬 +234</div><input value={phone} onChange={e=>setPhone(e.target.value.replace(/\D/g,"").slice(0,11))} placeholder="8012345678" type="tel" autoComplete="tel" style={{flex:1,padding:"12px 14px",borderRadius:10,background:t.inputBg,border:`1px solid ${t.inputBorder}`,color:t.text,fontSize:14,outline:"none"}}/></div>{phone&&!validPhone&&<div style={{fontSize:11,color:dark?"#fca5a5":"#dc2626",marginBottom:12}}>Enter 10-11 digits (e.g. 08012345678)</div>}</div>}
+          {method==="email"?<div key="email-signup"><Lbl t={t}>Email Address</Lbl><input value={email} onChange={e=>setEmail(e.target.value.trim().toLowerCase().slice(0,254))} placeholder="you@example.com" type="email" autoComplete="email" style={{width:"100%",padding:"12px 14px",borderRadius:10,background:t.inputBg,border:`1px solid ${t.inputBorder}`,color:t.text,fontSize:14,outline:"none",marginBottom:email&&!validEmail?4:16}}/>{email&&!validEmail&&<div style={{fontSize:11,color:dark?"#fca5a5":"#dc2626",marginBottom:12}}>Please enter a valid email address</div>}{email&&validEmail&&emailTaken&&<div style={{fontSize:11,color:dark?"#fca5a5":"#dc2626",marginBottom:12}}>This email is already registered. Try logging in instead.</div>}{email&&validEmail&&emailChecking&&<div style={{fontSize:11,color:t.textMuted,marginBottom:12}}>Checking...</div>}</div>:<div key="phone-signup"><Lbl t={t}>Phone Number</Lbl><div style={{display:"flex",gap:8,marginBottom:phone&&!validPhone?4:16}}><div style={{padding:"12px 14px",borderRadius:10,background:t.inputBg,border:`1px solid ${t.inputBorder}`,color:t.textSoft,fontSize:14,flexShrink:0}}>🇳🇬 +234</div><input value={phone} onChange={e=>setPhone(e.target.value.replace(/\D/g,"").slice(0,11))} placeholder="8012345678" type="tel" autoComplete="tel" style={{flex:1,padding:"12px 14px",borderRadius:10,background:t.inputBg,border:`1px solid ${t.inputBorder}`,color:t.text,fontSize:14,outline:"none"}}/></div>{phone&&!validPhone&&<div style={{fontSize:11,color:dark?"#fca5a5":"#dc2626",marginBottom:12}}>Enter 10-11 digits (e.g. 08012345678)</div>}</div>}
           <button onClick={()=>{setError("");if(!name){setError("Please enter your name");return;}if(method==="email"&&!email){setError("Please enter your email");return;}if(method==="email"&&!validEmail){setError("Please enter a valid email (e.g. you@gmail.com)");return;}if(method==="phone"&&!phone){setError("Please enter your phone number");return;}if(method==="phone"&&!validPhone){setError("Please enter a valid phone number (10-11 digits)");return;}setStep(2);}} style={{width:"100%",padding:"14px 0",borderRadius:12,background:t.btnPrimary,color:"#fff",fontSize:15,fontWeight:700,marginBottom:16,border:"none",cursor:"pointer"}}>Continue →</button>
           <div style={{textAlign:"center",fontSize:13,color:t.textSoft}}>Already have an account? <button onClick={()=>setMode("login")} style={{background:"none",color:t.accent,fontWeight:600,fontSize:13,border:"none",cursor:"pointer"}}>Log In</button></div>
         </>}
