@@ -98,7 +98,7 @@ export default function Landing(){
         .fd1{animation-delay:.06s}.fd2{animation-delay:.12s}.fd3{animation-delay:.18s}.fd4{animation-delay:.24s}.fd5{animation-delay:.3s}
         .lift{transition:transform .3s cubic-bezier(.2,.8,.2,1),box-shadow .3s ease,border-color .3s ease}
 
-        .pricing-sec{min-height:calc(100vh - 100px);display:flex;flex-direction:column;position:relative;background:#1a1520;overflow:hidden}
+        .pricing-sec{min-height:calc(100vh - 100px);display:flex;flex-direction:column;position:relative;background:${dark?"#060810":"#1a1520"};overflow:hidden}
         .pricing-bg{position:absolute;inset:0;pointer-events:none}
         .pricing-glow-center{position:absolute;top:15%;left:50%;transform:translateX(-50%);width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(196,125,142,.12) 0%,transparent 70%);animation:glow-pulse 4s ease-in-out infinite}
         .pricing-glow-left{position:absolute;bottom:10%;left:10%;width:300px;height:300px;border-radius:50%;background:rgba(254,44,85,.04);filter:blur(80px)}
