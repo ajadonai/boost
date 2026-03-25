@@ -1,13 +1,15 @@
 'use client';
-import React from "react";
+import React, { useId } from "react";
 
 // Nitro brand mark — double-ring N
 // Usage: <NitroLogo size={32} /> or <NitroLogo size={48} variant="icon" />
 export default function NitroLogo({ size = 32, variant = "mark", color, style = {} }) {
+  const uid = useId();
   const s = size;
 
   // Icon variant: solid N on gradient rounded square (for app icon, favicon, small contexts)
   if (variant === "icon") {
+    const igid = `ng${uid}`;
     const r = Math.round(s * 0.25);
     const pad = s * 0.22;
     const nLeft = s * 0.28, nRight = s * 0.72;
@@ -16,12 +18,12 @@ export default function NitroLogo({ size = 32, variant = "mark", color, style = 
     return (
       <svg width={s} height={s} viewBox={`0 0 ${s} ${s}`} style={style}>
         <defs>
-          <linearGradient id={`ng-${s}`} x1="0" y1="0" x2="1" y2="1">
+          <linearGradient id={igid} x1="0" y1="0" x2="1" y2="1">
             <stop offset="0%" stopColor="#c47d8e"/>
             <stop offset="100%" stopColor="#8b5e6b"/>
           </linearGradient>
         </defs>
-        <rect width={s} height={s} rx={r} fill={`url(#ng-${s})`}/>
+        <rect width={s} height={s} rx={r} fill={`url(#${igid})`}/>
         <path
           d={`M${nLeft},${nBot} L${nLeft},${nTop} L${nLeft+barW},${nTop} L${nLeft+barW},${nBot-s*0.14} L${nRight-barW},${nTop} L${nRight},${nTop} L${nRight},${nBot} Z`}
           fill="#fff" opacity="0.95"
@@ -31,7 +33,7 @@ export default function NitroLogo({ size = 32, variant = "mark", color, style = 
   }
 
   // Mark variant: double-ring N (the primary brand mark)
-  const gid = `nmg-${s}-${Math.random().toString(36).slice(2,6)}`;
+  const gid = `nmg${uid}`;
   const cx = s / 2, cy = s / 2;
   const outerR = s * 0.44;
   const innerR = s * 0.34;
