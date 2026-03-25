@@ -77,7 +77,6 @@ export default function Landing(){
   },[modal]);
 
   return(
-  return(
     <div className="root" style={{height:"100vh",overflow:"hidden",display:"flex",flexDirection:"column"}}>
       <style>{`
         .root{background:${t.bg};color:${t.text};font-family:'Outfit','Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;transition:background .5s ease,color .5s ease;overflow-x:clip}
