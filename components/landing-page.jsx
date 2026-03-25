@@ -315,6 +315,21 @@ export default function Landing(){
   );
 }
 
+const Lbl=({t,children})=><label style={{fontSize:11,color:t.textSoft,fontWeight:600,display:"block",marginBottom:5,textTransform:"uppercase",letterSpacing:1.5}}>{children}</label>;
+function PwStrength({pw,t}){
+  const checks=[pw.length>=8,/[A-Z]/.test(pw),/[0-9]/.test(pw),/[^A-Za-z0-9]/.test(pw)];
+  const score=checks.filter(Boolean).length;
+  const labels=["","Weak","Fair","Good","Strong"];
+  const colors=["","#dc2626","#d97706","#2563eb","#059669"];
+  if(!pw)return null;
+  return <div style={{marginBottom:14}}>
+    <div style={{display:"flex",gap:4,marginBottom:4}}>{[1,2,3,4].map(i=><div key={i} style={{flex:1,height:3,borderRadius:2,background:i<=score?colors[score]:(t.inputBorder||"#ddd"),transition:"background 0.3s"}}/>)}</div>
+    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+      <span style={{fontSize:11,color:colors[score],fontWeight:500}}>{labels[score]}</span>
+      <span style={{fontSize:10,color:t.textMuted}}>{checks[0]?"✓":"✗"} 8+ chars {checks[1]?"✓":"✗"} uppercase {checks[2]?"✓":"✗"} number {checks[3]?"✓":"✗"} symbol</span>
+    </div>
+  </div>;
+}
 function AuthModal({dark,t,mode,setMode,onClose}){
   const [method,setMethod]=useState("email");
   const [showPw,setShowPw]=useState(false);
