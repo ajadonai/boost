@@ -77,248 +77,134 @@ export default function Landing(){
   },[modal]);
 
   return(
-    <div className="root">
-      
+  return(
+    <div className="root" style={{height:"100vh",overflow:"hidden",display:"flex",flexDirection:"column"}}>
       <style>{`
-        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-        .root{min-height:100vh;background:${t.bg};color:${t.text};font-family:'Outfit','Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;transition:background 1.5s cubic-bezier(.4,0,.2,1),color 1.2s ease;overflow-x:clip;scroll-behavior:smooth}
-        @media(max-width:768px){.nav-links{display:none!important}.nav-login{display:none!important}}.snap-section{min-height:100vh;display:flex;flex-direction:column;justify-content:center;scroll-snap-align:start}
-        .m{font-family:'JetBrains Mono',monospace}.serif{font-family:'Cormorant Garamond','Plus Jakarta Sans',serif}
-        button{cursor:pointer;font-family:inherit;border:none}input,textarea{font-family:inherit}
-        @keyframes fi{from{opacity:0}to{opacity:1}}@keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
-        @keyframes float1{0%,100%{transform:translate(0,0) scale(1)}25%{transform:translate(30px,-20px) scale(1.05)}50%{transform:translate(-10px,15px) scale(0.95)}75%{transform:translate(20px,10px) scale(1.02)}}
-        @keyframes float2{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(-25px,15px) scale(1.03)}66%{transform:translate(15px,-25px) scale(0.97)}}
-        @keyframes float3{0%,100%{transform:translate(0,0)}50%{transform:translate(-15px,-20px)}}
-        @keyframes pulse-glow{0%,100%{opacity:0.4}50%{opacity:0.8}}
-        @keyframes spin-slow{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
-        @keyframes orbit-float{0%,100%{transform-origin:center;filter:brightness(1)}50%{filter:brightness(1.2);transform:scale(1.08)}}
-        @keyframes pulse-ring{0%,100%{transform:scale(1);opacity:0.3}50%{transform:scale(1.06);opacity:0.6}}
-        @keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
-        ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-thumb{background:${dark?"#2a2a2a":"#ccc"};border-radius:3px}
-        .sec{max-width:1100px;margin:0 auto;padding:0 24px}
-        .g3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
-        .g3p{display:grid;grid-template-columns:repeat(3,1fr);gap:36px}
-        .g4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
-        @media(max-width:900px){.g3,.g3p{grid-template-columns:1fr}.g4{grid-template-columns:repeat(2,1fr)}.hero-stats{gap:20px!important}}
-        @media(max-width:500px){.g4{grid-template-columns:1fr}}@media(max-width:400px){.g3,.g3p{grid-template-columns:1fr!important}.sec{padding:0 14px}}
-        .orb{position:absolute;border-radius:50%;pointer-events:none;filter:blur(80px)}
-        details summary::-webkit-details-marker{display:none}
-        details summary::marker{display:none}
-        details[open] .faq-chevron{transform:rotate(45deg)}
+        .root{background:${t.bg};color:${t.text};font-family:'Outfit','Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;transition:background .5s ease,color .5s ease;overflow-x:clip}
+        .serif{font-family:'Cormorant Garamond',serif}
+        .m{font-family:'JetBrains Mono',monospace}
+        button{cursor:pointer;font-family:inherit;border:none}input{font-family:inherit}
+        ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:${dark?"#2a2a2a":"#d0cdc8"};border-radius:2px}
+        @keyframes fu{from{transform:translateY(12px);opacity:0}to{transform:translateY(0);opacity:1}}
+        @keyframes fi{from{opacity:0}to{opacity:1}}
+        @keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
+        @keyframes scroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+        .fu{animation:fu .5s cubic-bezier(.2,.8,.2,1) both}
+        .fd1{animation-delay:.06s}.fd2{animation-delay:.12s}.fd3{animation-delay:.18s}.fd4{animation-delay:.24s}.fd5{animation-delay:.3s}
+        .hover-lift{transition:transform .25s ease,box-shadow .25s ease}
+        .hover-lift:hover{transform:translateY(-3px);box-shadow:${dark?"0 10px 28px rgba(0,0,0,.25)":"0 10px 28px rgba(0,0,0,.06)"}}
+        @media(max-width:768px){.nav-links{display:none!important}.nav-login{display:none!important}.stats-row{gap:24px!important}.feat-grid{grid-template-columns:1fr 1fr!important}.steps-grid{grid-template-columns:1fr 1fr!important}.price-grid{grid-template-columns:1fr!important}.test-grid{grid-template-columns:1fr!important}}
+        @media(max-width:480px){.feat-grid{grid-template-columns:1fr!important}.steps-grid{grid-template-columns:1fr!important}}
       `}</style>
 
-      <div style={{position:"fixed",inset:0,pointerEvents:"none",zIndex:0,overflow:"hidden"}}>
-        <div className="orb" style={{width:400,height:400,top:"-10%",left:"-5%",background:dark?"rgba(196,125,142,0.08)":"rgba(196,125,142,0.06)",animation:"float1 20s ease-in-out infinite"}}/>
-        <div className="orb" style={{width:300,height:300,top:"40%",right:"-5%",background:dark?"rgba(100,120,200,0.06)":"rgba(100,120,200,0.04)",animation:"float2 25s ease-in-out infinite"}}/>
-        <div className="orb" style={{width:250,height:250,bottom:"5%",left:"30%",background:dark?"rgba(110,231,183,0.05)":"rgba(16,185,129,0.04)",animation:"float3 18s ease-in-out infinite"}}/>
-        <div className="orb" style={{width:150,height:150,top:"20%",left:"50%",background:dark?"rgba(196,125,142,0.06)":"rgba(196,125,142,0.04)",animation:"float2 15s ease-in-out infinite 3s"}}/>
-        <div style={{position:"absolute",inset:0,backgroundImage:`linear-gradient(${dark?"rgba(255,255,255,0.015)":"rgba(0,0,0,0.015)"} 1px,transparent 1px),linear-gradient(90deg,${dark?"rgba(255,255,255,0.015)":"rgba(0,0,0,0.015)"} 1px,transparent 1px)`,backgroundSize:"60px 60px",opacity:0.5}}/>
-      </div>
-
-      <div style={{position:"sticky",top:0,zIndex:50}}>
-        <div>{[...(promoBanner?[promoBanner]:[]),...siteAlerts].map((a,i)=><div key={i} style={{padding:"10px 16px",textAlign:"center",fontSize:13,fontWeight:500,background:a.type==="warning"?(dark?(scrolled?"rgba(217,119,6,0.25)":"rgba(217,119,6,0.15)"):(scrolled?"#fff3cd":"#fffbeb")):(dark?(scrolled?"rgba(99,102,241,0.25)":"rgba(99,102,241,0.15)"):(scrolled?"#dde4ff":"#eef2ff")),color:a.type==="warning"?(dark?"#fcd34d":"#92400e"):(dark?"#a5b4fc":"#4f46e5"),borderBottom:`1px solid ${a.type==="warning"?(dark?"rgba(217,119,6,0.2)":"#fde68a"):(dark?"rgba(99,102,241,0.2)":"#c7d2fe")}`,backdropFilter:"blur(20px)",transition:"background 0.3s ease"}}>{a.type==="warning"?"⚠️":"✨"} {a.message}</div>)}</div>
-      <nav style={{backdropFilter:"blur(20px)",background:scrolled?(dark?"rgba(8,11,20,0.98)":"rgba(244,241,237,0.98)"):(dark?"rgba(8,11,20,0.4)":"rgba(244,241,237,0.4)"),borderBottom:`1px solid ${scrolled?t.surfaceBorder:"transparent"}`,transition:"background 0.3s ease, border-color 0.3s ease",boxShadow:scrolled?(dark?"0 1px 12px rgba(0,0,0,0.3)":"0 1px 12px rgba(0,0,0,0.06)"):"none"}}>
-        <div className="sec" style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"14px 24px"}}>
-          <button onClick={()=>window.scrollTo({top:0,behavior:"smooth"})} style={{display:"flex",alignItems:"center",gap:10,background:"none",padding:0,border:"none",outline:"none",cursor:"pointer"}}>
-            <div style={{width:32,height:32,borderRadius:9,background:"linear-gradient(135deg,#c47d8e,#8b5e6b)",display:"flex",alignItems:"center",justifyContent:"center"}}><svg width="14" height="14" viewBox="0 0 20 20" fill="none"><path d="M4,16 L4,4 L16,16 L16,4" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
-            <span style={{fontSize:17,fontWeight:700,color:t.text,letterSpacing:1.5}}>NITRO</span>
-          </button>
-          <div style={{display:"flex",alignItems:"center",gap:16}}>
-            <div className="nav-links" style={{display:"flex",gap:24,alignItems:"center"}}>
-              {["Services","Pricing","FAQ"].map(l=><button key={l} onClick={()=>document.getElementById(l==="Services"?"pricing":l==="Pricing"?"pricing":"faq")?.scrollIntoView({behavior:"smooth"})} style={{background:"none",fontSize:14,color:t.textSoft,fontWeight:450,border:"none",cursor:"pointer"}}>{l}</button>)}
-            </div>
-            <button onClick={toggleTheme} style={{width:44,height:24,borderRadius:12,background:dark?"#c47d8e":"rgba(0,0,0,0.08)",position:"relative",transition:"all .3s",border:"none",cursor:"pointer",flexShrink:0}}><div style={{width:18,height:18,borderRadius:"50%",background:"#fff",position:"absolute",top:3,left:dark?23:3,transition:"left .3s cubic-bezier(.2,.8,.2,1)",boxShadow:"0 1px 4px rgba(0,0,0,.2)"}}/></button>
-            <button onClick={()=>setModal("login")} className="nav-login" style={{padding:"9px 20px",borderRadius:10,background:"transparent",border:`1px solid ${t.surfaceBorder}`,color:t.text,fontSize:13,fontWeight:600,transition:"background 1.5s ease"}}>Log In</button>
-            <button onClick={()=>setModal("signup")} style={{padding:"9px 20px",borderRadius:10,background:t.btnPrimary,color:"#fff",fontSize:13,fontWeight:600}}>Get Started</button>
+      {/* ── NAVBAR ── */}
+      <nav style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"0 36px",height:60,background:${dark?""rgba(9,12,21,.95)"":""rgba(255,255,255,.95)""},backdropFilter:"blur(16px)",borderBottom:`1px solid ${t.surfaceBorder}`,flexShrink:0,zIndex:100}}>
+        <button onClick={()=>window.scrollTo({top:0,behavior:"smooth"})} style={{display:"flex",alignItems:"center",gap:10,background:"none",padding:0}}>
+          <div style={{width:30,height:30,borderRadius:8,background:"linear-gradient(135deg,#c47d8e,#8b5e6b)",display:"flex",alignItems:"center",justifyContent:"center"}}><svg width="13" height="13" viewBox="0 0 20 20" fill="none"><path d="M4,16 L4,4 L16,16 L16,4" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
+          <span style={{fontSize:17,fontWeight:700,color:t.text,letterSpacing:1.5}}>NITRO</span>
+        </button>
+        <div style={{display:"flex",alignItems:"center",gap:16}}>
+          <div className="nav-links" style={{display:"flex",gap:24,alignItems:"center"}}>
+            {["Services","Pricing","FAQ"].map(l=><button key={l} onClick={()=>document.getElementById(l.toLowerCase())?.scrollIntoView({behavior:"smooth"})} style={{background:"none",fontSize:14,color:t.textSoft,fontWeight:450}}>{l}</button>)}
           </div>
+          <button onClick={toggleTheme} style={{width:44,height:24,borderRadius:12,background:dark?"#c47d8e":"rgba(0,0,0,0.08)",position:"relative",transition:"all .3s",flexShrink:0}}><div style={{width:18,height:18,borderRadius:"50%",background:"#fff",position:"absolute",top:3,left:dark?23:3,transition:"left .3s cubic-bezier(.2,.8,.2,1)",boxShadow:"0 1px 4px rgba(0,0,0,.2)"}}/></button>
+          <button onClick={()=>setModal("login")} className="nav-login" style={{padding:"9px 20px",borderRadius:10,background:"transparent",border:`1px solid ${t.surfaceBorder}`,color:t.text,fontSize:13,fontWeight:600}}>Log In</button>
+          <button onClick={()=>setModal("signup")} style={{padding:"9px 20px",borderRadius:10,background:t.btnPrimary,color:"#fff",fontSize:13,fontWeight:600}}>Get Started</button>
         </div>
       </nav>
-      </div>
 
-      <section id="hero" className="snap-section" style={{padding:"100px 24px 80px",textAlign:"center",position:"relative",zIndex:1}}>
-        <div className="sec">
-          <div style={{position:"absolute",top:40,right:"10%",width:120,height:120,border:`2px solid ${dark?"rgba(196,125,142,0.1)":"rgba(196,125,142,0.08)"}`,borderRadius:"50%",animation:"spin-slow 30s linear infinite",pointerEvents:"none"}}/>
-          <div style={{position:"absolute",bottom:20,left:"8%",width:80,height:80,border:`1.5px dashed ${dark?"rgba(110,231,183,0.1)":"rgba(16,185,129,0.08)"}`,borderRadius:"50%",animation:"spin-slow 20s linear infinite reverse",pointerEvents:"none"}}/>
-          <Reveal>
-            <div style={{display:"inline-block",padding:"6px 18px",borderRadius:20,background:t.accentLight,border:`1px solid ${dark?"rgba(196,125,142,0.2)":"rgba(196,125,142,0.15)"}`,fontSize:13,color:t.accent,fontWeight:500,marginBottom:28}}>🚀 Nigeria's Premium SMM Platform</div>
-          </Reveal>
-          <Reveal delay={0.1}>
-            <h1 className="serif" style={{fontSize:"clamp(38px, 6vw, 68px)",fontWeight:700,color:t.text,lineHeight:1.1,marginBottom:22,letterSpacing:"-1px"}}>
-              Grow Your Social Media<br/><span style={{background:"linear-gradient(135deg,#c47d8e,#a3586b)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>Effortlessly</span>
-            </h1>
-          </Reveal>
-          <Reveal delay={0.2}>
-            <p style={{fontSize:"clamp(15px, 2vw, 18px)",color:t.textSoft,maxWidth:560,margin:"0 auto 40px",lineHeight:1.7}}>
-              Real followers, likes, and views for Instagram, TikTok, YouTube & more. Instant delivery. Naira payments. Trusted by thousands.
-            </p>
-          </Reveal>
-          <Reveal delay={0.3}>
-            <div style={{display:"flex",gap:12,justifyContent:"center",flexWrap:"wrap"}}>
-              <button onClick={()=>setModal("signup")} style={{padding:"15px 40px",borderRadius:14,background:t.btnPrimary,color:"#fff",fontSize:16,fontWeight:700,boxShadow:"0 4px 24px rgba(196,125,142,0.3)",transition:"transform 0.2s"}} onMouseEnter={e=>e.target.style.transform="translateY(-2px)"} onMouseLeave={e=>e.target.style.transform="translateY(0)"}>Get Started Free</button>
-              <button onClick={()=>document.getElementById("pricing")?.scrollIntoView({behavior:"smooth"})} style={{padding:"15px 40px",borderRadius:14,background:t.btnSecondary,color:t.text,fontSize:16,fontWeight:600,border:`1px solid ${t.btnSecBorder}`}}>View Pricing ↓</button>
+      {/* ── PROMO BANNER ── */}
+      {(promoBanner||siteAlerts.length>0)&&<div style={{flexShrink:0}}>{[...(promoBanner?[promoBanner]:[]),...siteAlerts].map((a,i)=><div key={i} style={{padding:"10px 16px",textAlign:"center",fontSize:13,fontWeight:500,background:a.type==="warning"?(dark?"rgba(217,119,6,0.15)":"#fffbeb"):(dark?"rgba(99,102,241,0.15)":"#eef2ff"),color:a.type==="warning"?(dark?"#fcd34d":"#92400e"):(dark?"#a5b4fc":"#4f46e5"),borderBottom:`1px solid ${t.surfaceBorder}`}}>{a.type==="warning"?"⚠️":"✨"} {a.message}</div>)}</div>}
+
+      {/* ── SCROLLABLE CONTENT ── */}
+      <div style={{flex:1,overflowY:"auto",overflowX:"hidden",WebkitOverflowScrolling:"touch"}}>
+
+        {/* ── HERO ── */}
+        <section style={{padding:"80px 40px 60px",textAlign:"center",position:"relative",overflow:"hidden"}}>
+          <div style={{position:"absolute",top:"-20%",left:"50%",transform:"translateX(-50%)",width:800,height:500,borderRadius:"50%",background:dark?"rgba(196,125,142,.06)":"rgba(196,125,142,.04)",filter:"blur(100px)",pointerEvents:"none"}}/>
+          <div style={{position:"relative",zIndex:1,maxWidth:720,margin:"0 auto"}}>
+            <div className="fu" style={{display:"inline-flex",alignItems:"center",gap:8,padding:"6px 18px",borderRadius:24,background:t.accentLight,border:`1px solid ${dark?"rgba(196,125,142,.15)":"rgba(196,125,142,.10)"}`,fontSize:13,fontWeight:550,color:t.accent,marginBottom:32}}>🚀 Trusted by {siteStats.users} creators across Nigeria</div>
+            <h1 className="fu fd1" style={{fontSize:"clamp(40px, 5.5vw, 60px)",fontWeight:800,lineHeight:1.08,letterSpacing:-1,marginBottom:24,color:t.text}}>Social Growth,<br/><span className="serif" style={{fontStyle:"italic",fontWeight:400,color:t.accent}}>Refined.</span></h1>
+            <p className="fu fd2" style={{fontSize:18,color:t.textSoft,fontWeight:430,maxWidth:480,margin:"0 auto 40px",lineHeight:1.65}}>Real followers. Real engagement. Instant delivery. Nigeria's most trusted SMM platform.</p>
+            <div className="fu fd3" style={{display:"flex",gap:14,justifyContent:"center",flexWrap:"wrap"}}>
+              <button onClick={()=>setModal("signup")} style={{padding:"15px 36px",borderRadius:14,background:t.btnPrimary,color:"#fff",fontSize:16,fontWeight:700,boxShadow:"0 8px 28px rgba(196,125,142,.25)"}}>Get Started Free →</button>
+              <button onClick={()=>document.getElementById("pricing")?.scrollIntoView({behavior:"smooth"})} style={{padding:"15px 36px",borderRadius:14,background:dark?"rgba(255,255,255,.05)":"rgba(255,255,255,.8)",color:t.text,fontSize:16,fontWeight:500,border:`1px solid ${t.surfaceBorder}`,backdropFilter:"blur(8px)"}}>View Pricing</button>
             </div>
-          </Reveal>
-          <Reveal delay={0.45}>
-            <div className="hero-stats" style={{display:"flex",justifyContent:"center",gap:40,marginTop:64,flexWrap:"wrap"}}>
-              {[[siteStats.users,"Active Users","👥"],[siteStats.orders,"Orders Delivered","📦"],["₦500","Min Deposit","💳"],["24/7","Support","💬"]].map(([v,l,ic])=>
-                <div key={l} style={{textAlign:"center"}}>
-                  <div style={{fontSize:14,marginBottom:4}}>{ic}</div>
-                  <div className="m" style={{fontSize:24,fontWeight:700,color:t.accent}}>{v}</div>
-                  <div style={{fontSize:12,color:t.textMuted,marginTop:2}}>{l}</div>
-                </div>
-              )}
+            <div className="fu fd4 stats-row" style={{display:"flex",justifyContent:"center",gap:48,marginTop:56}}>
+              {[[siteStats.users,"Active Users","👥"],[siteStats.orders,"Orders Delivered","📦"],["₦500","Min Deposit","💳"],["24/7","Support","💬"]].map(([v,l,ic])=><div key={l}><div style={{fontSize:16,marginBottom:4}}>{ic}</div><div className="m" style={{fontSize:22,fontWeight:700,color:t.text}}>{v}</div><div style={{fontSize:12,color:t.textMuted,marginTop:2,fontWeight:450}}>{l}</div></div>)}
             </div>
-          </Reveal>
-        </div>
-        <div style={{marginTop:72,overflow:"hidden",borderTop:`1px solid ${t.surfaceBorder}`,borderBottom:`1px solid ${t.surfaceBorder}`,padding:"16px 0",position:"relative",transition:"border-color 1.5s ease"}}>
-          <div style={{display:"flex",animation:"marquee 30s linear infinite",width:"max-content"}}>
-            {[...Array(2)].map((_,ri)=>(
-              <div key={ri} style={{display:"flex",gap:48,paddingRight:48,flexShrink:0}}>
-                {["Instagram Followers","TikTok Views","YouTube Subscribers","Twitter Likes","Facebook Page Likes","Telegram Members","Spotify Plays","Instagram Reels","TikTok Followers","YouTube Watch Time","Real Engagement","Instant Delivery","Naira Payments","Refill Guarantee","24/7 Support"].map((txt,i)=>(
-                  <span key={`${ri}-${i}`} style={{fontSize:14,fontWeight:500,color:i%3===0?t.accent:t.textMuted,whiteSpace:"nowrap",letterSpacing:"0.3px",display:"flex",alignItems:"center",gap:8}}>
-                    <span style={{width:4,height:4,borderRadius:"50%",background:t.accent,opacity:0.5,flexShrink:0}}/>
-                    {txt}
-                  </span>
-                ))}
-              </div>
-            ))}
+          </div>
+        </section>
+
+        {/* ── PLATFORM CAROUSEL ── */}
+        <div style={{padding:"20px 0 50px",overflow:"hidden"}}>
+          <div style={{display:"flex",animation:"scroll 30s linear infinite",width:"fit-content"}}>
+            {[0,1].map(rep=><div key={rep} style={{display:"flex",gap:12,paddingRight:12}}>
+              {[["📸","Instagram"],["🎵","TikTok"],["▶️","YouTube"],["𝕏","Twitter/X"],["📘","Facebook"],["✈️","Telegram"],["🎵","Spotify"],["👻","Snapchat"],["🔗","LinkedIn"],["📌","Pinterest"],["🎮","Twitch"],["💬","Discord"]].map(([ic,name])=><span key={rep+name} style={{display:"inline-flex",alignItems:"center",gap:8,padding:"10px 20px",borderRadius:12,background:t.surface,border:`1px solid ${t.surfaceBorder}`,fontSize:14,color:t.textSoft,fontWeight:450,backdropFilter:"blur(8px)",whiteSpace:"nowrap",flexShrink:0}}>{ic} {name}</span>)}
+            </div>)}
           </div>
         </div>
-      </section>
 
-      {/* Platform Carousel */}
-      <div style={{padding:"30px 0 50px",overflow:"hidden"}}>
-        <div style={{display:"flex",animation:"scroll 30s linear infinite",width:"fit-content"}}>
-          {[0,1].map(rep=><div key={rep} style={{display:"flex",gap:12,paddingRight:12}}>
-            {[["📸","Instagram"],["🎵","TikTok"],["▶️","YouTube"],["𝕏","Twitter/X"],["📘","Facebook"],["✈️","Telegram"],["🎵","Spotify"],["👻","Snapchat"],["🔗","LinkedIn"],["📌","Pinterest"],["🎮","Twitch"],["💬","Discord"]].map(([ic,name])=><span key={rep+name} style={{display:"inline-flex",alignItems:"center",gap:8,padding:"10px 20px",borderRadius:12,background:t.surface,border:`1px solid ${t.surfaceBorder}`,fontSize:14,color:t.textSoft,fontWeight:450,backdropFilter:"blur(8px)",whiteSpace:"nowrap",flexShrink:0,transition:"background 1.5s ease"}}>{ic} {name}</span>)}
-          </div>)}
-        </div>
-      </div>
+        {/* ── FEATURES ── */}
+        <section id="services" style={{padding:"80px 40px",maxWidth:1100,margin:"0 auto"}}>
+          <div style={{textAlign:"center",marginBottom:56}}><h2 style={{fontSize:36,fontWeight:700,color:t.text,marginBottom:12}}>Why <span style={{color:t.accent}}>Nitro</span>?</h2><p style={{fontSize:16,color:t.textSoft,fontWeight:430}}>Everything you need to grow your social presence</p></div>
+          <div className="feat-grid" style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:20}}>
+            {[["⚡","Instant Delivery","Orders start within minutes. Real-time tracking."],["🛡️","Safe & Secure","No passwords needed. Public URLs only."],["💳","Naira Payments","Cards, bank transfer, USSD via Paystack."],["🔄","Refill Guarantee","Auto-replenish drops at no extra cost."],["📊","Real-Time Dashboard","Track orders, wallet, and growth in one place."],["🤝","Earn 5% Forever","Share your link, earn commission permanently."]].map(([ic,title,desc],i)=><div key={i} className="hover-lift" style={{padding:"28px 24px",borderRadius:18,background:t.surface,border:`1px solid ${t.surfaceBorder}`,backdropFilter:"blur(8px)"}}><div style={{width:44,height:44,borderRadius:12,background:t.accentLight,display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,marginBottom:16}}>{ic}</div><h3 style={{fontSize:17,fontWeight:600,color:t.text,marginBottom:8}}>{title}</h3><p style={{fontSize:14,color:t.textSoft,lineHeight:1.65,fontWeight:430}}>{desc}</p></div>)}
+          </div>
+        </section>
 
-      <section id="features" className="snap-section" style={{padding:"80px 24px",position:"relative",zIndex:1}}>
-        <div className="sec">
-          <Reveal><div style={{textAlign:"center",marginBottom:48}}>
-            <h2 className="serif" style={{fontSize:"clamp(28px,4vw,42px)",fontWeight:600,color:t.text,marginBottom:12}}>Why Nitro?</h2>
-            <p style={{fontSize:15,color:t.textSoft,maxWidth:480,margin:"0 auto"}}>Everything you need to grow, in one place.</p>
-          </div></Reveal>
-          <div className="g3">
-            {[["⚡","Instant Delivery","Orders start in minutes. Real-time tracking on every order."],["💳","Pay in Naira","Paystack — cards, bank transfer, USSD. No dollar conversion."],["📸","All Platforms","Instagram, TikTok, YouTube, Twitter/X, Facebook, Telegram, Spotify."],["🔄","Refill Guarantee","Auto-replenish dropped followers within the guarantee period."],["🔒","100% Safe","No passwords needed. Delivery via public URLs only."],["🔗","Earn 5% Forever","Refer friends and earn commission on every order they make."]].map(([ic,title,desc],i)=>
-              <Reveal key={i} delay={i*0.08} style={{display:"flex"}}>
-                <div style={{padding:28,borderRadius:20,background:t.surface,border:`1px solid ${t.surfaceBorder}`,backdropFilter:"blur(12px)",boxShadow:t.cardShadow,transition:"background 1.5s ease,border-color 1.5s ease,transform 0.2s",cursor:"default",flex:1}} onMouseEnter={e=>e.currentTarget.style.transform="translateY(-4px)"} onMouseLeave={e=>e.currentTarget.style.transform="translateY(0)"}>
-                  <div style={{width:48,height:48,borderRadius:14,background:t.accentLight,display:"flex",alignItems:"center",justifyContent:"center",fontSize:24,marginBottom:16}}>{ic}</div>
-                  <h3 style={{fontSize:16,fontWeight:600,color:t.text,marginBottom:8}}>{title}</h3>
-                  <p style={{fontSize:13,color:t.textSoft,lineHeight:1.7}}>{desc}</p>
-                </div>
-              </Reveal>
-            )}
+        {/* ── HOW IT WORKS ── */}
+        <section style={{padding:"80px 40px",maxWidth:900,margin:"0 auto"}}>
+          <h2 style={{fontSize:36,fontWeight:700,color:t.text,textAlign:"center",marginBottom:48}}>How It Works</h2>
+          <div className="steps-grid" style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:16}}>
+            {[["1","Sign Up","Free in 30 seconds"],["2","Add Funds","From ₦500 via Paystack"],["3","Place Order","Pick service, paste link"],["4","Watch Growth","Delivery starts instantly"]].map(([n,title,desc])=><div key={n} style={{textAlign:"center",padding:"24px 16px",borderRadius:16,background:t.surface,border:`1px solid ${t.surfaceBorder}`,backdropFilter:"blur(8px)"}}><div style={{width:44,height:44,borderRadius:"50%",background:t.btnPrimary,display:"inline-flex",alignItems:"center",justifyContent:"center",fontSize:18,fontWeight:700,color:"#fff",marginBottom:14,boxShadow:"0 4px 16px rgba(196,125,142,.25)"}}>{n}</div><h3 style={{fontSize:15,fontWeight:600,color:t.text,marginBottom:4}}>{title}</h3><p style={{fontSize:13,color:t.textSoft,lineHeight:1.5,fontWeight:430}}>{desc}</p></div>)}
+          </div>
+        </section>
+
+        {/* ── PRICING ── */}
+        <section id="pricing" style={{padding:"80px 40px",maxWidth:1100,margin:"0 auto"}}>
+          <div style={{textAlign:"center",marginBottom:48}}><h2 style={{fontSize:36,fontWeight:700,color:t.text,marginBottom:12}}>Transparent Pricing</h2><p style={{fontSize:16,color:t.textSoft,fontWeight:430}}>No subscriptions. Pay-as-you-go. Per 1,000 units.</p></div>
+          <div className="price-grid" style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:20}}>
+            {[["TikTok","🎵",[["Followers","₦4,650"],["Views","₦465"],["Likes","₦2,325"],["Shares","₦1,200"]],false],["Instagram","📸",[["Followers","₦3,875"],["Likes","₦1,860"],["Reels Views","₦775"],["Story Views","₦1,240"]],true],["YouTube","▶️",[["Subscribers","₦12,400"],["Views","₦3,100"],["Watch Time","₦77,500"],["Likes","₦1,500"]],false]].map(([name,ic,prices,pop])=><div key={name} className="hover-lift" style={{padding:"32px 28px",borderRadius:20,background:t.surface,border:`1px solid ${pop?"rgba(196,125,142,.25)":t.surfaceBorder}`,backdropFilter:"blur(8px)",position:"relative",overflow:"hidden",transform:pop?"scale(1.02)":"none"}}>{pop&&<div style={{position:"absolute",top:0,left:0,right:0,height:3,background:t.btnPrimary}}/>}{pop&&<div style={{position:"absolute",top:14,right:14,padding:"3px 10px",borderRadius:6,background:t.accent,color:"#fff",fontSize:10,fontWeight:700,letterSpacing:1}}>POPULAR</div>}<div style={{fontSize:36,marginBottom:8}}>{ic}</div><h3 style={{fontSize:20,fontWeight:600,color:t.text,marginBottom:18}}>{name}</h3>{prices.map(([svc,price])=><div key={svc} style={{display:"flex",justifyContent:"space-between",padding:"11px 0",borderBottom:`1px solid ${t.surfaceBorder}`}}><span style={{fontSize:14,color:t.textSoft,fontWeight:430}}>{svc}</span><span className="m" style={{fontSize:14,fontWeight:600,color:t.green}}>{price}</span></div>)}<button onClick={()=>setModal("signup")} style={{marginTop:22,width:"100%",padding:"13px 0",borderRadius:12,background:pop?t.btnPrimary:"transparent",color:pop?"#fff":t.text,fontSize:14,fontWeight:600,border:pop?"none":`1px solid ${t.surfaceBorder}`}}>Get Started</button></div>)}
+          </div>
+          <div style={{marginTop:40,textAlign:"center"}}><p style={{fontSize:12,color:t.textMuted}}>All prices in ₦ per 1,000 units. More services available after signup.</p></div>
+        </section>
+
+        {/* ── TESTIMONIALS ── */}
+        <section style={{padding:"80px 40px",maxWidth:1100,margin:"0 auto"}}>
+          <h2 style={{fontSize:36,fontWeight:700,color:t.text,textAlign:"center",marginBottom:48}}>Trusted by Creators</h2>
+          <div className="test-grid" style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:20}}>
+            {[["Chioma A.","Instagram Influencer","Nitro helped me hit 50K followers. Delivery is fast and followers stay."],["Tunde O.","Music Artist","I use it for Spotify and YouTube. Instant delivery, Naira payments, no stress."],["Blessing E.","Business Owner","My boutique's IG went from 2K to 25K. Real engagement, real growth."]].map(([name,role,text],i)=><div key={i} className="hover-lift" style={{padding:"28px 24px",borderRadius:18,background:t.surface,border:`1px solid ${t.surfaceBorder}`,backdropFilter:"blur(8px)",display:"flex",flexDirection:"column"}}><div style={{fontSize:13,color:"#e0a458",marginBottom:10}}>★★★★★</div><p style={{fontSize:14,color:t.textSoft,lineHeight:1.7,fontWeight:430,fontStyle:"italic",flex:1,marginBottom:18}}>"{text}"</p><div style={{display:"flex",alignItems:"center",gap:10}}><div style={{width:36,height:36,borderRadius:"50%",background:t.logoGrad,display:"flex",alignItems:"center",justifyContent:"center",fontSize:15,fontWeight:700,color:"#fff"}}>{name[0]}</div><div><div style={{fontSize:14,fontWeight:600,color:t.text}}>{name}</div><div style={{fontSize:12,color:t.textMuted,fontWeight:430}}>{role}</div></div></div></div>)}
+          </div>
+        </section>
+
+        {/* ── FAQ ── */}
+        <section id="faq" style={{padding:"80px 40px",maxWidth:800,margin:"0 auto"}}>
+          <h2 style={{fontSize:36,fontWeight:700,color:t.text,textAlign:"center",marginBottom:48}}>Frequently Asked Questions</h2>
+          {[["How does Nitro work?","Sign up free, add funds via Paystack, choose a service, paste your link, and order. Delivery starts within minutes."],["Is it safe to use?","We never ask for passwords. All services use your public profile URL only."],["How do I pay?","Nigerian Naira via Paystack — debit cards, bank transfer, USSD. Minimum ₦500."],["Will my followers drop?","Services with refill guarantee auto-replenish any drops at no extra cost."],["Can I earn money?","Share your referral link and earn 5% commission on every order — forever."],["How fast is delivery?","Most services start within minutes. Typical completion is 0-24 hours."]].map(([q,a],i)=>{const isOpen=faqOpen===i;return <div key={i} style={{marginBottom:10,borderRadius:14,background:t.surface,border:`1px solid ${isOpen?"rgba(196,125,142,.2)":t.surfaceBorder}`,backdropFilter:"blur(8px)",transition:"border-color .3s",overflow:"hidden"}}><button onClick={()=>setFaqOpen(isOpen?null:i)} style={{width:"100%",padding:"18px 24px",fontSize:16,fontWeight:500,color:t.text,background:"none",display:"flex",justifyContent:"space-between",alignItems:"center",textAlign:"left"}}><span>{q}</span><span style={{fontSize:18,color:isOpen?t.accent:t.textMuted,transition:"transform .3s",transform:isOpen?"rotate(45deg)":"none",flexShrink:0}}>+</span></button><div style={{maxHeight:isOpen?200:0,overflow:"hidden",transition:"max-height .35s cubic-bezier(.4,0,.2,1)"}}><div style={{padding:"0 24px 18px",fontSize:14,color:t.textSoft,lineHeight:1.75,fontWeight:430,borderTop:`1px solid ${t.surfaceBorder}`}}><div style={{paddingTop:14}}>{a}</div></div></div></div>})}
+        </section>
+
+        {/* ── CTA ── */}
+        <section style={{padding:"60px 40px"}}>
+          <div style={{textAlign:"center",maxWidth:600,margin:"0 auto",padding:"56px 40px",borderRadius:24,background:t.surface,border:`1px solid ${t.surfaceBorder}`,backdropFilter:"blur(12px)"}}>
+            <h2 style={{fontSize:"clamp(28px,4vw,44px)",fontWeight:700,color:t.text,marginBottom:16}}>Ready to <span style={{color:t.accent}}>Grow</span>?</h2>
+            <p style={{fontSize:16,color:t.textSoft,marginBottom:36,fontWeight:430}}>Join thousands of Nigerian creators already using Nitro.</p>
+            <button onClick={()=>setModal("signup")} style={{padding:"16px 52px",borderRadius:14,background:t.btnPrimary,color:"#fff",fontSize:17,fontWeight:700,boxShadow:"0 8px 28px rgba(196,125,142,.25)"}}>Create Free Account</button>
+          </div>
+        </section>
+
+        {/* ── FOOTER CAROUSEL ── */}
+        <div style={{borderTop:`1px solid ${t.surfaceBorder}`,padding:"16px 0",overflow:"hidden"}}>
+          <div style={{display:"flex",animation:"scroll 25s linear infinite",width:"fit-content"}}>
+            {[0,1,2].map(rep=><div key={rep} style={{display:"flex",gap:32,paddingRight:32,alignItems:"center"}}>
+              {["Instagram","TikTok","YouTube","Twitter/X","Facebook","Telegram","Spotify","Snapchat","LinkedIn","Pinterest","Twitch","Discord"].map(name=><span key={rep+name} style={{fontSize:13,color:t.textMuted,fontWeight:450,whiteSpace:"nowrap",letterSpacing:.5}}>{name}</span>)}
+            </div>)}
           </div>
         </div>
-      </section>
 
-      <section id="pricing" className="snap-section" style={{padding:"80px 24px",position:"relative",zIndex:1}}>
-        <div className="sec" style={{maxWidth:1400}}>
-          <Reveal><div style={{textAlign:"center",marginBottom:48}}>
-            <h2 className="serif" style={{fontSize:"clamp(28px,4vw,42px)",fontWeight:600,color:t.text,marginBottom:12}}>Transparent Pricing</h2>
-            <p style={{fontSize:15,color:t.textSoft,maxWidth:480,margin:"0 auto"}}>No subscriptions. Pay-as-you-go. All prices per 1,000 units.</p>
-          </div></Reveal>
-          <div className="g3p">
-            {[["TikTok","🎵",[["Followers","₦4,650"],["Views","₦465"],["Likes","₦2,325"],["Shares","₦1,200"]],false],["Instagram","📸",[["Followers","₦3,875"],["Likes","₦1,860"],["Reels Views","₦775"],["Story Views","₦1,240"]],true],["YouTube","▶️",[["Subscribers","₦12,400"],["Views","₦3,100"],["Watch Time","₦77,500"],["Likes","₦1,500"]],false]].map(([name,ic,prices,pop],i)=>
-              <Reveal key={name} delay={i*0.1} style={{display:"flex"}}>
-                <div style={{padding:"32px 34px",borderRadius:20,background:t.surface,border:`1px solid ${pop?"rgba(196,125,142,0.25)":t.surfaceBorder}`,backdropFilter:"blur(12px)",boxShadow:pop?"0 0 40px rgba(196,125,142,0.1)":t.cardShadow,transition:"background 1.5s ease,transform 0.2s",position:"relative",overflow:"hidden",display:"flex",flexDirection:"column",flex:1,transform:pop?"scale(1.03)":"scale(1)"}} onMouseEnter={e=>e.currentTarget.style.transform=pop?"scale(1.05)":"scale(1.02)"} onMouseLeave={e=>e.currentTarget.style.transform=pop?"scale(1.03)":"scale(1)"}>
-                  {pop&&<div style={{position:"absolute",top:0,left:0,right:0,height:3,background:t.btnPrimary}}/>}
-                  {pop&&<div style={{position:"absolute",top:14,right:14,padding:"3px 10px",borderRadius:6,background:t.accent,color:"#fff",fontSize:10,fontWeight:700,letterSpacing:1}}>POPULAR</div>}
-                  <div style={{fontSize:36,marginBottom:8}}>{ic}</div>
-                  <h3 style={{fontSize:18,fontWeight:600,color:t.text,marginBottom:16}}>{name}</h3>
-                  <div style={{flex:1}}>{prices.map(([svc,price])=>
-                    <div key={svc} style={{display:"flex",justifyContent:"space-between",padding:"10px 0",borderBottom:`1px solid ${t.surfaceBorder}`}}>
-                      <span style={{fontSize:14,color:t.textSoft}}>{svc}</span>
-                      <span className="m" style={{fontSize:14,fontWeight:600,color:t.green}}>{price}</span>
-                    </div>
-                  )}</div>
-                  <button onClick={()=>setModal("signup")} style={{marginTop:20,width:"100%",padding:"12px 0",borderRadius:10,background:pop?t.btnPrimary:t.btnSecondary,color:pop?"#fff":t.text,fontSize:14,fontWeight:600,border:pop?"none":`1px solid ${t.btnSecBorder}`}}>Get Started</button>
-                </div>
-              </Reveal>
-            )}
-          </div>
-          <Reveal delay={0.3}><div style={{marginTop:40,textAlign:"center"}}>
-            <p style={{fontSize:13,color:t.textMuted,marginBottom:16,textTransform:"uppercase",letterSpacing:1.5,fontWeight:600}}>All platforms we support</p>
-            <div style={{display:"flex",flexWrap:"wrap",justifyContent:"center",gap:10}}>
-              {[["📸","Instagram"],["🎵","TikTok"],["▶️","YouTube"],["𝕏","Twitter/X"],["📘","Facebook"],["✈️","Telegram"],["🎵","Spotify"],["👻","Snapchat"],["🔗","LinkedIn"],["📌","Pinterest"],["🎮","Twitch"],["💬","Discord"]].map(([ic,name])=>
-                <span key={name} style={{display:"inline-flex",alignItems:"center",gap:6,padding:"8px 16px",borderRadius:10,background:t.surface,border:`1px solid ${t.surfaceBorder}`,fontSize:13,color:t.textSoft,fontWeight:500,backdropFilter:"blur(8px)",transition:"background 1.5s ease"}}>{ic} {name}</span>
-              )}
-            </div>
-            <p style={{fontSize:12,color:t.textMuted,marginTop:14}}>All prices in ₦ per 1,000 units. More services available after signup.</p>
-          </div></Reveal>
-        </div>
-      </section>
-
-      <section id="social-proof" className="snap-section" style={{padding:"60px 24px",position:"relative",zIndex:1}}>
-        <div className="sec">
-          <Reveal><div style={{textAlign:"center",marginBottom:36}}>
-            <h2 className="serif" style={{fontSize:"clamp(26px,4vw,38px)",fontWeight:600,color:t.text,marginBottom:10}}>How It Works</h2>
-          </div></Reveal>
-          <div className="g4" style={{maxWidth:900,margin:"0 auto 60px"}}>
-            {[["1","Sign Up","Create a free account in 30 seconds"],["2","Add Funds","Top up with Paystack — from ₦500"],["3","Place Order","Pick a service, paste your link, order"],["4","Watch Growth","Delivery starts instantly"]].map(([n,title,desc],i)=>
-              <Reveal key={i} delay={i*0.08} style={{display:"flex"}}>
-                <div style={{textAlign:"center",padding:20,borderRadius:16,background:t.surface,border:`1px solid ${t.surfaceBorder}`,backdropFilter:"blur(12px)",transition:"background 1.5s ease",flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center"}}>
-                  <div style={{width:40,height:40,borderRadius:"50%",background:t.btnPrimary,display:"inline-flex",alignItems:"center",justifyContent:"center",fontSize:16,fontWeight:700,color:"#fff",marginBottom:12,boxShadow:"0 4px 16px rgba(196,125,142,0.25)",flexShrink:0}}>{n}</div>
-                  <h3 style={{fontSize:14,fontWeight:600,color:t.text,marginBottom:4}}>{title}</h3>
-                  <p style={{fontSize:12,color:t.textSoft,lineHeight:1.5}}>{desc}</p>
-                </div>
-              </Reveal>
-            )}
-          </div>
-          <Reveal><h2 className="serif" style={{fontSize:"clamp(26px,4vw,38px)",fontWeight:600,color:t.text,marginBottom:32,textAlign:"center"}}>Trusted by Creators</h2></Reveal>
-          <div className="g3">
-            {[["Chioma A.","Instagram Influencer","Nitro helped me hit 50K followers. Delivery is fast and followers stay. Best panel in Nigeria.","⭐⭐⭐⭐⭐"],["Tunde O.","Music Artist","I use it for Spotify and YouTube. Instant delivery, Naira payments, no stress. Streams tripled.","⭐⭐⭐⭐⭐"],["Blessing E.","Business Owner","My boutique's IG went from 2K to 25K. Real engagement. I recommend to every business owner.","⭐⭐⭐⭐⭐"]].map(([name,role,text,stars],i)=>
-              <Reveal key={i} delay={i*0.1} style={{display:"flex"}}>
-                <div style={{padding:24,borderRadius:18,background:t.surface,border:`1px solid ${t.surfaceBorder}`,backdropFilter:"blur(12px)",boxShadow:t.cardShadow,transition:"background 1.5s ease",flex:1,display:"flex",flexDirection:"column"}}>
-                  <div style={{fontSize:13,marginBottom:8}}>{stars}</div>
-                  <div style={{fontSize:13,color:t.textSoft,lineHeight:1.7,marginBottom:14,fontStyle:"italic",flex:1}}>"{text}"</div>
-                  <div style={{display:"flex",alignItems:"center",gap:10}}>
-                    <div style={{width:34,height:34,borderRadius:"50%",background:t.logoGrad,display:"flex",alignItems:"center",justifyContent:"center",fontSize:14,fontWeight:700,color:"#fff"}}>{name[0]}</div>
-                    <div><div style={{fontSize:13,fontWeight:600,color:t.text}}>{name}</div><div style={{fontSize:11,color:t.textMuted}}>{role}</div></div>
-                  </div>
-                </div>
-              </Reveal>
-            )}
-          </div>
-        </div>
-      </section>
-
-      <section id="faq" className="snap-section" style={{padding:"60px 24px",position:"relative",zIndex:1}}>
-        <div className="sec" style={{maxWidth:800}}>
-          <Reveal><h2 className="serif" style={{fontSize:"clamp(28px,4vw,42px)",fontWeight:600,color:t.text,marginBottom:32,textAlign:"center"}}>Frequently Asked Questions</h2></Reveal>
-          {[["How does Nitro work?","Sign up for free, add funds to your wallet via Paystack (cards, bank transfer, or USSD), choose a service from our catalog, paste your social media link, and place your order. Delivery starts within minutes and you can track progress in real-time."],["Is it safe to use?","Absolutely. We never ask for your passwords or login credentials. All services are delivered using your public profile URL only. Your accounts remain completely secure."],["How do I pay?","We accept Nigerian Naira payments via Paystack — debit cards, bank transfer, and USSD. Minimum deposit is ₦500 and you can top up any amount to your wallet."],["Will my followers drop?","Some natural fluctuation may occur. Services marked with refill guarantee will automatically replenish any drops within the guarantee period at no extra cost."],["Can I earn money with Nitro?","Yes! Every account gets a referral link. Share it and earn 5% commission on every order your referrals make — credited to your wallet automatically, forever."],["How fast is delivery?","Most services start delivering within minutes of placing your order. Typical completion time is 0-24 hours depending on the service type and quantity ordered."]].map(([q,a],i)=>{
-            const isOpen=faqOpen===i;
-            return <Reveal key={i} delay={i*0.05}>
-              <div style={{marginBottom:10,borderRadius:14,background:t.surface,border:`1px solid ${isOpen?"rgba(196,125,142,0.2)":t.surfaceBorder}`,transition:"background 1.5s ease, border-color 0.3s ease"}}>
-                <button onClick={()=>setFaqOpen(isOpen?null:i)} style={{width:"100%",padding:"18px 24px",fontSize:16,fontWeight:500,color:t.text,cursor:"pointer",background:"none",display:"flex",justifyContent:"space-between",alignItems:"center",gap:12,textAlign:"left"}}>
-                  <span>{q}</span>
-                  <span style={{fontSize:18,color:isOpen?t.accent:t.textMuted,flexShrink:0,transition:"transform 0.3s ease, color 0.3s ease",transform:isOpen?"rotate(45deg)":"rotate(0deg)"}}>+</span>
-                </button>
-                <div style={{maxHeight:isOpen?300:0,overflow:"hidden",transition:"max-height 0.35s cubic-bezier(0.4,0,0.2,1)"}}>
-                  <div style={{padding:"0 24px 18px",fontSize:14,color:t.textSoft,lineHeight:1.8,borderTop:`1px solid ${t.surfaceBorder}`}}><div style={{paddingTop:14}}>{a}</div></div>
-                </div>
-              </div>
-            </Reveal>;
-          })}
-        </div>
-      </section>
-
-      <section id="cta-footer" className="snap-section" style={{padding:"0",position:"relative",zIndex:1,display:"flex",flexDirection:"column"}}>
-        <div style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center",padding:"60px 24px"}}>
-          <Reveal>
-            <div style={{textAlign:"center",maxWidth:600,margin:"0 auto",padding:"56px 32px",borderRadius:24,background:t.surface,border:`1px solid ${t.surfaceBorder}`,backdropFilter:"blur(12px)"}}>
-              <h2 className="serif" style={{fontSize:"clamp(30px,5vw,48px)",fontWeight:700,color:t.text,marginBottom:16}}>Ready to <span style={{color:t.accent}}>Grow</span>?</h2>
-              <p style={{fontSize:16,color:t.textSoft,marginBottom:32}}>Join thousands of Nigerian creators already using Nitro.</p>
-              <button onClick={()=>setModal("signup")} style={{padding:"16px 52px",borderRadius:14,background:t.btnPrimary,color:"#fff",fontSize:17,fontWeight:700,boxShadow:"0 4px 28px rgba(196,125,142,0.3)"}}>Create Free Account</button>
-            </div>
-          </Reveal>
-        </div>
-        <div style={{borderTop:`1px solid ${t.surfaceBorder}`,padding:"16px 0",overflow:"hidden"}}><div style={{display:"flex",animation:"scroll 25s linear infinite",width:"fit-content"}}>{[0,1,2].map(rep=><div key={rep} style={{display:"flex",gap:32,paddingRight:32,alignItems:"center"}}>{["Instagram","TikTok","YouTube","Twitter/X","Facebook","Telegram","Spotify","Snapchat","LinkedIn","Pinterest","Twitch","Discord"].map(name=><span key={rep+name} style={{fontSize:13,color:t.textMuted,fontWeight:450,whiteSpace:"nowrap",letterSpacing:.5}}>{name}</span>)}</div>)}</div></div>
+        {/* ── FOOTER ── */}
         <Footer t={t} dark={dark}/>
-      </section>
+      </div>
 
       {modal&&<AuthModal dark={dark} t={t} mode={modal} setMode={setModal} onClose={closeModal}/>}
     </div>
