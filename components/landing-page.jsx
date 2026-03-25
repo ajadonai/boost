@@ -154,7 +154,7 @@ export default function Landing(){
         </section>
 
         {/* ━━━ SCREEN 2: WHY NITRO + HOW IT WORKS ━━━ */}
-        <section id="services" className="sec" style={{background:dark?"rgba(255,255,255,.015)":"rgba(0,0,0,.012)",overflow:"hidden"}}>
+        <section id="services" style={{minHeight:"calc(100vh - 100px)",display:"flex",flexDirection:"column",position:"relative",background:dark?"rgba(255,255,255,.015)":"rgba(0,0,0,.012)",overflow:"hidden"}}>
           <div style={{flex:1,display:"flex",flexDirection:"column",position:"relative",zIndex:1,overflow:"hidden",padding:"0 48px"}}>
             <div style={{maxWidth:1140,margin:"0 auto",width:"100%",flex:1,display:"flex",flexDirection:"column"}}>
 
