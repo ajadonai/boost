@@ -177,47 +177,6 @@ export default function Landing(){
           .tc{padding:20px 18px!important;border-radius:18px!important}
         }
 
-
-        .faq-sec{overflow:hidden}
-        .faq-content{max-width:760px;margin:0 auto;width:100%;padding:0 48px}
-        .faq-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:40px}
-        .faq-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:3px;color:${t.accent};margin-bottom:8px}
-        .faq-title{font-size:40px;font-weight:800;color:${t.text};letter-spacing:-.5px;line-height:1.1}
-        .faq-title-accent{font-weight:400;font-style:italic;color:${t.accent};font-size:46px}
-        .faq-aside{font-size:14px;color:${t.textMuted};font-weight:430;max-width:220px;text-align:right;line-height:1.5}
-        .faq-list{display:flex;flex-direction:column;gap:10px}
-        .faq-item{border-radius:18px;background:${dark?"rgba(15,19,35,.55)":"rgba(255,255,255,.5)"};border:1px solid ${dark?"rgba(255,255,255,.07)":"rgba(0,0,0,.05)"};backdrop-filter:blur(16px);transition:all .3s ease;overflow:hidden}
-        .faq-item-open{background:${dark?"rgba(15,19,35,.75)":"rgba(255,255,255,.7)"};border-color:${dark?"rgba(196,125,142,.2)":"rgba(196,125,142,.15)"}}
-        .faq-q{width:100%;padding:22px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;text-align:left;background:none;color:${t.text};cursor:pointer;font-family:inherit}
-        .faq-q-left{display:flex;align-items:center;gap:16px;flex:1}
-        .faq-num{font-size:12px;font-weight:600;transition:color .3s;flex-shrink:0;width:24px}
-        .faq-q-text{font-size:17px;transition:all .3s}
-        .faq-toggle{width:32px;height:32px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .35s cubic-bezier(.16,1,.3,1)}
-        .faq-a{overflow:hidden;transition:max-height .4s cubic-bezier(.16,1,.3,1)}
-        .faq-a-inner{padding:0 24px 22px 64px;font-size:15px;color:${t.textSoft};line-height:1.75;font-weight:430;border-top:1px solid ${dark?"rgba(255,255,255,.07)":"rgba(0,0,0,.05)"};padding-top:18px}
-        @media(max-width:1024px){
-          .faq-content{padding:0 40px}
-          .faq-title{font-size:34px}
-          .faq-title-accent{font-size:38px}
-        }
-        @media(max-width:768px){
-          .faq-content{padding:0 16px}
-          .faq-header{flex-direction:column;align-items:flex-start;margin-bottom:24px}
-          .faq-aside{display:none}
-          .faq-label{font-size:9px}
-          .faq-title{font-size:26px}
-          .faq-title br{display:none}
-          .faq-title-accent{font-size:30px}
-          .faq-list{gap:8px}
-          .faq-item{border-radius:16px}
-          .faq-q{padding:18px 18px}
-          .faq-q-left{gap:12px}
-          .faq-num{font-size:11px}
-          .faq-q-text{font-size:15px}
-          .faq-toggle{width:28px;height:28px;border-radius:8px}
-          .faq-a-inner{padding:0 18px 18px 54px;font-size:14px;padding-top:14px}
-        }
-
         .faq-sec{overflow:hidden}
         .faq-content{max-width:760px;margin:0 auto;width:100%;padding:0 48px}
         .faq-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:40px}
@@ -228,8 +187,8 @@ export default function Landing(){
         .faq-list{display:flex;flex-direction:column;gap:10px}
         .faq-item{border-radius:18px;background:${dark?"rgba(15,19,35,.55)":"rgba(255,255,255,.5)"};border:1px solid ${dark?"rgba(255,255,255,.07)":"rgba(0,0,0,.05)"};backdrop-filter:blur(16px);transition:all .3s ease;overflow:hidden}
         .faq-open{background:${dark?"rgba(15,19,35,.75)":"rgba(255,255,255,.7)"};border-color:${dark?"rgba(196,125,142,.2)":"rgba(196,125,142,.15)"}}
-        .faq-q{width:100%;padding:22px 24px;display:flex;justify-content:space-between;align-items:center;gap:16;text-align:left;background:none;color:${t.text};font-family:inherit;cursor:pointer}
-        .faq-q-inner{display:flex;align-items:center;gap:16;flex:1}
+        .faq-q{width:100%;padding:22px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;text-align:left;background:none;color:${t.text};font-family:inherit;cursor:pointer}
+        .faq-q-inner{display:flex;align-items:center;gap:16px;flex:1}
         .faq-num{font-size:12px;font-weight:600;color:${t.textMuted};flex-shrink:0;width:24px;transition:color .3s}
         .faq-open .faq-num{color:${t.accent}}
         .faq-q-text{font-size:17px;font-weight:500;color:${t.textSoft};transition:all .3s}
@@ -238,12 +197,6 @@ export default function Landing(){
         .faq-toggle-open{background:${t.accent};transform:rotate(45deg)}
         .faq-a-wrap{overflow:hidden;transition:max-height .4s cubic-bezier(.16,1,.3,1)}
         .faq-a{padding:0 24px 22px 64px;font-size:15px;color:${t.textSoft};line-height:1.75;font-weight:430;border-top:1px solid ${dark?"rgba(255,255,255,.07)":"rgba(0,0,0,.05)"}}
-        .cta-sec{display:flex;flex-direction:column}
-        .cta-inner{flex:1;display:flex;align-items:center;justify-content:center;padding:40px}
-        .cta-card{text-align:center;max-width:600px;margin:0 auto;padding:60px 40px;border-radius:24px;backdrop-filter:blur(12px)}
-        .cta-title{font-size:clamp(30px,4.5vw,48px);font-weight:800;color:${t.text};margin-bottom:16px}
-        .cta-sub{font-size:16px;margin-bottom:36px;font-weight:430}
-        .cta-btn{padding:16px 52px;border-radius:14px;color:#fff;font-size:17px;font-weight:700;box-shadow:0 8px 28px rgba(196,125,142,.25);border:none;cursor:pointer;font-family:inherit}
         @media(max-width:1024px){
           .faq-content{padding:0 40px}
           .faq-title{font-size:34px}
@@ -263,11 +216,6 @@ export default function Landing(){
           .faq-q-text{font-size:15px}
           .faq-toggle{width:28px;height:28px;border-radius:8px}
           .faq-a{padding:0 18px 18px 54px;font-size:14px}
-          .cta-inner{padding:24px 16px}
-          .cta-card{padding:40px 24px;border-radius:20px}
-          .cta-title{font-size:28px}
-          .cta-sub{font-size:14px;margin-bottom:28px}
-          .cta-btn{padding:14px 40px;font-size:15px;border-radius:12px}
         }
 
         .feat{transition:all .35s cubic-bezier(.16,1,.3,1)}
@@ -448,12 +396,12 @@ export default function Landing(){
         </section>
 
         {/* ━━━ SCREEN 6: CTA + FOOTER ━━━ */}
-        <section id="cta" className="cta-sec sec" style={{background:dark?"rgba(255,255,255,.015)":"rgba(0,0,0,.012)"}}>
-          <div className="cta-inner">
-            <div className="cta-card" style={{background:t.surface,border:`1px solid ${t.surfaceBorder}`,boxShadow:dark?"0 8px 32px rgba(0,0,0,.2)":"0 8px 32px rgba(0,0,0,.04)"}}>
-              <h2 className="cta-title">Ready to <span className="serif" style={{fontStyle:"italic",fontWeight:400,color:t.accent}}>Grow</span>?</h2>
-              <p className="cta-sub" style={{color:t.textSoft}}>Join {siteStats.users} Nigerian creators already using Nitro.</p>
-              <button onClick={()=>setModal("signup")} className="cta-btn" style={{background:t.btnPrimary}}>Create Free Account</button>
+        <section id="cta" className="sec" style={{background:dark?"rgba(255,255,255,.015)":"rgba(0,0,0,.012)"}}>
+          <div style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center",padding:"40px"}}>
+            <div style={{textAlign:"center",maxWidth:600,margin:"0 auto",padding:"60px 40px",borderRadius:24,background:t.surface,border:`1px solid ${t.surfaceBorder}`,backdropFilter:"blur(12px)",boxShadow:dark?"0 8px 32px rgba(0,0,0,.2)":"0 8px 32px rgba(0,0,0,.04)"}}>
+              <h2 style={{fontSize:"clamp(30px,4.5vw,48px)",fontWeight:800,color:t.text,marginBottom:16}}>Ready to <span className="serif" style={{fontStyle:"italic",fontWeight:400,color:t.accent}}>Grow</span>?</h2>
+              <p style={{fontSize:16,color:t.textSoft,marginBottom:36,fontWeight:430}}>Join {siteStats.users} Nigerian creators already using Nitro.</p>
+              <button onClick={()=>setModal("signup")} style={{padding:"16px 52px",borderRadius:14,background:t.btnPrimary,color:"#fff",fontSize:17,fontWeight:700,boxShadow:"0 8px 28px rgba(196,125,142,.25)"}}>Create Free Account</button>
             </div>
           </div>
           <Footer t={t} dark={dark}/>
@@ -692,4 +640,3 @@ export function Footer({t,dark}){
   );
 }
 
-// v1774481735
