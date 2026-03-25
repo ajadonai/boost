@@ -14,7 +14,7 @@ const fNc = (a) => {const v=Math.abs(a);if(v>=1e9)return `₦${(v/1e9).toFixed(1
 const fD = (d) => new Date(d).toLocaleDateString("en-NG", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
 const stColors = (dark) => ({Completed:dark?["#0a2416","#6ee7b7","#166534"]:["#ecfdf5","#059669","#a7f3d0"],Processing:dark?["#0f1629","#a5b4fc","#3730a3"]:["#eef2ff","#4f46e5","#c7d2fe"],Pending:dark?["#1c1608","#fcd34d","#92400e"]:["#fffbeb","#d97706","#fde68a"],Partial:dark?["#1f0a0a","#fca5a5","#991b1b"]:["#fef2f2","#dc2626","#fecaca"],Canceled:dark?["#141414","#a3a3a3","#404040"]:["#f5f5f5","#737373","#d4d4d4"]});
 const Badge = ({ s, dark }) => { const v = stColors(dark)[s]||stColors(dark).Canceled; return <span style={{ fontSize: 11, fontWeight: 600, padding: "3px 10px", borderRadius: 6, background: v[0], color: v[1], border: `1px solid ${v[2]}`, whiteSpace: "nowrap" }}>{s}</span>; };
-const Card = ({ children, style, d = 0, dark }) => <div style={{background: dark ? "rgba(15,18,30,0.95)" : "#fff",border: `1px solid ${dark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.06)"}`,borderRadius: 14, padding: 22, animation: `fu 0.4s cubic-bezier(.2,.8,.2,1) ${d}s both`,transition: "all 0.4s cubic-bezier(.2,.8,.2,1)",...style}}>{children}</div>;
+const Card = ({ children, style, d = 0, dark }) => <div style={{background: dark ? "rgba(15,18,30,0.95)" : "#fff",border: `1px solid ${dark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.06)"}`,borderRadius: 14, padding: 22, animation: `fu 0.4s cubic-bezier(.2,.8,.2,1) ${d}s both`,boxShadow: dark ? "0 2px 8px rgba(0,0,0,0.15)" : "0 1px 4px rgba(0,0,0,0.03)",transition: "all 0.3s cubic-bezier(.2,.8,.2,1)",...style}}>{children}</div>;
 
 const NAV_GROUPS = [
   { label: null, items: [["dashboard","Dashboard"],["new-order","New Order"]] },
@@ -66,10 +66,10 @@ function ActivityPanel({t,dark,txs,orders,user,go}){
   const combined=[...(txs||[]).map(tx=>({...tx,_type:"tx",_time:new Date(tx.date).getTime()}))].sort((a,b)=>b._time-a._time).slice(0,12);
   return <>
     <div style={{padding:"16px",borderBottom:`1px solid ${t.border}`,flexShrink:0}}>
-      <div style={{padding:"16px 14px",borderRadius:14,background:dark?"linear-gradient(135deg,#0d1a2e,#161028)":"linear-gradient(135deg,#f9f5f1,#f0e8e2)",border:`1px solid ${dark?"rgba(196,125,142,.12)":"rgba(196,125,142,.08)"}`}}>
-        <div style={{fontSize:10,fontWeight:650,textTransform:"uppercase",letterSpacing:2.5,color:t.textMuted,marginBottom:6}}>Wallet balance</div>
+      <div style={{padding:"18px 16px",borderRadius:14,background:dark?"linear-gradient(135deg,#0d1a2e,#161028)":"linear-gradient(135deg,#f9f5f1,#f0e8e2)",border:`1px solid ${dark?"rgba(196,125,142,.12)":"rgba(196,125,142,.08)"}`}}>
+        <div style={{fontSize:10,fontWeight:650,textTransform:"uppercase",letterSpacing:2.5.5,color:t.textMuted,marginBottom:6}}>Wallet balance</div>
         <div className="m" style={{fontSize:22,fontWeight:700,color:t.green}}>{fN(user?.balance||0)}</div>
-        <button onClick={()=>go("funds")} style={{marginTop:10,width:"100%",padding:"9px 0",borderRadius:10,background:"linear-gradient(135deg,#c47d8e,#a3586b)",color:"#fff",fontSize:13,fontWeight:600,border:"none",cursor:"pointer"}}>+ Add Funds</button>
+        <button onClick={()=>go("funds")} style={{marginTop:10,width:"100%",padding:"10px 0",borderRadius:10,background:"linear-gradient(135deg,#c47d8e,#a3586b)",color:"#fff",fontSize:13,fontWeight:600,border:"none",cursor:"pointer"}}>+ Add Funds</button>
       </div>
     </div>
     <div style={{padding:"14px 16px 8px",display:"flex",justifyContent:"space-between",alignItems:"center",flexShrink:0}}>
@@ -88,7 +88,7 @@ function ActivityPanel({t,dark,txs,orders,user,go}){
           </div>
           <div style={{flex:1,minWidth:0}}>
             <div style={{display:"flex",justifyContent:"space-between",gap:6}}>
-              <span style={{fontSize:12,fontWeight:500,color:t.text,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{item.type==="deposit"?"Deposit":item.type==="referral"?"Referral":"Order"}{item.note?" — "+item.note.replace("Order ",""):""}</span>
+              <span style={{fontSize:12,fontWeight:500,color:t.text,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{item.type==="deposit"?"Deposit via Paystack":item.type==="referral"?"Referral bonus":"Order charge"}{item.note?" — "+item.note.replace("Order ",""):""}</span>
               <span className="m" style={{fontSize:11,fontWeight:600,color:isPos?t.green:t.red,flexShrink:0}}>{isPos?"+":"-"}{fNc(item.amount)}</span>
             </div>
             <div style={{fontSize:11,color:t.textMuted,marginTop:2}}>{fD(item.date)}</div>
@@ -216,14 +216,14 @@ export default function App() {
   const SidebarNav=({onNav})=><>
     <nav style={{flex:1,padding:"10px 12px",overflowY:"auto",display:"flex",flexDirection:"column",gap:1}}>
       {NAV_GROUPS.map((g,gi)=><div key={gi} style={{marginBottom:gi<NAV_GROUPS.length-1?4:0}}>
-        {g.label&&<div style={{fontSize:10,fontWeight:650,textTransform:"uppercase",letterSpacing:2.5,color:t.sbLabel,padding:"14px 10px 6px"}}>{g.label}</div>}
-        {g.items.map(([id,lb])=>{const a=pg===id;return <button key={id} className="ni" onClick={()=>{go(id);onNav?.();}} style={{display:"flex",alignItems:"center",gap:12,padding:"10px 12px",width:"100%",textAlign:"left",fontSize:14,fontWeight:a?600:430,borderRadius:10,background:a?t.sbAccent:"transparent",color:a?t.accent:t.sbText,borderLeft:a?`3px solid ${t.accent}`:"3px solid transparent",border:"none",cursor:"pointer"}}>
+        {g.label&&<div style={{fontSize:10,fontWeight:650,textTransform:"uppercase",letterSpacing:2.5,color:t.sbLabel,padding:"16px 10px 6px"}}>{g.label}</div>}
+        {g.items.map(([id,lb])=>{const a=pg===id;return <button key={id} className="ni" onClick={()=>{go(id);onNav?.();}} style={{display:"flex",alignItems:"center",gap:12,padding:"10px 12px",width:"100%",textAlign:"left",fontSize:14,fontWeight:a?600:440,borderRadius:10,background:a?t.sbAccent:"transparent",color:a?t.accent:t.sbText,borderLeft:a?`3px solid ${t.accent}`:"3px solid transparent",borderTop:"none",borderRight:"none",borderBottom:"none",cursor:"pointer"}}>
           <span style={{fontSize:15,width:20,textAlign:"center",opacity:a?1:.5}}>{NAV_ICONS[id]}</span>{lb}
           {id==="orders"&&activeOrders>0&&<span style={{marginLeft:"auto",fontSize:10,fontWeight:600,padding:"2px 7px",borderRadius:6,background:dark?"rgba(165,180,252,.12)":"#eef2ff",color:dark?"#a5b4fc":"#4f46e5"}}>{activeOrders}</span>}
         </button>})}
       </div>)}
     </nav>
-    <div style={{padding:"12px 16px",borderTop:`1px solid ${t.sbBorder}`,display:"flex",justifyContent:"center",gap:6}}>
+    <div style={{padding:"12px 16px",borderTop:`1px solid ${t.sbBorder}`,display:"flex",justifyContent:"space-around"}}>
       {[["X","https://x.com/TheNitroNG"],["IG","https://instagram.com/TheNitroNg"],["WA","https://wa.me/2348012345678"]].map(([lb,url])=><a key={lb} href={url} target="_blank" rel="noopener" style={{width:34,height:34,borderRadius:8,display:"flex",alignItems:"center",justifyContent:"center",color:t.sbText,background:dark?"rgba(255,255,255,.04)":"rgba(0,0,0,.03)",border:`1px solid ${t.sbBorder}`,textDecoration:"none",fontSize:11,fontWeight:600}}>{lb}</a>)}
     </div>
     <div style={{padding:"12px 16px",borderTop:`1px solid ${t.sbBorder}`,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
@@ -234,7 +234,7 @@ export default function App() {
 
   return (
     <div className="root" style={{height:"100vh",overflow:"hidden",display:"flex",flexDirection:"column"}}>
-      <style>{`*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}.root{background:${t.bg};color:${t.text};font-family:'Outfit','Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;transition:background .5s ease}input,select,textarea{font-family:inherit}button{cursor:pointer;font-family:inherit;border:none}.m{font-family:'JetBrains Mono',monospace}@keyframes fu{from{transform:translateY(8px);opacity:0}to{transform:translateY(0);opacity:1}}@keyframes di{from{transform:translateY(-6px);opacity:0}to{transform:translateY(0);opacity:1}}@keyframes si{from{transform:translateX(40px);opacity:0}to{transform:translateX(0);opacity:1}}@keyframes slideL{from{transform:translateX(-100%)}to{transform:translateX(0)}}@keyframes slideR{from{transform:translateX(100%)}to{transform:translateX(0)}}@keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}.ni{transition:all .2s ease}.ni:hover{background:${t.sbAccent}!important}.ch{transition:all .25s cubic-bezier(.2,.8,.2,1)}.ch:hover{border-color:${t.border}!important;transform:translateY(-1px)}.rh{transition:background .15s}.rh:hover{background:${dark?"rgba(255,255,255,.02)":"rgba(0,0,0,.012)"}!important}::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:${dark?"#2a2a2a":"#d0cdc8"};border-radius:2px}.ov{position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);z-index:150}.sg{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.g2{display:grid;grid-template-columns:1.5fr 1fr;gap:20px}.og{display:grid;grid-template-columns:1fr 320px;gap:20px}.fg{display:grid;grid-template-columns:1fr 1fr;gap:20px}.rg{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.spg{display:grid;grid-template-columns:1fr 1fr;gap:20px}.pf-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}.oth,.otr{display:grid;grid-template-columns:110px 1.5fr 1fr 90px 110px 90px 100px;padding:14px 20px;align-items:center}.ocm{display:none}.sth,.str{display:grid;grid-template-columns:40px 1.5fr 100px 80px 80px 70px 70px;padding:12px 16px;align-items:center}.scm{display:none}@media(max-width:1200px){.rsb{display:none!important}.body-row .mid{flex:1!important}}@media(max-width:768px){.lsb{display:none!important}.mob-hdr{display:flex!important}.desk-hdr{display:none!important}.sg{grid-template-columns:1fr 1fr}.g2,.og,.fg,.spg{grid-template-columns:1fr}.rg{grid-template-columns:1fr 1fr}.oth,.otr{display:none}.ocm{display:block}.sth,.str{display:none}.scm{display:block}}@media(min-width:769px){.mob-hdr{display:none!important}}@media(max-width:480px){.sg{grid-template-columns:1fr}}`}</style>
+      <style>{`*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}.root{background:${t.bg};color:${t.text};font-family:'Outfit','Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;transition:background .5s ease}input,select,textarea{font-family:inherit}button{cursor:pointer;font-family:inherit;border:none}.m{font-family:'JetBrains Mono',monospace}@keyframes fu{from{transform:translateY(8px);opacity:0}to{transform:translateY(0);opacity:1}}@keyframes di{from{transform:translateY(-6px);opacity:0}to{transform:translateY(0);opacity:1}}@keyframes si{from{transform:translateX(40px);opacity:0}to{transform:translateX(0);opacity:1}}@keyframes slideL{from{transform:translateX(-100%)}to{transform:translateX(0)}}@keyframes slideR{from{transform:translateX(100%)}to{transform:translateX(0)}}@keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}.ni{transition:all .2s ease}.ni:hover{background:${t.sbAccent}!important}.ch{transition:all .25s cubic-bezier(.2,.8,.2,1)}.ch:hover{border-color:${t.border}!important;transform:translateY(-1px);box-shadow:${dark?"0 6px 20px rgba(0,0,0,.3)":"0 6px 20px rgba(0,0,0,.05)"}}.rh{transition:background .15s}.rh:hover{background:${dark?"rgba(255,255,255,.02)":"rgba(0,0,0,.012)"}!important}::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:${dark?"#2a2a2a":"#d0cdc8"};border-radius:2px}.ov{position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);z-index:150}.sg{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.g2{display:grid;grid-template-columns:1.5fr 1fr;gap:20px}.og{display:grid;grid-template-columns:1fr 320px;gap:20px}.fg{display:grid;grid-template-columns:1fr 1fr;gap:20px}.rg{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.spg{display:grid;grid-template-columns:1fr 1fr;gap:20px}.pf-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}.oth,.otr{display:grid;grid-template-columns:110px 1.5fr 1fr 90px 110px 90px 100px;padding:14px 20px;align-items:center}.ocm{display:none}.sth,.str{display:grid;grid-template-columns:40px 1.5fr 100px 80px 80px 70px 70px;padding:12px 16px;align-items:center}.scm{display:none}@media(max-width:1200px){.rsb{display:none!important}.body-row .mid{flex:1!important}}@media(max-width:768px){.lsb{display:none!important}.mob-hdr{display:flex!important}.desk-hdr{display:none!important}.sg{grid-template-columns:1fr 1fr}.g2,.og,.fg,.spg{grid-template-columns:1fr}.rg{grid-template-columns:1fr 1fr}.oth,.otr{display:none}.ocm{display:block}.sth,.str{display:none}.scm{display:block}}@media(min-width:769px){.mob-hdr{display:none!important}}@media(max-width:480px){.sg{grid-template-columns:1fr}}`}</style>
 
       {/* ── TOAST ── */}
       {toast&&<div style={{position:"fixed",top:16,right:16,left:16,zIndex:300,display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,padding:"14px 18px",borderRadius:14,background:toast.e?(dark?"#3b1111":"#fef2f2"):(dark?"#0a2416":"#ecfdf5"),border:`1px solid ${toast.e?(dark?"#7f1d1d":"#fecaca"):(dark?"#166534":"#a7f3d0")}`,color:toast.e?t.red:t.green,fontSize:14,fontWeight:600,animation:"si .4s cubic-bezier(.2,.8,.2,1)",maxWidth:440,marginLeft:"auto",backdropFilter:"blur(16px)"}}><span>{toast.e?"⚠️":"✓"} {toast.m}</span><button onClick={dismissToast} style={{background:"none",color:t.textMuted,fontSize:18,padding:4,flexShrink:0}}>✕</button></div>}
@@ -248,7 +248,7 @@ export default function App() {
         <div style={{flex:1,display:"flex",justifyContent:"center"}}>
           <div style={{position:"relative",width:"100%",maxWidth:420}}>
             <span style={{position:"absolute",left:14,top:"50%",transform:"translateY(-50%)",color:t.textMuted,fontSize:14}}>🔍</span>
-            <input placeholder="Search services, orders..." onFocus={()=>setSf(true)} onBlur={()=>setSf(false)} style={{width:"100%",padding:"9px 14px 9px 38px",borderRadius:10,background:dark?"rgba(255,255,255,.04)":"rgba(0,0,0,.03)",border:`1px solid ${sf?t.accent:"transparent"}`,color:t.text,fontSize:14,fontWeight:430,outline:"none",transition:"all .2s"}}/>
+            <input placeholder="Search services, orders..." onFocus={()=>setSf(true)} onBlur={()=>setSf(false)} style={{width:"100%",padding:"10px 14px 10px 40px",borderRadius:12,background:dark?"rgba(255,255,255,.04)":"rgba(0,0,0,.03)",border:`1px solid ${sf?t.accent:"transparent"}`,color:t.text,fontSize:14,fontWeight:430,outline:"none",transition:"all .2s"}}/>
           </div>
         </div>
         <div style={{display:"flex",alignItems:"center",gap:6,flexShrink:0}}>
@@ -259,7 +259,7 @@ export default function App() {
       </header>
 
       {/* ── MOBILE HEADER ── */}
-      <div className="mob-hdr" style={{display:"none",alignItems:"center",justifyContent:"space-between",padding:"10px 16px",background:t.navBg,backdropFilter:"blur(16px)",borderBottom:`1px solid ${t.border}`,flexShrink:0,zIndex:100}}>
+      <div className="mob-hdr" style={{display:"none",alignItems:"center",justifyContent:"space-between",padding:"12px 16px",background:t.navBg,backdropFilter:"blur(16px)",borderBottom:`1px solid ${t.border}`,flexShrink:0,zIndex:100}}>
         <button onClick={()=>setSb(true)} style={{background:"none",color:t.text,padding:4,fontSize:18}}>☰</button>
         <div style={{display:"flex",alignItems:"center",gap:8}}>
           <NitroLogo size={24} variant="mark"/>
@@ -329,7 +329,7 @@ export default function App() {
           {/* Footer — fixed at bottom of scroll */}
           <div style={{borderTop:`1px solid ${t.border}`,padding:"12px 28px",display:"flex",justifyContent:"space-between",alignItems:"center",fontSize:11,color:t.textMuted,fontWeight:430,flexShrink:0}}>
             <span>© 2026 Nitro</span>
-            <div style={{display:"flex",gap:16}}>{[["Terms","/terms"],["Privacy","/privacy"],["Refund","/refund"]].map(([l,h])=><a key={l} href={h} style={{color:t.textMuted,textDecoration:"none",fontSize:11}}>{l}</a>)}</div>
+            <div style={{display:"flex",gap:16}}>{[["Terms","/terms"],["Privacy","/privacy"],["Refund","/refund"],["X","https://x.com/TheNitroNG"],["Instagram","https://instagram.com/TheNitroNg"]].map(([l,h])=><a key={l} href={h} style={{color:t.textMuted,textDecoration:"none",fontSize:11}}>{l}</a>)}</div>
           </div>
         </div>
 
@@ -342,8 +342,8 @@ export default function App() {
   );
 }
 
-const Hdr=({title,sub,action,t})=><div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:24,animation:"fu .4s ease",flexWrap:"wrap",gap:12}}><div><h1 style={{fontSize:26,fontWeight:700,color:t.text,letterSpacing:"-0.3px"}}>{title}</h1>{sub&&<p style={{fontSize:14,color:t.textSoft,marginTop:6,fontWeight:450}}>{sub}</p>}</div>{action}</div>;
-const Stat=({l,v,c,d=0,t,dark})=><div style={{background:dark?"rgba(255,255,255,0.04)":"rgba(0,0,0,0.025)",borderRadius:14,padding:20,animation:`fu 0.5s ease ${d}s both`}}><div style={{fontSize:13,color:t.textMuted,fontWeight:450,fontWeight:600,textTransform:"uppercase",letterSpacing:2}}>{l}</div><div className="m" style={{fontSize:22,fontWeight:700,color:c||t.text,marginTop:8}}>{v}</div></div>;
+const Hdr=({title,sub,action,t})=><div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:24,animation:"fu .4s ease",flexWrap:"wrap",gap:12}}><div><h1 style={{fontSize:24,fontWeight:700,color:t.text,letterSpacing:"-0.3px"}}>{title}</h1>{sub&&<p style={{fontSize:14,color:t.textSoft,marginTop:4,fontWeight:430}}>{sub}</p>}</div>{action}</div>;
+const Stat=({l,v,c,d=0,t,dark})=><div style={{background:dark?"rgba(255,255,255,0.04)":"rgba(0,0,0,0.025)",borderRadius:14,padding:"18px 20px",borderLeft:`3px solid ${c||t.accent}`,animation:`fu 0.4s cubic-bezier(.2,.8,.2,1) ${d}s both`}}><div style={{fontSize:10,color:t.textMuted,fontWeight:650,textTransform:"uppercase",letterSpacing:2}}>{l}</div><div className="m" style={{fontSize:22,fontWeight:700,color:c||t.text,marginTop:8}}>{v}</div></div>;
 
 function Dash({user,orders,txs,go,t,dark}){
   const spent=orders.reduce((a,o)=>a+o.charge,0);const act=orders.filter(o=>["Processing","Pending"].includes(o.status)).length;
