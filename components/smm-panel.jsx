@@ -300,22 +300,39 @@ function Fnds({onAdd,bal,txs,t,dark}){
   const [payState,setPayState]=useState("idle");
   const [payError,setPayError]=useState("");
   const [payRef,setPayRef]=useState("");
-  const [payMethod,setPayMethod]=useState("card");
-  const [gateway,setGateway]=useState(GATEWAYS.find(g=>g.enabled)?.id||"paystack");
+    const [gateway,setGateway]=useState(GATEWAYS.find(g=>g.enabled)?.id||"paystack");
   const [txPage,setTxPage]=useState(1);const [txPp,setTxPp]=useState(10);
   const activeGateways=GATEWAYS.filter(g=>g.enabled);
   const currentGw=GATEWAYS.find(g=>g.id===gateway)||GATEWAYS[0];
 
-  const startPayment=()=>{
+  const startPayment=async()=>{
     if(Number(a)<500)return;
-    setPayState("popup");
+    setPayState("verifying");
     setPayError("");
-    setPayRef((gateway==="flutterwave"?"FLW-":gateway==="monnify"?"MNF-":gateway==="korapay"?"KRP-":"PAY-")+Date.now().toString(36).toUpperCase());
+    try{
+      const res=await fetch("/api/payments/initialize",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({amount:Number(a)})});
+      const data=await res.json();
+      if(!res.ok||!data.authorization_url){setPayState("failed");setPayError(data.error||"Failed to start payment");return;}
+      setPayRef(data.reference);
+      window.location.href=data.authorization_url;
+    }catch(err){setPayState("failed");setPayError("Network error. Please try again.");}
   };
 
-  // Payment popup actions
-  const simPaySuccess=()=>{setPayState("verifying");setTimeout(()=>{setPayState("success");onAdd(Number(a));},2000);};
-  const simPayCancel=()=>{setPayState("cancelled");setTimeout(()=>setPayState("idle"),2000);};
+  // Check for payment callback on mount
+  useEffect(()=>{
+    const params=new URLSearchParams(window.location.search);
+    const ref=params.get("verify")||params.get("reference")||params.get("trxref");
+    if(ref){
+      setPayState("verifying");setPayRef(ref);
+      fetch("/api/payments/verify",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({reference:ref})})
+        .then(r=>r.json()).then(d=>{
+          if(d.success){setPayState("success");setA(String(d.amount||0));onAdd(d.amount||0);}
+          else{setPayState("failed");setPayError(d.error||"Verification failed");}
+        }).catch(()=>{setPayState("failed");setPayError("Could not verify payment");});
+      window.history.replaceState({},"","/dashboard");
+    }
+  },[]);
+
   const resetPayment=()=>{setPayState("idle");setPayError("");setA("");};
 
   const amt=Number(a)||0;
@@ -340,11 +357,7 @@ function Fnds({onAdd,bal,txs,t,dark}){
             <label style={{fontSize:11,color:t.textSoft,fontWeight:600,display:"block",marginBottom:6,textTransform:"uppercase",letterSpacing:1.5}}>Payment Gateway</label>
             <div style={{display:"flex",flexDirection:"column",gap:6}}>{activeGateways.map(g=><button key={g.id} onClick={()=>setGateway(g.id)} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"12px 14px",borderRadius:10,background:gateway===g.id?(dark?"rgba(196,125,142,0.06)":"rgba(196,125,142,0.04)"):"transparent",border:`1px solid ${gateway===g.id?t.accentBorder:t.btnSecBorder}`}}><span style={{fontSize:14,fontWeight:500,color:t.text}}>{g.name}</span><div style={{width:18,height:18,borderRadius:"50%",border:`2px solid ${gateway===g.id?t.accent:t.textMuted}`,display:"flex",alignItems:"center",justifyContent:"center"}}>{gateway===g.id&&<div style={{width:10,height:10,borderRadius:"50%",background:t.accent}}/>}</div></button>)}</div>
           </div>
-          {/* Payment method */}
-          <div style={{marginBottom:16}}>
-            <label style={{fontSize:11,color:t.textSoft,fontWeight:600,display:"block",marginBottom:6,textTransform:"uppercase",letterSpacing:1.5}}>Pay With</label>
-            <div style={{display:"flex",gap:8}}>{[["card","Card"],["bank","Bank Transfer"]].map(([v,lb])=><button key={v} onClick={()=>setPayMethod(v)} style={{flex:1,padding:"12px 0",borderRadius:10,fontSize:13,fontWeight:500,background:payMethod===v?t.accentLight:t.btnSecondary,color:payMethod===v?t.accent:t.textSoft,border:`1px solid ${t.btnSecBorder}`,boxShadow:payMethod===v?t.accentShadow:"none"}}>{lb}</button>)}</div>
-          </div>
+
           {amt>=500&&<div style={{padding:14,borderRadius:12,background:dark?"#0a0d18":"#faf8f5",border:`0.5px solid ${t.surfaceBorder}`,marginBottom:14}}>
             <div style={{display:"flex",justifyContent:"space-between",marginBottom:6}}><span style={{fontSize:13,color:t.textSoft}}>Amount</span><span className="m" style={{fontSize:13,color:t.text}}>{fN(amt)}</span></div>
             <div style={{display:"flex",justifyContent:"space-between",marginBottom:6}}><span style={{fontSize:13,color:t.textSoft}}>Fee</span><span className="m" style={{fontSize:13,color:t.text}}>₦0</span></div>
@@ -355,46 +368,12 @@ function Fnds({onAdd,bal,txs,t,dark}){
           <div style={{marginTop:14,display:"flex",justifyContent:"center",gap:8,fontSize:11,color:t.textMuted,flexWrap:"wrap",textAlign:"center"}}><span>Secured by {currentGw.name}</span><span>•</span><span>Instant for cards</span><span>•</span><span>Min ₦500</span></div>
         </Card>}
 
-        {/* ── POPUP STATE: payment checkout ── */}
-        {payState==="popup"&&<Card dark={dark} style={{border:`1px solid ${t.accentBorder}`}}>
-          <div style={{textAlign:"center",marginBottom:20}}>
-            <div style={{fontSize:11,color:t.textMuted,fontWeight:600,textTransform:"uppercase",letterSpacing:2}}>{currentGw.name} Checkout</div>
-            <div className="m" style={{fontSize:32,fontWeight:700,color:t.text,marginTop:8}}>{fN(amt)}</div>
-            <div style={{fontSize:12,color:t.textMuted,marginTop:4}}>Ref: <span className="m">{payRef}</span></div>
-          </div>
-          <div style={{padding:16,borderRadius:12,background:dark?"#0a0d18":"#faf8f5",border:`0.5px solid ${t.surfaceBorder}`,marginBottom:16}}>
-            <div style={{fontSize:13,color:t.textSoft,marginBottom:12}}>
-              {payMethod==="card"?"Enter your card details below:":"Complete the bank transfer:"}
-            </div>
-            {payMethod==="card"?<>
-              <div style={{padding:"12px 14px",borderRadius:8,background:t.inputBg,border:`1px solid ${t.inputBorder}`,marginBottom:8,color:t.textMuted,fontSize:13}}>•••• •••• •••• 4242</div>
-              <div style={{display:"flex",gap:8,marginBottom:8}}>
-                <div style={{flex:1,padding:"12px 14px",borderRadius:8,background:t.inputBg,border:`1px solid ${t.inputBorder}`,color:t.textMuted,fontSize:13}}>MM/YY</div>
-                <div style={{flex:1,padding:"12px 14px",borderRadius:8,background:t.inputBg,border:`1px solid ${t.inputBorder}`,color:t.textMuted,fontSize:13}}>CVV</div>
-              </div>
-            </>:<>
-              <div style={{fontSize:12,color:t.text,marginBottom:6}}>Transfer <span className="m" style={{color:t.green,fontWeight:600}}>{fN(amt)}</span> to:</div>
-              <div style={{padding:12,borderRadius:8,background:t.accentLight,border:`1px solid ${t.accentBorder}`,marginBottom:8}}>
-                <div style={{display:"flex",justifyContent:"space-between",marginBottom:4}}><span style={{fontSize:12,color:t.textSoft}}>Bank</span><span style={{fontSize:12,color:t.text,fontWeight:500}}>Wema Bank</span></div>
-                <div style={{display:"flex",justifyContent:"space-between",marginBottom:4}}><span style={{fontSize:12,color:t.textSoft}}>Account</span><span className="m" style={{fontSize:13,color:t.accent,fontWeight:600}}>7825631094</span></div>
-                <div style={{display:"flex",justifyContent:"space-between"}}><span style={{fontSize:12,color:t.textSoft}}>Name</span><span style={{fontSize:12,color:t.text,fontWeight:500}}>Paystack-BoostPanel</span></div>
-              </div>
-              <div style={{fontSize:11,color:t.textMuted,textAlign:"center"}}>Account expires in 30 minutes</div>
-            </>}
-          </div>
-          <div style={{fontSize:11,fontWeight:600,color:t.textMuted,textTransform:"uppercase",letterSpacing:1.5,marginBottom:8}}>Complete Payment:</div>
-          <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
-            <button onClick={simPaySuccess} style={{flex:1,padding:"12px 0",borderRadius:10,background:dark?"rgba(110,231,183,0.1)":"#ecfdf5",color:t.green,fontSize:13,fontWeight:600,border:`1px solid ${dark?"rgba(110,231,183,0.2)":"#a7f3d0"}`}}>✓ I've Paid</button>
-            <button onClick={simPayCancel} style={{flex:1,padding:"12px 0",borderRadius:10,background:t.btnSecondary,color:t.textSoft,fontSize:13,fontWeight:600,border:`1px solid ${t.btnSecBorder}`}}>← Cancel</button>
-          </div>
-        </Card>}
-
         {/* ── VERIFYING STATE ── */}
         {payState==="verifying"&&<Card dark={dark}>
           <div style={{textAlign:"center",padding:"30px 0"}}>
             <div style={{width:56,height:56,borderRadius:"50%",border:`3px solid ${t.surfaceBorder}`,borderTopColor:t.accent,animation:"spin 1s linear infinite",margin:"0 auto 20px"}}/>
             <h3 style={{fontSize:18,fontWeight:600,color:t.text,marginBottom:6}}>Verifying Payment</h3>
-            <p style={{fontSize:14,color:t.textSoft,marginBottom:4}}>Confirming your {payMethod==="card"?"card payment":"bank transfer"} with {currentGw.name}...</p>
+            <p style={{fontSize:14,color:t.textSoft,marginBottom:4}}>Confirming your payment with {currentGw.name}...</p>
             <p className="m" style={{fontSize:12,color:t.textMuted}}>Ref: {payRef}</p>
             <div style={{marginTop:16,padding:"10px 16px",borderRadius:8,background:dark?"rgba(99,102,241,0.08)":"#eef2ff",display:"inline-block"}}>
               <span style={{fontSize:12,color:dark?"#a5b4fc":"#4f46e5"}}>This usually takes a few seconds</span>
@@ -413,7 +392,7 @@ function Fnds({onAdd,bal,txs,t,dark}){
             <div style={{padding:14,borderRadius:12,background:dark?"#0a0d18":"#faf8f5",border:`0.5px solid ${t.surfaceBorder}`,marginBottom:20,maxWidth:280,margin:"0 auto 20px"}}>
               <div style={{display:"flex",justifyContent:"space-between",marginBottom:6}}><span style={{fontSize:13,color:t.textSoft}}>Amount</span><span className="m" style={{fontSize:13,color:t.green}}>{fN(amt)}</span></div>
               <div style={{display:"flex",justifyContent:"space-between",marginBottom:6}}><span style={{fontSize:13,color:t.textSoft}}>Gateway</span><span style={{fontSize:13,color:t.text}}>{currentGw.name}</span></div>
-              <div style={{display:"flex",justifyContent:"space-between",marginBottom:6}}><span style={{fontSize:13,color:t.textSoft}}>Method</span><span style={{fontSize:13,color:t.text}}>{payMethod==="card"?"Card":"Bank Transfer"}</span></div>
+              
               <div style={{display:"flex",justifyContent:"space-between"}}><span style={{fontSize:13,color:t.textSoft}}>New Balance</span><span className="m" style={{fontSize:13,color:t.green,fontWeight:700}}>{fN(bal)}</span></div>
             </div>
             <button onClick={resetPayment} style={{padding:"12px 32px",borderRadius:12,background:t.btnPrimary,color:"#fff",fontSize:14,fontWeight:600}}>Add More Funds</button>
