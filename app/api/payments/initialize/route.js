@@ -54,6 +54,11 @@ export async function POST(req) {
         amount: amountKobo,
         reference,
         callback_url: `${origin}/dashboard?verify=${reference}`,
+        customer: {
+          email: user.email,
+          first_name: user.name.split(' ')[0],
+          last_name: user.name.split(' ').slice(1).join(' ') || user.name.split(' ')[0],
+        },
         metadata: {
           userId: user.id,
           userName: user.name,
