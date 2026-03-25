@@ -1,6 +1,7 @@
 'use client';
 import NitroLogo from './nitro-logo';
 import { useState, useEffect, useRef } from "react";
+import { ErrorBoundary } from './error-boundary';
 
 const GATEWAYS = [
   {id:"paystack",name:"Paystack",enabled:true},
@@ -12,42 +13,91 @@ const fN = (a) => `₦${Math.abs(a).toLocaleString("en-NG")}`;
 const fNc = (a) => {const v=Math.abs(a);if(v>=1e9)return `₦${(v/1e9).toFixed(1)}B`;if(v>=1e6)return `₦${(v/1e6).toFixed(1)}M`;if(v>=1e5)return `₦${Math.round(v/1e3)}K`;return `₦${v.toLocaleString("en-NG")}`;};
 const fD = (d) => new Date(d).toLocaleDateString("en-NG", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
 const stColors = (dark) => ({Completed:dark?["#0a2416","#6ee7b7","#166534"]:["#ecfdf5","#059669","#a7f3d0"],Processing:dark?["#0f1629","#a5b4fc","#3730a3"]:["#eef2ff","#4f46e5","#c7d2fe"],Pending:dark?["#1c1608","#fcd34d","#92400e"]:["#fffbeb","#d97706","#fde68a"],Partial:dark?["#1f0a0a","#fca5a5","#991b1b"]:["#fef2f2","#dc2626","#fecaca"],Canceled:dark?["#141414","#a3a3a3","#404040"]:["#f5f5f5","#737373","#d4d4d4"]});
-const Badge = ({ s, dark }) => { const v = stColors(dark)[s]||stColors(dark).Canceled; return <span style={{ fontSize: 12, fontWeight: 600, padding: "4px 12px", borderRadius: 8, background: v[0], color: v[1], border: `0.5px solid ${v[2]}`, whiteSpace: "nowrap" }}>{s}</span>; };
-const Card = ({ children, style, d = 0, dark }) => <div style={{background: dark ? "rgba(15,18,30,0.92)" : "#fff",border: `0.5px solid ${dark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.08)"}`,borderRadius: 16, padding: 24, animation: `fu 0.5s cubic-bezier(.2,.8,.2,1) ${d}s both`,transition: "background 1.5s cubic-bezier(.4,0,.2,1), border-color 1.5s ease",...style}}>{children}</div>;
+const Badge = ({ s, dark }) => { const v = stColors(dark)[s]||stColors(dark).Canceled; return <span style={{ fontSize: 11, fontWeight: 600, padding: "3px 10px", borderRadius: 6, background: v[0], color: v[1], border: `1px solid ${v[2]}`, whiteSpace: "nowrap" }}>{s}</span>; };
+const Card = ({ children, style, d = 0, dark }) => <div style={{background: dark ? "rgba(15,18,30,0.95)" : "#fff",border: `1px solid ${dark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.06)"}`,borderRadius: 14, padding: 22, animation: `fu 0.4s cubic-bezier(.2,.8,.2,1) ${d}s both`,transition: "all 0.4s cubic-bezier(.2,.8,.2,1)",...style}}>{children}</div>;
+
+const NAV_GROUPS = [
+  { label: null, items: [["dashboard","Dashboard"],["new-order","New Order"]] },
+  { label: "ORDERS", items: [["orders","My Orders"],["services","Services"]] },
+  { label: "WALLET", items: [["funds","Add Funds"],["referrals","Referrals"]] },
+  { label: "HELP", items: [["support","Support"]] },
+];
+const NAV_ICONS = {dashboard:"\u{1F3E0}","new-order":"\u{1F6D2}",orders:"\u{1F4CB}",services:"\u{1F4E6}",funds:"\u{1F4B3}",referrals:"\u{1F517}",support:"\u{1F4AC}",settings:"\u{2699}\u{FE0F}"};
 
 function Pagination({total,page,setPage,perPage,setPerPage,t}){
   const totalPages=Math.ceil(total/perPage);
   if(total<=5)return null;
   return <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginTop:16,flexWrap:"wrap",gap:10}}>
     <div style={{display:"flex",alignItems:"center",gap:8}}>
-      <span style={{fontSize:13,color:t.textMuted,fontWeight:450}}>Show</span>
-      <select value={perPage} onChange={e=>{setPerPage(Number(e.target.value));setPage(1);}} style={{padding:"4px 8px",borderRadius:6,background:t.inputBg,border:`1px solid ${t.inputBorder}`,color:t.text,fontSize:12,outline:"none"}}>{[5,10,20,50].map(n=><option key={n} value={n}>{n}</option>)}</select>
-      <span style={{fontSize:13,color:t.textMuted,fontWeight:450}}>of {total}</span>
+      <span style={{fontSize:12,color:t.textMuted}}>Show</span>
+      <select value={perPage} onChange={e=>{setPerPage(Number(e.target.value));setPage(1);}} style={{padding:"5px 8px",borderRadius:6,background:t.inputBg,border:`1px solid ${t.inputBorder}`,color:t.text,fontSize:12,outline:"none"}}>{[5,10,20,50].map(n=><option key={n} value={n}>{n}</option>)}</select>
+      <span style={{fontSize:12,color:t.textMuted}}>of {total}</span>
     </div>
     {totalPages>1&&<div style={{display:"flex",gap:4}}>{Array.from({length:Math.min(totalPages,7)},(_,i)=>{let p;if(totalPages<=7)p=i+1;else if(page<=4)p=i+1;else if(page>=totalPages-3)p=totalPages-6+i;else p=page-3+i;return <button key={p} onClick={()=>setPage(p)} style={{width:30,height:30,borderRadius:6,fontSize:11,fontWeight:600,background:page===p?t.accentLight:"transparent",color:page===p?t.accent:t.textMuted,border:`1px solid ${page===p?"transparent":t.btnSecBorder}`,boxShadow:page===p?t.accentShadow:"none"}}>{p}</button>})}</div>}
-    <div style={{display:"flex",gap:6}}><button onClick={()=>setPage(p=>Math.max(1,p-1))} disabled={page===1} style={{padding:"5px 12px",borderRadius:6,fontSize:11,fontWeight:500,background:t.btnSecondary,color:page===1?t.textMuted:t.textSoft,border:`1px solid ${t.btnSecBorder}`,opacity:page===1?.5:1}}>← Prev</button><button onClick={()=>setPage(p=>Math.min(totalPages,p+1))} disabled={page>=totalPages} style={{padding:"5px 12px",borderRadius:6,fontSize:11,fontWeight:500,background:t.btnSecondary,color:page>=totalPages?t.textMuted:t.textSoft,border:`1px solid ${t.btnSecBorder}`,opacity:page>=totalPages?.5:1}}>Next →</button></div>
+    <div style={{display:"flex",gap:6}}><button onClick={()=>setPage(p=>Math.max(1,p-1))} disabled={page===1} style={{padding:"5px 12px",borderRadius:6,fontSize:11,fontWeight:500,background:t.btnSecondary,color:page===1?t.textMuted:t.textSoft,border:`1px solid ${t.btnSecBorder}`,opacity:page===1?.4:1}}>Prev</button><button onClick={()=>setPage(p=>Math.min(totalPages,p+1))} disabled={page>=totalPages} style={{padding:"5px 12px",borderRadius:6,fontSize:11,fontWeight:500,background:t.btnSecondary,color:page>=totalPages?t.textMuted:t.textSoft,border:`1px solid ${t.btnSecBorder}`,opacity:page>=totalPages?.4:1}}>Next</button></div>
   </div>;
 }
 
-function ThemeToggle({ dark, onToggle, compact }) {
-  return <button onClick={onToggle} style={{display:"flex",alignItems:"center",background:dark?"rgba(255,255,255,0.06)":"rgba(0,0,0,0.06)",borderRadius:20,padding:3,width:compact?52:64,height:compact?28:32,border:`1px solid ${dark?"rgba(255,255,255,0.08)":"rgba(0,0,0,0.1)"}`,position:"relative",flexShrink:0,transition:"all 0.4s cubic-bezier(.2,.8,.2,1)"}} title={dark?"Switch to day":"Switch to night"}>
-    <div style={{width:compact?22:26,height:compact?22:26,borderRadius:"50%",background:dark?"#c47d8e":"#e0a458",display:"flex",alignItems:"center",justifyContent:"center",fontSize:compact?12:14,position:"absolute",left:dark?3:(compact?27:35),transition:"left 0.4s cubic-bezier(.4,0,.2,1), background 1.5s cubic-bezier(.4,0,.2,1)",boxShadow:"0 1px 4px rgba(0,0,0,0.2)"}}>{dark?"🌙":"☀️"}</div>
-  </button>;
+function ThemeToggle({dark,onToggle,compact}){return <button onClick={onToggle} style={{width:compact?44:48,height:compact?24:26,borderRadius:compact?12:13,background:dark?"#c47d8e":"rgba(0,0,0,0.1)",position:"relative",transition:"all .3s ease",flexShrink:0,border:"none"}} title={dark?"Switch to day":"Switch to night"}><div style={{width:compact?18:20,height:compact?18:20,borderRadius:"50%",background:"#fff",position:"absolute",top:3,left:dark?(compact?23:25):3,transition:"left .3s cubic-bezier(.2,.8,.2,1)",boxShadow:"0 1px 4px rgba(0,0,0,0.2)"}}/></button>;}
+
+function UserDropdown({open,setOpen,user,t,dark}){
+  const ref=useRef(null);
+  useEffect(()=>{const h=(e)=>{if(ref.current&&!ref.current.contains(e.target))setOpen(false);};document.addEventListener("mousedown",h);return()=>document.removeEventListener("mousedown",h);},[]);
+  return <div ref={ref} style={{position:"relative"}}>
+    <button onClick={()=>setOpen(!open)} style={{display:"flex",alignItems:"center",gap:8,padding:"4px 8px 4px 4px",borderRadius:10,background:open?(dark?"rgba(255,255,255,.06)":"rgba(0,0,0,.04)"):"transparent",border:`1px solid ${open?t.border:"transparent"}`,transition:"all .2s",cursor:"pointer"}}>
+      <div style={{width:30,height:30,borderRadius:8,background:"linear-gradient(135deg,#c47d8e,#8b5e6b)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,fontWeight:700,color:"#fff"}}>{user.name?.[0]||"U"}</div>
+      <span style={{fontSize:13,fontWeight:600,color:t.text}}>{user.name?.split(" ")[0]||"User"}</span>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={t.textMuted} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{transition:"transform .2s",transform:open?"rotate(180deg)":"none"}}><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    {open&&<div style={{position:"absolute",top:"calc(100% + 6px)",right:0,width:220,background:t.cardBg,borderRadius:14,border:`1px solid ${t.border}`,boxShadow:dark?"0 12px 40px rgba(0,0,0,.5)":"0 12px 40px rgba(0,0,0,.10)",padding:6,zIndex:200,animation:"di .2s cubic-bezier(.2,.8,.2,1)"}}>
+      <div style={{padding:"12px",borderBottom:`1px solid ${t.border}`,marginBottom:4}}>
+        <div style={{fontSize:14,fontWeight:600,color:t.text}}>{user.name}</div>
+        <div style={{fontSize:12,color:t.textMuted,marginTop:2}}>{user.email}</div>
+      </div>
+      <button onClick={()=>{setOpen(false);}} style={{display:"flex",alignItems:"center",gap:10,padding:"9px 12px",width:"100%",textAlign:"left",fontSize:13,fontWeight:450,color:t.textSoft,borderRadius:8,background:"transparent",border:"none",cursor:"pointer"}}>⚙️ Settings</button>
+      <button style={{display:"flex",alignItems:"center",gap:10,padding:"9px 12px",width:"100%",textAlign:"left",fontSize:13,fontWeight:450,color:t.textSoft,borderRadius:8,background:"transparent",border:"none",cursor:"pointer"}}>💬 Help & Support</button>
+      <div style={{height:1,background:t.border,margin:"4px 0"}}/>
+      <button style={{display:"flex",alignItems:"center",gap:10,padding:"9px 12px",width:"100%",textAlign:"left",fontSize:13,fontWeight:500,color:t.red,borderRadius:8,background:"transparent",border:"none",cursor:"pointer"}}>🚪 Log out</button>
+    </div>}
+  </div>;
 }
 
-// Reusable loading button — disables + shows spinner while loading
-function LoadBtn({children,onClick,primary,disabled,style:s,t}){
-  const [loading,setLoading]=useState(false);
-  const handleClick=async()=>{if(loading||disabled)return;setLoading(true);try{await onClick();}catch(e){}finally{setTimeout(()=>setLoading(false),600);}};
-  return <button onClick={handleClick} disabled={loading||disabled} style={{display:"flex",alignItems:"center",justifyContent:"center",gap:8,opacity:(loading||disabled)?0.6:1,...s}}>
-    {loading&&<span style={{width:14,height:14,border:"2px solid rgba(255,255,255,0.3)",borderTopColor:primary?"#fff":"currentColor",borderRadius:"50%",animation:"spin .6s linear infinite",flexShrink:0}}/>}
-    {loading?"Processing...":children}
-  </button>;
+function ActivityPanel({t,dark,txs,orders,user,go}){
+  const combined=[...(txs||[]).map(tx=>({...tx,_type:"tx",_time:new Date(tx.date).getTime()}))].sort((a,b)=>b._time-a._time).slice(0,12);
+  return <>
+    <div style={{padding:"16px",borderBottom:`1px solid ${t.border}`,flexShrink:0}}>
+      <div style={{padding:"16px 14px",borderRadius:14,background:dark?"linear-gradient(135deg,#0d1a2e,#161028)":"linear-gradient(135deg,#f9f5f1,#f0e8e2)",border:`1px solid ${dark?"rgba(196,125,142,.12)":"rgba(196,125,142,.08)"}`}}>
+        <div style={{fontSize:10,fontWeight:650,textTransform:"uppercase",letterSpacing:2.5,color:t.textMuted,marginBottom:6}}>Wallet balance</div>
+        <div className="m" style={{fontSize:22,fontWeight:700,color:t.green}}>{fN(user?.balance||0)}</div>
+        <button onClick={()=>go("funds")} style={{marginTop:10,width:"100%",padding:"9px 0",borderRadius:10,background:"linear-gradient(135deg,#c47d8e,#a3586b)",color:"#fff",fontSize:13,fontWeight:600,border:"none",cursor:"pointer"}}>+ Add Funds</button>
+      </div>
+    </div>
+    <div style={{padding:"14px 16px 8px",display:"flex",justifyContent:"space-between",alignItems:"center",flexShrink:0}}>
+      <span style={{fontSize:14,fontWeight:600,color:t.text}}>Activity</span>
+      <button onClick={()=>go("funds")} style={{background:"none",color:t.accent,fontSize:12,fontWeight:600,border:"none",cursor:"pointer"}}>View all</button>
+    </div>
+    <div style={{flex:1,overflowY:"auto",padding:"0 16px 16px"}}>
+      {combined.length===0&&<div style={{textAlign:"center",padding:"32px 0",color:t.textMuted,fontSize:13}}>No activity yet</div>}
+      {combined.map((item,i)=>{
+        const isPos=item.amount>0;
+        const dotColor=isPos?t.green:t.red;
+        return <div key={i} style={{display:"flex",gap:10,padding:"10px 0",borderBottom:i<combined.length-1?`1px solid ${t.border}`:"none"}}>
+          <div style={{paddingTop:5,flexShrink:0,display:"flex",flexDirection:"column",alignItems:"center"}}>
+            <div style={{width:7,height:7,borderRadius:"50%",background:dotColor}}/>
+            {i<combined.length-1&&<div style={{width:1,flex:1,minHeight:18,background:t.border,marginTop:4}}/>}
+          </div>
+          <div style={{flex:1,minWidth:0}}>
+            <div style={{display:"flex",justifyContent:"space-between",gap:6}}>
+              <span style={{fontSize:12,fontWeight:500,color:t.text,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{item.type==="deposit"?"Deposit":item.type==="referral"?"Referral":"Order"}{item.note?" — "+item.note.replace("Order ",""):""}</span>
+              <span className="m" style={{fontSize:11,fontWeight:600,color:isPos?t.green:t.red,flexShrink:0}}>{isPos?"+":"-"}{fNc(item.amount)}</span>
+            </div>
+            <div style={{fontSize:11,color:t.textMuted,marginTop:2}}>{fD(item.date)}</div>
+          </div>
+        </div>;
+      })}
+    </div>
+  </>;
 }
-
-// Error boundary wrapper — renders children safely
-import { ErrorBoundary } from './error-boundary';
-// In production Next.js, this catches render crashes gracefully
 
 export default function App() {
   const [pg, setPg] = useState("dashboard");
@@ -57,15 +107,17 @@ export default function App() {
   const [alerts, setAlerts] = useState([]);
   const [services, setServices] = useState([]);
   const [sb, setSb] = useState(false);
+  const [actOpen, setActOpen] = useState(false);
   const [toast, setToast] = useState(null);
   const [dismissedAlerts, setDismissedAlerts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [userOpen, setUserOpen] = useState(false);
+  const [sf, setSf] = useState(false);
   const getAutoTheme = () => {const h=new Date().getHours(),m=new Date().getMinutes();if(h>=7&&h<18)return false;if(h>=19||h<6)return true;if(h===6)return m<30;if(h===18)return m>=30;return true;};
   const [dark, setDark] = useState(getAutoTheme);
   const [manualOverride, setManualOverride] = useState(false);
   useEffect(() => {if(manualOverride)return;const iv=setInterval(()=>setDark(getAutoTheme()),60000);return()=>clearInterval(iv);},[manualOverride]);
 
-  // Fetch real dashboard data
   useEffect(() => {
     async function load() {
       try {
@@ -78,14 +130,11 @@ export default function App() {
           if (data.transactions?.length) setTxs(data.transactions);
           if (data.alerts?.length) setAlerts(data.alerts);
         } else {
-          console.error('Dashboard API error:', res.status);
           setUser({ name: "User", email: "", balance: 0, refCode: "—", refs: 0, earnings: 0 });
         }
       } catch (err) {
-        console.error('Dashboard fetch failed:', err);
         setUser({ name: "User", email: "", balance: 0, refCode: "—", refs: 0, earnings: 0 });
       }
-      // Fetch services
       try {
         const sRes = await fetch('/api/services');
         if (sRes.ok) { const sData = await sRes.json(); if (sData.services?.length) setServices(sData.services); }
@@ -109,7 +158,7 @@ export default function App() {
   const toastTimer = useRef(null);
   const notify = (m, e) => { setToast({ m, e }); if (toastTimer.current) clearTimeout(toastTimer.current); toastTimer.current = setTimeout(() => setToast(null), 6000); };
   const dismissToast = () => { setToast(null); if (toastTimer.current) clearTimeout(toastTimer.current); };
-  const go = (p) => { setPg(p); };
+  const go = (p) => { setPg(p); setSb(false); setActOpen(false); };
   const placeOrder = async (svc, link, qty) => {
     try {
       const res = await fetch('/api/orders', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({serviceId:svc.id,link,quantity:qty})});
@@ -121,72 +170,174 @@ export default function App() {
     } catch { notify('Failed to place order', true); }
   };
   const addFunds = (a) => { reloadDashboard(); notify(`₦${Number(a).toLocaleString()} added to wallet!`); };
-
   const handleLogout=async()=>{try{await fetch("/api/auth/logout",{method:"POST"});}catch{}window.location.href="/";};
-  const NAV = [["dashboard","🏠","Dashboard"],["new-order","🛒","New Order"],["orders","📋","Orders"],["funds","💳","Add Funds"],["services","📦","Services"],["referrals","🔗","Referrals"],["support","💬","Support"],["settings","⚙️","Settings"]];
-  const t={bg:dark?"#080b14":"#f4f1ed",text:dark?"#ece9e4":"#1a1a1a",textSoft:dark?"#a09c96":"#6b6966",textMuted:dark?"#6b6762":"#9e9a95",surface:dark?"rgba(15,18,30,0.97)":"rgba(255,255,255,0.97)",surfaceBorder:dark?"rgba(255,255,255,0.08)":"rgba(0,0,0,0.07)",cardBg:dark?"rgba(15,18,30,0.85)":"rgba(255,255,255,0.9)",inputBg:dark?"#0d1020":"#fff",inputBorder:dark?"rgba(255,255,255,0.10)":"rgba(0,0,0,0.12)",accent:"#c47d8e",accentLight:dark?"rgba(196,125,142,0.12)":"rgba(196,125,142,0.08)",accentBorder:dark?"rgba(196,125,142,0.3)":"rgba(196,125,142,0.25)",accentShadow:dark?"inset 0 0 0 1px rgba(196,125,142,0.35)":"inset 0 0 0 1px rgba(196,125,142,0.3)",green:dark?"#6ee7b7":"#059669",red:dark?"#fca5a5":"#dc2626",balGrad:dark?"linear-gradient(135deg, #0d1a2e, #161028)":"linear-gradient(135deg, #f9f5f1, #f0e8e2)",balBorder:dark?"rgba(196,125,142,0.2)":"rgba(196,125,142,0.15)",btnPrimary:"linear-gradient(135deg, #c47d8e, #a3586b)",btnSecondary:dark?"rgba(255,255,255,0.05)":"rgba(0,0,0,0.03)",btnSecBorder:dark?"rgba(255,255,255,0.10)":"rgba(0,0,0,0.09)",gradBg:dark?"radial-gradient(ellipse at 20% 0%, rgba(196,125,142,0.06) 0%, transparent 50%), radial-gradient(ellipse at 80% 100%, rgba(100,120,180,0.04) 0%, transparent 50%)":"radial-gradient(ellipse at 20% 0%, rgba(196,125,142,0.05) 0%, transparent 50%), radial-gradient(ellipse at 80% 100%, rgba(180,160,140,0.04) 0%, transparent 50%)",logoGrad:"linear-gradient(135deg, #c47d8e, #8b5e6b)"};
+
+  const t={
+    bg:dark?"#090c15":"#f0ede8",
+    cardBg:dark?"#111628":"#ffffff",
+    text:dark?"#eae7e2":"#1c1b19",
+    textSoft:dark?"#a8a4a0":"#5c5955",
+    textMuted:dark?"#6d6965":"#a09c97",
+    surface:dark?"rgba(15,18,30,0.97)":"rgba(255,255,255,0.97)",
+    surfaceBorder:dark?"rgba(255,255,255,0.07)":"rgba(0,0,0,0.06)",
+    border:dark?"rgba(255,255,255,0.07)":"rgba(0,0,0,0.06)",
+    inputBg:dark?"#0d1020":"#f8f6f3",
+    inputBorder:dark?"rgba(255,255,255,0.10)":"rgba(0,0,0,0.12)",
+    accent:"#c47d8e",
+    accentLight:dark?"rgba(196,125,142,0.12)":"rgba(196,125,142,0.06)",
+    accentBorder:dark?"rgba(196,125,142,0.3)":"rgba(196,125,142,0.25)",
+    accentShadow:dark?"inset 0 0 0 1px rgba(196,125,142,0.35)":"inset 0 0 0 1px rgba(196,125,142,0.3)",
+    green:dark?"#6ee7b7":"#059669",
+    red:dark?"#fca5a5":"#dc2626",
+    btnPrimary:"linear-gradient(135deg, #c47d8e, #a3586b)",
+    btnSecondary:dark?"rgba(255,255,255,0.05)":"rgba(0,0,0,0.03)",
+    btnSecBorder:dark?"rgba(255,255,255,0.10)":"rgba(0,0,0,0.09)",
+    logoGrad:"linear-gradient(135deg, #c47d8e, #8b5e6b)",
+    navBg:dark?"rgba(12,16,34,0.95)":"rgba(255,255,255,0.95)",
+    sbBg:dark?"#0c1022":"#ffffff",
+    sbText:dark?"#9a9691":"#7a7672",
+    sbLabel:dark?"#44413d":"#ccc8c3",
+    sbAccent:dark?"rgba(196,125,142,0.10)":"rgba(196,125,142,0.06)",
+    sbBorder:dark?"rgba(255,255,255,0.06)":"rgba(0,0,0,0.06)",
+  };
 
   if (loading || !user) return (
-    <div style={{minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",background:dark?"#080b14":"#f4f1ed"}}>
+    <div style={{height:"100vh",display:"flex",alignItems:"center",justifyContent:"center",background:t.bg}}>
       <div style={{textAlign:"center"}}>
-        <div style={{marginBottom:16,animation:"pulse 1.5s ease infinite"}}><NitroLogo size={48} variant="mark"/></div>
-        <div style={{fontSize:15,fontWeight:500,color:dark?"#a09c96":"#6b6966"}}>Loading your dashboard...</div>
+        <div style={{marginBottom:20,animation:"pulse 1.5s ease infinite"}}><NitroLogo size={48} variant="mark"/></div>
+        <div style={{fontSize:14,fontWeight:500,color:t.textSoft}}>Loading your dashboard...</div>
       </div>
-      <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}`}</style>
+      <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}`}</style>
     </div>
   );
 
+  const activeOrders=orders.filter(o=>["Processing","Pending"].includes(o.status)).length;
+
+  const SidebarNav=({onNav})=><>
+    <nav style={{flex:1,padding:"10px 12px",overflowY:"auto",display:"flex",flexDirection:"column",gap:1}}>
+      {NAV_GROUPS.map((g,gi)=><div key={gi} style={{marginBottom:gi<NAV_GROUPS.length-1?4:0}}>
+        {g.label&&<div style={{fontSize:10,fontWeight:650,textTransform:"uppercase",letterSpacing:2.5,color:t.sbLabel,padding:"14px 10px 6px"}}>{g.label}</div>}
+        {g.items.map(([id,lb])=>{const a=pg===id;return <button key={id} className="ni" onClick={()=>{go(id);onNav?.();}} style={{display:"flex",alignItems:"center",gap:12,padding:"10px 12px",width:"100%",textAlign:"left",fontSize:14,fontWeight:a?600:430,borderRadius:10,background:a?t.sbAccent:"transparent",color:a?t.accent:t.sbText,borderLeft:a?`3px solid ${t.accent}`:"3px solid transparent",border:"none",cursor:"pointer"}}>
+          <span style={{fontSize:15,width:20,textAlign:"center",opacity:a?1:.5}}>{NAV_ICONS[id]}</span>{lb}
+          {id==="orders"&&activeOrders>0&&<span style={{marginLeft:"auto",fontSize:10,fontWeight:600,padding:"2px 7px",borderRadius:6,background:dark?"rgba(165,180,252,.12)":"#eef2ff",color:dark?"#a5b4fc":"#4f46e5"}}>{activeOrders}</span>}
+        </button>})}
+      </div>)}
+    </nav>
+    <div style={{padding:"12px 16px",borderTop:`1px solid ${t.sbBorder}`,display:"flex",justifyContent:"center",gap:6}}>
+      {[["X","https://x.com/TheNitroNG"],["IG","https://instagram.com/TheNitroNg"],["WA","https://wa.me/2348012345678"]].map(([lb,url])=><a key={lb} href={url} target="_blank" rel="noopener" style={{width:34,height:34,borderRadius:8,display:"flex",alignItems:"center",justifyContent:"center",color:t.sbText,background:dark?"rgba(255,255,255,.04)":"rgba(0,0,0,.03)",border:`1px solid ${t.sbBorder}`,textDecoration:"none",fontSize:11,fontWeight:600}}>{lb}</a>)}
+    </div>
+    <div style={{padding:"12px 16px",borderTop:`1px solid ${t.sbBorder}`,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+      <span style={{fontSize:12,fontWeight:500,color:t.sbLabel}}>{dark?"Night":"Day"} mode</span>
+      <ThemeToggle dark={dark} onToggle={toggleTheme} compact/>
+    </div>
+  </>;
+
   return (
-    <div className="root">
-      
-      <style>{`*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}.root{min-height:100vh;background:${t.bg};color:${t.text};font-family:'Outfit','Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;transition:background 0.6s cubic-bezier(.2,.8,.2,1),color 0.6s ease}input,select,textarea{font-family:inherit}button{cursor:pointer;font-family:inherit;border:none}.m{font-family:'JetBrains Mono',monospace}@keyframes si{from{transform:translateX(40px);opacity:0}to{transform:translateX(0);opacity:1}}@keyframes fu{from{transform:translateY(12px);opacity:0}to{transform:translateY(0);opacity:1}}@keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}::-webkit-scrollbar{width:5px}::-webkit-scrollbar-thumb{background:${dark?"#2a2a2a":"#ccc"};border-radius:3px}.sg{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.g2{display:grid;grid-template-columns:1.5fr 1fr;gap:16px}.og{display:grid;grid-template-columns:1fr 320px;gap:16px}.fg{display:grid;grid-template-columns:1fr 1fr;gap:16px}.rg{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.spg{display:grid;grid-template-columns:1fr 1fr;gap:16px}.layout{display:flex;min-height:100vh}.sb{width:220px;background:${t.surface};border-right:0.5px solid ${t.surfaceBorder};display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;transition:background 1.5s cubic-bezier(.4,0,.2,1),border-color 1.5s ease;overflow:visible}.mn{margin-left:220px;padding:32px 36px;min-height:100vh;flex:1;position:relative;z-index:1}.ov{display:none}.mh{display:none}.sb-close{display:none}.oth,.otr{display:grid;grid-template-columns:110px 1.5fr 1fr 90px 110px 90px 100px;padding:14px 20px;align-items:center}.ocm{display:none}.sth,.str{display:grid;grid-template-columns:40px 1.5fr 100px 80px 80px 70px 70px;padding:10px 16px;align-items:center}.scm{display:none}.pf-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}@media(max-width:1024px){.sg{grid-template-columns:repeat(2,1fr)}.g2,.og,.fg,.spg{grid-template-columns:1fr}.rg{grid-template-columns:repeat(2,1fr)}.mn{padding:24px 20px}}@media(max-width:768px){.sb{transform:translateX(-100%);width:280px}.sb.open{transform:translateX(0)}.ov{display:block;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:90;backdrop-filter:blur(4px)}.mh{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:${t.surface};border-bottom:0.5px solid ${t.surfaceBorder};position:sticky;top:0;z-index:80}.mn{margin-left:0;padding:16px}.sg{grid-template-columns:repeat(2,1fr);gap:10px}.rg{grid-template-columns:1fr}.oth,.otr{display:none}.ocm{display:block}.sth,.str{display:none}.scm{display:block}.sb-close{display:flex}}@media(max-width:400px){.sg{grid-template-columns:1fr}.mn{padding:12px}}`}</style>
-      <div style={{position:"fixed",inset:0,background:t.gradBg,pointerEvents:"none",zIndex:0}}/>
-      {toast&&<div style={{position:"fixed",top:16,right:16,left:16,zIndex:200,display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,padding:"12px 16px 12px 20px",borderRadius:14,background:toast.e?(dark?"#3b1111":"#fef2f2"):(dark?"#0a2416":"#ecfdf5"),border:`1px solid ${toast.e?(dark?"#7f1d1d":"#fecaca"):(dark?"#166534":"#a7f3d0")}`,color:toast.e?t.red:t.green,fontSize:14,fontWeight:500,animation:"si .3s ease",maxWidth:420,marginLeft:"auto",backdropFilter:"blur(12px)"}}><span>{toast.e?"⚠️":"✓"} {toast.m}</span><button onClick={dismissToast} style={{background:"none",color:t.textMuted,fontSize:18,padding:"2px 4px",lineHeight:1,flexShrink:0}}>✕</button></div>}
-      <div className="mh"><button onClick={()=>setSb(true)} style={{background:"none",color:t.text,fontSize:22,padding:4}}>☰</button><button onClick={()=>window.scrollTo({top:0,behavior:"smooth"})} style={{display:"flex",alignItems:"center",gap:8,background:"none",padding:0,border:"none",outline:"none",cursor:"pointer"}}><NitroLogo size={28} variant="mark"/><span style={{fontSize:16,fontWeight:700,color:t.text,letterSpacing:1}}>NITRO</span></button><div style={{display:"flex",alignItems:"center",gap:8}}><span className="m" style={{fontSize:12,fontWeight:600,color:t.green}}>{fNc(user.balance)}</span><button onClick={handleLogout} title="Log out" style={{width:28,height:28,borderRadius:6,display:"flex",alignItems:"center",justifyContent:"center",background:"none",border:`1px solid ${t.btnSecBorder}`,color:t.red,cursor:"pointer"}}><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></button></div></div>
-      {sb&&<div className="ov" onClick={()=>setSb(false)}/>}
-      <aside className={`sb${sb?" open":""}`}>
-        <div style={{padding:"16px 14px",borderBottom:`0.5px solid ${t.surfaceBorder}`,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-          <button onClick={()=>window.scrollTo({top:0,behavior:"smooth"})} style={{display:"flex",alignItems:"center",gap:8,background:"none",padding:0,border:"none",outline:"none",cursor:"pointer"}}><NitroLogo size={32} variant="mark"/><div style={{display:"flex",alignItems:"baseline",gap:4}}><span style={{fontSize:17,fontWeight:700,color:t.text,letterSpacing:1}}>NITRO</span><span style={{fontSize:10,fontWeight:600,color:t.textMuted}}>NG</span></div></button>
-          <button className="sb-close" onClick={()=>setSb(false)} style={{background:"none",color:t.textMuted,fontSize:18,padding:4,alignItems:"center",justifyContent:"center"}}>✕</button>
+    <div className="root" style={{height:"100vh",overflow:"hidden",display:"flex",flexDirection:"column"}}>
+      <style>{`*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}.root{background:${t.bg};color:${t.text};font-family:'Outfit','Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;transition:background .5s ease}input,select,textarea{font-family:inherit}button{cursor:pointer;font-family:inherit;border:none}.m{font-family:'JetBrains Mono',monospace}@keyframes fu{from{transform:translateY(8px);opacity:0}to{transform:translateY(0);opacity:1}}@keyframes di{from{transform:translateY(-6px);opacity:0}to{transform:translateY(0);opacity:1}}@keyframes si{from{transform:translateX(40px);opacity:0}to{transform:translateX(0);opacity:1}}@keyframes slideL{from{transform:translateX(-100%)}to{transform:translateX(0)}}@keyframes slideR{from{transform:translateX(100%)}to{transform:translateX(0)}}@keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}.ni{transition:all .2s ease}.ni:hover{background:${t.sbAccent}!important}.ch{transition:all .25s cubic-bezier(.2,.8,.2,1)}.ch:hover{border-color:${t.border}!important;transform:translateY(-1px)}.rh{transition:background .15s}.rh:hover{background:${dark?"rgba(255,255,255,.02)":"rgba(0,0,0,.012)"}!important}::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:${dark?"#2a2a2a":"#d0cdc8"};border-radius:2px}.ov{position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);z-index:150}.sg{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.g2{display:grid;grid-template-columns:1.5fr 1fr;gap:20px}.og{display:grid;grid-template-columns:1fr 320px;gap:20px}.fg{display:grid;grid-template-columns:1fr 1fr;gap:20px}.rg{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.spg{display:grid;grid-template-columns:1fr 1fr;gap:20px}.pf-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}.oth,.otr{display:grid;grid-template-columns:110px 1.5fr 1fr 90px 110px 90px 100px;padding:14px 20px;align-items:center}.ocm{display:none}.sth,.str{display:grid;grid-template-columns:40px 1.5fr 100px 80px 80px 70px 70px;padding:12px 16px;align-items:center}.scm{display:none}@media(max-width:1200px){.rsb{display:none!important}.body-row .mid{flex:1!important}}@media(max-width:768px){.lsb{display:none!important}.mob-hdr{display:flex!important}.desk-hdr{display:none!important}.sg{grid-template-columns:1fr 1fr}.g2,.og,.fg,.spg{grid-template-columns:1fr}.rg{grid-template-columns:1fr 1fr}.oth,.otr{display:none}.ocm{display:block}.sth,.str{display:none}.scm{display:block}}@media(min-width:769px){.mob-hdr{display:none!important}}@media(max-width:480px){.sg{grid-template-columns:1fr}}`}</style>
+
+      {/* ── TOAST ── */}
+      {toast&&<div style={{position:"fixed",top:16,right:16,left:16,zIndex:300,display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,padding:"14px 18px",borderRadius:14,background:toast.e?(dark?"#3b1111":"#fef2f2"):(dark?"#0a2416":"#ecfdf5"),border:`1px solid ${toast.e?(dark?"#7f1d1d":"#fecaca"):(dark?"#166534":"#a7f3d0")}`,color:toast.e?t.red:t.green,fontSize:14,fontWeight:600,animation:"si .4s cubic-bezier(.2,.8,.2,1)",maxWidth:440,marginLeft:"auto",backdropFilter:"blur(16px)"}}><span>{toast.e?"⚠️":"✓"} {toast.m}</span><button onClick={dismissToast} style={{background:"none",color:t.textMuted,fontSize:18,padding:4,flexShrink:0}}>✕</button></div>}
+
+      {/* ── TOP NAVBAR — full width ── */}
+      <header className="desk-hdr" style={{display:"flex",alignItems:"center",padding:"0 24px",height:54,background:t.navBg,backdropFilter:"blur(16px)",borderBottom:`1px solid ${t.border}`,flexShrink:0,zIndex:100,gap:16}}>
+        <div style={{width:206,display:"flex",alignItems:"center",gap:10,flexShrink:0}}>
+          <NitroLogo size={28} variant="mark"/>
+          <span style={{fontSize:16,fontWeight:700,color:t.text,letterSpacing:1.5}}>NITRO</span>
         </div>
-        <div style={{padding:"10px 14px",borderBottom:`0.5px solid ${t.surfaceBorder}`}}><div style={{fontSize:9,color:t.textMuted,fontWeight:500,textTransform:"uppercase",letterSpacing:2}}>Balance</div><div className="m" style={{fontSize:17,fontWeight:600,color:t.green,marginTop:2}}>{fNc(user.balance)}</div></div>
-        <nav style={{flex:1,paddingTop:6,paddingBottom:6,paddingLeft:8,paddingRight:0,display:"flex",flexDirection:"column",gap:1,overflow:"visible"}}>{NAV.map(([id,ic,lb])=>{const act=pg===id;return <button key={id} onClick={()=>go(id)} title={lb} style={{display:"flex",alignItems:"center",gap:12,paddingTop:10,paddingBottom:10,padding:"10px 14px",width:"100%",textAlign:"left",fontSize:14,fontWeight:act?600:450,overflow:"visible",border:"none",background:act?"linear-gradient(135deg, #c47d8e, #a3586b)":"transparent",color:act?"#fff":t.textSoft,borderRadius:act?12:10,position:act?"relative":"static",zIndex:act?3:"auto"}}><span style={{fontSize:15,width:18,textAlign:"center"}}>{ic}</span>{lb}</button>})}</nav>
-        <div style={{padding:"10px 14px",borderTop:`0.5px solid ${t.surfaceBorder}`,display:"flex",alignItems:"center",justifyContent:"space-between",gap:8}}>
-          <span style={{fontSize:11,color:t.textMuted}}>{dark?"Night":"Day"} mode</span>
-          <div style={{display:"flex",alignItems:"center",gap:6}}><ThemeToggle dark={dark} onToggle={toggleTheme} compact/><button onClick={handleLogout} title="Log out" style={{width:26,height:26,borderRadius:6,display:"flex",alignItems:"center",justifyContent:"center",background:"none",border:`0.5px solid ${t.btnSecBorder}`,color:t.red,cursor:"pointer",flexShrink:0}}><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></button></div>
-        </div>
-        <div style={{padding:"10px 14px",borderTop:`0.5px solid ${t.surfaceBorder}`,display:"flex",alignItems:"center",gap:8}}>
-          <div style={{width:26,height:26,borderRadius:"50%",background:t.logoGrad,display:"flex",alignItems:"center",justifyContent:"center",fontSize:10,fontWeight:700,color:"#fff",flexShrink:0}}>{user.name[0]}</div>
-          <div style={{minWidth:0,flex:1}}><div style={{fontSize:11,fontWeight:600,color:t.text,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{user.name}</div><div style={{fontSize:10,color:t.textMuted,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{user.email}</div></div>
-        </div>
-      </aside>
-      <main className="mn">
-        <div style={{position:"sticky",top:0,zIndex:40,paddingBottom:alerts.filter(a=>!dismissedAlerts.includes(a.id)).length?4:0}}>
-        {alerts.filter(a=>!dismissedAlerts.includes(a.id)).map(a=><div key={a.id} style={{padding:"12px 16px",marginBottom:10,borderRadius:12,display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,fontSize:13,fontWeight:500,animation:"fu .3s ease",background:a.type==="warning"?(dark?"rgba(217,119,6,0.1)":"#fffbeb"):a.type==="critical"?(dark?"rgba(220,38,38,0.1)":"#fef2f2"):(dark?"rgba(99,102,241,0.1)":"#eef2ff"),color:a.type==="warning"?(dark?"#fcd34d":"#92400e"):a.type==="critical"?(dark?"#fca5a5":"#dc2626"):(dark?"#a5b4fc":"#4f46e5"),border:`1px solid ${a.type==="warning"?(dark?"rgba(217,119,6,0.2)":"#fde68a"):a.type==="critical"?(dark?"rgba(220,38,38,0.2)":"#fecaca"):(dark?"rgba(99,102,241,0.2)":"#c7d2fe")}`,backdropFilter:"blur(12px)"}}><span>{a.type==="warning"?"⚠️":a.type==="critical"?"🚨":"ℹ️"} {a.message}</span><button onClick={()=>setDismissedAlerts(p=>[...p,a.id])} style={{background:"none",color:"inherit",fontSize:16,padding:2,flexShrink:0,opacity:0.6}}>✕</button></div>)}
-        </div>
-        <ErrorBoundary t={t} key={pg}>
-        <div style={{maxWidth:760}}>
-        {pg==="dashboard"&&<Dash user={user} orders={orders} txs={txs} go={go} t={t} dark={dark}/>}
-        {pg==="new-order"&&<NewOrd services={services} onPlace={placeOrder} bal={user.balance} t={t} dark={dark}/>}
-        {pg==="orders"&&<Ords orders={orders} t={t} dark={dark}/>}
-        {pg==="funds"&&<Fnds onAdd={addFunds} bal={user.balance} txs={txs} t={t} dark={dark}/>}
-        {pg==="referrals"&&<Refs user={user} t={t} dark={dark}/>}
-        {pg==="services"&&<Svcs services={services} go={go} t={t} dark={dark}/>}
-        {pg==="support"&&<Sup t={t} dark={dark}/>}
-        {pg==="settings"&&<Settings user={user} t={t} dark={dark} toggleTheme={toggleTheme} manualOverride={manualOverride}/>}
-        </div>
-        </ErrorBoundary>
-        <footer style={{borderTop:`1px solid ${t.surfaceBorder}`,marginTop:48,padding:"28px 0 20px"}}>
-          <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:12}}>
-            <div style={{fontSize:13,color:t.textMuted,fontWeight:450}}>© 2026 Nitro. All rights reserved.</div>
-            <div style={{display:"flex",flexDirection:"column",alignItems:"flex-end",gap:8}}>
-              <div style={{display:"flex",gap:16}}>{[["X (Twitter)","https://x.com/TheNitroNG"],["Instagram","https://instagram.com/TheNitroNg"]].map(([s,url])=><a key={s} href={url} target="_blank" rel="noopener" style={{fontSize:12,color:t.textSoft,textDecoration:"none"}}>{s}</a>)}</div>
-              <div style={{display:"flex",gap:16}}>{[["Terms","/terms"],["Privacy","/privacy"],["Refund","/refund"],["Cookie","/cookie"]].map(([l,h])=><a key={l} href={h} style={{fontSize:11,color:t.textMuted,textDecoration:"none"}}>{l}</a>)}</div>
-            </div>
+        <div style={{flex:1,display:"flex",justifyContent:"center"}}>
+          <div style={{position:"relative",width:"100%",maxWidth:420}}>
+            <span style={{position:"absolute",left:14,top:"50%",transform:"translateY(-50%)",color:t.textMuted,fontSize:14}}>🔍</span>
+            <input placeholder="Search services, orders..." onFocus={()=>setSf(true)} onBlur={()=>setSf(false)} style={{width:"100%",padding:"9px 14px 9px 38px",borderRadius:10,background:dark?"rgba(255,255,255,.04)":"rgba(0,0,0,.03)",border:`1px solid ${sf?t.accent:"transparent"}`,color:t.text,fontSize:14,fontWeight:430,outline:"none",transition:"all .2s"}}/>
           </div>
-        </footer>
-      </main>
-      
+        </div>
+        <div style={{display:"flex",alignItems:"center",gap:6,flexShrink:0}}>
+          <button style={{width:38,height:38,borderRadius:9,display:"flex",alignItems:"center",justifyContent:"center",background:"transparent",color:t.textMuted,position:"relative",fontSize:16}}>🔔<span style={{position:"absolute",top:7,right:8,width:6,height:6,borderRadius:"50%",background:t.accent}}/></button>
+          <div style={{width:1,height:22,background:t.border,margin:"0 4px"}}/>
+          <UserDropdown open={userOpen} setOpen={setUserOpen} user={user} t={t} dark={dark}/>
+        </div>
+      </header>
+
+      {/* ── MOBILE HEADER ── */}
+      <div className="mob-hdr" style={{display:"none",alignItems:"center",justifyContent:"space-between",padding:"10px 16px",background:t.navBg,backdropFilter:"blur(16px)",borderBottom:`1px solid ${t.border}`,flexShrink:0,zIndex:100}}>
+        <button onClick={()=>setSb(true)} style={{background:"none",color:t.text,padding:4,fontSize:18}}>☰</button>
+        <div style={{display:"flex",alignItems:"center",gap:8}}>
+          <NitroLogo size={24} variant="mark"/>
+          <span style={{fontSize:15,fontWeight:700,color:t.text,letterSpacing:1}}>NITRO</span>
+        </div>
+        <div style={{display:"flex",gap:6}}>
+          <button style={{background:"none",color:t.textMuted,padding:4,position:"relative",fontSize:14}}>🔔<span style={{position:"absolute",top:0,right:0,width:5,height:5,borderRadius:"50%",background:t.accent}}/></button>
+          <button onClick={()=>setActOpen(true)} style={{background:"none",color:t.textMuted,padding:4,position:"relative",fontSize:14}}>📊<span style={{position:"absolute",top:0,right:0,width:5,height:5,borderRadius:"50%",background:t.green}}/></button>
+        </div>
+      </div>
+
+      {/* ── MOBILE NAV DRAWER ── */}
+      {sb&&<><div className="ov" onClick={()=>setSb(false)}/><aside style={{position:"fixed",top:0,left:0,bottom:0,width:280,background:t.sbBg,zIndex:200,animation:"slideL .3s cubic-bezier(.2,.8,.2,1)",display:"flex",flexDirection:"column",borderRight:`1px solid ${t.sbBorder}`}}>
+        <div style={{padding:"16px 18px",display:"flex",justifyContent:"space-between",alignItems:"center",borderBottom:`1px solid ${t.sbBorder}`}}>
+          <div style={{display:"flex",alignItems:"center",gap:10}}><NitroLogo size={26} variant="mark"/><span style={{fontSize:16,fontWeight:700,color:t.text,letterSpacing:1.5}}>NITRO</span></div>
+          <button onClick={()=>setSb(false)} style={{background:"none",color:t.textMuted,fontSize:20,padding:4}}>✕</button>
+        </div>
+        <div style={{padding:"14px 18px",borderBottom:`1px solid ${t.sbBorder}`,display:"flex",alignItems:"center",gap:10}}>
+          <div style={{width:34,height:34,borderRadius:10,background:t.logoGrad,display:"flex",alignItems:"center",justifyContent:"center",fontSize:14,fontWeight:700,color:"#fff"}}>{user.name?.[0]||"U"}</div>
+          <div><div style={{fontSize:14,fontWeight:600,color:t.text}}>{user.name}</div><div style={{fontSize:12,color:t.textMuted,marginTop:1}}>{user.email}</div></div>
+        </div>
+        <SidebarNav onNav={()=>setSb(false)}/>
+        <div style={{padding:"12px 18px",borderTop:`1px solid ${t.sbBorder}`}}>
+          <button onClick={handleLogout} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 12px",width:"100%",fontSize:14,fontWeight:500,color:t.red,borderRadius:10,background:"transparent"}}>🚪 Log out</button>
+        </div>
+      </aside></>}
+
+      {/* ── MOBILE ACTIVITY DRAWER ── */}
+      {actOpen&&<><div className="ov" onClick={()=>setActOpen(false)}/><aside style={{position:"fixed",top:0,right:0,bottom:0,width:300,background:t.sbBg,zIndex:200,animation:"slideR .3s cubic-bezier(.2,.8,.2,1)",display:"flex",flexDirection:"column",borderLeft:`1px solid ${t.sbBorder}`}}>
+        <div style={{padding:"16px 18px",display:"flex",justifyContent:"space-between",alignItems:"center",borderBottom:`1px solid ${t.sbBorder}`}}>
+          <span style={{fontSize:15,fontWeight:600,color:t.text}}>Activity</span>
+          <button onClick={()=>setActOpen(false)} style={{background:"none",color:t.textMuted,fontSize:20,padding:4}}>✕</button>
+        </div>
+        <ActivityPanel t={t} dark={dark} txs={txs} orders={orders} user={user} go={go}/>
+      </aside></>}
+
+      {/* ── BODY: sidebar + content + activity ── */}
+      <div className="body-row" style={{display:"flex",flex:1,overflow:"hidden"}}>
+
+        {/* LEFT SIDEBAR — desktop */}
+        <aside className="lsb" style={{width:230,background:t.sbBg,borderRight:`1px solid ${t.sbBorder}`,display:"flex",flexDirection:"column",flexShrink:0,overflow:"hidden"}}>
+          <SidebarNav/>
+        </aside>
+
+        {/* MAIN CONTENT — scrolls */}
+        <div className="mid" style={{flex:1,overflowY:"auto",display:"flex",flexDirection:"column"}}>
+          {/* Alerts */}
+          {alerts.filter(a=>!dismissedAlerts.includes(a.id)).length>0&&<div style={{padding:"12px 24px 0",flexShrink:0}}>
+            {alerts.filter(a=>!dismissedAlerts.includes(a.id)).map(a=><div key={a.id} style={{padding:"12px 16px",marginBottom:8,borderRadius:12,display:"flex",alignItems:"center",justifyContent:"space-between",gap:10,fontSize:13,fontWeight:500,background:a.type==="warning"?(dark?"rgba(217,119,6,0.1)":"#fffbeb"):a.type==="critical"?(dark?"rgba(220,38,38,0.1)":"#fef2f2"):(dark?"rgba(99,102,241,0.1)":"#eef2ff"),color:a.type==="warning"?(dark?"#fcd34d":"#92400e"):a.type==="critical"?(dark?"#fca5a5":"#dc2626"):(dark?"#a5b4fc":"#4f46e5"),border:`1px solid ${a.type==="warning"?(dark?"rgba(217,119,6,0.2)":"#fde68a"):a.type==="critical"?(dark?"rgba(220,38,38,0.2)":"#fecaca"):(dark?"rgba(99,102,241,0.2)":"#c7d2fe")}`}}><span>{a.type==="warning"?"⚠️":a.type==="critical"?"🚨":"ℹ️"} {a.message}</span><button onClick={()=>setDismissedAlerts(p=>[...p,a.id])} style={{background:"none",color:"inherit",fontSize:16,padding:2,flexShrink:0,opacity:.5}}>✕</button></div>)}
+          </div>}
+
+          <div style={{padding:"24px 28px",flex:1}}>
+            <ErrorBoundary t={t} key={pg}>
+            <div style={{maxWidth:760}}>
+            {pg==="dashboard"&&<Dash user={user} orders={orders} txs={txs} go={go} t={t} dark={dark}/>}
+            {pg==="new-order"&&<NewOrd services={services} onPlace={placeOrder} bal={user.balance} t={t} dark={dark}/>}
+            {pg==="orders"&&<Ords orders={orders} t={t} dark={dark}/>}
+            {pg==="funds"&&<Fnds onAdd={addFunds} bal={user.balance} txs={txs} t={t} dark={dark}/>}
+            {pg==="referrals"&&<Refs user={user} t={t} dark={dark}/>}
+            {pg==="services"&&<Svcs services={services} go={go} t={t} dark={dark}/>}
+            {pg==="support"&&<Sup t={t} dark={dark}/>}
+            {pg==="settings"&&<Settings user={user} t={t} dark={dark} toggleTheme={toggleTheme} manualOverride={manualOverride}/>}
+            </div>
+            </ErrorBoundary>
+          </div>
+
+          {/* Footer — fixed at bottom of scroll */}
+          <div style={{borderTop:`1px solid ${t.border}`,padding:"12px 28px",display:"flex",justifyContent:"space-between",alignItems:"center",fontSize:11,color:t.textMuted,fontWeight:430,flexShrink:0}}>
+            <span>© 2026 Nitro</span>
+            <div style={{display:"flex",gap:16}}>{[["Terms","/terms"],["Privacy","/privacy"],["Refund","/refund"]].map(([l,h])=><a key={l} href={h} style={{color:t.textMuted,textDecoration:"none",fontSize:11}}>{l}</a>)}</div>
+          </div>
+        </div>
+
+        {/* RIGHT SIDEBAR — ACTIVITY (desktop) */}
+        <aside className="rsb" style={{width:300,background:t.sbBg,borderLeft:`1px solid ${t.sbBorder}`,display:"flex",flexDirection:"column",flexShrink:0,overflow:"hidden"}}>
+          <ActivityPanel t={t} dark={dark} txs={txs} orders={orders} user={user} go={go}/>
+        </aside>
+      </div>
     </div>
   );
 }
