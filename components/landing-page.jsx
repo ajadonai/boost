@@ -25,12 +25,13 @@ export default function Landing(){
   const [modal,setModal]=useState(null);
   const [faqOpen,setFaqOpen]=useState(null);
   const [scrolled,setScrolled]=useState(false);
+  const scrollRef=useRef(null);
   const [siteStats,setSiteStats]=useState({users:"12K+",orders:"2M+"});
   const [promoBanner,setPromoBanner]=useState({message:"New! Sign up today and get 10% bonus on your first deposit.",type:"info"});
   const [siteAlerts,setSiteAlerts]=useState([]);
   useEffect(()=>{const saved=localStorage.getItem("nitro-theme")||"auto";setThemeMode(saved);if(saved==="day")setDark(false);else if(saved==="night")setDark(true);else setDark(getAuto());},[]);
   useEffect(()=>{if(themeMode!=="auto")return;const iv=setInterval(()=>setDark(getAuto()),60000);return()=>clearInterval(iv);},[themeMode]);
-  useEffect(()=>{const onScroll=()=>setScrolled(window.scrollY>20);window.addEventListener("scroll",onScroll);return()=>window.removeEventListener("scroll",onScroll);},[]);
+  useEffect(()=>{const el=scrollRef.current;if(!el)return;const onScroll=()=>setScrolled(el.scrollTop>20);el.addEventListener("scroll",onScroll);return()=>el.removeEventListener("scroll",onScroll);},[]);
   useEffect(()=>{const p=new URLSearchParams(window.location.search);if(p.get("login"))setModal("login");if(p.get("signup"))setModal("signup");if(p.get("ref")){setModal("signup");}},[]);
   useEffect(()=>{(async()=>{try{const res=await fetch("/api/site-info");if(res.ok){const d=await res.json();if(d.stats)setSiteStats(d.stats);if(d.promo)setPromoBanner(d.promo);else setPromoBanner(null);if(d.alerts?.length)setSiteAlerts(d.alerts);}}catch{}})();},[]);
   const closeModal=useCallback(()=>setModal(null),[]);
@@ -117,10 +118,10 @@ export default function Landing(){
       {(promoBanner||siteAlerts.length>0)&&<div style={{flexShrink:0}}>{[...(promoBanner?[promoBanner]:[]),...siteAlerts].map((a,i)=><div key={i} style={{padding:"10px 16px",textAlign:"center",fontSize:13,fontWeight:500,background:a.type==="warning"?(dark?"rgba(217,119,6,0.15)":"#fffbeb"):(dark?"rgba(99,102,241,0.15)":"#eef2ff"),color:a.type==="warning"?(dark?"#fcd34d":"#92400e"):(dark?"#a5b4fc":"#4f46e5"),borderBottom:`1px solid ${t.surfaceBorder}`}}>{a.type==="warning"?"⚠️":"✨"} {a.message}</div>)}</div>}
 
       {/* ── SCROLLABLE CONTENT ── */}
-      <div style={{flex:1,overflowY:"auto",overflowX:"hidden",WebkitOverflowScrolling:"touch"}}>
+      <div ref={scrollRef} style={{flex:1,overflowY:"auto",overflowX:"hidden",WebkitOverflowScrolling:"touch",scrollBehavior:"smooth"}}>
 
         {/* ── HERO — full viewport height ── */}
-        <section style={{minHeight:"calc(100vh - 60px)",display:"flex",flexDirection:"column",textAlign:"center",position:"relative",overflow:"hidden"}}>
+        <section style={{minHeight:"calc(100vh - 120px)",display:"flex",flexDirection:"column",textAlign:"center",position:"relative",overflow:"hidden"}}>
           <div style={{position:"absolute",top:"-20%",left:"50%",transform:"translateX(-50%)",width:800,height:500,borderRadius:"50%",background:dark?"rgba(196,125,142,.06)":"rgba(196,125,142,.04)",filter:"blur(100px)",pointerEvents:"none"}}/>
           <div style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center",padding:"40px 40px 20px",position:"relative",zIndex:1}}>
             <div style={{maxWidth:720}}>
@@ -149,10 +150,12 @@ export default function Landing(){
 
 
         {/* ── FEATURES ── */}
-        <section id="services" style={{padding:"80px 40px",maxWidth:1100,margin:"0 auto"}}>
+        <section id="services" style={{padding:"80px 40px",background:dark?"rgba(255,255,255,.015)":"rgba(0,0,0,.012)"}}>
+          <div style={{maxWidth:1100,margin:"0 auto"}}>
           <div style={{textAlign:"center",marginBottom:56}}><h2 style={{fontSize:36,fontWeight:700,color:t.text,marginBottom:12}}>Why <span style={{color:t.accent}}>Nitro</span>?</h2><p style={{fontSize:16,color:t.textSoft,fontWeight:430}}>Everything you need to grow your social presence</p></div>
           <div className="feat-grid" style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:20}}>
             {[["⚡","Instant Delivery","Orders start within minutes. Real-time tracking."],["🛡️","Safe & Secure","No passwords needed. Public URLs only."],["💳","Naira Payments","Cards, bank transfer, USSD via Paystack."],["🔄","Refill Guarantee","Auto-replenish drops at no extra cost."],["📊","Real-Time Dashboard","Track orders, wallet, and growth in one place."],["🤝","Earn 5% Forever","Share your link, earn commission permanently."]].map(([ic,title,desc],i)=><div key={i} className="hover-lift" style={{padding:"28px 24px",borderRadius:18,background:t.surface,border:`1px solid ${t.surfaceBorder}`,backdropFilter:"blur(8px)"}}><div style={{width:44,height:44,borderRadius:12,background:t.accentLight,display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,marginBottom:16}}>{ic}</div><h3 style={{fontSize:17,fontWeight:600,color:t.text,marginBottom:8}}>{title}</h3><p style={{fontSize:14,color:t.textSoft,lineHeight:1.65,fontWeight:430}}>{desc}</p></div>)}
+          </div>
           </div>
         </section>
 
@@ -165,8 +168,8 @@ export default function Landing(){
         </section>
 
         {/* ── PRICING ── */}
-        <section id="pricing" style={{padding:"80px 40px",maxWidth:1100,margin:"0 auto"}}>
-          <div style={{textAlign:"center",marginBottom:48}}><h2 style={{fontSize:36,fontWeight:700,color:t.text,marginBottom:12}}>Transparent Pricing</h2><p style={{fontSize:16,color:t.textSoft,fontWeight:430}}>No subscriptions. Pay-as-you-go. Per 1,000 units.</p></div>
+        <section id="pricing" style={{padding:"80px 40px",background:dark?"rgba(255,255,255,.015)":"rgba(0,0,0,.012)"}}>
+          <div style={{maxWidth:1100,margin:"0 auto"}}><div style={{textAlign:"center",marginBottom:48}}><h2 style={{fontSize:36,fontWeight:700,color:t.text,marginBottom:12}}>Transparent Pricing</h2><p style={{fontSize:16,color:t.textSoft,fontWeight:430}}>No subscriptions. Pay-as-you-go. Per 1,000 units.</p></div>
           <div className="price-grid" style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:20}}>
             {[["TikTok","🎵",[["Followers","₦4,650"],["Views","₦465"],["Likes","₦2,325"],["Shares","₦1,200"]],false],["Instagram","📸",[["Followers","₦3,875"],["Likes","₦1,860"],["Reels Views","₦775"],["Story Views","₦1,240"]],true],["YouTube","▶️",[["Subscribers","₦12,400"],["Views","₦3,100"],["Watch Time","₦77,500"],["Likes","₦1,500"]],false]].map(([name,ic,prices,pop])=><div key={name} className="hover-lift" style={{padding:"32px 28px",borderRadius:20,background:t.surface,border:`1px solid ${pop?"rgba(196,125,142,.25)":t.surfaceBorder}`,backdropFilter:"blur(8px)",position:"relative",overflow:"hidden",transform:pop?"scale(1.02)":"none"}}>{pop&&<div style={{position:"absolute",top:0,left:0,right:0,height:3,background:t.btnPrimary}}/>}{pop&&<div style={{position:"absolute",top:14,right:14,padding:"3px 10px",borderRadius:6,background:t.accent,color:"#fff",fontSize:10,fontWeight:700,letterSpacing:1}}>POPULAR</div>}<div style={{fontSize:36,marginBottom:8}}>{ic}</div><h3 style={{fontSize:20,fontWeight:600,color:t.text,marginBottom:18}}>{name}</h3>{prices.map(([svc,price])=><div key={svc} style={{display:"flex",justifyContent:"space-between",padding:"11px 0",borderBottom:`1px solid ${t.surfaceBorder}`}}><span style={{fontSize:14,color:t.textSoft,fontWeight:430}}>{svc}</span><span className="m" style={{fontSize:14,fontWeight:600,color:t.green}}>{price}</span></div>)}<button onClick={()=>setModal("signup")} style={{marginTop:22,width:"100%",padding:"13px 0",borderRadius:12,background:pop?t.btnPrimary:"transparent",color:pop?"#fff":t.text,fontSize:14,fontWeight:600,border:pop?"none":`1px solid ${t.surfaceBorder}`}}>Get Started</button></div>)}
           </div>
@@ -182,10 +185,10 @@ export default function Landing(){
         </section>
 
         {/* ── FAQ ── */}
-        <section id="faq" style={{padding:"80px 40px",maxWidth:800,margin:"0 auto"}}>
-          <h2 style={{fontSize:36,fontWeight:700,color:t.text,textAlign:"center",marginBottom:48}}>Frequently Asked Questions</h2>
+        <section id="faq" style={{padding:"80px 40px",background:dark?"rgba(255,255,255,.015)":"rgba(0,0,0,.012)"}}>
+          <div style={{maxWidth:800,margin:"0 auto"}}><h2 style={{fontSize:36,fontWeight:700,color:t.text,textAlign:"center",marginBottom:48}}>Frequently Asked Questions</h2>
           {[["How does Nitro work?","Sign up free, add funds via Paystack, choose a service, paste your link, and order. Delivery starts within minutes."],["Is it safe to use?","We never ask for passwords. All services use your public profile URL only."],["How do I pay?","Nigerian Naira via Paystack — debit cards, bank transfer, USSD. Minimum ₦500."],["Will my followers drop?","Services with refill guarantee auto-replenish any drops at no extra cost."],["Can I earn money?","Share your referral link and earn 5% commission on every order — forever."],["How fast is delivery?","Most services start within minutes. Typical completion is 0-24 hours."]].map(([q,a],i)=>{const isOpen=faqOpen===i;return <div key={i} style={{marginBottom:10,borderRadius:14,background:t.surface,border:`1px solid ${isOpen?"rgba(196,125,142,.2)":t.surfaceBorder}`,backdropFilter:"blur(8px)",transition:"border-color .3s",overflow:"hidden"}}><button onClick={()=>setFaqOpen(isOpen?null:i)} style={{width:"100%",padding:"18px 24px",fontSize:16,fontWeight:500,color:t.text,background:"none",display:"flex",justifyContent:"space-between",alignItems:"center",textAlign:"left"}}><span>{q}</span><span style={{fontSize:18,color:isOpen?t.accent:t.textMuted,transition:"transform .3s",transform:isOpen?"rotate(45deg)":"none",flexShrink:0}}>+</span></button><div style={{maxHeight:isOpen?200:0,overflow:"hidden",transition:"max-height .35s cubic-bezier(.4,0,.2,1)"}}><div style={{padding:"0 24px 18px",fontSize:14,color:t.textSoft,lineHeight:1.75,fontWeight:430,borderTop:`1px solid ${t.surfaceBorder}`}}><div style={{paddingTop:14}}>{a}</div></div></div></div>})}
-        </section>
+        </div></section>
 
         {/* ── CTA ── */}
         <section style={{padding:"60px 40px"}}>
