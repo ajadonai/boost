@@ -5,7 +5,8 @@ export const metadata = {
   title: 'Nitro — #1 SMM Panel in Nigeria',
   description: 'Buy Instagram followers, TikTok views, YouTube subscribers and more. Instant delivery, real engagement, cheapest rates in Nigeria.',
   icons: {
-    icon: '/favicon.ico',
+    icon: '/favicon.png',
+    apple: '/apple-touch-icon.png',
   },
 };
 
