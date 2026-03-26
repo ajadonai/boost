@@ -69,8 +69,8 @@ export default function VerifyAccount(){
         @keyframes pop{0%{transform:scale(0.8);opacity:0}50%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}
         .code-input{width:48px;height:56px;max-width:calc((100vw - 140px)/6);text-align:center;font-size:24px;font-weight:700;border-radius:12px;outline:none;transition:border-color .2s,box-shadow .2s}
         .code-input:focus{border-color:#c47d8e!important;box-shadow:0 0 0 3px rgba(196,125,142,.15)}
-        @media(max-width:768px){.code-input{width:42px;height:48px;font-size:20px;border-radius:10px}.verify-card{padding:28px 24px!important;border-radius:18px!important;height:auto!important;max-height:85dvh!important}}
-        @media(max-width:1024px){.verify-card{height:540px!important;padding:32px 28px!important}}
+        @media(max-width:768px){.code-input{width:42px;height:48px;font-size:20px;border-radius:10px}.auth-card{max-width:100%!important;height:520px!important;max-height:none!important;padding:24px 20px!important;border-radius:16px!important}}
+        @media(max-width:1024px){.auth-card{max-width:420px!important;height:540px!important;padding:32px 28px!important}}
       `}</style>
 
       {/* Nav */}
@@ -92,7 +92,7 @@ export default function VerifyAccount(){
 
       {/* Center card */}
       <div style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center",padding:20}}>
-        <div className="verify-card" style={{width:"100%",maxWidth:440,height:580,maxHeight:"90dvh",overflow:"hidden",background:dark?"rgba(17,22,40,0.98)":"rgba(255,255,255,0.98)",border:`1px solid ${t.surfaceBrd}`,borderRadius:20,padding:"36px 32px",boxShadow:dark?"0 20px 60px rgba(0,0,0,0.5)":"0 20px 60px rgba(0,0,0,0.1)",backdropFilter:"blur(20px)",textAlign:"center",display:"flex",flexDirection:"column",justifyContent:"center"}}>
+        <div className="auth-card" style={{width:"100%",maxWidth:440,height:580,maxHeight:"90dvh",overflow:"hidden",background:dark?"rgba(17,22,40,0.98)":"rgba(255,255,255,0.98)",border:`1px solid ${t.surfaceBrd}`,borderRadius:20,padding:"36px 32px",boxShadow:dark?"0 20px 60px rgba(0,0,0,0.5)":"0 20px 60px rgba(0,0,0,0.1)",backdropFilter:"blur(20px)",textAlign:"center",display:"flex",flexDirection:"column",justifyContent:"center"}}>
 
           {!verified?<>
             {/* Logo */}
