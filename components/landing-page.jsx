@@ -354,10 +354,68 @@ export default function Landing(){
           </div>
         </section>
 
-        {/* ━━━ CTA + FOOTER ━━━ */}
-        <section id="cta" style={{minHeight:"50dvh",display:"flex",alignItems:"center",justifyContent:"center",background:t.bg}}>
-          <div style={{textAlign:"center",color:t.textMuted,fontSize:16,fontWeight:450}}>CTA + Footer — awaiting mockup</div>
-        </section>
+        {/* ━━━ SECTION 6: CTA + FOOTER ━━━ */}
+        <div className="s6-cta-wrapper" style={{background:t.bg}}>
+          <div className="s6-cta" style={{background:dark?"linear-gradient(145deg,#1a0e14 0%,#2d1520 30%,#1e0f18 60%,#0f0a12 100%)":"linear-gradient(145deg,#c47d8e 0%,#a3586b 35%,#8b4a5e 65%,#6b3a4a 100%)",border:dark?"1px solid rgba(196,125,142,.12)":"none"}}>
+            {/* Spinning ring */}
+            <div className="s6-ring" style={{border:`1px solid ${dark?"rgba(196,125,142,.1)":"rgba(255,255,255,.12)"}`}}><div className="s6-ring-inner" style={{border:`1px solid ${dark?"rgba(196,125,142,.06)":"rgba(255,255,255,.08)"}`}}/></div>
+            {/* Orbs */}
+            <div className="s6-orb1" style={{background:dark?"rgba(196,125,142,.08)":"rgba(255,255,255,.06)"}}/>
+            <div className="s6-orb2" style={{background:dark?"rgba(165,180,252,.05)":"rgba(255,255,255,.05)"}}/>
+            {/* Particles */}
+            {[["15%","18%",4,0],["25%","75%",3,1],["70%","15%",3,.5],["60%","82%",5,1.5],["40%","90%",3,2],["80%","45%",4,.8]].map(([top,left,s,d],i)=><div key={i} className="s6-particle" style={{top,left,width:s,height:s,background:dark?"rgba(196,125,142,.25)":"rgba(255,255,255,.25)",animationDelay:`${d}s`,animationDuration:`${3+i}s`}}/>)}
+
+            <div className="s6-cta-content">
+              {/* Live badge */}
+              <div className="s6-badge" style={{background:dark?"rgba(196,125,142,.12)":"rgba(255,255,255,.12)",border:`1px solid ${dark?"rgba(196,125,142,.18)":"rgba(255,255,255,.2)"}`}}>
+                <div className="s6-pulse"/>
+                <span className="m s6-badge-count" style={{color:dark?"#c47d8e":"#fff"}}>{siteStats.users}+</span>
+                <span className="s6-badge-text" style={{color:dark?"rgba(196,125,142,.7)":"rgba(255,255,255,.7)"}}>creators growing right now</span>
+              </div>
+              <h2 className="s6-h2-bold">Your Audience</h2>
+              <h2 className="serif s6-h2-italic" style={{color:dark?"#c47d8e":"#fff"}}>Won't Grow Itself.</h2>
+              <p className="s6-sub" style={{color:dark?"rgba(255,255,255,.55)":"rgba(255,255,255,.75)"}}>Every minute you wait, your competitors are getting ahead. Start with ₦500 and see results in seconds.</p>
+              <div className="s6-buttons">
+                <button className="s6-btn-primary" onClick={()=>setModal("signup")}>Get Started Free →</button>
+                <button className="s6-btn-ghost" style={{border:`1.5px solid ${dark?"rgba(255,255,255,.12)":"rgba(255,255,255,.25)"}`}} onClick={()=>document.getElementById("pricing")?.scrollIntoView({behavior:"smooth"})}>View Pricing ↓</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <footer className="s6-footer" style={{background:dark?"#050710":"#e6e2dc"}}>
+          <div className="s6-footer-top" style={{borderBottom:`1px solid ${dark?"rgba(255,255,255,.06)":"rgba(0,0,0,.06)"}`}}>
+            <div className="s6-footer-brand">
+              <div className="s6-footer-logo">
+                <div style={{width:24,height:24,borderRadius:6,background:"linear-gradient(135deg,#c47d8e,#8b5e6b)",display:"flex",alignItems:"center",justifyContent:"center"}}><svg width="10" height="10" viewBox="0 0 20 20" fill="none"><path d="M4,16 L4,4 L16,16 L16,4" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
+                <span className="s6-footer-brand-name" style={{color:t.text}}>NITRO</span>
+              </div>
+              <p className="s6-footer-tagline" style={{color:dark?"#555":"#999"}}>Nigeria's fastest SMM panel. Real growth, instant delivery.</p>
+            </div>
+            <div className="s6-footer-links">
+              <div>
+                <div className="s6-footer-col-title" style={{color:t.textMuted}}>Product</div>
+                {[["Services","#services"],["Pricing","#pricing"],["FAQ","#faq"]].map(([l,href])=><div key={l} className="s6-footer-link" style={{color:dark?"#8a8680":"#666"}} onClick={()=>document.getElementById(href.slice(1))?.scrollIntoView({behavior:"smooth"})}>{l}</div>)}
+              </div>
+              <div>
+                <div className="s6-footer-col-title" style={{color:t.textMuted}}>Legal</div>
+                {[["Terms","/terms"],["Privacy","/privacy"],["Refund","/refund"],["Cookies","/cookie"]].map(([l,href])=><a key={l} href={href} className="s6-footer-link" style={{color:dark?"#8a8680":"#666",display:"block"}}>{l}</a>)}
+              </div>
+            </div>
+          </div>
+          <div className="s6-footer-bottom">
+            <span className="s6-copyright" style={{color:dark?"#555":"#999"}}>© 2025 Nitro. All rights reserved.</span>
+            <div className="s6-footer-social">
+              <div className="s6-social-icons">
+                <a href="https://instagram.com/Nitro.ng" target="_blank" rel="noopener" className="s6-sico" style={{color:dark?"#8a8680":"#666"}}><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
+                <a href="https://x.com/TheNitroNG" target="_blank" rel="noopener" className="s6-sico" style={{color:dark?"#8a8680":"#666"}}><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
+                <a href="https://wa.me/message" target="_blank" rel="noopener" className="s6-sico" style={{color:dark?"#8a8680":"#666"}}><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg></a>
+              </div>
+              <div className="s6-social-divider" style={{background:dark?"rgba(255,255,255,.06)":"rgba(0,0,0,.06)"}}/>
+              <a href="mailto:TheNitroNG@gmail.com" className="s6-sico s6-email" style={{color:dark?"#8a8680":"#666"}}><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="22,6 12,13 2,6"/></svg><span className="s6-email-text">TheNitroNG@gmail.com</span></a>
+            </div>
+          </div>
+        </footer>
 
       </div>
 
