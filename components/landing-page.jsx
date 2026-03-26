@@ -411,11 +411,11 @@ export default function Landing(){
             </div>
             <div className="s6-footer-links">
               <div>
-                <div className="s6-footer-col-title" style={{color:dark?"#8a8680":"#777"}}>Product</div>
+                <div className="s6-footer-col-title" style={{color:t.accent}}>Product</div>
                 {[["Services","#services"],["Pricing","#pricing"],["FAQ","#faq"]].map(([l,href])=><div key={l} className="s6-footer-link" style={{color:dark?"#b0aca8":"#555"}} onClick={()=>document.getElementById(href.slice(1))?.scrollIntoView({behavior:"smooth"})}>{l}</div>)}
               </div>
               <div>
-                <div className="s6-footer-col-title" style={{color:dark?"#8a8680":"#777"}}>Legal</div>
+                <div className="s6-footer-col-title" style={{color:t.accent}}>Legal</div>
                 {[["Terms","/terms"],["Privacy","/privacy"],["Refund","/refund"],["Cookies","/cookie"]].map(([l,href])=><a key={l} href={href} className="s6-footer-link" style={{color:dark?"#b0aca8":"#555",display:"block"}}>{l}</a>)}
               </div>
             </div>
