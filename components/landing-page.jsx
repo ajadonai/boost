@@ -51,7 +51,7 @@ export default function Landing(){
     logoGrad:"linear-gradient(135deg,#c47d8e,#8b5e6b)",
     overlay:dark?"rgba(0,0,0,0.7)":"rgba(0,0,0,0.4)",
     cardShadow:dark?"0 2px 20px rgba(0,0,0,0.4)":"0 2px 20px rgba(0,0,0,0.06)",
-    heroBg:dark?"#060810":"#c49a93",heroText:dark?"#eae7e2":"#1c1b19",heroSoft:dark?"#b0aca8":"#4a4542",heroMuted:dark?"#7d7974":"#887f78",heroGlass:dark?"rgba(15,19,35,.5)":"rgba(255,255,255,.35)",heroGlassBrd:dark?"rgba(255,255,255,.08)":"rgba(255,255,255,.25)",heroAccentBadge:dark?"rgba(196,125,142,.15)":"rgba(255,255,255,.25)",
+    heroBg:dark?"#060810":"linear-gradient(135deg,#c47d8e 0%,#a3586b 40%,#8b4a5e 100%)",heroText:dark?"#eae7e2":"#fff",heroSoft:dark?"#b0aca8":"rgba(255,255,255,.85)",heroMuted:dark?"#7d7974":"rgba(255,255,255,.55)",heroGlass:dark?"rgba(15,19,35,.5)":"rgba(255,255,255,.12)",heroGlassBrd:dark?"rgba(255,255,255,.08)":"rgba(255,255,255,.2)",heroAccentBadge:dark?"rgba(196,125,142,.15)":"rgba(255,255,255,.15)",
   }),[dark]);
 
   const sectionIds=["hero","services","pricing","testimonials","faq","cta"];
@@ -102,7 +102,7 @@ export default function Landing(){
         .hero-split{display:flex;flex-direction:row;align-items:center;justify-content:center;gap:40px;padding:40px 60px;max-width:1200px;margin:0 auto;width:100%}
         .hero-left{flex:1;text-align:left;max-width:560px}
         .hero-right{width:400px;flex-shrink:0}
-        .hero-inline-card{background:${dark?"rgba(17,22,40,0.95)":"rgba(255,255,255,0.95)"};border:1px solid ${dark?"rgba(255,255,255,.08)":"rgba(0,0,0,.06)"};border-radius:20px;padding:28px 26px;backdrop-filter:blur(20px);box-shadow:${dark?"0 24px 64px rgba(0,0,0,0.5)":"0 24px 64px rgba(0,0,0,0.1)"};position:relative}
+        .hero-inline-card{background:${dark?"rgba(17,22,40,0.95)":"rgba(255,255,255,0.95)"};border:1px solid ${dark?"rgba(255,255,255,.08)":"rgba(0,0,0,.06)"};border-radius:20px;padding:28px 26px;backdrop-filter:blur(20px);box-shadow:${dark?"0 24px 64px rgba(0,0,0,0.5)":"0 24px 64px rgba(0,0,0,0.1)"};position:relative;height:540px;overflow:hidden}
         .hero-mobile-cta{display:none}
         @media(max-width:1024px){.hero-split{flex-direction:column;gap:32px;padding:36px 36px 28px;text-align:center}.hero-left{text-align:center}.hero-right{display:none}.hero-mobile-cta{display:flex;justify-content:center;margin-top:24px}.hero-left .fd4:not(.hero-mobile-cta){display:none!important}.hero-stats{justify-content:center!important}}
         @media(max-width:768px){.hero-split{padding:28px 24px 20px;gap:24px}.hero-mobile-cta button{padding:14px 36px!important;font-size:15px!important}}
@@ -288,7 +288,7 @@ export default function Landing(){
       `}</style>
 
       {/* ═══ NAVBAR ═══ */}
-      <nav className="main-nav" style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"0 36px",height:60,background:dark?"rgba(9,12,21,.5)":"rgba(255,255,255,.08)",backdropFilter:"blur(12px)",borderBottom:`1px solid ${dark?"rgba(255,255,255,.06)":"rgba(255,255,255,.15)"}`,flexShrink:0,zIndex:100}}>
+      <nav className="main-nav" style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"0 36px",height:60,background:dark?"#060810":scrolled?"rgba(163,88,107,.98)":"rgba(163,88,107,.95)",borderBottom:`1px solid ${dark?"rgba(255,255,255,.06)":"rgba(255,255,255,.12)"}`,flexShrink:0,zIndex:100,transition:"background .3s"}}>
         <button onClick={()=>scrollRef.current?.scrollTo({top:0,behavior:"smooth"})} style={{display:"flex",alignItems:"center",gap:10,background:"none",padding:0}}>
           <div style={{width:30,height:30,borderRadius:8,background:"linear-gradient(135deg,#c47d8e,#8b5e6b)",display:"flex",alignItems:"center",justifyContent:"center"}}><svg width="13" height="13" viewBox="0 0 20 20" fill="none"><path d="M4,16 L4,4 L16,16 L16,4" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
           <span style={{fontSize:17,fontWeight:700,color:t.heroText,letterSpacing:1.5}}>NITRO</span>
@@ -298,7 +298,7 @@ export default function Landing(){
             {["Services","Pricing","FAQ"].map(l=><button key={l} onClick={()=>document.getElementById(l.toLowerCase())?.scrollIntoView({behavior:"smooth"})} style={{background:"none",fontSize:14,color:dark?"rgba(255,255,255,.6)":"rgba(255,255,255,.7)",fontWeight:450}}>{l}</button>)}
           </div>
           <button onClick={toggleTheme} style={{width:44,height:24,borderRadius:12,background:dark?"#c47d8e":"rgba(255,255,255,.15)",position:"relative",transition:"all .3s",flexShrink:0}}><div style={{width:18,height:18,borderRadius:"50%",background:"#fff",position:"absolute",top:3,left:dark?23:3,transition:"left .3s cubic-bezier(.2,.8,.2,1)",boxShadow:"0 1px 4px rgba(0,0,0,.2)"}}/></button>
-          <button onClick={()=>setModal("login")} className="nav-login" style={{padding:"7px 18px",borderRadius:8,background:"transparent",border:`1px solid ${dark?"rgba(255,255,255,.12)":"rgba(255,255,255,.25)"}`,color:t.heroText,fontSize:13,fontWeight:550}}>Log In</button>
+          <button onClick={()=>setModal("login")} className="nav-login" style={{padding:"8px 20px",borderRadius:10,background:"transparent",border:`1px solid ${dark?"rgba(255,255,255,.15)":"rgba(255,255,255,.3)"}`,color:"#fff",fontSize:13,fontWeight:600}}>Log In</button>
         </div>
       </nav>
 
@@ -328,6 +328,7 @@ export default function Landing(){
             {/* RIGHT — Inline auth card (desktop only) */}
             <div className="hero-right">
               <div className="hero-inline-card">
+                <div style={{display:"flex",justifyContent:"center",marginBottom:16}}><div style={{width:36,height:36,borderRadius:10,background:"linear-gradient(135deg,#c47d8e,#8b5e6b)",display:"flex",alignItems:"center",justifyContent:"center"}}><svg width="15" height="15" viewBox="0 0 20 20" fill="none"><path d="M4,16 L4,4 L16,16 L16,4" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/></svg></div></div>
                 <h2 style={{fontSize:22,fontWeight:700,color:t.text,textAlign:"center",marginBottom:3}}>{heroAuth==="login"?"Welcome back":"Create Account"}</h2>
                 <p style={{fontSize:13,color:t.textSoft,textAlign:"center",marginBottom:20,fontWeight:430}}>{heroAuth==="login"?"Log in to your Nitro account":"Join 2,400+ Nigerian creators"}</p>
                 {/* Method toggle */}
