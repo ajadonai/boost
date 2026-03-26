@@ -140,11 +140,13 @@ export default function Landing(){
           </div>
         </nav>
 
-        {/* ═══ ALERTS ═══ */}
-        {siteAlerts.length>0&&siteAlerts.map((a,i)=><div key={i} style={{padding:"10px 24px",textAlign:"center",fontSize:13,fontWeight:500,background:a.type==="warning"?(dark?"rgba(217,119,6,.12)":"#fffbeb"):(dark?"rgba(196,125,142,.08)":"rgba(196,125,142,.04)"),color:a.type==="warning"?(dark?"#fbbf24":"#92400e"):(dark?t.accent:"#9b4d5f"),borderBottom:`1px solid ${t.surfaceBorder}`}}>{a.type==="warning"?"⚠️ ":"🎉 "}{a.message}</div>)}
-
         {/* ━━━ HERO ━━━ */}
         <section id="hero" style={{overflow:"hidden",background:t.heroBg,position:"relative",display:"flex",flexDirection:"column",minHeight:"calc(100dvh - 60px)"}}>
+          {/* Alert banner area — reserved space for up to 2 alerts */}
+          <div style={{minHeight:siteAlerts.length>0?0:0,flexShrink:0}}>
+            {siteAlerts.length>0&&siteAlerts.map((a,i)=><div key={i} style={{padding:"10px 24px",textAlign:"center",fontSize:13,fontWeight:500,background:a.type==="warning"?(dark?"rgba(217,119,6,.15)":"rgba(255,255,255,.15)"):(dark?"rgba(196,125,142,.1)":"rgba(255,255,255,.1)"),color:a.type==="warning"?(dark?"#fbbf24":"#fff"):(dark?t.accent:"rgba(255,255,255,.9)"),borderBottom:`1px solid ${dark?"rgba(255,255,255,.06)":"rgba(255,255,255,.12)"}`,backdropFilter:"blur(8px)"}}>{a.type==="warning"?"⚠️ ":"🎉 "}{a.message}</div>)}
+          </div>
+
           {/* Ambient orbs */}
           <div style={{position:"absolute",inset:0,overflow:"hidden",pointerEvents:"none"}}>
             <div style={{position:"absolute",top:"-8%",left:"25%",width:500,height:400,borderRadius:"50%",background:dark?"rgba(196,125,142,.06)":"rgba(255,255,255,.08)",filter:"blur(100px)",animation:"float1 20s ease-in-out infinite"}}/>
