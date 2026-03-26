@@ -90,37 +90,7 @@ export default function Landing(){
   return(
     <div className="root" suppressHydrationWarning style={{height:"100dvh",overflow:"hidden",display:"flex",flexDirection:"column"}}>
       <style suppressHydrationWarning>{`
-        .root{background:${t.bg};color:${t.text};font-family:'Outfit',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;transition:background .5s ease,color .5s ease}
-        .serif{font-family:'Cormorant Garamond',serif}
-        .m{font-family:'JetBrains Mono',monospace}
-        button{cursor:pointer;font-family:inherit;border:none}input{font-family:inherit}
-        @keyframes fi{from{opacity:0}to{opacity:1}}
-        @keyframes fu{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
-        @keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
-        @keyframes scroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
-        @keyframes shimmer{0%{left:-100%}100%{left:200%}}
-        @keyframes float1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(12px,-8px) scale(1.02)}}
-        @keyframes float2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-10px,12px) scale(1.03)}}
-        .shimmer-btn{position:relative;overflow:hidden;transition:all .3s ease}
-        .shimmer-btn::after{content:'';position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.15),transparent);animation:shimmer 3s ease-in-out infinite}
-        .shimmer-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(196,125,142,.2)}
-        .fu{animation:fu .6s cubic-bezier(.16,1,.3,1) both}
-        .fd1{animation-delay:.08s}.fd2{animation-delay:.16s}.fd3{animation-delay:.24s}.fd4{animation-delay:.32s}.fd5{animation-delay:.4s}
-        .stat-card{transition:transform .2s ease}.stat-card:hover{transform:translateY(-2px)}
-        .hero-split{display:flex;flex-direction:row;align-items:center;justify-content:center;gap:48px;padding:56px 60px 40px;max-width:1200px;margin:0 auto;width:100%;position:relative;z-index:1;flex:1}
-        .hero-left{flex:1;max-width:540;text-align:left;position:relative;z-index:1}
-        .hero-right{width:400px;flex-shrink:0}
-        .hero-mobile-cta{display:none}
-        .hero-view-pricing{display:inline-flex}
-        .carousel-track{display:flex;animation:scroll 40s linear infinite;width:fit-content}
-        .carousel-track:hover{animation-play-state:paused}
-        @media(max-width:1199px){.hero-split{flex-direction:column;gap:0;padding:0 40px;text-align:center;min-height:0!important;flex:1;justify-content:center}.hero-left{text-align:center;max-width:100%;display:flex;flex-direction:column;align-items:center}.hero-right{display:none}.hero-mobile-cta{display:flex!important;justify-content:center;margin-top:24px!important}.hero-view-pricing{display:none!important}.hero-stats{justify-content:center!important;justify-items:center!important;max-width:360px!important;width:100%!important;grid-template-columns:repeat(3,1fr)!important}.stat-card{width:100%!important}.hero-badge{font-size:13px!important;margin-bottom:20px!important}.hero-h1{font-size:52px!important}.hero-refined{font-size:58px!important}.hero-sub{font-size:17px!important;max-width:480px!important;text-align:center!important;margin-bottom:28px!important}}
-        @media(max-width:767px){#hero{height:calc(100dvh - 52px)!important}.hero-split{padding:0 20px;gap:0;min-height:0!important;flex:1;justify-content:center!important}.hero-left{display:flex;flex-direction:column;align-items:center}.hero-stats{grid-template-columns:repeat(3,1fr)!important;gap:10px!important;max-width:100%!important;width:100%!important;margin:0!important}.hero-badge{font-size:12px!important;margin-bottom:16px!important;padding:5px 14px!important}.hero-h1{font-size:38px!important;margin-bottom:14px!important}.hero-refined{font-size:44px!important}.hero-sub{font-size:15px!important;margin-bottom:22px!important;max-width:340px!important;text-align:center!important;line-height:1.55!important}.hero-mobile-cta{margin-top:22px!important}.hero-mobile-cta button{padding:14px 40px!important;font-size:15px!important;border-radius:14px!important}.stat-card{padding:14px 8px!important;border-radius:14px!important;min-width:0!important;width:100%!important}.stat-card .m{font-size:17px!important}.stat-card svg{width:18px!important;height:18px!important}}
-        .nav-links{display:flex}
-        @media(max-width:1199px){.nav-links{display:none!important}.main-nav{padding:0 28px!important}}
-        @media(max-width:767px){.main-nav{padding:0 20px!important;height:52px!important}}
-        @media(max-width:1199px){.auth-card{max-width:420px!important;height:540px!important;padding:24px 26px!important;border-radius:18px!important}.auth-card h2{font-size:20px!important}.auth-card p{font-size:12px!important;margin-bottom:18px!important}.auth-card input{padding:10px 12px!important;font-size:13px!important;border-radius:10px!important;margin-bottom:6px!important}.auth-card button{font-size:13px!important;padding:12px 0!important}.auth-card label{font-size:10px!important;margin-bottom:3px!important}.auth-card .auth-logo{margin-bottom:14px!important}.auth-card .auth-close{width:28px!important;height:28px!important;font-size:14px!important}}
-        @media(max-width:767px){.auth-card{max-width:100%!important;height:520px!important;padding:20px 18px!important;border-radius:16px!important}.auth-card h2{font-size:19px!important}.auth-card p{font-size:11px!important;margin-bottom:12px!important}.auth-card input{padding:9px 12px!important;font-size:13px!important;border-radius:10px!important;margin-bottom:6px!important}.auth-card button{font-size:13px!important;padding:11px 0!important;border-radius:10px!important}.auth-card label{font-size:9px!important;margin-bottom:2px!important}.auth-card .auth-logo{margin-bottom:10px!important}.auth-card .auth-logo>div{width:32px!important;height:32px!important}.auth-card .auth-close{width:26px!important;height:26px!important;font-size:13px!important}}
+        .root{background:${t.bg};color:${t.text};transition:background .5s ease,color .5s ease}
       `}</style>
 
       <div ref={scrollRef} style={{flex:1,overflowY:"auto",overflowX:"hidden",position:"relative"}}>
@@ -141,7 +111,7 @@ export default function Landing(){
         </nav>
 
         {/* ━━━ HERO ━━━ */}
-        <section id="hero" style={{overflow:"hidden",background:t.heroBg,position:"relative",display:"flex",flexDirection:"column",height:"calc(100dvh - 60px)"}}>
+        <section id="hero" style={{overflow:"hidden",background:t.heroBg,position:"relative",display:"flex",flexDirection:"column"}}>
           {/* Alert banner area */}
           <div style={{flexShrink:0}}>
             {siteAlerts.length>0&&siteAlerts.map((a,i)=><div key={i} style={{padding:"10px 24px",textAlign:"center",fontSize:13,fontWeight:500,background:a.type==="warning"?(dark?"rgba(217,119,6,.15)":"rgba(255,255,255,.15)"):(dark?"rgba(196,125,142,.1)":"rgba(255,255,255,.1)"),color:a.type==="warning"?(dark?"#fbbf24":"#fff"):(dark?t.accent:"rgba(255,255,255,.9)"),borderBottom:`1px solid ${dark?"rgba(255,255,255,.06)":"rgba(255,255,255,.12)"}`,backdropFilter:"blur(8px)"}}>{a.type==="warning"?"⚠️ ":"🎉 "}{a.message}</div>)}
@@ -153,7 +123,7 @@ export default function Landing(){
             <div style={{position:"absolute",bottom:"5%",right:"10%",width:250,height:250,borderRadius:"50%",background:dark?"rgba(110,160,230,.04)":"rgba(255,255,255,.06)",filter:"blur(80px)",animation:"float2 25s ease-in-out infinite"}}/>
           </div>
 
-          <div className="hero-split" style={{flex:"1 1 0%",display:"flex",alignItems:"center",justifyContent:"center",minHeight:0}}>
+          <div className="hero-split">
             {/* LEFT */}
             <div className="hero-left">
               <div className="fu hero-badge" style={{display:"inline-flex",alignItems:"center",gap:8,padding:"6px 18px",borderRadius:24,background:t.heroAccentBadge,border:`1px solid ${dark?"rgba(196,125,142,.15)":"rgba(255,255,255,.3)"}`,fontSize:13,fontWeight:550,color:dark?t.accent:"#fff",marginBottom:28,backdropFilter:"blur(8px)"}}>🚀 Trusted by {siteStats.users} creators across Nigeria</div>
