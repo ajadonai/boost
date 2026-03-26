@@ -365,7 +365,7 @@ export default function Dashboard() {
           {/* Avatar */}
           <button className="dash-avatar-btn">
             <div className="dash-avatar" style={{ background: t.accent }}>{initials}</div>
-            <span className="dash-nav-name" style={{ color: t.text }}>{firstName}</span>
+            <span className="dash-nav-name" style={{ color: t.text, textTransform: "uppercase" }}>{firstName}</span>
           </button>
         </div>
       </nav>
@@ -403,7 +403,7 @@ export default function Dashboard() {
 
         {/* ── MAIN ── */}
         <main className="dash-main" style={{ background: t.bg }}>
-          <div className="dash-welcome" style={{ color: t.text }}>Welcome back, {firstName}</div>
+          <div className="dash-welcome" style={{ color: t.text }}>Welcome back, {firstName.toUpperCase()}</div>
           <div className="dash-welcome-sub" style={{ color: t.textMuted }}>Here's what's happening with your account.</div>
 
           {renderPage()}
