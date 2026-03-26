@@ -110,7 +110,12 @@ export default function Landing(){
             <div className="nav-links" style={{gap:24,alignItems:"center",marginRight:8}}>
               {["Services","Pricing","FAQ"].map(l=><button key={l} onClick={()=>document.getElementById(l.toLowerCase())?.scrollIntoView({behavior:"smooth"})} style={{background:"none",fontSize:14,color:dark?"rgba(255,255,255,.6)":"rgba(255,255,255,.7)",fontWeight:450}}>{l}</button>)}
             </div>
-            <button onClick={toggleTheme} style={{width:44,height:24,borderRadius:12,background:dark?"#c47d8e":"rgba(255,255,255,.15)",position:"relative",transition:"all .3s",flexShrink:0}}><div style={{width:18,height:18,borderRadius:"50%",background:"#fff",position:"absolute",top:3,left:dark?23:3,transition:"left .3s cubic-bezier(.2,.8,.2,1)",boxShadow:"0 1px 4px rgba(0,0,0,.2)"}}/></button>
+            <button onClick={toggleTheme} aria-label={dark?"Switch to light":"Switch to dark"} className="theme-toggle" style={{width:52,height:28,borderRadius:14,background:dark?"rgba(99,102,241,.25)":"rgba(255,255,255,.2)",position:"relative",transition:"background .4s ease",flexShrink:0,border:`1px solid ${dark?"rgba(99,102,241,.2)":"rgba(255,255,255,.25)"}`}}>
+              <div style={{width:22,height:22,borderRadius:"50%",background:dark?"#1e1b4b":"#fff",position:"absolute",top:2,left:dark?27:3,transition:"left .4s cubic-bezier(.34,1.56,.64,1), background .4s ease",boxShadow:dark?"0 0 8px rgba(99,102,241,.3)":"0 1px 6px rgba(0,0,0,.15)",display:"flex",alignItems:"center",justifyContent:"center"}}>
+                {dark?<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#a5b4fc" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+                :<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>}
+              </div>
+            </button>
             <button onClick={()=>setModal("login")} style={{padding:"8px 20px",borderRadius:10,background:"transparent",border:`1px solid ${dark?"rgba(255,255,255,.15)":"rgba(255,255,255,.3)"}`,color:"#fff",fontSize:13,fontWeight:600}}>Log In</button>
           </div>
         </nav>
