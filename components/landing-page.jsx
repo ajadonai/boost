@@ -289,9 +289,44 @@ export default function Landing(){
           </div>
         </section>
 
-        {/* ━━━ TESTIMONIALS ━━━ */}
-        <section id="testimonials" style={{minHeight:"100dvh",display:"flex",alignItems:"center",justifyContent:"center",background:t.bg}}>
-          <div style={{textAlign:"center",color:t.textMuted,fontSize:16,fontWeight:450}}>Testimonials — awaiting mockup</div>
+        {/* ━━━ SECTION 4: TESTIMONIALS ━━━ */}
+        <section id="testimonials" className="s4" style={{background:t.bg}}>
+          <div className="s4-header">
+            <div className="m s4-label" style={{color:t.accent}}>Testimonials</div>
+            <h2 className="s4-heading" style={{color:t.text}}>What Our <span className="serif s4-heading-accent" style={{color:t.accent}}>Users</span> Say</h2>
+            <p className="s4-desc" style={{color:t.textSoft}}>Real reviews from real Nigerian creators and businesses.</p>
+          </div>
+
+          {/* Desktop/Tablet grid */}
+          <div className="s4-grid">
+            {[["Chioma A.","Fashion Brand Owner","I was skeptical at first, but Nitro delivered 5K followers to my business page in under 2 hours. My engagement actually went up.",5,"CA","#c47d8e"],["Tunde M.","Music Producer","Been using Nitro for 3 months to boost my YouTube views. The pricing is unbeatable and delivery is always instant.",5,"TM","#e0a458"],["Amara O.","Content Creator","The 24/7 support is what keeps me here. I had an issue at 2AM and someone responded within minutes.",5,"AO","#6ee7b7"],["Emeka N.","Digital Marketer","I manage social media for 12 clients. Nitro's bulk pricing saves me at least ₦50K monthly.",4,"EN","#a5b4fc"],["Blessing I.","Beauty Influencer","Started with ₦500 just to test. Now I deposit ₦20K monthly. My TikTok grew from 2K to 45K in 4 months.",5,"BI","#f472b6"],["Kola D.","E-commerce Seller","Fastest delivery I've seen from any Nigerian SMM panel. Instagram likes come through in literally seconds.",5,"KD","#fbbf24"]].map(([name,role,text,rating,avatar,color],i)=>(
+              <div key={i} className="s4-card" style={{background:dark?"rgba(255,255,255,.05)":"rgba(255,255,255,.85)",border:`1px solid ${dark?"rgba(255,255,255,.1)":"rgba(0,0,0,.1)"}`}}>
+                <div className="s4-stars">{Array(5).fill(0).map((_,j)=><svg key={j} width="14" height="14" viewBox="0 0 24 24" fill={j<rating?"#fbbf24":"none"} stroke="#fbbf24" strokeWidth="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>)}</div>
+                <p className="s4-text" style={{color:dark?"#c0bdb8":"#444"}}>"{text}"</p>
+                <div className="s4-author" style={{borderTop:`1px solid ${dark?"rgba(255,255,255,.08)":"rgba(0,0,0,.08)"}`}}>
+                  <div className="s4-avatar" style={{background:color}}>{avatar}</div>
+                  <div><div className="s4-name" style={{color:t.text}}>{name}</div><div className="s4-role" style={{color:t.textMuted}}>{role}</div></div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Mobile horizontal scroll */}
+          <div className="s4-scroll">
+            {[["Chioma A.","Fashion Brand Owner","Nitro delivered 5K followers in under 2 hours. My engagement actually went up.",5,"CA","#c47d8e"],["Tunde M.","Music Producer","3 months boosting YouTube views. Pricing is unbeatable, delivery always instant.",5,"TM","#e0a458"],["Amara O.","Content Creator","24/7 support — had an issue at 2AM, someone responded within minutes.",5,"AO","#6ee7b7"],["Emeka N.","Digital Marketer","Managing 12 clients. Nitro saves me ₦50K monthly with bulk pricing.",4,"EN","#a5b4fc"],["Blessing I.","Beauty Influencer","Started with ₦500. TikTok grew from 2K to 45K in 4 months.",5,"BI","#f472b6"],["Kola D.","E-commerce Seller","Fastest Nigerian SMM panel. Instagram likes in literally seconds.",5,"KD","#fbbf24"]].map(([name,role,text,rating,avatar,color],i)=>(
+              <div key={i} className="s4-scroll-card" style={{background:dark?"rgba(255,255,255,.05)":"rgba(255,255,255,.85)",border:`1px solid ${dark?"rgba(255,255,255,.1)":"rgba(0,0,0,.1)"}`}}>
+                <div className="s4-stars">{Array(5).fill(0).map((_,j)=><svg key={j} width="12" height="12" viewBox="0 0 24 24" fill={j<rating?"#fbbf24":"none"} stroke="#fbbf24" strokeWidth="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>)}</div>
+                <p className="s4-scroll-text" style={{color:dark?"#c0bdb8":"#444"}}>"{text}"</p>
+                <div className="s4-author s4-author-sm" style={{borderTop:`1px solid ${dark?"rgba(255,255,255,.08)":"rgba(0,0,0,.08)"}`}}>
+                  <div className="s4-avatar s4-avatar-sm" style={{background:color}}>{avatar}</div>
+                  <div><div className="s4-name s4-name-sm" style={{color:t.text}}>{name}</div><div className="s4-role" style={{color:t.textMuted}}>{role}</div></div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="s4-dots">
+            {Array(6).fill(0).map((_,i)=><div key={i} className="s4-dot" style={{background:i===0?t.accent:t.textMuted}}/>)}
+          </div>
         </section>
 
         {/* ━━━ FAQ ━━━ */}
