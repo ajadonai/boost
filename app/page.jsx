@@ -1,6 +1,5 @@
 'use client';
-import dynamic from 'next/dynamic';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 
 function LoadingScreen() {
   const [dark, setDark] = useState(false);
@@ -12,6 +11,7 @@ function LoadingScreen() {
       else { const h = new Date().getHours(), m = new Date().getMinutes(); setDark(h >= 19 || h < 6 || (h === 6 && m < 30) || (h === 18 && m >= 30)); }
     } catch { const h = new Date().getHours(); setDark(h >= 19 || h < 6); }
   }, []);
+
   const bg = dark ? "#060810" : "#f4f1ed";
   const accent = "#c47d8e";
   const glow = dark ? "rgba(196,125,142,.25)" : "rgba(196,125,142,.2)";
@@ -34,43 +34,93 @@ function LoadingScreen() {
         @keyframes float2{0%,100%{transform:translate(0,0)}50%{transform:translate(-10px,12px)}}
         @keyframes float3{0%,100%{transform:translate(0,0)}50%{transform:translate(8px,12px)}}
         @keyframes dotPulse{0%,80%,100%{opacity:.3}40%{opacity:1}}
-        @keyframes progressFill{0%{width:0}100%{width:85%}}
+        @keyframes progressFill{0%{width:0}100%{width:90%}}
+        .ld-logo{width:64px;height:64px;border-radius:18px}
+        .ld-title{font-size:20px}
+        .ld-sub{font-size:12px;margin-bottom:40px}
+        .ld-bar{width:200px;height:3px}
+        .ld-r1{width:160px;height:160px}
+        .ld-r2{width:220px;height:220px}
+        .ld-r3{width:280px;height:280px}
+        .ld-o1{width:300px;height:300px}
+        .ld-o2{width:250px;height:250px}
+        .ld-dot{width:4px;height:4px}
+        .ld-svg{width:28px;height:28px}
+        @media(min-width:768px){
+          .ld-logo{width:80px;height:80px;border-radius:22px}
+          .ld-title{font-size:24px}
+          .ld-sub{font-size:14px;margin-bottom:48px}
+          .ld-bar{width:260px;height:3px}
+          .ld-r1{width:200px;height:200px}
+          .ld-r2{width:280px;height:280px}
+          .ld-r3{width:360px;height:360px}
+          .ld-o1{width:400px;height:400px}
+          .ld-o2{width:320px;height:320px}
+          .ld-dot{width:5px;height:5px}
+          .ld-svg{width:34px;height:34px}
+        }
+        @media(min-width:1200px){
+          .ld-logo{width:88px;height:88px;border-radius:24px}
+          .ld-title{font-size:28px}
+          .ld-sub{font-size:15px;margin-bottom:56px}
+          .ld-bar{width:300px;height:4px}
+          .ld-r1{width:240px;height:240px}
+          .ld-r2{width:340px;height:340px}
+          .ld-r3{width:440px;height:440px}
+          .ld-o1{width:500px;height:500px}
+          .ld-o2{width:400px;height:400px}
+          .ld-dot{width:5px;height:5px}
+          .ld-svg{width:38px;height:38px}
+        }
       `}</style>
 
       {/* Ambient orbs */}
-      <div style={{position:"absolute",top:"15%",left:"-10%",width:300,height:300,borderRadius:"50%",background:orbA,filter:"blur(80px)",animation:"float1 20s ease-in-out infinite",pointerEvents:"none"}}/>
-      <div style={{position:"absolute",bottom:"10%",right:"-15%",width:250,height:250,borderRadius:"50%",background:orbB,filter:"blur(70px)",animation:"float2 25s ease-in-out infinite",pointerEvents:"none"}}/>
+      <div className="ld-o1" style={{position:"absolute",top:"15%",left:"-10%",borderRadius:"50%",background:orbA,filter:"blur(80px)",animation:"float1 20s ease-in-out infinite",pointerEvents:"none"}}/>
+      <div className="ld-o2" style={{position:"absolute",bottom:"10%",right:"-15%",borderRadius:"50%",background:orbB,filter:"blur(70px)",animation:"float2 25s ease-in-out infinite",pointerEvents:"none"}}/>
 
       {/* Particles */}
-      {[["20%","75%",3,0],["45%","15%",4,1],["70%","80%",3,.5],["80%","25%",4,1.5]].map(([t2,l,s,d],i)=>(
+      {[["20%","75%",3,0],["45%","15%",4,1],["70%","80%",3,.5],["80%","25%",4,1.5],["10%","50%",3,2],["60%","40%",4,.3]].map(([t2,l,s,d],i)=>(
         <div key={i} style={{position:"absolute",top:t2,left:l,width:s,height:s,borderRadius:"50%",background:particle,animation:`float3 ${3.5+i}s ease-in-out infinite ${d}s`,pointerEvents:"none"}}/>
       ))}
 
       {/* Pulse rings */}
-      <div style={{position:"absolute",width:160,height:160,borderRadius:"50%",border:`1px solid ${ring}`,animation:"pulse-ring 3s ease-in-out infinite",pointerEvents:"none"}}/>
-      <div style={{position:"absolute",width:220,height:220,borderRadius:"50%",border:`1px solid ${ring2}`,animation:"pulse-ring 3s ease-in-out infinite .5s",pointerEvents:"none"}}/>
-      <div style={{position:"absolute",width:280,height:280,borderRadius:"50%",border:`1px solid ${ring3}`,animation:"pulse-ring 3s ease-in-out infinite 1s",pointerEvents:"none"}}/>
+      <div className="ld-r1" style={{position:"absolute",borderRadius:"50%",border:`1px solid ${ring}`,animation:"pulse-ring 3s ease-in-out infinite",pointerEvents:"none"}}/>
+      <div className="ld-r2" style={{position:"absolute",borderRadius:"50%",border:`1px solid ${ring2}`,animation:"pulse-ring 3s ease-in-out infinite .5s",pointerEvents:"none"}}/>
+      <div className="ld-r3" style={{position:"absolute",borderRadius:"50%",border:`1px solid ${ring3}`,animation:"pulse-ring 3s ease-in-out infinite 1s",pointerEvents:"none"}}/>
 
       {/* Content */}
       <div style={{position:"relative",zIndex:1,display:"flex",flexDirection:"column",alignItems:"center"}}>
-        <div style={{width:64,height:64,borderRadius:18,background:"linear-gradient(135deg,#c47d8e,#8b5e6b)",display:"flex",alignItems:"center",justifyContent:"center",boxShadow:`0 12px 40px ${glow}`,animation:"breathe 4s ease-in-out infinite",marginBottom:24}}>
-          <svg width="28" height="28" viewBox="0 0 20 20" fill="none"><path d="M4,16 L4,4 L16,16 L16,4" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+        <div className="ld-logo" style={{background:"linear-gradient(135deg,#c47d8e,#8b5e6b)",display:"flex",alignItems:"center",justifyContent:"center",boxShadow:`0 12px 40px ${glow}`,animation:"breathe 4s ease-in-out infinite",marginBottom:24}}>
+          <svg className="ld-svg" viewBox="0 0 20 20" fill="none"><path d="M4,16 L4,4 L16,16 L16,4" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
         </div>
-        <span style={{fontSize:20,fontWeight:800,color:text,letterSpacing:3,marginBottom:6}}>NITRO</span>
-        <span style={{fontSize:12,fontWeight:400,color:muted,letterSpacing:1,marginBottom:40}}>Loading your experience</span>
-        <div style={{width:200,height:3,borderRadius:2,background:track,overflow:"hidden",position:"relative",marginBottom:12}}>
-          <div style={{width:"85%",height:"100%",borderRadius:2,background:`linear-gradient(90deg,${accent},#a3586b)`,animation:"progressFill 2s ease-out forwards",boxShadow:`0 0 8px ${dark?"rgba(196,125,142,.3)":"rgba(196,125,142,.2)"}`}}/>
+        <span className="ld-title" style={{fontWeight:800,color:text,letterSpacing:3,marginBottom:6}}>NITRO</span>
+        <span className="ld-sub" style={{fontWeight:400,color:muted,letterSpacing:1}}>Loading your experience</span>
+        <div className="ld-bar" style={{borderRadius:2,background:track,overflow:"hidden",position:"relative",marginBottom:12}}>
+          <div style={{width:"90%",height:"100%",borderRadius:2,background:`linear-gradient(90deg,${accent},#a3586b)`,animation:"progressFill 1.5s ease-out forwards",boxShadow:`0 0 8px ${dark?"rgba(196,125,142,.3)":"rgba(196,125,142,.2)"}`}}/>
         </div>
         <div style={{display:"flex",gap:4,marginTop:4}}>
-          {[0,1,2].map(i=><div key={i} style={{width:4,height:4,borderRadius:"50%",background:accent,animation:`dotPulse 1.4s ease-in-out infinite ${i*.2}s`}}/>)}
+          {[0,1,2].map(i=><div key={i} className="ld-dot" style={{borderRadius:"50%",background:accent,animation:`dotPulse 1.4s ease-in-out infinite ${i*.2}s`}}/>)}
         </div>
       </div>
     </div>
   );
 }
 
-const Landing = dynamic(() => import('@/components/landing-page'), { ssr: false, loading: () => <LoadingScreen /> });
-
 export default function HomePage() {
+  const [ready, setReady] = useState(false);
+  const [minWait, setMinWait] = useState(false);
+  const LandingRef = useRef(null);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setMinWait(true), 1500);
+    import('@/components/landing-page').then(mod => {
+      LandingRef.current = mod.default;
+      setReady(true);
+    });
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (!ready || !minWait || !LandingRef.current) return <LoadingScreen />;
+  const Landing = LandingRef.current;
   return <Landing />;
 }
