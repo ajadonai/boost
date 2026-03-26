@@ -195,7 +195,7 @@ input { font-family: inherit; }
 /* ══════════════════════════════════════ */
 /* ══ SECTION 4: TESTIMONIALS ══ */
 /* ══════════════════════════════════════ */
-.s4 { padding: 80px 60px; max-width: 1200px; margin: 0 auto; }
+.s4 { padding: 80px 60px; max-width: 1200px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; justify-content: center; }
 .s4-header { text-align: center; margin-bottom: 48px; }
 .s4-label { font-size: 10px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 12px; }
 .s4-heading { font-size: 36px; font-weight: 700; margin-bottom: 8px; }
@@ -232,6 +232,7 @@ input { font-family: inherit; }
 /* ══════════════════════════════════════ */
 /* ══ SECTION 6: CTA + FOOTER ══ */
 /* ══════════════════════════════════════ */
+.s6-wrapper { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; }
 .s6-cta-wrapper { padding: 32px 60px 0; }
 .s6-cta { border-radius: 32px; padding: 80px 72px; text-align: center; position: relative; overflow: hidden; }
 .s6-ring { position: absolute; top: -100px; right: -80px; width: 320px; height: 320px; border-radius: 50%; animation: spin-slow 40s linear infinite; pointer-events: none; }

@@ -366,8 +366,9 @@ export default function Landing(){
 
         <div className="section-divider" style={{background:t.bg}}><div className="section-divider-line" style={{background:`linear-gradient(90deg,transparent,${dark?"rgba(196,125,142,.2)":"rgba(196,125,142,.15)"},transparent)`}}/><div className="section-divider-dot" style={{background:t.accent}}/><div className="section-divider-line" style={{background:`linear-gradient(90deg,transparent,${dark?"rgba(196,125,142,.2)":"rgba(196,125,142,.15)"},transparent)`}}/></div>
 
+        <div className="s6-wrapper snap-section" style={{background:t.bgAlt}}>
         {/* ━━━ SECTION 6: CTA + FOOTER ━━━ */}
-        <div className="s6-cta-wrapper snap-section" style={{background:t.bgAlt}}>
+        <div className="s6-cta-wrapper">
           <div className="s6-cta" style={{background:dark?"linear-gradient(145deg,#1a0e14 0%,#2d1520 30%,#1e0f18 60%,#0f0a12 100%)":"linear-gradient(145deg,#c47d8e 0%,#a3586b 35%,#8b4a5e 65%,#6b3a4a 100%)",border:dark?"1px solid rgba(196,125,142,.12)":"none"}}>
             {/* Spinning ring */}
             <div className="s6-ring" style={{border:`1px solid ${dark?"rgba(196,125,142,.1)":"rgba(255,255,255,.12)"}`}}><div className="s6-ring-inner" style={{border:`1px solid ${dark?"rgba(196,125,142,.06)":"rgba(255,255,255,.08)"}`}}/></div>
@@ -428,6 +429,7 @@ export default function Landing(){
             </div>
           </div>
         </footer>
+        </div>{/* end s6-wrapper */}
 
       </div>
 
