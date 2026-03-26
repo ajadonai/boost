@@ -142,8 +142,8 @@ export default function Landing(){
 
         {/* ━━━ HERO ━━━ */}
         <section id="hero" style={{overflow:"hidden",background:t.heroBg,position:"relative",display:"flex",flexDirection:"column",minHeight:"calc(100dvh - 60px)"}}>
-          {/* Alert banner area — reserved space for up to 2 alerts */}
-          <div style={{minHeight:siteAlerts.length>0?0:0,flexShrink:0}}>
+          {/* Alert banner area */}
+          <div style={{flexShrink:0}}>
             {siteAlerts.length>0&&siteAlerts.map((a,i)=><div key={i} style={{padding:"10px 24px",textAlign:"center",fontSize:13,fontWeight:500,background:a.type==="warning"?(dark?"rgba(217,119,6,.15)":"rgba(255,255,255,.15)"):(dark?"rgba(196,125,142,.1)":"rgba(255,255,255,.1)"),color:a.type==="warning"?(dark?"#fbbf24":"#fff"):(dark?t.accent:"rgba(255,255,255,.9)"),borderBottom:`1px solid ${dark?"rgba(255,255,255,.06)":"rgba(255,255,255,.12)"}`,backdropFilter:"blur(8px)"}}>{a.type==="warning"?"⚠️ ":"🎉 "}{a.message}</div>)}
           </div>
 
@@ -153,7 +153,7 @@ export default function Landing(){
             <div style={{position:"absolute",bottom:"5%",right:"10%",width:250,height:250,borderRadius:"50%",background:dark?"rgba(110,160,230,.04)":"rgba(255,255,255,.06)",filter:"blur(80px)",animation:"float2 25s ease-in-out infinite"}}/>
           </div>
 
-          <div className="hero-split" style={{flex:1}}>
+          <div className="hero-split" style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center"}}>
             {/* LEFT */}
             <div className="hero-left">
               <div className="fu hero-badge" style={{display:"inline-flex",alignItems:"center",gap:8,padding:"6px 18px",borderRadius:24,background:t.heroAccentBadge,border:`1px solid ${dark?"rgba(196,125,142,.15)":"rgba(255,255,255,.3)"}`,fontSize:13,fontWeight:550,color:dark?t.accent:"#fff",marginBottom:28,backdropFilter:"blur(8px)"}}>🚀 Trusted by {siteStats.users} creators across Nigeria</div>
