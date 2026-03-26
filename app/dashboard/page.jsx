@@ -1,23 +1,26 @@
-export const dynamic = 'force-dynamic';
+'use client';
+import { useEffect, useState, useRef } from 'react';
+import LoadingScreen from '@/components/loading-screen';
 
-export const metadata = {
-  title: 'Dashboard — Nitro',
-};
+export default function DashboardPage() {
+  const [ready, setReady] = useState(false);
+  const [minWait, setMinWait] = useState(false);
+  const PanelRef = useRef(null);
 
-import SMMPanel from '@/components/smm-panel';
-import { headers } from 'next/headers';
+  useEffect(() => {
+    // Back-button auth check
+    if (window.performance && window.performance.navigation.type === 2) {
+      fetch('/api/auth/me').then(r => { if (r.status === 401) window.location.replace('/?logout=1'); });
+    }
+    const timer = setTimeout(() => setMinWait(true), 500);
+    import('@/components/smm-panel').then(mod => {
+      PanelRef.current = mod.default;
+      setReady(true);
+    });
+    return () => clearTimeout(timer);
+  }, []);
 
-export default async function DashboardPage() {
-  const h = await headers();
-  // Prevent browser from caching this page (back button after logout fix)
-  return (
-    <>
-      <script dangerouslySetInnerHTML={{ __html: `
-        if (window.performance && window.performance.navigation.type === 2) {
-          fetch('/api/auth/me').then(r => { if (r.status === 401) window.location.href = '/?logout=1'; });
-        }
-      `}} />
-      <SMMPanel />
-    </>
-  );
+  if (!ready || !minWait || !PanelRef.current) return <LoadingScreen />;
+  const SMMPanel = PanelRef.current;
+  return <SMMPanel />;
 }
