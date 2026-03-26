@@ -199,6 +199,22 @@ input { font-family: inherit; }
 .s4-dots { display: none; }
 
 /* ══════════════════════════════════════ */
+/* ══ SECTION 5: FAQ ══ */
+/* ══════════════════════════════════════ */
+.s5 { padding: 80px 60px; max-width: 1200px; margin: 0 auto; }
+.s5-header { text-align: center; margin-bottom: 48px; }
+.s5-label { font-size: 10px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 12px; }
+.s5-heading { font-size: 36px; font-weight: 700; margin-bottom: 8px; }
+.s5-heading-accent { font-style: italic; font-weight: 400; font-size: 40px; }
+.s5-desc { font-size: 15px; max-width: 480px; margin: 0 auto; line-height: 1.6; }
+.s5-list { max-width: 720px; margin: 0 auto; }
+.s5-question { width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 20px 0; background: transparent; text-align: left; }
+.s5-q-text { font-size: 16px; font-weight: 600; padding-right: 16px; transition: color .3s; }
+.s5-chevron { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background .3s; }
+.s5-answer { overflow: hidden; transition: max-height .4s cubic-bezier(.4,0,.2,1), opacity .3s ease; }
+.s5-a-text { font-size: 14px; line-height: 1.7; padding-bottom: 20px; max-width: 640px; }
+
+/* ══════════════════════════════════════ */
 /* ══ TABLET (max-width: 1199px) ══ */
 /* ══════════════════════════════════════ */
 @media (max-width: 1199px) {
@@ -290,6 +306,16 @@ input { font-family: inherit; }
   .s4-avatar { width: 32px; height: 32px; border-radius: 8px; font-size: 11px; }
   .s4-name { font-size: 12px; }
   .s4-role { font-size: 10px; }
+  /* Section 5 tablet */
+  .s5 { padding: 56px 40px; }
+  .s5-header { margin-bottom: 36px; }
+  .s5-heading { font-size: 32px; }
+  .s5-heading-accent { font-size: 36px; }
+  .s5-desc { font-size: 14px; max-width: 400px; }
+  .s5-question { padding: 18px 0; }
+  .s5-q-text { font-size: 15px; }
+  .s5-chevron { width: 24px; height: 24px; }
+  .s5-a-text { font-size: 13px; padding-bottom: 18px; }
 }
 
 /* ══════════════════════════════════════ */
@@ -425,4 +451,15 @@ input { font-family: inherit; }
     border-radius: 50%;
     opacity: 0.6;
   }
+  /* Section 5 mobile */
+  .s5 { padding: 40px 20px; }
+  .s5-header { margin-bottom: 24px; }
+  .s5-label { font-size: 9px; margin-bottom: 10px; }
+  .s5-heading { font-size: 26px; margin-bottom: 4px; }
+  .s5-heading-accent { font-size: 30px; }
+  .s5-desc { font-size: 13px; max-width: 300px; }
+  .s5-question { padding: 16px 0; }
+  .s5-q-text { font-size: 14px; }
+  .s5-chevron { width: 24px; height: 24px; }
+  .s5-a-text { font-size: 13px; line-height: 1.6; padding-bottom: 16px; }
 }
