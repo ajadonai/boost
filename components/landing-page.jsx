@@ -177,7 +177,8 @@ export default function Landing(){
           .tc{padding:20px 18px!important;border-radius:18px!important}
         }
 
-        .faq-sec{overflow:hidden}
+        .faq-sec{overflow:hidden;justify-content:flex-start;padding:60px 0}
+        .faq-mobile-note{display:none;margin-top:20px;text-align:center;font-size:12px;color:${t.textMuted};font-weight:430}
         .faq-content{max-width:760px;margin:0 auto;width:100%;padding:0 48px}
         .faq-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:40px}
         .faq-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:3px;color:${t.accent};margin-bottom:8px}
@@ -208,7 +209,9 @@ export default function Landing(){
           .faq-aside{display:none}
           .faq-label{font-size:9px;letter-spacing:2.5px}
           .faq-title{font-size:26px}
+          .faq-title br{display:none}
           .faq-title-accent{font-size:30px}
+          .faq-mobile-note{display:block}
           .faq-list{gap:8px}
           .faq-q{padding:18px 18px}
           .faq-q-inner{gap:12px}
@@ -392,10 +395,9 @@ export default function Landing(){
             <div className="faq-list">
               {[["How does Nitro work?","Sign up free, add funds via Paystack, choose a service, paste your link, and order. Delivery starts within minutes and you can track progress in real-time from your dashboard."],["Is it safe to use?","Absolutely. We never ask for your passwords or login credentials. All services are delivered using your public profile URL only. Your accounts remain completely secure."],["How do I pay?","We accept Nigerian Naira payments via Paystack — debit cards, bank transfer, and USSD. Minimum deposit is ₦500 and funds are added to your wallet instantly."],["Will my followers drop?","Some natural fluctuation may occur. Services marked with refill guarantee will automatically replenish any drops within the guarantee period at no extra cost."],["Can I earn money with Nitro?","Yes! Every account gets a unique referral link. Share it and earn 5% commission on every order your referrals make — credited to your wallet automatically, forever."],["How fast is delivery?","Most services start delivering within minutes of placing your order. Typical completion time is 0-24 hours depending on the service type and quantity ordered."]].map(([q,a],i)=>{const isOpen=faqOpen===i;return <div key={i} className={`faq-item ${isOpen?"faq-open":""}`}><button onClick={()=>setFaqOpen(isOpen?null:i)} className="faq-q"><div className="faq-q-inner"><span className="m faq-num">{"0"+(i+1)}</span><span className="faq-q-text">{q}</span></div><div className={`faq-toggle ${isOpen?"faq-toggle-open":""}`}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={isOpen?"#fff":t.textMuted} strokeWidth="2" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div></button><div className="faq-a-wrap" style={{maxHeight:isOpen?300:0}}><div className="faq-a"><div style={{paddingTop:16}}>{a}</div></div></div></div>})}
             </div>
+            <p className="faq-mobile-note">Need more help? Contact our support team.</p>
           </div>
         </section>
-
-        {/* ━━━ SCREEN 6: CTA + FOOTER ━━━ */}
         <section id="cta" className="sec" style={{background:dark?"rgba(255,255,255,.015)":"rgba(0,0,0,.012)"}}>
           <div style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center",padding:"40px"}}>
             <div style={{textAlign:"center",maxWidth:600,margin:"0 auto",padding:"60px 40px",borderRadius:24,background:t.surface,border:`1px solid ${t.surfaceBorder}`,backdropFilter:"blur(12px)",boxShadow:dark?"0 8px 32px rgba(0,0,0,.2)":"0 8px 32px rgba(0,0,0,.04)"}}>
