@@ -232,17 +232,17 @@ export default function Landing(){
         .cta-note{margin-top:18px;font-size:12px;color:${t.textMuted};font-weight:430}
         .footer-wrap{border-top:1px solid ${t.surfaceBorder};background:${dark?"rgba(9,12,21,.6)":"rgba(0,0,0,.02)"};transition:all .5s}
         .footer-inner{max-width:1100px;margin:0 auto;padding:48px 24px 20px}
-        .footer-top{display:flex;justify-content:space-between;flex-wrap:wrap;gap:40;margin-bottom:40}
+        .footer-top{display:flex;justify-content:space-between;flex-wrap:wrap;gap:40px;margin-bottom:40px}
         .footer-brand{max-width:280px}
         .footer-brand-desc{font-size:13px;color:${t.textSoft};line-height:1.7;font-weight:430}
-        .footer-links{display:flex;gap:48;flex-wrap:wrap}
+        .footer-links{display:flex;gap:48px;flex-wrap:wrap}
         .footer-col-title{font-size:11px;font-weight:600;color:${t.textMuted};text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px}
         .footer-link{display:block;font-size:13px;color:${t.textSoft};text-decoration:none;margin-bottom:8px;transition:color .2s}
         .footer-divider{height:1px;background:${t.surfaceBorder};margin-bottom:20px;transition:background .5s}
-        .footer-bottom{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12}
+        .footer-bottom{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
         .footer-copy{font-size:12px;color:${t.textMuted}}
-        .footer-social{display:flex;gap:16}
-        .footer-social a{color:${t.textSoft};display:flex;align-items:center;gap:6;font-size:12px;text-decoration:none;transition:color .2s}
+        .footer-social{display:flex;gap:16px}
+        .footer-social a{color:${t.textSoft};display:flex;align-items:center;gap:6px;font-size:12px;text-decoration:none;transition:color .2s}
         @media(max-width:1024px){
           .cta-sec{padding:70px 40px 60px}
           .cta-title{font-size:38px}
@@ -259,9 +259,9 @@ export default function Landing(){
           .cta-btn{padding:14px 40px;font-size:15px;border-radius:12px}
           .cta-note{margin-top:14px}
           .footer-inner{padding:36px 20px 16px}
-          .footer-top{gap:32;margin-bottom:32;flex-direction:column}
+          .footer-top{gap:32px;margin-bottom:32px;flex-direction:column}
           .footer-brand{max-width:100%}
-          .footer-links{gap:32}
+          .footer-links{gap:32px}
           .footer-bottom{flex-direction:column}
           .footer-social-label{display:none}
         }
