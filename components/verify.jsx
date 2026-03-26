@@ -1,13 +1,13 @@
 'use client';
-// N-mark logo inline
 import { useState, useEffect, useRef } from "react";
 
 export default function VerifyAccount(){
-  const getAuto=()=>{const h=new Date().getHours();if(h>=7&&h<18)return false;return true;};
+  const getAuto=()=>{const h=new Date().getHours();return h>=7&&h<18?false:true;};
   const [dark,setDark]=useState(getAuto);
   const [mo,setMo]=useState(false);
   const toggleTheme=()=>{setMo(true);setDark(d=>!d);};
   useEffect(()=>{if(mo)return;const iv=setInterval(()=>setDark(getAuto()),60000);return()=>clearInterval(iv);},[mo]);
+
   const [code,setCode]=useState(["","","","","",""]);
   const [verifying,setVerifying]=useState(false);
   const [error,setError]=useState("");
@@ -16,20 +16,8 @@ export default function VerifyAccount(){
   const [userEmail,setUserEmail]=useState("");
   const inputs=useRef([]);
 
-  // Fetch user email on mount
-  useEffect(()=>{
-    fetch("/api/auth/me").then(r=>r.json()).then(d=>{
-      if(d.user?.email)setUserEmail(d.user.email);
-    }).catch(()=>{});
-  },[]);
-
-  // Countdown timer for resend
-  useEffect(()=>{
-    if(resendTimer<=0)return;
-    const iv=setInterval(()=>setResendTimer(p=>p-1),1000);
-    return()=>clearInterval(iv);
-  },[resendTimer]);
-
+  useEffect(()=>{fetch("/api/auth/me").then(r=>r.json()).then(d=>{if(d.user?.email)setUserEmail(d.user.email);}).catch(()=>{});},[]);
+  useEffect(()=>{if(resendTimer<=0)return;const iv=setInterval(()=>setResendTimer(p=>p-1),1000);return()=>clearInterval(iv);},[resendTimer]);
 
   const submitCode=async(codeStr)=>{
     setVerifying(true);setError("");
@@ -40,166 +28,126 @@ export default function VerifyAccount(){
       setVerified(true);
     }catch{setError("Something went wrong. Please try again.");setVerifying(false);}
   };
+
   const resendCode=async()=>{
     setResendTimer(60);
-    try{
-      const res=await fetch("/api/auth/verify",{method:"PUT"});
-      const data=await res.json();
-      if(!res.ok)setError(data.error||"Failed to resend");
-    }catch{setError("Failed to resend code");}
+    try{const res=await fetch("/api/auth/verify",{method:"PUT"});const data=await res.json();if(!res.ok)setError(data.error||"Failed to resend");}catch{setError("Failed to resend code");}
   };
+
   const handleChange=(i,val)=>{
-    if(!/^\d*$/.test(val))return; // digits only
-    const next=[...code];
-    next[i]=val.slice(-1); // single digit
-    setCode(next);
-    setError("");
+    if(!/^\d*$/.test(val))return;
+    const next=[...code];next[i]=val.slice(-1);setCode(next);setError("");
     if(val&&i<5)inputs.current[i+1]?.focus();
-    // Auto-submit when all 6 filled
-    if(next.every(d=>d)&&next.join("").length===6){
-      setVerifying(true);
-      submitCode(next.join(""));
-    }
+    if(next.every(d=>d)&&next.join("").length===6){setVerifying(true);submitCode(next.join(""));}
   };
-
-  const handleKeyDown=(i,e)=>{
-    if(e.key==="Backspace"&&!code[i]&&i>0){inputs.current[i-1]?.focus();}
-  };
-
+  const handleKeyDown=(i,e)=>{if(e.key==="Backspace"&&!code[i]&&i>0)inputs.current[i-1]?.focus();};
   const handlePaste=(e)=>{
-    e.preventDefault();
-    const pasted=e.clipboardData.getData("text").replace(/\D/g,"").slice(0,6);
-    if(pasted.length===0)return;
-    const next=[...code];
-    for(let i=0;i<6;i++)next[i]=pasted[i]||"";
-    setCode(next);
-    const focusIdx=Math.min(pasted.length,5);
-    inputs.current[focusIdx]?.focus();
-    if(next.every(d=>d)){
-      setVerifying(true);
-      submitCode(next.join(""));
-    }
+    e.preventDefault();const pasted=e.clipboardData.getData("text").replace(/\D/g,"").slice(0,6);
+    if(!pasted.length)return;const next=[...code];for(let i=0;i<6;i++)next[i]=pasted[i]||"";
+    setCode(next);inputs.current[Math.min(pasted.length,5)]?.focus();
+    if(next.every(d=>d)){setVerifying(true);submitCode(next.join(""));}
   };
-
-  const resend=()=>{if(resendTimer<=0){setResendTimer(60);setError("");setCode(["","","","","",""]);inputs.current[0]?.focus();}};
+  const resend=()=>{if(resendTimer<=0){resendCode();setError("");setCode(["","","","","",""]);inputs.current[0]?.focus();}};
 
   const t={
-    bg:dark?"#080b14":"#f4f1ed",text:dark?"#e8e4df":"#1a1a1a",textSoft:dark?"#8a8680":"#888580",textMuted:dark?"#555250":"#b0ada8",
-    surface:dark?"rgba(15,18,30,0.92)":"rgba(255,255,255,0.92)",surfaceBorder:dark?"rgba(255,255,255,0.06)":"rgba(0,0,0,0.08)",
-    inputBg:dark?"#0d1020":"#fff",inputBorder:dark?"rgba(255,255,255,0.08)":"rgba(0,0,0,0.1)",
-    accent:"#c47d8e",green:dark?"#6ee7b7":"#059669",red:dark?"#fca5a5":"#dc2626",
+    bg:dark?"#090c15":"#f0ede8",text:dark?"#eae7e2":"#1c1b19",soft:dark?"#a8a4a0":"#5c5955",muted:dark?"#6d6965":"#a09c97",
+    accent:"#c47d8e",grad:"linear-gradient(135deg,#c47d8e,#a3586b)",green:dark?"#6ee7b7":"#059669",red:dark?"#fca5a5":"#dc2626",
+    surface:dark?"rgba(15,19,35,.55)":"rgba(255,255,255,.5)",surfaceBrd:dark?"rgba(255,255,255,.07)":"rgba(0,0,0,.05)",
+    inputBg:dark?"#0d1020":"#fff",inputBorder:dark?"rgba(255,255,255,.08)":"rgba(0,0,0,.1)",
     btnPrimary:"linear-gradient(135deg,#c47d8e,#a3586b)",
-    logoGrad:"linear-gradient(135deg,#c47d8e,#8b5e6b)",
   };
 
   return(
-    <div className="root">
-      
+    <div style={{minHeight:"100dvh",background:t.bg,fontFamily:"'Outfit',system-ui,sans-serif",transition:"background .5s ease",display:"flex",flexDirection:"column"}}>
       <style>{`
-        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-        .root{min-height:100vh;background:${t.bg};font-family:'Outfit','Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;display:flex;flex-direction:column;transition:background 1.5s ease;position:relative;overflow:hidden}
-        .serif{font-family:'Plus Jakarta Sans',-apple-system,sans-serif}.m{font-family:'JetBrains Mono',monospace}
-        button{cursor:pointer;font-family:inherit;border:none}input{font-family:inherit}
-        @keyframes fu{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;450;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap');
+        *{box-sizing:border-box;margin:0;padding:0}
+        button,a{cursor:pointer;font-family:inherit;border:none;text-decoration:none}
+        .serif{font-family:'Cormorant Garamond',serif}
+        .m{font-family:'JetBrains Mono',monospace}
         @keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
         @keyframes pop{0%{transform:scale(0.8);opacity:0}50%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}
-        @keyframes float1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(15px,-10px) scale(1.03)}}
-        .orb{position:absolute;border-radius:50%;pointer-events:none;filter:blur(80px)}
-        .code-input{width:48px;height:56px;max-width:calc((100vw - 120px)/6);text-align:center;font-size:24px;font-weight:700;border-radius:12px;outline:none;transition:border-color 0.2s,box-shadow 0.2s}
-        .code-input:focus{border-color:#c47d8e!important;box-shadow:0 0 0 3px rgba(196,125,142,0.15)}
+        .code-input{width:48px;height:56px;max-width:calc((100vw - 140px)/6);text-align:center;font-size:24px;font-weight:700;border-radius:12px;outline:none;transition:border-color .2s,box-shadow .2s}
+        .code-input:focus{border-color:#c47d8e!important;box-shadow:0 0 0 3px rgba(196,125,142,.15)}
+        @media(max-width:768px){.code-input{width:42px;height:48px;font-size:20px;border-radius:10px}.verify-card{padding:28px 24px!important;border-radius:18px!important;height:auto!important;max-height:85dvh!important}}
+        @media(max-width:1024px){.verify-card{height:540px!important;padding:32px 28px!important}}
       `}</style>
 
-      <div style={{padding:"14px 0",borderBottom:`1px solid ${t.surfaceBorder}`,position:"sticky",top:0,zIndex:50,background:dark?"rgba(8,11,20,0.8)":"rgba(244,241,237,0.8)",backdropFilter:"blur(20px)",transition:"background 1.5s ease"}}>
-        <div style={{maxWidth:800,margin:"0 auto",padding:"0 24px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-          <button onClick={()=>window.scrollTo({top:0,behavior:"smooth"})} style={{display:"flex",alignItems:"center",gap:10,background:"none",padding:0,border:"none",outline:"none",cursor:"pointer"}}>
-            <div style={{width:32,height:32,borderRadius:9,background:"linear-gradient(135deg,#c47d8e,#8b5e6b)",display:"flex",alignItems:"center",justifyContent:"center"}}><svg width="14" height="14" viewBox="0 0 20 20" fill="none"><path d="M4,16 L4,4 L16,16 L16,4" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
-            <span className="serif" style={{fontSize:18,fontWeight:600,color:t.text}}>Nitro</span>
-          </button>
-          <button onClick={toggleTheme} style={{display:"flex",alignItems:"center",background:dark?"rgba(255,255,255,0.06)":"rgba(0,0,0,0.06)",borderRadius:20,padding:3,width:52,height:28,border:`1px solid ${dark?"rgba(255,255,255,0.08)":"rgba(0,0,0,0.1)"}`,position:"relative",flexShrink:0,transition:"background 1.5s cubic-bezier(.4,0,.2,1),border-color 1.5s ease"}}><div style={{width:22,height:22,borderRadius:"50%",background:dark?"#c47d8e":"#e0a458",display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,position:"absolute",left:dark?3:27,transition:"left 0.4s cubic-bezier(.4,0,.2,1),background 1.5s cubic-bezier(.4,0,.2,1)",boxShadow:"0 1px 4px rgba(0,0,0,0.2)"}}>{dark?"🌙":"☀️"}</div></button>
+      {/* Nav */}
+      <nav style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"0 24px",height:56,background:dark?"rgba(9,12,21,.9)":"rgba(240,237,232,.9)",backdropFilter:"blur(16px)",borderBottom:`1px solid ${t.surfaceBrd}`,flexShrink:0,position:"sticky",top:0,zIndex:50}}>
+        <a href="/" style={{display:"flex",alignItems:"center",gap:10}}>
+          <div style={{width:28,height:28,borderRadius:7,background:t.grad,display:"flex",alignItems:"center",justifyContent:"center"}}>
+            <svg width="12" height="12" viewBox="0 0 20 20" fill="none"><path d="M4,16 L4,4 L16,16 L16,4" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          </div>
+          <span style={{fontSize:16,fontWeight:700,color:t.text,letterSpacing:1.5}}>NITRO</span>
+        </a>
+        <div style={{display:"flex",alignItems:"center",gap:12}}>
+          <button onClick={toggleTheme} style={{width:44,height:24,borderRadius:12,background:dark?"#c47d8e":"rgba(0,0,0,0.08)",position:"relative",transition:"all .3s",flexShrink:0}}><div style={{width:18,height:18,borderRadius:"50%",background:"#fff",position:"absolute",top:3,left:dark?23:3,transition:"left .3s cubic-bezier(.2,.8,.2,1)",boxShadow:"0 1px 4px rgba(0,0,0,.2)"}}/></button>
+          <a href="/" style={{fontSize:13,fontWeight:550,color:t.soft,display:"flex",alignItems:"center",gap:4}}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={t.muted} strokeWidth="2" strokeLinecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+            Back
+          </a>
         </div>
-      </div>
-      <div style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center"}}>
-      <div className="orb" style={{width:300,height:300,top:"-15%",right:"-10%",background:dark?"rgba(196,125,142,0.08)":"rgba(196,125,142,0.06)",animation:"float1 18s ease-in-out infinite"}}/>
-      <div className="orb" style={{width:200,height:200,bottom:"-10%",left:"-5%",background:dark?"rgba(100,120,200,0.06)":"rgba(100,120,200,0.04)",animation:"float1 22s ease-in-out infinite 3s"}}/>
-      <div style={{position:"absolute",inset:0,backgroundImage:`linear-gradient(${dark?"rgba(255,255,255,0.015)":"rgba(0,0,0,0.015)"} 1px,transparent 1px),linear-gradient(90deg,${dark?"rgba(255,255,255,0.015)":"rgba(0,0,0,0.015)"} 1px,transparent 1px)`,backgroundSize:"60px 60px",pointerEvents:"none"}}/>
+      </nav>
 
-      {/* Card */}
-      <div style={{width:"100%",maxWidth:420,padding:20,position:"relative",zIndex:1,animation:"fu 0.5s ease"}}>
-        <div style={{background:t.surface,border:`1px solid ${t.surfaceBorder}`,borderRadius:24,padding:"40px 32px",backdropFilter:"blur(20px)",boxShadow:dark?"0 20px 60px rgba(0,0,0,0.4)":"0 20px 60px rgba(0,0,0,0.08)",transition:"background 1.5s ease",textAlign:"center"}}>
+      {/* Center card */}
+      <div style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center",padding:20}}>
+        <div className="verify-card" style={{width:"100%",maxWidth:440,height:580,maxHeight:"90dvh",overflow:"hidden",background:dark?"rgba(17,22,40,0.98)":"rgba(255,255,255,0.98)",border:`1px solid ${t.surfaceBrd}`,borderRadius:20,padding:"36px 32px",boxShadow:dark?"0 20px 60px rgba(0,0,0,0.5)":"0 20px 60px rgba(0,0,0,0.1)",backdropFilter:"blur(20px)",textAlign:"center",display:"flex",flexDirection:"column",justifyContent:"center"}}>
 
           {!verified?<>
             {/* Logo */}
-            <div style={{marginBottom:16}}><div style={{width:48,height:48,borderRadius:12,background:"linear-gradient(135deg,#c47d8e,#8b5e6b)",display:"flex",alignItems:"center",justifyContent:"center"}}><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4,16 L4,4 L16,16 L16,4" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/></svg></div></div>
-            <h1 className="serif" style={{fontSize:26,fontWeight:600,color:t.text,marginBottom:6}}>Verify Your Account</h1>
-            <p style={{fontSize:14,color:t.textSoft,marginBottom:6}}>We sent a 6-digit code to</p>
-            <p style={{fontSize:14,color:t.accent,fontWeight:600,marginBottom:28}}>{userEmail||"your email"}</p>
+            <div style={{marginBottom:20}}><div style={{width:38,height:38,borderRadius:10,background:t.grad,display:"inline-flex",alignItems:"center",justifyContent:"center"}}><svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M4,16 L4,4 L16,16 L16,4" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/></svg></div></div>
+
+            <h2 style={{fontSize:24,fontWeight:700,color:t.text,marginBottom:4}}>Verify Your Account</h2>
+            <p style={{fontSize:14,color:t.soft,marginBottom:4,fontWeight:430}}>We sent a 6-digit code to</p>
+            <p className="m" style={{fontSize:13,color:t.accent,fontWeight:600,marginBottom:28}}>{userEmail||"your email"}</p>
 
             {/* Error */}
-            {error&&<div style={{padding:"10px 14px",borderRadius:10,background:dark?"rgba(220,38,38,0.1)":"#fef2f2",border:`1px solid ${dark?"rgba(220,38,38,0.2)":"#fecaca"}`,color:t.red,fontSize:13,marginBottom:16,animation:"fu 0.2s ease"}}>⚠️ {error}</div>}
+            {error&&<div style={{padding:"10px 14px",borderRadius:10,background:dark?"rgba(220,38,38,0.1)":"#fef2f2",border:`1px solid ${dark?"rgba(220,38,38,0.2)":"#fecaca"}`,color:t.red,fontSize:13,marginBottom:16}}>⚠️ {error}</div>}
 
-            {/* 6-digit code input */}
-            <div style={{display:"flex",justifyContent:"center",gap:8,marginBottom:24}}>
+            {/* Code inputs */}
+            <div style={{display:"flex",justifyContent:"center",gap:8,marginBottom:28}}>
               {code.map((digit,i)=>(
-                <input
-                  key={i}
-                  ref={el=>inputs.current[i]=el}
-                  className="code-input m"
-                  type="text"
-                  inputMode="numeric"
-                  maxLength={1}
-                  value={digit}
-                  onChange={e=>handleChange(i,e.target.value)}
-                  onKeyDown={e=>handleKeyDown(i,e)}
-                  onPaste={i===0?handlePaste:undefined}
-                  disabled={verifying}
-                  style={{background:t.inputBg,border:`1px solid ${digit?t.accent:t.inputBorder}`,color:t.text,opacity:verifying?0.5:1}}
+                <input key={i} ref={el=>inputs.current[i]=el} className="code-input m" type="text" inputMode="numeric" maxLength={1} value={digit}
+                  onChange={e=>handleChange(i,e.target.value)} onKeyDown={e=>handleKeyDown(i,e)} onPaste={i===0?handlePaste:undefined} disabled={verifying}
+                  style={{background:t.inputBg,border:`1px solid ${digit?t.accent:t.inputBorder}`,color:t.text,opacity:verifying?.5:1}}
                 />
               ))}
             </div>
 
-            {/* Verifying state */}
+            {/* Verifying spinner */}
             {verifying&&<div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:8,marginBottom:20,color:t.accent}}>
-              <span style={{width:16,height:16,border:"2px solid rgba(196,125,142,0.3)",borderTopColor:t.accent,borderRadius:"50%",animation:"spin 0.6s linear infinite"}}/>
+              <span style={{width:16,height:16,border:"2px solid rgba(196,125,142,.3)",borderTopColor:t.accent,borderRadius:"50%",animation:"spin .6s linear infinite",display:"inline-block"}}/>
               <span style={{fontSize:14,fontWeight:500}}>Verifying...</span>
             </div>}
 
             {/* Resend */}
-            <div style={{fontSize:13,color:t.textMuted}}>
-              {resendTimer>0?(
-                <span>Resend code in <span className="m" style={{color:t.accent,fontWeight:600}}>{resendTimer}s</span></span>
-              ):(
-                <button onClick={resend} style={{background:"none",color:t.accent,fontWeight:600,fontSize:13}}>Resend Code</button>
-              )}
+            <div style={{fontSize:13,color:t.muted,marginBottom:24}}>
+              {resendTimer>0?<span>Resend code in <span className="m" style={{color:t.accent,fontWeight:600}}>{resendTimer}s</span></span>
+              :<button onClick={resend} style={{background:"none",color:t.accent,fontWeight:600,fontSize:13}}>Resend Code</button>}
             </div>
 
-            <div style={{marginTop:24,paddingTop:16,borderTop:`1px solid ${t.surfaceBorder}`,fontSize:12,color:t.textMuted,lineHeight:1.6}}>
-              Check your spam folder if you don't see it. <br/>Code expires in 15 minutes.
+            <div style={{paddingTop:16,borderTop:`1px solid ${t.surfaceBrd}`,fontSize:12,color:t.muted,lineHeight:1.6}}>
+              Check your spam folder if you don't see it.<br/>Code expires in 15 minutes.
             </div>
           </>:<>
-            {/* Success state */}
-            <div style={{animation:"pop 0.4s ease"}}>
-              <div style={{width:64,height:64,borderRadius:"50%",background:dark?"rgba(110,231,183,0.1)":"rgba(5,150,105,0.08)",display:"inline-flex",alignItems:"center",justifyContent:"center",fontSize:32,marginBottom:16,border:`2px solid ${t.green}`}}>✓</div>
-              <h1 className="serif" style={{fontSize:26,fontWeight:600,color:t.text,marginBottom:8}}>Verified!</h1>
-              <p style={{fontSize:14,color:t.textSoft,marginBottom:28}}>Your account has been verified successfully. You're all set to start using Nitro.</p>
-              <a href="/dashboard" style={{display:"inline-block",padding:"14px 40px",borderRadius:12,background:t.btnPrimary,color:"#fff",fontSize:15,fontWeight:700,textDecoration:"none"}}>Go to Dashboard</a>
+            {/* Success */}
+            <div style={{animation:"pop .4s ease"}}>
+              <div style={{width:64,height:64,borderRadius:"50%",background:dark?"rgba(110,231,183,.1)":"rgba(5,150,105,.08)",display:"inline-flex",alignItems:"center",justifyContent:"center",fontSize:32,marginBottom:16,border:`2px solid ${t.green}`}}>✓</div>
+              <h2 style={{fontSize:24,fontWeight:700,color:t.text,marginBottom:8}}>Verified!</h2>
+              <p style={{fontSize:14,color:t.soft,marginBottom:28,fontWeight:430}}>Your account has been verified successfully. You're all set to start using Nitro.</p>
+              <a href="/dashboard" style={{display:"inline-block",padding:"14px 40px",borderRadius:12,background:t.btnPrimary,color:"#fff",fontSize:15,fontWeight:700}}>Go to Dashboard</a>
             </div>
           </>}
         </div>
-
-        <div style={{textAlign:"center",marginTop:20}}>
-          <a href="/" style={{fontSize:13,color:t.textMuted,textDecoration:"none"}}>← Back to home</a>
-        </div>
       </div>
 
-      </div>
-      <footer style={{position:"relative",bottom:0,left:0,right:0,borderTop:`1px solid ${t.surfaceBorder}`}}>
-        <div style={{maxWidth:800,margin:"0 auto",padding:"16px 24px"}}>
-          <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:12}}>
-            <div style={{fontSize:12,color:t.textMuted}}>© 2026 Nitro. All rights reserved.</div>
-            <div style={{display:"flex",flexDirection:"column",alignItems:"flex-end",gap:8}}>
-              <div style={{display:"flex",gap:16}}>{["Twitter","Instagram"].map(s=><a key={s} href="#" style={{fontSize:12,color:t.textSoft,textDecoration:"none"}}>{s}</a>)}</div>
-              <div style={{display:"flex",gap:16}}>{[["Terms","/terms"],["Privacy","/privacy"],["Refund","/refund"],["Cookie","/cookie"]].map(([l,h])=><a key={l} href={h} style={{fontSize:11,color:t.textMuted,textDecoration:"none"}}>{l}</a>)}</div>
-            </div>
+      {/* Footer */}
+      <footer style={{borderTop:`1px solid ${t.surfaceBrd}`,padding:"20px 24px"}}>
+        <div style={{maxWidth:780,margin:"0 auto",display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:12}}>
+          <span style={{fontSize:12,color:t.muted}}>© 2026 Nitro. All rights reserved.</span>
+          <div style={{display:"flex",gap:16}}>
+            {[["Terms","/terms"],["Privacy","/privacy"],["Refund","/refund"],["Cookie","/cookie"]].map(([l,h])=><a key={l} href={h} style={{fontSize:11,color:t.muted}}>{l}</a>)}
           </div>
         </div>
       </footer>
