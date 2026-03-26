@@ -393,7 +393,7 @@ export default function Landing(){
               <p className="s6-sub" style={{color:dark?"rgba(255,255,255,.55)":"rgba(255,255,255,.75)"}}>Every minute you wait, your competitors are getting ahead. Start with ₦500 and see results in seconds.</p>
               <div className="s6-buttons">
                 <button className="s6-btn-primary" onClick={()=>setModal("signup")}>Get Started Free →</button>
-                <button className="s6-btn-ghost" style={{border:`1.5px solid ${dark?"rgba(255,255,255,.12)":"rgba(255,255,255,.25)"}`}} onClick={()=>document.getElementById("pricing")?.scrollIntoView({behavior:"smooth"})}>View Pricing ↓</button>
+                <button className="s6-btn-ghost" style={{border:`1.5px solid ${dark?"rgba(255,255,255,.12)":"rgba(255,255,255,.25)"}`}} onClick={()=>document.getElementById("pricing")?.scrollIntoView({behavior:"smooth"})}>View Pricing</button>
               </div>
             </div>
           </div>
