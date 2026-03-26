@@ -86,7 +86,7 @@ export default function Landing(){
     btnPrimary:"linear-gradient(135deg,#c47d8e,#a3586b)",
     logoGrad:"linear-gradient(135deg,#c47d8e,#8b5e6b)",
     overlay:dark?"rgba(0,0,0,0.7)":"rgba(0,0,0,0.4)",
-    heroBg:dark?"#060810":"linear-gradient(135deg,#c47d8e 0%,#a3586b 40%,#8b4a5e 100%)",
+    heroBg:dark?"linear-gradient(135deg,#060810 0%,#0a0f1e 40%,#0d0a18 100%)":"linear-gradient(135deg,#c47d8e 0%,#a3586b 40%,#8b4a5e 100%)",
     heroText:dark?"#eae7e2":"#fff",heroSoft:dark?"#b0aca8":"rgba(255,255,255,.85)",heroMuted:dark?"#7d7974":"rgba(255,255,255,.55)",
     heroGlass:dark?"rgba(15,19,35,.5)":"rgba(255,255,255,.12)",heroGlassBrd:dark?"rgba(255,255,255,.08)":"rgba(255,255,255,.2)",
     heroAccentBadge:dark?"rgba(196,125,142,.15)":"rgba(255,255,255,.15)",
@@ -119,7 +119,7 @@ export default function Landing(){
         <section id="hero" style={{overflow:"hidden",background:t.heroBg,position:"relative",display:"flex",flexDirection:"column"}}>
           {/* Alert banner area */}
           <div style={{flexShrink:0}}>
-            {siteAlerts.length>0&&siteAlerts.map((a,i)=><div key={i} style={{padding:"10px 24px",textAlign:"center",fontSize:13,fontWeight:500,background:a.type==="warning"?(dark?"rgba(217,119,6,.15)":"rgba(255,255,255,.15)"):(dark?"rgba(196,125,142,.1)":"rgba(255,255,255,.1)"),color:a.type==="warning"?(dark?"#fbbf24":"#fff"):(dark?t.accent:"rgba(255,255,255,.9)"),borderBottom:`1px solid ${dark?"rgba(255,255,255,.06)":"rgba(255,255,255,.12)"}`,backdropFilter:"blur(8px)"}}>{a.type==="warning"?"⚠️ ":"🎉 "}{a.message}</div>)}
+            {siteAlerts.length>0&&siteAlerts.map((a,i)=><div key={i} style={{padding:"10px 24px",textAlign:"center",fontSize:13,fontWeight:500,background:a.type==="warning"?(dark?"rgba(217,119,6,.08)":"rgba(255,255,255,.12)"):(dark?"rgba(196,125,142,.06)":"rgba(255,255,255,.1)"),color:a.type==="warning"?(dark?"#fbbf24":"rgba(255,255,255,.95)"):(dark?"#c47d8e":"rgba(255,255,255,.9)"),borderBottom:`1px solid ${dark?"rgba(255,255,255,.04)":"rgba(255,255,255,.1)"}`,borderLeft:`3px solid ${a.type==="warning"?(dark?"rgba(251,191,36,.3)":"rgba(255,255,255,.35)"):(dark?"rgba(196,125,142,.25)":"rgba(255,255,255,.3)")}`,letterSpacing:.2}}>{a.type==="warning"?"⚠️ ":"🎉 "}{a.message}</div>)}
           </div>
 
           {/* Ambient orbs */}
