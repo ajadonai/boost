@@ -107,7 +107,7 @@ export default function AdminPanel(){
   const toggleTheme=()=>{setManualOverride(true);setDark(d=>{const next=!d;try{localStorage.setItem("nitro-theme",next?"night":"day");}catch{}return next;});};const toastTimer=useRef(null);
   const notify=(m,e)=>{setToast({m,e});if(toastTimer.current)clearTimeout(toastTimer.current);toastTimer.current=setTimeout(()=>setToast(null),6000);};
   const logAction=(action,type)=>{setActivityLog(p=>[{id:Date.now(),admin:currentAdmin.name,action,type,time:new Date().toISOString()},...p]);};
-  const handleLogout=async()=>{try{await fetch("/api/auth/admin/logout",{method:"POST"});}catch{}window.location.href="/admin/login";};
+  const handleLogout=async()=>{try{await fetch("/api/auth/admin/logout",{method:"POST"});}catch{}window.location.replace("/admin/login?logout=1");};
   const dismissToast=()=>{setToast(null);if(toastTimer.current)clearTimeout(toastTimer.current);};
   const go=(p)=>{if(role.pages.includes(p)){setPg(p);}};
   const ALL_NAV=[["overview","📊","Overview"],["orders","📋","Orders"],["users","👥","Users"],["tickets","💬","Tickets"],["---1","",""],["services","📦","Services"],["api","🔌","API"],["payments","💳","Payments"],["---2","",""],["analytics","📈","Analytics"],["alerts","📢","Alerts"],["coupons","🎟️","Coupons"],["notifications","📣","Notifications"],["maintenance","🔧","Maintenance"],["activity","📝","Activity"],["---3","",""],["team","🛡️","Team"],["settings","⚙️","Settings"]];

@@ -185,7 +185,7 @@ export default function App() {
     } catch { notify('Failed to place order', true); }
   };
   const addFunds = (a) => { reloadDashboard(); notify(`₦${Number(a).toLocaleString()} added to wallet!`); };
-  const handleLogout=async()=>{try{await fetch("/api/auth/logout",{method:"POST"});}catch{}window.location.href="/";};
+  const handleLogout=async()=>{try{await fetch("/api/auth/logout",{method:"POST"});}catch{}window.location.replace("/?logout=1");};
 
   const t={
     bg:dark?"#090c15":"#f0ede8",

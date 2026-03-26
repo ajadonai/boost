@@ -46,7 +46,8 @@ export default function Landing(){
   const stepsHover=useRef(false);
   useEffect(()=>{const iv=setInterval(()=>{if(!stepsHover.current)setActiveStep(s=>(s+1)%4)},3500);return()=>clearInterval(iv);},[]);
   useEffect(()=>{const el=scrollRef.current;if(!el)return;const onScroll=()=>setScrolled(el.scrollTop>20);el.addEventListener("scroll",onScroll);return()=>el.removeEventListener("scroll",onScroll);},[]);
-  useEffect(()=>{const p=new URLSearchParams(window.location.search);if(p.get("login"))setModal("login");if(p.get("signup"))setModal("signup");if(p.get("ref"))setModal("signup");},[]);
+  const [logoutMsg,setLogoutMsg]=useState(false);
+  useEffect(()=>{const p=new URLSearchParams(window.location.search);if(p.get("login"))setModal("login");if(p.get("signup"))setModal("signup");if(p.get("ref"))setModal("signup");if(p.get("logout")){setLogoutMsg(true);window.history.replaceState({},"","/");setTimeout(()=>setLogoutMsg(false),4000);}},[]);
   useEffect(()=>{(async()=>{try{const res=await fetch("/api/site-info");if(res.ok){const d=await res.json();if(d.stats)setSiteStats(d.stats);if(d.promo)setPromoBanner(d.promo);if(d.alerts?.length)setSiteAlerts(d.alerts);}}catch{}})();},[]);
   const closeModal=useCallback(()=>setModal(null),[]);
 
@@ -444,6 +445,9 @@ export default function Landing(){
       </div>
 
       {modal&&<AuthModal key="auth-modal" dark={dark} t={t} mode={modal} setMode={setModal} onClose={closeModal}/>}
+
+      {/* Logout toast */}
+      {logoutMsg&&<div className="logout-toast" style={{position:"fixed",top:20,left:"50%",transform:"translateX(-50%)",zIndex:9999,padding:"12px 24px",borderRadius:14,background:dark?"rgba(17,22,40,.95)":"rgba(255,255,255,.95)",border:`1px solid ${dark?"rgba(255,255,255,.08)":"rgba(0,0,0,.06)"}`,backdropFilter:"blur(16px)",boxShadow:dark?"0 8px 32px rgba(0,0,0,.4)":"0 8px 32px rgba(0,0,0,.1)",display:"flex",alignItems:"center",gap:10,animation:"fu .4s ease"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6ee7b7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg><span style={{fontSize:13,fontWeight:500,color:t.text}}>You've been logged out successfully</span></div>}
     </div>
   );
 }

@@ -19,10 +19,12 @@ export default function AdminLogin(){
   const [loading,setLoading]=useState(false);
   const [error,setError]=useState("");
   const [quoteIdx,setQuoteIdx]=useState(0);
+  const [logoutMsg,setLogoutMsg]=useState(false);
 
   useEffect(()=>{const saved=localStorage.getItem("nitro-theme")||"auto";setThemeMode(saved);if(saved==="day")setDark(false);else if(saved==="night")setDark(true);else setDark(getAuto());},[]);
   useEffect(()=>{if(themeMode!=="auto")return;const iv=setInterval(()=>setDark(getAuto()),60000);return()=>clearInterval(iv);},[themeMode]);
   useEffect(()=>{const iv=setInterval(()=>setQuoteIdx(q=>(q+1)%QUOTES.length),6000);return()=>clearInterval(iv);},[]);
+  useEffect(()=>{const p=new URLSearchParams(window.location.search);if(p.get("logout")){setLogoutMsg(true);window.history.replaceState({},"","/admin/login");setTimeout(()=>setLogoutMsg(false),4000);}},[]);
   const toggleTheme=()=>{const next=!dark;setDark(next);const mode=next?"night":"day";setThemeMode(mode);localStorage.setItem("nitro-theme",mode);};
 
   const handleLogin=async()=>{
@@ -171,6 +173,9 @@ export default function AdminLogin(){
           </div>
         </div>
       </div>
+
+      {/* Logout toast */}
+      {logoutMsg&&<div style={{position:"fixed",top:20,left:"50%",transform:"translateX(-50%)",zIndex:9999,padding:"12px 24px",borderRadius:14,background:dark?"rgba(17,22,40,.95)":"rgba(255,255,255,.95)",border:`1px solid ${dark?"rgba(255,255,255,.08)":"rgba(0,0,0,.06)"}`,backdropFilter:"blur(16px)",boxShadow:dark?"0 8px 32px rgba(0,0,0,.4)":"0 8px 32px rgba(0,0,0,.1)",display:"flex",alignItems:"center",gap:10,animation:"fu .4s ease"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6ee7b7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg><span style={{fontSize:13,fontWeight:500,color:t.text}}>You've been logged out successfully</span></div>}
     </div>
   );
 }
