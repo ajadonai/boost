@@ -254,9 +254,39 @@ export default function Landing(){
           </div>
         </section>
 
-        {/* ━━━ PRICING ━━━ */}
-        <section id="pricing" style={{minHeight:"100dvh",display:"flex",alignItems:"center",justifyContent:"center",background:t.bg}}>
-          <div style={{textAlign:"center",color:t.textMuted,fontSize:16,fontWeight:450}}>Pricing — awaiting mockup</div>
+        {/* ━━━ SECTION 3: PRICING ━━━ */}
+        <section id="pricing" className="s3" style={{background:t.bg}}>
+          <div className="s3-block">
+            <div className="s3-label"><span className="m s3-label-text" style={{color:t.accent}}>Pricing</span></div>
+            <div className="s3-content">
+              <h2 className="s3-heading" style={{color:t.text}}>Transparent <span className="serif s3-heading-accent" style={{color:t.accent}}>Pricing</span></h2>
+              <p className="s3-desc" style={{color:t.textSoft}}>No hidden fees. No subscriptions. Just add funds and pay per service. Prices start as low as ₦3 per 1,000.</p>
+
+              <div className="s3-grid">
+                {[["Instagram",<svg key="ig" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E1306C" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>,[["Followers","₦15/1K"],["Likes","₦8/1K"],["Views","₦5/1K"]]],["TikTok",<svg key="tt" width="16" height="18" viewBox="0 0 448 512" fill="#ff0050"><path d="M448 209.91a210.06 210.06 0 01-122.77-39.25v178.72A162.55 162.55 0 11185 188.31v89.89a74.62 74.62 0 1052.23 71.18V0h88a121 121 0 00122.77 121.33z"/></svg>,[["Followers","₦20/1K"],["Likes","₦10/1K"],["Views","₦3/1K"]]],["YouTube",<svg key="yt" width="20" height="14" viewBox="0 0 576 512" fill="#FF0000"><path d="M549.655 124.083c-6.281-23.65-24.787-42.276-48.284-48.597C458.781 64 288 64 288 64S117.22 64 74.629 75.486c-23.497 6.322-42.003 24.947-48.284 48.597-11.412 42.867-11.412 132.305-11.412 132.305s0 89.438 11.412 132.305c6.281 23.65 24.787 41.5 48.284 47.821C117.22 448 288 448 288 448s170.78 0 213.371-11.486c23.497-6.321 42.003-24.171 48.284-47.821 11.412-42.867 11.412-132.305 11.412-132.305s0-89.438-11.412-132.305zm-317.51 213.508V175.185l142.739 81.205-142.739 81.201z"/></svg>,[["Subscribers","₦50/1K"],["Views","₦8/1K"],["Likes","₦12/1K"]]],["Twitter/X",<svg key="x" width="16" height="16" viewBox="0 0 24 24" fill={dark?"#eee":"#222"}><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>,[["Followers","₦25/1K"],["Likes","₦10/1K"],["Retweets","₦15/1K"]]],["Facebook",<svg key="fb" width="10" height="18" viewBox="0 0 320 512" fill="#1877F2"><path d="M279.14 288l14.22-92.66h-88.91v-60.13c0-25.35 12.42-50.06 52.24-50.06h40.42V6.26S260.43 0 225.36 0c-73.22 0-121.08 44.38-121.08 124.72v70.62H22.89V288h81.39v224h100.17V288z"/></svg>,[["Page Likes","₦18/1K"],["Followers","₦20/1K"],["Post Likes","₦8/1K"]]],["Telegram",<svg key="tg" width="18" height="16" viewBox="0 0 496 512" fill="#0088cc"><path d="M248 8C111.033 8 0 119.033 0 256s111.033 248 248 248 248-111.033 248-248S384.967 8 248 8zm114.952 168.66c-3.732 39.215-19.881 134.378-28.1 178.3-3.476 18.584-10.322 24.816-16.948 25.425-14.4 1.326-25.338-9.517-39.287-18.661-21.827-14.308-34.158-23.215-55.346-37.177-24.485-16.135-8.612-25 5.342-39.5 3.652-3.793 67.107-61.51 68.335-66.746.154-.655.3-3.1-1.154-4.384s-3.59-.849-5.135-.5q-3.283.746-104.608 69.142-14.845 10.194-26.894 9.934c-8.855-.191-25.888-5.006-38.551-9.123-15.531-5.048-27.875-7.717-26.8-16.291q.84-6.7 18.45-13.7 108.446-47.248 144.628-62.3c68.872-28.647 83.183-33.623 92.511-33.789 2.052-.034 6.639.474 9.61 2.885a10.452 10.452 0 013.53 6.716 43.765 43.765 0 01.417 9.769z"/></svg>,[["Members","₦30/1K"],["Post Views","₦5/1K"],["Reactions","₦10/1K"]]]].map(([platform,icon,services])=>(
+                  <div key={platform} className="s3-card" style={{background:t.cardBg,border:`1px solid ${t.surfaceBorder}`}}>
+                    <div className="s3-card-header">{icon}<span className="s3-card-platform" style={{color:t.text}}>{platform}</span></div>
+                    {services.map(([name,price])=>(
+                      <div key={name} className="s3-card-row" style={{borderTop:`1px solid ${t.surfaceBorder}`}}>
+                        <span className="s3-card-service" style={{color:t.textSoft}}>{name}</span>
+                        <span className="m s3-card-price" style={{color:t.green}}>{price}</span>
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+
+              <div className="s3-deposit" style={{background:dark?"rgba(196,125,142,.06)":"rgba(196,125,142,.04)",border:`1px solid ${dark?"rgba(196,125,142,.1)":"rgba(196,125,142,.08)"}`}}>
+                <div className="s3-deposit-icon" style={{background:dark?"rgba(196,125,142,.12)":"rgba(196,125,142,.08)"}}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={t.accent} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/><path d="M7 15h4"/></svg>
+                </div>
+                <div>
+                  <div className="s3-deposit-title" style={{color:t.text}}>Start with just <span className="m" style={{color:t.accent}}>₦500</span></div>
+                  <div className="s3-deposit-desc" style={{color:t.textSoft}}>Fund your wallet via bank transfer, card, or crypto. No minimums per order.</div>
+                </div>
+              </div>
+            </div>
+          </div>
         </section>
 
         {/* ━━━ TESTIMONIALS ━━━ */}
