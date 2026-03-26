@@ -1,5 +1,4 @@
 'use client';
-import NitroLogo from './nitro-logo';
 import { useState, useEffect } from "react";
 
 export default function Privacy(){
@@ -8,95 +7,82 @@ export default function Privacy(){
   const [mo,setMo]=useState(false);
   const toggleTheme=()=>{setMo(true);setDark(d=>!d);};
   useEffect(()=>{if(mo)return;const iv=setInterval(()=>setDark(getAuto()),60000);return()=>clearInterval(iv);},[mo]);
-  const t={
-    bg:dark?"#080b14":"#f4f1ed",text:dark?"#e8e4df":"#1a1a1a",textSoft:dark?"#8a8680":"#888580",textMuted:dark?"#555250":"#b0ada8",
-    accent:"#c47d8e",surface:dark?"rgba(15,18,30,0.92)":"rgba(255,255,255,0.92)",surfaceBorder:dark?"rgba(255,255,255,0.06)":"rgba(0,0,0,0.08)",
-    logoGrad:"linear-gradient(135deg,#c47d8e,#8b5e6b)",
-  };
-  const S=({title,children})=><div style={{marginBottom:32}}><h2 className="serif" style={{fontSize:20,fontWeight:600,color:t.text,marginBottom:10}}>{title}</h2><div style={{fontSize:14,color:t.textSoft,lineHeight:1.9}}>{children}</div></div>;
 
+  const t={bg:dark?"#090c15":"#f0ede8",text:dark?"#eae7e2":"#1c1b19",soft:dark?"#a8a4a0":"#5c5955",muted:dark?"#6d6965":"#a09c97",accent:"#c47d8e",grad:"linear-gradient(135deg,#c47d8e,#a3586b)",surface:dark?"rgba(15,19,35,.55)":"rgba(255,255,255,.5)",surfaceBrd:dark?"rgba(255,255,255,.07)":"rgba(0,0,0,.05)"};
+
+  const sections=[
+    ["Information We Collect","When you use Nitro, we collect information you provide directly, such as your name, email address, phone number, and payment details during registration and transactions. We also automatically collect technical data including your IP address, browser type, device information, operating system, referring URLs, pages viewed, time spent on pages, click patterns, and interaction data. Additionally, we collect transaction data including order history, wallet activity, payment records, and service usage metrics."],
+    ["How We Use Your Information","We use the information we collect to provide, operate, and maintain our services, process your transactions and deliver ordered services, communicate with you about your account, orders, and support requests, improve and personalize your experience on the Platform, conduct research, analytics, and data analysis to enhance our services, detect, prevent, and address fraud, abuse, and security issues, comply with legal obligations and enforce our terms, and send you updates and relevant communications about our services."],
+    ["Data Sharing & Disclosure","We may share your information with third-party payment processors (Paystack, Flutterwave, Monnify, Korapay) to facilitate transactions, with API service providers to fulfill your orders (only the minimum data required, such as target URLs), with analytics and infrastructure providers that help us operate the Platform, and with law enforcement or regulatory authorities when required by law. We do not sell your personal contact information to third-party advertisers. We may share aggregated, anonymized data with partners for commercial purposes."],
+    ["Cookies & Tracking","We use cookies and similar technologies to keep you logged in and maintain your session, remember your preferences such as theme settings, analyze usage patterns and improve the Platform, and ensure security and prevent fraud. You can manage cookie preferences through your browser settings, though disabling certain cookies may affect Platform functionality."],
+    ["Data Retention","We retain your personal data for as long as your account is active or as needed to provide services. Transaction records and order history are retained for a minimum of 5 years for legal and accounting purposes. After account deletion, we may retain anonymized and aggregated data indefinitely for analytics. Backup copies may persist in our systems for a reasonable period after deletion."],
+    ["Data Security","We implement industry-standard security measures including encryption of data in transit and at rest, secure payment processing through certified payment gateways, regular security audits and monitoring, and access controls limiting employee access to personal data. While we strive to protect your information, no method of electronic transmission or storage is 100% secure."],
+    ["Your Rights","Depending on your location and applicable law, you may have the right to access the personal data we hold about you, request correction of inaccurate data, request deletion of your account and associated data (subject to retention requirements), object to certain processing of your data, and request a copy of your data in a portable format. To exercise these rights, contact us at privacy@thenitro.ng. We will respond within 30 days."],
+    ["Children's Privacy","Nitro is not intended for users under 18 years of age. We do not knowingly collect personal information from minors. If we learn that we have collected data from a user under 18, we will delete that information promptly."],
+    ["International Data","Your data may be processed and stored in Nigeria and other countries where our service providers operate. By using the Platform, you consent to the transfer of your information to these locations."],
+    ["Third-Party Links","The Platform may contain links to third-party websites and social media platforms. We are not responsible for the privacy practices or content of these external sites."],
+    ["Changes to This Policy","We may update this Privacy Policy from time to time. Material changes will be communicated through the Platform or via email. Continued use of the Platform after changes constitutes acceptance of the updated policy."],
+    ["Contact Us","For privacy-related questions or requests, contact us at privacy@thenitro.ng"],
+  ];
+
+  return <LegalPage dark={dark} t={t} toggleTheme={toggleTheme} label="Privacy" title="Privacy" titleAccent="Policy" date="March 23, 2026" sections={sections} emailField="privacy@thenitro.ng" relatedLinks={[["Terms of Service","/terms"],["Refund Policy","/refund"],["Cookie Policy","/cookie"]]}/>;
+}
+
+function LegalPage({dark,t,toggleTheme,label,title,titleAccent,date,sections,emailField,relatedLinks}){
   return(
-    <div style={{minHeight:"100vh",background:t.bg,fontFamily:"'Plus Jakarta Sans',-apple-system,sans-serif",transition:"background 1.5s ease"}}>
-      
-      <style>{`.serif{font-family:'Plus Jakarta Sans',-apple-system,sans-serif}`}</style>
+    <div style={{minHeight:"100dvh",background:t.bg,fontFamily:"'Outfit',system-ui,sans-serif",transition:"background .5s ease",display:"flex",flexDirection:"column"}}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;450;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap');
+        *{box-sizing:border-box;margin:0;padding:0}
+        button,a{cursor:pointer;font-family:inherit;border:none;text-decoration:none}
+        .serif{font-family:'Cormorant Garamond',serif}
+        .m{font-family:'JetBrains Mono',monospace}
+      `}</style>
 
-      <div style={{padding:"24px 0",borderBottom:`1px solid ${t.surfaceBorder}`,position:"sticky",top:0,zIndex:50,background:t.bg,backdropFilter:"blur(20px)",transition:"background 1.5s ease"}}>
-        <div style={{maxWidth:800,margin:"0 auto",padding:"0 24px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-          <button onClick={()=>window.location.href="/"} style={{display:"flex",alignItems:"center",gap:10,background:"none",padding:0,border:"none",outline:"none",cursor:"pointer"}}>
-            <NitroLogo size={32} variant="mark"/>
-            <span className="serif" style={{fontSize:18,fontWeight:600,color:t.text}}>Nitro</span>
-          </button>
-          <button onClick={toggleTheme} style={{display:"flex",alignItems:"center",background:dark?"rgba(255,255,255,0.06)":"rgba(0,0,0,0.06)",borderRadius:20,padding:3,width:52,height:28,border:`1px solid ${dark?"rgba(255,255,255,0.08)":"rgba(0,0,0,0.1)"}`,position:"relative",flexShrink:0,transition:"background 1.5s cubic-bezier(.4,0,.2,1),border-color 1.5s ease"}}><div style={{width:22,height:22,borderRadius:"50%",background:dark?"#c47d8e":"#e0a458",display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,position:"absolute",left:dark?3:27,transition:"left 0.4s cubic-bezier(.4,0,.2,1),background 1.5s cubic-bezier(.4,0,.2,1)",boxShadow:"0 1px 4px rgba(0,0,0,0.2)"}}>{dark?"🌙":"☀️"}</div></button>
+      <nav style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"0 24px",height:56,background:dark?"rgba(9,12,21,.9)":"rgba(240,237,232,.9)",backdropFilter:"blur(16px)",borderBottom:`1px solid ${t.surfaceBrd}`,flexShrink:0,position:"sticky",top:0,zIndex:50}}>
+        <a href="/" style={{display:"flex",alignItems:"center",gap:10}}>
+          <div style={{width:28,height:28,borderRadius:7,background:t.grad,display:"flex",alignItems:"center",justifyContent:"center"}}><svg width="12" height="12" viewBox="0 0 20 20" fill="none"><path d="M4,16 L4,4 L16,16 L16,4" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
+          <span style={{fontSize:16,fontWeight:700,color:t.text,letterSpacing:1.5}}>NITRO</span>
+        </a>
+        <div style={{display:"flex",alignItems:"center",gap:12}}>
+          <button onClick={toggleTheme} style={{width:44,height:24,borderRadius:12,background:dark?"#c47d8e":"rgba(0,0,0,0.08)",position:"relative",transition:"all .3s",flexShrink:0}}><div style={{width:18,height:18,borderRadius:"50%",background:"#fff",position:"absolute",top:3,left:dark?23:3,transition:"left .3s cubic-bezier(.2,.8,.2,1)",boxShadow:"0 1px 4px rgba(0,0,0,.2)"}}/></button>
+          <a href="/" style={{fontSize:13,fontWeight:550,color:t.soft,display:"flex",alignItems:"center",gap:4}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={t.muted} strokeWidth="2" strokeLinecap="round"><polyline points="15 18 9 12 15 6"/></svg>Back</a>
         </div>
-      </div>
+      </nav>
 
-      <div style={{maxWidth:800,margin:"0 auto",padding:"48px 24px 80px"}}>
-        <h1 className="serif" style={{fontSize:"clamp(28px,5vw,40px)",fontWeight:600,color:t.text,marginBottom:6}}>Privacy Policy</h1>
-        <p style={{fontSize:13,color:t.textMuted,marginBottom:40}}>Last updated: March 23, 2026</p>
-
-        <S title="1. Information We Collect">
-          When you use Nitro, we collect information you provide directly, such as your name, email address, phone number, and payment details during registration and transactions. We also automatically collect technical data including your IP address, browser type, device information, operating system, referring URLs, pages viewed, time spent on pages, click patterns, and interaction data. Additionally, we collect transaction data including order history, wallet activity, payment records, and service usage metrics.
-        </S>
-
-        <S title="2. How We Use Your Information">
-          We use the information we collect to provide, operate, and maintain our services, process your transactions and deliver ordered services, communicate with you about your account, orders, and support requests, improve and personalize your experience on the Platform, conduct research, analytics, and data analysis to enhance our services and develop new features, generate aggregated and anonymized insights for business intelligence, marketing analysis, and strategic planning, detect, prevent, and address fraud, abuse, and security issues, comply with legal obligations and enforce our terms, and send you updates, promotional materials, and relevant communications about our services. By using the Platform, you acknowledge that data generated through your use of our services may be utilized by Nitro for internal and commercial purposes, including service optimization, product development, market research, and business analytics.
-        </S>
-
-        <S title="3. Data Sharing & Disclosure">
-          We may share your information with third-party payment processors (Paystack, Flutterwave, Monnify, Korapay) to facilitate transactions, with API service providers to fulfill your orders (only the minimum data required, such as target URLs), with analytics and infrastructure providers that help us operate the Platform, with law enforcement or regulatory authorities when required by law or to protect our legal rights, and in connection with a merger, acquisition, or sale of assets. We do not sell your personal contact information to third-party advertisers. However, we may share aggregated, anonymized data that does not identify you personally with partners, advertisers, or other third parties for commercial purposes.
-        </S>
-
-        <S title="4. Cookies & Tracking">
-          We use cookies and similar technologies to keep you logged in and maintain your session, remember your preferences such as theme settings, analyze usage patterns and improve the Platform, and ensure security and prevent fraud. You can manage cookie preferences through your browser settings, though disabling certain cookies may affect Platform functionality.
-        </S>
-
-        <S title="5. Data Retention">
-          We retain your personal data for as long as your account is active or as needed to provide services. Transaction records and order history are retained for a minimum of 5 years for legal and accounting purposes. After account deletion, we may retain anonymized and aggregated data indefinitely for analytics and business purposes. Backup copies may persist in our systems for a reasonable period after deletion.
-        </S>
-
-        <S title="6. Data Security">
-          We implement industry-standard security measures including encryption of data in transit and at rest, secure payment processing through certified payment gateways, regular security audits and monitoring, and access controls limiting employee access to personal data. While we strive to protect your information, no method of electronic transmission or storage is 100% secure, and we cannot guarantee absolute security.
-        </S>
-
-        <S title="7. Your Rights">
-          Depending on your location and applicable law, you may have the right to access the personal data we hold about you, request correction of inaccurate data, request deletion of your account and associated data (subject to our retention requirements), object to certain processing of your data, and request a copy of your data in a portable format. To exercise these rights, contact us at <a href="mailto:privacy@thenitro.ng" style={{color:t.accent}}>privacy@thenitro.ng</a>. We will respond within 30 days.
-        </S>
-
-        <S title="8. Children's Privacy">
-          Nitro is not intended for users under 18 years of age. We do not knowingly collect personal information from minors. If we learn that we have collected data from a user under 18, we will delete that information promptly.
-        </S>
-
-        <S title="9. International Data">
-          Your data may be processed and stored in Nigeria and other countries where our service providers operate. By using the Platform, you consent to the transfer of your information to these locations.
-        </S>
-
-        <S title="10. Third-Party Links">
-          The Platform may contain links to third-party websites and social media platforms. We are not responsible for the privacy practices or content of these external sites. We encourage you to review the privacy policies of any third-party services you interact with.
-        </S>
-
-        <S title="11. Changes to This Policy">
-          We may update this Privacy Policy from time to time. Material changes will be communicated through the Platform or via email. Continued use of the Platform after changes constitutes acceptance of the updated policy.
-        </S>
-
-        <S title="12. Contact Us">
-          For privacy-related questions or requests, contact us at <a href="mailto:privacy@thenitro.ng" style={{color:t.accent}}>privacy@thenitro.ng</a>
-        </S>
-
-        <div style={{marginTop:40,paddingTop:24,borderTop:`1px solid ${t.surfaceBorder}`,display:"flex",gap:20,fontSize:13,color:t.textMuted}}>
-          <a href="/terms" style={{color:t.accent,textDecoration:"none"}}>Terms of Service</a>
-          <a href="/" style={{color:t.textMuted,textDecoration:"none"}}>Back to Home</a>
+      <div style={{flex:1,maxWidth:780,margin:"0 auto",width:"100%",padding:"48px 24px 60px"}}>
+        <div style={{marginBottom:40}}>
+          <div style={{fontSize:10,fontWeight:700,textTransform:"uppercase",letterSpacing:3,color:t.accent,marginBottom:10}}>{label}</div>
+          <h1 style={{fontSize:"clamp(32px,5vw,44px)",fontWeight:800,color:t.text,letterSpacing:-.5,lineHeight:1.1,marginBottom:8}}>{title} <span className="serif" style={{fontWeight:400,fontStyle:"italic",color:t.accent,fontSize:"clamp(36px,5.5vw,50px)"}}>{titleAccent}</span></h1>
+          <p className="m" style={{fontSize:12,color:t.muted,fontWeight:500}}>Last updated: {date}</p>
         </div>
-      </div>
 
-      <footer style={{borderTop:`1px solid ${t.surfaceBorder}`,marginTop:40}}>
-        <div style={{maxWidth:800,margin:"0 auto",padding:"24px 24px"}}>
-          <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:12}}>
-            <div style={{fontSize:12,color:t.textMuted}}>© 2026 Nitro. All rights reserved.</div>
-            <div style={{display:"flex",flexDirection:"column",alignItems:"flex-end",gap:8}}>
-              <div style={{display:"flex",gap:16}}>{["Twitter","Instagram"].map(s=><a key={s} href="#" style={{fontSize:12,color:t.textSoft,textDecoration:"none"}}>{s}</a>)}</div>
-              <div style={{display:"flex",gap:16}}>{[["Terms","/terms"],["Privacy","/privacy"],["Refund","/refund"],["Cookie","/cookie"]].map(([l,h])=><a key={l} href={h} style={{fontSize:11,color:t.textMuted,textDecoration:"none"}}>{l}</a>)}</div>
+        <div style={{display:"flex",flexDirection:"column",gap:16}}>
+          {sections.map(([sTitle,content],i)=>(
+            <div key={i} style={{padding:"24px 24px",borderRadius:18,background:t.surface,border:`1px solid ${t.surfaceBrd}`,backdropFilter:"blur(16px)",position:"relative",overflow:"hidden"}}>
+              <div style={{position:"absolute",top:0,left:0,width:"25%",height:2,background:t.accent,opacity:.3}}/>
+              <div style={{display:"flex",alignItems:"flex-start",gap:16}}>
+                <span className="m" style={{fontSize:12,fontWeight:600,color:t.accent,flexShrink:0,marginTop:2,width:24}}>{String(i+1).padStart(2,"0")}</span>
+                <div style={{flex:1}}>
+                  <h2 style={{fontSize:17,fontWeight:700,color:t.text,marginBottom:10,letterSpacing:-.2}}>{sTitle}</h2>
+                  <p style={{fontSize:14,color:t.soft,lineHeight:1.85,fontWeight:430}}>
+                    {emailField&&content.includes(emailField)?<>{content.split(emailField)[0]}<a href={`mailto:${emailField}`} style={{color:t.accent}}>{emailField}</a>{content.split(emailField)[1]||""}</>:content}
+                  </p>
+                </div>
+              </div>
             </div>
-          </div>
+          ))}
+        </div>
+
+        <div style={{marginTop:40,display:"flex",gap:16,flexWrap:"wrap"}}>
+          {relatedLinks.map(([l,h])=><a key={l} href={h} style={{fontSize:13,color:t.accent,fontWeight:550}}>{l}</a>)}
+        </div>
+      </div>
+
+      <footer style={{borderTop:`1px solid ${t.surfaceBrd}`,padding:"20px 24px"}}>
+        <div style={{maxWidth:780,margin:"0 auto",display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:12}}>
+          <span style={{fontSize:12,color:t.muted}}>© 2026 Nitro. All rights reserved.</span>
+          <div style={{display:"flex",gap:16}}>{[["Terms","/terms"],["Privacy","/privacy"],["Refund","/refund"],["Cookie","/cookie"]].map(([l,h])=><a key={l} href={h} style={{fontSize:11,color:t.muted}}>{l}</a>)}</div>
         </div>
       </footer>
     </div>
