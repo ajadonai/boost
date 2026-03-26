@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect, useRef } from "react";
 import { ErrorBoundary } from './error-boundary';
+import LoadingScreen from './loading-screen';
 
 const GATEWAYS = [
   {id:"paystack",name:"Paystack",enabled:true},
@@ -216,15 +217,7 @@ export default function App() {
     sbBorder:dark?"rgba(255,255,255,0.06)":"rgba(0,0,0,0.06)",
   };
 
-  if (loading || !user) return (
-    <div style={{height:"100vh",display:"flex",alignItems:"center",justifyContent:"center",background:t.bg}}>
-      <div style={{textAlign:"center"}}>
-        <div style={{marginBottom:24,animation:"pulse 1.5s ease infinite"}}><div style={{width:64,height:64,borderRadius:16,background:"linear-gradient(135deg,#c47d8e,#8b5e6b)",display:"flex",alignItems:"center",justifyContent:"center"}}><svg width="28" height="28" viewBox="0 0 20 20" fill="none"><path d="M4,16 L4,4 L16,16 L16,4" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/></svg></div></div>
-        <div style={{fontSize:14,fontWeight:500,color:t.textSoft}}>Loading your dashboard...</div>
-      </div>
-      <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}`}</style>
-    </div>
-  );
+  if (loading || !user) return <LoadingScreen />;
 
   const activeOrders=orders.filter(o=>["Processing","Pending"].includes(o.status)).length;
 
