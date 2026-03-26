@@ -40,7 +40,8 @@ export default function Landing(){
   const [promoBanner,setPromoBanner]=useState(null);
   const [siteAlerts,setSiteAlerts]=useState([]);
 
-  useEffect(()=>{const iv=setInterval(()=>setActiveStep(s=>(s+1)%4),3500);return()=>clearInterval(iv);},[]);
+  const stepsHover=useRef(false);
+  useEffect(()=>{const iv=setInterval(()=>{if(!stepsHover.current)setActiveStep(s=>(s+1)%4)},3500);return()=>clearInterval(iv);},[]);
   useEffect(()=>{const el=scrollRef.current;if(!el)return;const onScroll=()=>setScrolled(el.scrollTop>20);el.addEventListener("scroll",onScroll);return()=>el.removeEventListener("scroll",onScroll);},[]);
   useEffect(()=>{const p=new URLSearchParams(window.location.search);if(p.get("login"))setModal("login");if(p.get("signup"))setModal("signup");if(p.get("ref"))setModal("signup");},[]);
   useEffect(()=>{(async()=>{try{const res=await fetch("/api/site-info");if(res.ok){const d=await res.json();if(d.stats)setSiteStats(d.stats);if(d.promo)setPromoBanner(d.promo);if(d.alerts?.length)setSiteAlerts(d.alerts);}}catch{}})();},[]);
@@ -222,7 +223,7 @@ export default function Landing(){
               <p className="s2-desc s2-desc-steps" style={{color:t.textSoft}}>From sign-up to growth in under a minute.</p>
 
               {/* Desktop: progress bar + active card */}
-              <div className="s2-steps-progress">
+              <div className="s2-steps-progress" onMouseEnter={()=>{stepsHover.current=true}} onMouseLeave={()=>{stepsHover.current=false}}>
                 {[["01","📝","Create Account"],["02","💰","Add Funds"],["03","🛒","Place Order"],["04","🚀","Watch It Grow"]].map(([num,emoji,title],i)=>(
                   <div key={i} className="s2-step-node" style={{flex:i<3?1:"none",display:"flex",alignItems:"center"}}>
                     <button onClick={()=>setActiveStep(i)} onMouseEnter={()=>setActiveStep(i)} className="s2-step-btn" style={{background:activeStep===i?t.accent:(t.cardBg),border:`1px solid ${activeStep===i?t.accent:t.surfaceBorder}`}}>
@@ -232,7 +233,7 @@ export default function Landing(){
                   </div>
                 ))}
               </div>
-              <div className="s2-step-detail" style={{background:t.cardBg,border:`1px solid ${t.surfaceBorder}`}}>
+              <div className="s2-step-detail" onMouseEnter={()=>{stepsHover.current=true}} onMouseLeave={()=>{stepsHover.current=false}} style={{background:t.cardBg,border:`1px solid ${t.surfaceBorder}`}}>
                 <div className="s2-step-detail-header">
                   <span className="s2-step-detail-emoji">{["📝","💰","🛒","🚀"][activeStep]}</span>
                   <span className="s2-step-detail-title" style={{color:t.text}}>{["Create Account","Add Funds","Place Order","Watch It Grow"][activeStep]}</span>
