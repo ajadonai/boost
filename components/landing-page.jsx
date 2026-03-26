@@ -608,7 +608,7 @@ function AuthModal({dark,t,mode,setMode,onClose}){
         <p style={{fontSize:14,color:t.textSoft,textAlign:"center",marginBottom:28,fontWeight:430}}>{mode==="login"?"Log in to your Nitro account":mode==="forgot"?(forgotSent?"Check your email for the reset link":"Enter your email and we'll send a reset link"):step===1?"Step 1 of 2 — Your details":"Step 2 of 2 — Set your password"}</p>
 
         {/* Error — space always reserved */}
-        <div style={{minHeight:42,marginBottom:4}}>{error?<div style={{padding:"10px 14px",borderRadius:10,background:dark?"rgba(220,38,38,0.1)":"#fef2f2",border:`1px solid ${dark?"rgba(220,38,38,0.2)":"#fecaca"}`,color:dark?"#fca5a5":"#dc2626",fontSize:13}}>⚠️ {error}</div>:null}</div>
+        <div style={{height:36,marginBottom:2,display:"flex",alignItems:"center"}}>{error?<div style={{width:"100%",padding:"8px 12px",borderRadius:8,background:dark?"rgba(220,38,38,0.1)":"#fef2f2",border:`1px solid ${dark?"rgba(220,38,38,0.2)":"#fecaca"}`,color:dark?"#fca5a5":"#dc2626",fontSize:12,lineHeight:1.2}}>⚠️ {error}</div>:null}</div>
 
         {/* ── LOGIN ── */}
         {mode==="login"&&<>

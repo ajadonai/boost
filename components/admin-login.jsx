@@ -104,7 +104,7 @@ export default function AdminLogin(){
             <p style={{fontSize:13,color:t.textMuted,marginTop:6}}>Authorized personnel only</p>
           </div>
 
-          <div style={{minHeight:42,marginBottom:4}}>{error?<div style={{padding:"10px 14px",borderRadius:10,background:dark?"rgba(220,38,38,.1)":"#fef2f2",border:`1px solid ${dark?"rgba(220,38,38,.2)":"#fecaca"}`,color:t.red,fontSize:13}}>⚠️ {error}</div>:null}</div>
+          <div style={{height:36,marginBottom:2,display:"flex",alignItems:"center"}}>{error?<div style={{width:"100%",padding:"8px 12px",borderRadius:8,background:dark?"rgba(220,38,38,.1)":"#fef2f2",border:`1px solid ${dark?"rgba(220,38,38,.2)":"#fecaca"}`,color:t.red,fontSize:12,lineHeight:1.2}}>⚠️ {error}</div>:null}</div>
 
           <label style={{fontSize:11,color:t.textSoft,fontWeight:600,display:"block",marginBottom:5,textTransform:"uppercase",letterSpacing:1.5}}>Email Address</label>
           <input value={email} onChange={e=>{setEmail(e.target.value);setError("");}} placeholder="admin@thenitro.ng" type="email" style={{width:"100%",padding:"12px 14px",borderRadius:10,background:t.inputBg,border:`1px solid ${t.inputBorder}`,color:t.text,fontSize:14,outline:"none",marginBottom:16}}/>
