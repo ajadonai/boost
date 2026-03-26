@@ -121,6 +121,7 @@ input { font-family: inherit; }
     justify-content: center;
   }
   .hero-left {
+    flex: none;
     text-align: center;
     max-width: 100%;
     display: flex;
