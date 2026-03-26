@@ -306,34 +306,156 @@ input { font-family: inherit; }
 /* ══════════════════════════════════════ */
 /* ══ USER DASHBOARD ══ */
 /* ══════════════════════════════════════ */
-.dash-nav { height: 56px; padding: 0 24px; }
-.dash-nav-name { }
-.dash-hamburger { display: none !important; }
-.dash-left { width: 220px; }
-.dash-right { width: 240px; display: flex; flex-direction: column; }
-.dash-main { padding: 28px; }
-.dash-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 24px; }
-.dash-overlay { display: none; }
 
+/* Shell */
+.dash-root { height: 100dvh; display: flex; flex-direction: column; }
+.dash-body { display: flex; flex: 1; position: relative; overflow: hidden; }
+
+/* Nav */
+.dash-nav { display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; z-index: 20; height: 56px; padding: 0 24px; }
+.dash-nav-left { display: flex; align-items: center; gap: 12px; }
+.dash-nav-right { display: flex; align-items: center; gap: 16px; }
+.dash-hamburger { display: none !important; background: none; padding: 4px; }
+.dash-logo-link { display: flex; align-items: center; gap: 8px; text-decoration: none; }
+.dash-logo-box { width: 26px; height: 26px; border-radius: 7px; background: linear-gradient(135deg, #c47d8e, #8b5e6b); display: flex; align-items: center; justify-content: center; }
+.dash-logo-text { font-size: 14px; font-weight: 700; letter-spacing: 1.5px; }
+.dash-nav-name { font-size: 13px; font-weight: 550; }
+
+/* Theme toggle */
+.dash-theme-toggle { width: 44px; height: 24px; border-radius: 12px; position: relative; }
+.dash-theme-thumb { width: 18px; height: 18px; border-radius: 50%; position: absolute; top: 2px; transition: left .6s cubic-bezier(.4,0,.2,1); display: flex; align-items: center; justify-content: center; }
+
+/* Bell */
+.dash-bell { background: none; display: flex; position: relative; padding: 2px; }
+.dash-bell-dot { position: absolute; top: 0; right: 0; width: 7px; height: 7px; border-radius: 50%; background: #dc2626; }
+
+/* Avatar */
+.dash-avatar-btn { background: none; display: flex; align-items: center; gap: 8px; }
+.dash-avatar { width: 30px; height: 30px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #fff; }
+
+/* Notification dropdown */
+.dash-notif { position: absolute; top: calc(100% + 8px); right: 0; width: 320px; border-radius: 14px; backdrop-filter: blur(20px); z-index: 50; overflow: hidden; }
+.dash-notif-header { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; }
+.dash-notif-list { max-height: 280px; overflow-y: auto; }
+.dash-notif-item { display: flex; align-items: flex-start; gap: 10px; padding: 12px 16px; }
+.dash-notif-icon { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
+/* Left sidebar */
+.dash-left { width: 220px; display: flex; flex-direction: column; padding: 16px 12px; flex-shrink: 0; overflow: auto; }
+.dash-sidebar-close { display: none; }
+.dash-nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 12px; font-size: 13px; margin-bottom: 2px; text-align: left; width: 100%; background: none; }
+.dash-sidebar-divider { height: 1px; margin: 8px 14px; }
+.dash-sidebar-balance { padding: 10px 14px; margin-bottom: 4px; }
+.dash-bal-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 4px; }
+.dash-bal-value { font-size: 18px; font-weight: 700; }
+.dash-logout { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 12px; background: none; color: #dc2626; font-size: 13px; font-weight: 450; text-align: left; width: 100%; opacity: .7; }
+
+/* Overlay */
+.dash-overlay { display: none; position: absolute; inset: 0; background: rgba(0,0,0,.3); z-index: 10; }
+
+/* Main content */
+.dash-main { flex: 1; overflow: auto; padding: 28px; display: flex; flex-direction: column; }
+.dash-welcome { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+.dash-welcome-sub { font-size: 13px; margin-bottom: 24px; }
+
+/* Alert bar */
+.dash-alert { padding: 12px 16px; border-radius: 12px; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 450; line-height: 1.4; border-left-width: 3px; }
+
+/* Stat cards */
+.dash-stats { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+.dash-stat-card { padding: 20px; border-radius: 16px; }
+.dash-stat-label { font-size: 12px; margin-bottom: 8px; font-weight: 450; }
+.dash-stat-value { font-size: 24px; font-weight: 700; }
+.dash-stat-sub { font-size: 11px; margin-top: 4px; font-weight: 400; }
+
+/* Section title */
+.dash-section-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px; }
+
+/* Orders card */
+.dash-orders-card { border-radius: 16px; padding: 4px 16px; }
+.dash-order-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; gap: 12px; }
+.dash-order-service { font-size: 13px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dash-order-meta { display: flex; gap: 12px; margin-top: 4px; flex-wrap: wrap; font-size: 11px; }
+.dash-order-right { text-align: right; flex-shrink: 0; }
+.dash-order-amount { font-size: 13px; font-weight: 600; }
+.dash-empty { padding: 40px 20px; text-align: center; font-size: 14px; font-weight: 500; }
+.dash-view-all { text-align: center; padding: 10px 0; }
+.dash-view-all button { font-size: 12px; font-weight: 550; background: none; }
+
+/* Placeholder page */
+.dash-placeholder { padding: 40px; border-radius: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 300px; }
+
+/* Mobile referral card */
+.dash-mobile-ref { display: none; margin-top: 16px; border-radius: 14px; padding: 16px; text-align: center; }
+.dash-ref-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 4px; }
+.dash-ref-code { font-size: 18px; font-weight: 700; letter-spacing: 2px; }
+.dash-ref-stats { font-size: 11px; margin-top: 4px; }
+
+/* Footer */
+.dash-footer { padding: 16px 0 8px; margin-top: auto; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; font-size: 11px; }
+.dash-footer-links { display: flex; align-items: center; gap: 16px; }
+.dash-footer-links a { text-decoration: none; display: flex; align-items: center; }
+
+/* Right sidebar */
+.dash-right { width: 320px; flex-shrink: 0; display: flex; flex-direction: column; padding: 20px 16px; overflow: hidden; }
+.dash-rs-section { overflow: auto; }
+.dash-rs-active { flex: 0 0 40%; }
+.dash-rs-promo { flex: 0 0 45%; padding-top: 8px; }
+.dash-rs-ref { flex: 0 0 15%; display: flex; align-items: center; padding-top: 8px; }
+.dash-rs-divider { height: 1px; margin: 4px 0; flex-shrink: 0; }
+.dash-rs-title { font-size: 10px; font-weight: 650; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px; padding-left: 4px; }
+.dash-rs-pills { display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; }
+.dash-rs-pill { display: flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 8px; font-size: 10px; font-weight: 600; }
+.dash-rs-dot { width: 5px; height: 5px; border-radius: 50%; animation: pd 1.5s ease-in-out infinite; }
+@keyframes pd { 0%, 100% { opacity: 1; } 50% { opacity: .4; } }
+.dash-rs-list { display: flex; flex-direction: column; gap: 6px; }
+.dash-rs-item { padding: 10px 12px; border-radius: 10px; }
+.dash-rs-item-name { font-size: 12px; font-weight: 500; margin-bottom: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dash-rs-item-row { display: flex; justify-content: space-between; align-items: center; font-size: 10px; }
+.dash-rs-viewall { width: 100%; padding: 6px 0; font-size: 11px; font-weight: 550; text-align: center; background: none; margin-top: 4px; }
+.dash-rs-stats-list { display: flex; flex-direction: column; }
+.dash-rs-stat-row { display: flex; align-items: center; gap: 10px; padding: 9px 4px; }
+.dash-rs-stat-icon { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.dash-rs-stat-label { font-size: 10px; font-weight: 450; }
+.dash-rs-stat-val { font-size: 12px; font-weight: 600; margin-top: 1px; }
+.dash-rs-ref-card { padding: 14px; border-radius: 12px; text-align: center; width: 100%; }
+
+/* ── TABLET: 768-1199px ── */
 @media (max-width: 1199px) {
   .dash-nav { height: 52px; padding: 0 20px; }
   .dash-hamburger { display: flex !important; }
   .dash-right { display: none !important; }
   .dash-left {
-    width: 240px; position: absolute; top: 0; bottom: 0; z-index: 15;
-    left: -240px;
+    width: 260px; position: absolute; top: 0; bottom: 0; z-index: 15;
+    left: -260px;
     transition: left .3s ease;
   }
+  .dash-sidebar-close { display: flex; position: absolute; top: 12px; right: 12px; background: none; padding: 4px; z-index: 5; }
   .dash-overlay { display: block; }
   .dash-main { padding: 24px; }
   .dash-stats { grid-template-columns: 1fr 1fr; }
+  .dash-mobile-ref { display: block; }
 }
 
+/* ── MOBILE: 0-767px ── */
 @media (max-width: 767px) {
   .dash-nav { height: 52px; padding: 0 16px; }
   .dash-nav-name { display: none; }
+  .dash-nav-right { gap: 12px; }
   .dash-main { padding: 16px; }
-  .dash-stats { grid-template-columns: 1fr; }
+  .dash-stats { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .dash-stat-card { padding: 14px; border-radius: 12px; }
+  .dash-stat-value { font-size: 20px; }
+  .dash-stat-label { font-size: 10px; margin-bottom: 4px; }
+  .dash-stat-sub { font-size: 10px; margin-top: 2px; }
+  .dash-welcome { font-size: 18px; }
+  .dash-welcome-sub { font-size: 12px; margin-bottom: 16px; }
+  .dash-orders-card { border-radius: 12px; padding: 2px 12px; }
+  .dash-order-meta { gap: 6px; }
+  .dash-notif { width: 280px; right: -8px; }
+  .dash-alert { padding: 10px 12px; border-radius: 10px; font-size: 12px; }
+  .dash-mobile-ref { border-radius: 12px; padding: 14px; }
+  .dash-ref-code { font-size: 16px; }
 }
 
 /* ══════════════════════════════════════ */
