@@ -153,7 +153,7 @@ export default function Landing(){
             <div style={{position:"absolute",bottom:"5%",right:"10%",width:250,height:250,borderRadius:"50%",background:dark?"rgba(110,160,230,.04)":"rgba(255,255,255,.06)",filter:"blur(80px)",animation:"float2 25s ease-in-out infinite"}}/>
           </div>
 
-          <div className="hero-split" style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center"}}>
+          <div className="hero-split" style={{flex:"1 1 0%",display:"flex",alignItems:"center",justifyContent:"center",minHeight:0}}>
             {/* LEFT */}
             <div className="hero-left">
               <div className="fu hero-badge" style={{display:"inline-flex",alignItems:"center",gap:8,padding:"6px 18px",borderRadius:24,background:t.heroAccentBadge,border:`1px solid ${dark?"rgba(196,125,142,.15)":"rgba(255,255,255,.3)"}`,fontSize:13,fontWeight:550,color:dark?t.accent:"#fff",marginBottom:28,backdropFilter:"blur(8px)"}}>🚀 Trusted by {siteStats.users} creators across Nigeria</div>
