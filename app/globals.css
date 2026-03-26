@@ -360,7 +360,7 @@ input { font-family: inherit; }
     align-items: center;
   }
   .hero-right { display: none; }
-  .hero-mobile-cta { display: flex; justify-content: center; margin-top: 24px; }
+  .hero-mobile-cta { display: flex; justify-content: center; margin-top: 40px; }
   .hero-view-pricing { display: none; }
   .hero-stats {
     justify-content: center;
@@ -489,7 +489,7 @@ input { font-family: inherit; }
   .hero-h1 { font-size: 32px; margin-bottom: 10px; }
   .hero-refined { font-size: 36px; }
   .hero-sub { font-size: 14px; margin-bottom: 18px; max-width: 320px; text-align: center; line-height: 1.5; }
-  .hero-mobile-cta { margin-top: 18px; }
+  .hero-mobile-cta { margin-top: 30px; }
   .hero-mobile-cta button { padding: 13px 36px; font-size: 14px; border-radius: 14px; }
   .stat-card { padding: 10px 6px; border-radius: 12px; min-width: 0; width: 100%; }
   .stat-card .m { font-size: 16px; }
