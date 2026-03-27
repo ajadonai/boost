@@ -346,7 +346,7 @@ input { font-family: inherit; }
 /* Left sidebar */
 .dash-left { width: 220px; display: flex; flex-direction: column; padding: 16px 12px; flex-shrink: 0; overflow: auto; }
 .dash-sidebar-close { display: none; }
-.dash-nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 12px; font-size: 13px; margin-bottom: 2px; text-align: left; width: 100%; background: none; }
+.dash-nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 12px; font-size: 13.5px; margin-bottom: 2px; text-align: left; width: 100%; background: none; }
 .dash-sidebar-divider { height: 1px; margin: 8px 14px; }
 .dash-sidebar-balance { padding: 10px 14px; margin-bottom: 4px; }
 .dash-bal-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 4px; }
@@ -367,20 +367,20 @@ input { font-family: inherit; }
 /* Stat cards */
 .dash-stats { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; margin-bottom: 24px; }
 .dash-stat-card { padding: 20px; border-radius: 16px; }
-.dash-stat-label { font-size: 12px; margin-bottom: 8px; font-weight: 450; }
+.dash-stat-label { font-size: 12px; margin-bottom: 8px; font-weight: 500; }
 .dash-stat-value { font-size: 24px; font-weight: 700; }
-.dash-stat-sub { font-size: 11px; margin-top: 4px; font-weight: 400; }
+.dash-stat-sub { font-size: 12px; margin-top: 4px; font-weight: 400; }
 
 /* Section title */
-.dash-section-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px; }
+.dash-section-title { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px; }
 
 /* Orders card */
 .dash-orders-card { border-radius: 16px; padding: 4px 16px; }
 .dash-order-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; gap: 12px; }
-.dash-order-service { font-size: 13px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.dash-order-meta { display: flex; gap: 12px; margin-top: 4px; flex-wrap: wrap; font-size: 11px; }
+.dash-order-service { font-size: 14px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dash-order-meta { display: flex; gap: 12px; margin-top: 4px; flex-wrap: wrap; font-size: 12px; }
 .dash-order-right { text-align: right; flex-shrink: 0; }
-.dash-order-amount { font-size: 13px; font-weight: 600; }
+.dash-order-amount { font-size: 14px; font-weight: 600; }
 .dash-empty { padding: 40px 20px; text-align: center; font-size: 14px; font-weight: 500; }
 .dash-view-all { text-align: center; padding: 10px 0; }
 .dash-view-all button { font-size: 12px; font-weight: 550; background: none; }
@@ -406,7 +406,7 @@ input { font-family: inherit; }
 .dash-rs-promo { flex: 0 0 45%; padding-top: 8px; }
 .dash-rs-ref { flex: 0 0 15%; display: flex; align-items: center; padding-top: 8px; }
 .dash-rs-divider { height: 1px; margin: 4px 0; flex-shrink: 0; }
-.dash-rs-title { font-size: 10px; font-weight: 650; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px; padding-left: 4px; }
+.dash-rs-title { font-size: 11px; font-weight: 650; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px; padding-left: 4px; }
 .dash-rs-pills { display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; }
 .dash-rs-pill { display: flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 8px; font-size: 10px; font-weight: 600; }
 .dash-rs-dot { width: 5px; height: 5px; border-radius: 50%; animation: pd 1.5s ease-in-out infinite; }
@@ -419,7 +419,7 @@ input { font-family: inherit; }
 .dash-rs-stats-list { display: flex; flex-direction: column; }
 .dash-rs-stat-row { display: flex; align-items: center; gap: 10px; padding: 9px 4px; }
 .dash-rs-stat-icon { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.dash-rs-stat-label { font-size: 10px; font-weight: 450; }
+.dash-rs-stat-label { font-size: 11px; font-weight: 500; }
 .dash-rs-stat-val { font-size: 12px; font-weight: 600; margin-top: 1px; }
 .dash-rs-ref-card { padding: 14px; border-radius: 12px; text-align: center; width: 100%; }
 

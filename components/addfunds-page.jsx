@@ -10,6 +10,8 @@ const GATEWAYS = [
   { id: "paystack", label: "Paystack", enabled: true },
   { id: "flutterwave", label: "Flutterwave", enabled: true },
   { id: "alatpay", label: "ALATPay (Wema)", enabled: true },
+  { id: "crypto", label: "Crypto (USDT/BTC)", enabled: false },
+  { id: "monnify", label: "Monnify", enabled: false },
 ];
 
 const ACCEPTED_TYPES = ["Cards", "Bank Transfer", "USSD", "Mobile Money"];
@@ -141,12 +143,15 @@ export default function AddFundsPage({ user, dark, t, paymentStatus, setPaymentS
             {/* Payment method selector */}
             <div className="fund-method-section">
               <div className="fund-method-title" style={{ color: t.text }}>Select payment method</div>
-              {activeGateways.map((g, i) => (
-                <div key={g.id} onClick={() => setMethod(g.id)} className="fund-method-row" style={{ borderBottom: i < activeGateways.length - 1 ? `1px solid ${t.cardBorder}` : "none" }}>
-                  <div className="fund-radio" style={{ borderWidth: 2, borderStyle: "solid", borderColor: method === g.id ? t.accent : (dark ? "rgba(255,255,255,.15)" : "rgba(0,0,0,.15)") }}>
-                    {method === g.id && <div className="fund-radio-dot" style={{ background: t.accent }} />}
+              {GATEWAYS.map((g, i) => (
+                <div key={g.id} onClick={() => g.enabled && setMethod(g.id)} className="fund-method-row" style={{ borderBottom: i < GATEWAYS.length - 1 ? `1px solid ${t.cardBorder}` : "none", opacity: g.enabled ? 1 : .4, cursor: g.enabled ? "pointer" : "default" }}>
+                  <div className="fund-radio" style={{ borderWidth: 2, borderStyle: "solid", borderColor: method === g.id && g.enabled ? t.accent : (dark ? "rgba(255,255,255,.15)" : "rgba(0,0,0,.15)") }}>
+                    {method === g.id && g.enabled && <div className="fund-radio-dot" style={{ background: t.accent }} />}
                   </div>
-                  <span style={{ fontSize: 13, fontWeight: method === g.id ? 600 : 450, color: method === g.id ? t.text : t.textSoft }}>{g.label}</span>
+                  <span style={{ fontSize: 13, fontWeight: method === g.id && g.enabled ? 600 : 450, color: method === g.id && g.enabled ? t.text : t.textSoft, display: "flex", alignItems: "center", gap: 8 }}>
+                    {g.label}
+                    {!g.enabled && <span className="m" style={{ fontSize: 9, padding: "2px 6px", borderRadius: 4, background: dark ? "#1c1608" : "#fffbeb", color: dark ? "#fcd34d" : "#d97706", fontWeight: 700 }}>SOON</span>}
+                  </span>
                 </div>
               ))}
             </div>

@@ -368,14 +368,14 @@ export default function Dashboard() {
   const t = useMemo(() => ({
     bg: dark ? "#080b14" : "#f4f1ed",
     sidebarBg: dark ? "#060810" : "#eceae5",
-    sidebarBorder: dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.08)",
-    cardBg: dark ? "rgba(255,255,255,.03)" : "rgba(255,255,255,.75)",
-    cardBorder: dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.08)",
-    text: dark ? "#eae7e2" : "#1a1917",
-    textSoft: dark ? "#8a8680" : "#666460",
-    textMuted: dark ? "#555250" : "#8a8785",
+    sidebarBorder: dark ? "rgba(255,255,255,.08)" : "rgba(0,0,0,.1)",
+    cardBg: dark ? "rgba(255,255,255,.04)" : "rgba(255,255,255,.8)",
+    cardBorder: dark ? "rgba(255,255,255,.08)" : "rgba(0,0,0,.1)",
+    text: dark ? "#f5f3f0" : "#1a1917",
+    textSoft: dark ? "#a09b95" : "#555250",
+    textMuted: dark ? "#706c68" : "#757170",
     accent: "#c47d8e",
-    navActive: dark ? "rgba(196,125,142,.08)" : "rgba(196,125,142,.08)",
+    navActive: dark ? "rgba(196,125,142,.1)" : "rgba(196,125,142,.1)",
     green: dark ? "#6ee7b7" : "#059669",
   }), [dark]);
 
