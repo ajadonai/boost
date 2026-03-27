@@ -173,7 +173,16 @@ export default function OrdersPage({ orders, txs, dark, t }) {
               )}
             </div>
           )) : (
-            <div className="ord-empty" style={{ color: t.textMuted }}>No orders found</div>
+            <div className="ord-empty" style={{ color: t.textMuted, padding: "40px 20px", textAlign: "center" }}>
+              <svg width="48" height="48" viewBox="0 0 64 64" fill="none" style={{ marginBottom: 14, opacity: .5 }}>
+                <rect x="12" y="8" width="40" height="48" rx="6" stroke={t.accent} strokeWidth="1.5" opacity=".3" />
+                <line x1="20" y1="22" x2="44" y2="22" stroke={t.accent} strokeWidth="1.5" opacity=".2" strokeLinecap="round" />
+                <line x1="20" y1="30" x2="38" y2="30" stroke={t.accent} strokeWidth="1.5" opacity=".15" strokeLinecap="round" />
+                <line x1="20" y1="38" x2="34" y2="38" stroke={t.accent} strokeWidth="1.5" opacity=".1" strokeLinecap="round" />
+              </svg>
+              <div style={{ fontSize: 15, fontWeight: 600, color: t.textSoft, marginBottom: 4 }}>No orders found</div>
+              <div style={{ fontSize: 12, color: t.textMuted }}>Your order history will appear here</div>
+            </div>
           )}
         </div>
         <Pagination total={filteredOrders.length} page={oPage} setPage={setOPage} perPage={perPage} setPerPage={setPerPage} t={t} />
@@ -203,7 +212,16 @@ export default function OrdersPage({ orders, txs, dark, t }) {
               </div>
             </div>
           )) : (
-            <div className="ord-empty" style={{ color: t.textMuted }}>No transactions found</div>
+            <div className="ord-empty" style={{ color: t.textMuted, padding: "40px 20px", textAlign: "center" }}>
+              <svg width="48" height="48" viewBox="0 0 64 64" fill="none" style={{ marginBottom: 14, opacity: .5 }}>
+                <rect x="8" y="16" width="48" height="32" rx="6" stroke={t.accent} strokeWidth="1.5" opacity=".25" />
+                <rect x="38" y="26" width="18" height="12" rx="3" stroke={t.accent} strokeWidth="1.5" opacity=".2" />
+                <circle cx="46" cy="32" r="2" stroke={t.accent} strokeWidth="1.5" opacity=".3" />
+                <line x1="16" y1="24" x2="30" y2="24" stroke={t.accent} strokeWidth="1.5" opacity=".15" strokeLinecap="round" />
+              </svg>
+              <div style={{ fontSize: 15, fontWeight: 600, color: t.textSoft, marginBottom: 4 }}>No transactions yet</div>
+              <div style={{ fontSize: 12, color: t.textMuted }}>Deposits and spending will show up here</div>
+            </div>
           )}
         </div>
         <Pagination total={filteredTxs.length} page={tPage} setPage={setTPage} perPage={perPage} setPerPage={setPerPage} t={t} />

@@ -110,8 +110,18 @@ function OverviewPage({ user, orders, alerts, dark, t }) {
           </div>
         )) : (
           <div className="dash-empty">
-            <div style={{ color: t.textSoft }}>No orders yet</div>
-            <div style={{ color: t.textMuted, fontSize: 12, marginTop: 4 }}>Place your first order to see activity here</div>
+            <svg width="56" height="56" viewBox="0 0 64 64" fill="none" style={{ marginBottom: 16, opacity: .6 }}>
+              <rect x="12" y="8" width="40" height="48" rx="6" stroke={t.accent} strokeWidth="1.5" opacity=".3" />
+              <line x1="20" y1="22" x2="44" y2="22" stroke={t.accent} strokeWidth="1.5" opacity=".2" strokeLinecap="round" />
+              <line x1="20" y1="30" x2="38" y2="30" stroke={t.accent} strokeWidth="1.5" opacity=".15" strokeLinecap="round" />
+              <line x1="20" y1="38" x2="34" y2="38" stroke={t.accent} strokeWidth="1.5" opacity=".1" strokeLinecap="round" />
+              <circle cx="32" cy="32" r="12" stroke={t.accent} strokeWidth="1.5" opacity=".2" />
+              <line x1="28" y1="32" x2="36" y2="32" stroke={t.accent} strokeWidth="2" strokeLinecap="round" opacity=".4" />
+              <line x1="32" y1="28" x2="32" y2="36" stroke={t.accent} strokeWidth="2" strokeLinecap="round" opacity=".4" />
+            </svg>
+            <div style={{ fontSize: 16, fontWeight: 600, color: t.textSoft, marginBottom: 6 }}>No orders yet</div>
+            <div style={{ color: t.textMuted, fontSize: 12, marginBottom: 16, lineHeight: 1.5 }}>Place your first order and watch your stats come alive</div>
+            <button onClick={() => {}} style={{ padding: "10px 24px", borderRadius: 8, background: `linear-gradient(135deg,${t.accent},#8b5e6b)`, color: "#fff", fontSize: 13, fontWeight: 600, border: "none" }}>Place your first order</button>
           </div>
         )}
         {orders.length > 5 && (
@@ -213,18 +223,38 @@ function RightSidebar({ orders, user, dark, t }) {
 /* ═══ NOTIFICATION DROPDOWN              ═══ */
 /* ═══════════════════════════════════════════ */
 function NotifDropdown({ orders, txs, dark, t, onClose }) {
+  const [filter, setFilter] = useState("all");
+  const [readIds, setReadIds] = useState(new Set());
+
+  /* Build notification items from real data */
   const items = [
     ...orders.filter(o => o.status === "Completed").slice(0, 3).map(o => ({
-      msg: `Order ${o.id} completed`, time: o.created ? fD(o.created) : "",
-      icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={dark ? "#6ee7b7" : "#059669"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>,
-      iconBg: dark ? "rgba(110,231,183,.1)" : "rgba(5,150,105,.06)",
+      id: `ord-${o.id}`, type: "order", title: "Order completed",
+      desc: `${o.id} · ${o.service || "Service"} delivered`,
+      time: o.created ? fD(o.created) : "",
+      color: dark ? "#60a5fa" : "#2563eb",
+      icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>,
+    })),
+    ...orders.filter(o => o.status === "Processing" || o.status === "Pending").slice(0, 2).map(o => ({
+      id: `proc-${o.id}`, type: "order", title: "Order processing",
+      desc: `${o.id} · ${o.service || "Service"} started`,
+      time: o.created ? fD(o.created) : "",
+      color: dark ? "#e0a458" : "#d97706",
+      icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
     })),
     ...txs.filter(tx => tx.type === "deposit").slice(0, 2).map(tx => ({
-      msg: `Deposit of ${fN(tx.amount)} received`, time: tx.date ? fD(tx.date) : "",
-      icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={dark ? "#6ee7b7" : "#059669"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>,
-      iconBg: dark ? "rgba(110,231,183,.1)" : "rgba(5,150,105,.06)",
+      id: `dep-${tx.id || tx.reference}`, type: "deposit", title: "Deposit received",
+      desc: `${fN(tx.amount)} added via ${tx.method || "Paystack"}`,
+      time: tx.date ? fD(tx.date) : "",
+      color: dark ? "#6ee7b7" : "#059669",
+      icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>,
     })),
   ];
+
+  const filtered = filter === "all" ? items : items.filter(n => n.type === filter);
+  const unreadCount = items.filter(n => !readIds.has(n.id)).length;
+  const markAllRead = () => setReadIds(new Set(items.map(n => n.id)));
+  const markRead = (id) => setReadIds(prev => new Set([...prev, id]));
 
   return (
     <div className="dash-notif" style={{
@@ -232,21 +262,40 @@ function NotifDropdown({ orders, txs, dark, t, onClose }) {
       borderWidth: 1, borderStyle: "solid", borderColor: t.cardBorder,
       boxShadow: dark ? "0 12px 40px rgba(0,0,0,.5)" : "0 12px 40px rgba(0,0,0,.12)",
     }}>
+      {/* Header */}
       <div className="dash-notif-header">
-        <span style={{ fontSize: 13, fontWeight: 600, color: t.text }}>Notifications</span>
-        <button style={{ fontSize: 11, fontWeight: 500, color: t.accent, background: "none" }}>Mark all read</button>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <span style={{ fontSize: 14, fontWeight: 700, color: t.text }}>Notifications</span>
+          {unreadCount > 0 && <span className="m" style={{ fontSize: 9, padding: "2px 6px", borderRadius: 5, background: dark ? "#1c1015" : "#fdf2f4", color: t.accent, fontWeight: 700 }}>{unreadCount}</span>}
+        </div>
+        {unreadCount > 0 && <button onClick={markAllRead} style={{ fontSize: 11, fontWeight: 600, color: t.accent, background: "none" }}>Mark all read</button>}
       </div>
+      {/* Filter tabs */}
+      <div style={{ display: "flex", gap: 4, padding: "0 14px 10px" }}>
+        {[["all", "All"], ["order", "Orders"], ["deposit", "Deposits"]].map(([id, label]) => (
+          <button key={id} onClick={() => setFilter(id)} style={{ padding: "3px 10px", borderRadius: 7, fontSize: 10, fontWeight: 550, background: filter === id ? (dark ? "rgba(196,125,142,.1)" : "rgba(196,125,142,.06)") : "transparent", color: filter === id ? t.accent : t.textMuted }}>{label}</button>
+        ))}
+      </div>
+      <div style={{ height: 1, background: t.cardBorder }} />
+      {/* List */}
       <div className="dash-notif-list">
-        {items.length > 0 ? items.map((n, i) => (
-          <div key={i} className="dash-notif-item" style={{ borderBottom: i < items.length - 1 ? `1px solid ${t.cardBorder}` : "none" }}>
-            <div className="dash-notif-icon" style={{ background: n.iconBg }}>{n.icon}</div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 12, fontWeight: 500, color: t.text }}>{n.msg}</div>
-              <div style={{ fontSize: 10, color: t.textMuted, marginTop: 2 }}>{n.time}</div>
+        {filtered.length > 0 ? filtered.map((n, i) => {
+          const isRead = readIds.has(n.id);
+          return (
+            <div key={n.id} onClick={() => markRead(n.id)} className="dash-notif-item" style={{ borderBottom: i < filtered.length - 1 ? `1px solid ${t.cardBorder}` : "none", background: !isRead ? (dark ? "rgba(196,125,142,.03)" : "rgba(196,125,142,.02)") : "transparent", cursor: "pointer" }}>
+              <div className="dash-notif-icon" style={{ background: `${n.color}15`, color: n.color }}>{n.icon}</div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 6 }}>
+                  <span style={{ fontSize: 12, fontWeight: isRead ? 450 : 600, color: t.text }}>{n.title}</span>
+                  {!isRead && <div style={{ width: 6, height: 6, borderRadius: "50%", background: t.accent, flexShrink: 0 }} />}
+                </div>
+                <div style={{ fontSize: 11, color: t.textSoft, marginTop: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{n.desc}</div>
+                <div style={{ fontSize: 10, color: t.textMuted, marginTop: 3 }}>{n.time}</div>
+              </div>
             </div>
-          </div>
-        )) : (
-          <div style={{ padding: "20px 16px", textAlign: "center", fontSize: 12, color: t.textMuted }}>No new notifications</div>
+          );
+        }) : (
+          <div style={{ padding: "24px 14px", textAlign: "center", fontSize: 12, color: t.textMuted }}>No notifications</div>
         )}
       </div>
     </div>

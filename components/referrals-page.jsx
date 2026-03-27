@@ -107,9 +107,15 @@ export default function ReferralsPage({ user, dark, t }) {
             <div className="m ref-bonus" style={{ color: t.green }}>+{fN(r.bonus || 0)}</div>
           </div>
         )) : (
-          <div className="ref-empty">
-            <div style={{ fontSize: 13, color: t.textMuted, fontWeight: 450 }}>No referrals yet</div>
-            <div style={{ fontSize: 11, color: t.textMuted, opacity: .5, marginTop: 4 }}>Share your link to start earning</div>
+          <div className="ref-empty" style={{ padding: "40px 20px", textAlign: "center" }}>
+            <svg width="48" height="48" viewBox="0 0 64 64" fill="none" style={{ marginBottom: 14, opacity: .5 }}>
+              <circle cx="24" cy="24" r="8" stroke={t.accent} strokeWidth="1.5" opacity=".25" />
+              <circle cx="40" cy="24" r="8" stroke={t.accent} strokeWidth="1.5" opacity=".15" />
+              <path d="M24 36c-8 0-14 4-14 10v2h28v-2c0-6-6-10-14-10z" stroke={t.accent} strokeWidth="1.5" opacity=".2" />
+              <path d="M26 16l6-4 6 4" stroke={t.accent} strokeWidth="1.5" opacity=".2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            <div style={{ fontSize: 15, fontWeight: 600, color: t.textSoft, marginBottom: 4 }}>No referrals yet</div>
+            <div style={{ fontSize: 12, color: t.textMuted, lineHeight: 1.5 }}>Share your link and earn ₦500 for every friend who joins</div>
           </div>
         )}
       </div>
