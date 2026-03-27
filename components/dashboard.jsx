@@ -304,6 +304,9 @@ export default function Dashboard() {
 
   const handleLogout = async () => { try { await fetch("/api/auth/logout", { method: "POST" }); } catch {} window.location.replace("/?logout=1"); };
 
+  /* Reset new-order state when leaving */
+  useEffect(() => { if (!isNewOrder) { setNoSelSvc(null); setNoSelTier(null); setNoLink(""); setNoCatModal(false); } }, [active]);
+
   const t = useMemo(() => ({
     bg: dark ? "#080b14" : "#f4f1ed",
     sidebarBg: dark ? "#060810" : "#eceae5",
@@ -325,9 +328,6 @@ export default function Dashboard() {
   /* Loading */
   const sp = dark ? "rgba(196,125,142,.3)" : "rgba(196,125,142,.2)";
   if (!user) return <div style={{ height: "100dvh", display: "flex", alignItems: "center", justifyContent: "center", background: t.bg }}><div style={{ width: 24, height: 24, borderWidth: 2, borderStyle: "solid", borderTopColor: t.accent, borderRightColor: sp, borderBottomColor: sp, borderLeftColor: sp, borderRadius: "50%", animation: "spin .6s linear infinite" }} /></div>;
-
-  /* Reset new-order state when leaving */
-  useEffect(() => { if (!isNewOrder) { setNoSelSvc(null); setNoSelTier(null); setNoLink(""); setNoCatModal(false); } }, [active]);
 
   /* Render active page */
   const renderPage = () => {
