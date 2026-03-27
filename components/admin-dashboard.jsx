@@ -1,6 +1,11 @@
 'use client';
 import { useState, useEffect, useMemo, useRef } from "react";
 import { ToastProvider } from "./toast";
+import AdminOrdersPage from "./admin-orders";
+import AdminUsersPage from "./admin-users";
+import AdminTicketsPage from "./admin-tickets";
+import AdminServicesPage from "./admin-services";
+import { AdminPaymentsPage, AdminAnalyticsPage, AdminAlertsPage, AdminSettingsPage } from "./admin-pages";
 
 /* ═══════════════════════════════════════════ */
 /* ═══ HELPERS                             ═══ */
@@ -275,14 +280,14 @@ export default function AdminDashboard() {
   const renderPage = () => {
     switch (active) {
       case "overview": return <AdminOverview data={data} dark={dark} t={t} />;
-      case "orders": return <PlaceholderPage title="Orders" subtitle="Manage all platform orders" dark={dark} t={t} />;
-      case "users": return <PlaceholderPage title="Users" subtitle="Manage user accounts" dark={dark} t={t} />;
-      case "tickets": return <PlaceholderPage title="Tickets" subtitle="Customer support tickets" dark={dark} t={t} />;
-      case "services": return <PlaceholderPage title="Services" subtitle="Platform, service, and tier catalog" dark={dark} t={t} />;
-      case "payments": return <PlaceholderPage title="Payments" subtitle="Payment gateways and transactions" dark={dark} t={t} />;
-      case "analytics": return <PlaceholderPage title="Analytics" subtitle="Revenue, growth, and performance" dark={dark} t={t} />;
-      case "alerts": return <PlaceholderPage title="Alerts" subtitle="User-facing notifications and banners" dark={dark} t={t} />;
-      case "settings": return <PlaceholderPage title="Settings" subtitle="Admin preferences and configuration" dark={dark} t={t} />;
+      case "orders": return <AdminOrdersPage dark={dark} t={t} />;
+      case "users": return <AdminUsersPage dark={dark} t={t} />;
+      case "tickets": return <AdminTicketsPage dark={dark} t={t} />;
+      case "services": return <AdminServicesPage dark={dark} t={t} />;
+      case "payments": return <AdminPaymentsPage dark={dark} t={t} />;
+      case "analytics": return <AdminAnalyticsPage dark={dark} t={t} />;
+      case "alerts": return <AdminAlertsPage dark={dark} t={t} />;
+      case "settings": return <AdminSettingsPage admin={admin} dark={dark} t={t} themeMode={themeMode} setThemeMode={setThemeMode} setDark={setDark} />;
       default: return <AdminOverview data={data} dark={dark} t={t} />;
     }
   };
