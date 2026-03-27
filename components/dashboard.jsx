@@ -4,6 +4,8 @@ import NewOrderPage, { PLATFORMS, PLATFORM_GROUPS, OrderForm } from "./new-order
 import OrdersPage, { OrdersSidebar } from "./orders-page";
 import ReferralsPage, { ReferralsSidebar } from "./referrals-page";
 import ServicesPage, { ServicesSidebar } from "./services-page";
+import SettingsPage, { SettingsSidebar } from "./settings-page";
+import SupportPage, { SupportSidebar } from "./support-page";
 
 /* ═══════════════════════════════════════════ */
 /* ═══ SVG ICONS                          ═══ */
@@ -277,6 +279,8 @@ export default function Dashboard() {
   const isOrders = active === "orders";
   const isReferrals = active === "referrals";
   const isServices = active === "services";
+  const isSettings = active === "settings";
+  const isSupport = active === "support";
   const noHasOrder = noSelSvc && noSelTier;
 
   /* Services page state */
@@ -354,6 +358,10 @@ export default function Dashboard() {
         return <ReferralsPage user={user} dark={dark} t={t} />;
       case "services":
         return <ServicesPage dark={dark} t={t} svcPlatform={svcPlatform} setSvcPlatform={setSvcPlatform} onOrderNav={(plat) => { if (plat) setNoPlatform(plat); setActive("new-order"); }} catModal={svcCatModal} setCatModal={setSvcCatModal} />;
+      case "settings":
+        return <SettingsPage user={user} dark={dark} t={t} themeMode={themeMode} setThemeMode={setThemeMode} setDark={setDark} />;
+      case "support":
+        return <SupportPage dark={dark} t={t} tickets={[]} />;
       default:
         return (
           <div className="dash-placeholder" style={{ background: t.cardBg, borderWidth: 1, borderStyle: "solid", borderColor: t.cardBorder }}>
@@ -471,7 +479,7 @@ export default function Dashboard() {
 
         {/* ── MAIN ── */}
         <main className="dash-main" style={{ background: t.bg }}>
-          {!isNewOrder && !isOrders && !isReferrals && !isServices && <>
+          {!isNewOrder && !isOrders && !isReferrals && !isServices && !isSettings && !isSupport && <>
             <div className="dash-welcome" style={{ color: t.text }}>Welcome back, {firstName.toUpperCase()}</div>
             <div className="dash-welcome-sub" style={{ color: t.textMuted }}>Here's what's happening with your account.</div>
           </>}
@@ -512,6 +520,10 @@ export default function Dashboard() {
             <ReferralsSidebar user={user} dark={dark} t={t} />
           ) : isServices ? (
             <ServicesSidebar dark={dark} t={t} onOrderNav={() => setActive("new-order")} />
+          ) : isSettings ? (
+            <SettingsSidebar user={user} dark={dark} t={t} />
+          ) : isSupport ? (
+            <SupportSidebar dark={dark} t={t} tickets={[]} />
           ) : (
             <RightSidebar orders={orders} user={user} dark={dark} t={t} />
           )}
