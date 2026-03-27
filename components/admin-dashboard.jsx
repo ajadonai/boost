@@ -6,6 +6,7 @@ import AdminUsersPage from "./admin-users";
 import AdminTicketsPage from "./admin-tickets";
 import AdminServicesPage from "./admin-services";
 import { AdminPaymentsPage, AdminAnalyticsPage, AdminAlertsPage, AdminSettingsPage } from "./admin-pages";
+import { AdminActivityPage, AdminTeamPage, AdminCouponsPage, AdminNotificationsPage, AdminMaintenancePage, AdminAPIPage } from "./admin-extra-pages";
 
 /* ═══════════════════════════════════════════ */
 /* ═══ HELPERS                             ═══ */
@@ -301,12 +302,12 @@ export default function AdminDashboard() {
       case "payments": return <AdminPaymentsPage dark={dark} t={t} />;
       case "analytics": return <AdminAnalyticsPage dark={dark} t={t} />;
       case "alerts": return <AdminAlertsPage dark={dark} t={t} />;
-      case "coupons": return <PlaceholderPage title="Coupons" subtitle="Manage promo codes and discounts" dark={dark} t={t} />;
-      case "notifications": return <PlaceholderPage title="Notifications" subtitle="Send push notifications to users" dark={dark} t={t} />;
-      case "activity": return <PlaceholderPage title="Activity Log" subtitle="Admin audit trail" dark={dark} t={t} />;
-      case "team": return <PlaceholderPage title="Team" subtitle="Manage admin accounts and roles" dark={dark} t={t} />;
-      case "maintenance": return <PlaceholderPage title="Maintenance" subtitle="Maintenance mode and system controls" dark={dark} t={t} />;
-      case "api": return <PlaceholderPage title="API" subtitle="API keys, rate limits, and documentation" dark={dark} t={t} />;
+      case "coupons": return <AdminCouponsPage dark={dark} t={t} />;
+      case "notifications": return <AdminNotificationsPage dark={dark} t={t} />;
+      case "activity": return <AdminActivityPage dark={dark} t={t} />;
+      case "team": return <AdminTeamPage dark={dark} t={t} />;
+      case "maintenance": return <AdminMaintenancePage dark={dark} t={t} />;
+      case "api": return <AdminAPIPage dark={dark} t={t} />;
       case "settings": return <AdminSettingsPage admin={admin} dark={dark} t={t} themeMode={themeMode} setThemeMode={setThemeMode} setDark={setDark} />;
       default: return <AdminOverview data={data} dark={dark} t={t} />;
     }
