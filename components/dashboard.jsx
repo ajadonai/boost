@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect, useMemo, useRef } from "react";
 import NewOrderPage, { PLATFORMS, PLATFORM_GROUPS, OrderForm } from "./new-order";
+import OrdersPage, { OrdersSidebar } from "./orders-page";
 
 /* ═══════════════════════════════════════════ */
 /* ═══ SVG ICONS                          ═══ */
@@ -271,6 +272,7 @@ export default function Dashboard() {
   const [noLink, setNoLink] = useState("");
   const [noCatModal, setNoCatModal] = useState(false);
   const isNewOrder = active === "new-order";
+  const isOrders = active === "orders";
   const noHasOrder = noSelSvc && noSelTier;
 
   /* Theme */
@@ -338,6 +340,8 @@ export default function Dashboard() {
         return <OverviewPage user={user} orders={orders} alerts={alerts} dark={dark} t={t} />;
       case "new-order":
         return <NewOrderPage dark={dark} t={t} platform={noPlatform} setPlatform={setNoPlatform} selSvc={noSelSvc} setSelSvc={setNoSelSvc} selTier={noSelTier} setSelTier={setNoSelTier} qty={noQty} setQty={setNoQty} link={noLink} setLink={setNoLink} catModal={noCatModal} setCatModal={setNoCatModal} />;
+      case "orders":
+        return <OrdersPage orders={orders} txs={txs} dark={dark} t={t} />;
       default:
         return (
           <div className="dash-placeholder" style={{ background: t.cardBg, borderWidth: 1, borderStyle: "solid", borderColor: t.cardBorder }}>
@@ -451,7 +455,7 @@ export default function Dashboard() {
 
         {/* ── MAIN ── */}
         <main className="dash-main" style={{ background: t.bg }}>
-          {!isNewOrder && <>
+          {!isNewOrder && !isOrders && <>
             <div className="dash-welcome" style={{ color: t.text }}>Welcome back, {firstName.toUpperCase()}</div>
             <div className="dash-welcome-sub" style={{ color: t.textMuted }}>Here's what's happening with your account.</div>
           </>}
@@ -477,7 +481,6 @@ export default function Dashboard() {
         {/* ── RIGHT SIDEBAR ── */}
         <aside className="dash-right" style={{ background: t.sidebarBg, borderLeft: `1px solid ${t.sidebarBorder}` }}>
           {isNewOrder ? (
-            /* Order form in right sidebar */
             noHasOrder ? (
               <OrderForm selSvc={noSelSvc} selTier={noSelTier} platform={noPlatform} qty={noQty} setQty={setNoQty} link={noLink} setLink={setNoLink} dark={dark} t={t} compact />
             ) : (
@@ -487,6 +490,8 @@ export default function Dashboard() {
                 <div style={{ fontSize: 11, color: t.textMuted, opacity: .5, marginTop: 4, textAlign: "center" }}>Choose a platform and service to place an order</div>
               </div>
             )
+          ) : isOrders ? (
+            <OrdersSidebar orders={orders} dark={dark} t={t} />
           ) : (
             <RightSidebar orders={orders} user={user} dark={dark} t={t} />
           )}
