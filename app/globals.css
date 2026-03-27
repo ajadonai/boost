@@ -2,7 +2,7 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  transition: background 1.2s ease, background-color 1.2s ease, color 1.2s ease, border-color 1.2s ease, box-shadow 1.2s ease;
+  transition: background-color 1.2s ease, color 1.2s ease, border-color 1.2s ease;
 }
 
 html, body {
@@ -312,7 +312,6 @@ input { font-family: inherit; }
 .dash-body { display: flex; flex: 1; position: relative; overflow: hidden; }
 
 /* ── HOVER EFFECTS ── */
-.dash-stat-card { transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease, background-color .15s ease !important; cursor: pointer; }
 .dash-stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.08); border-color: rgba(196,125,142,.25) !important; }
 .dash-order-row { transition: background-color .15s ease !important; cursor: pointer; }
 .dash-order-row:hover { background: rgba(196,125,142,.04); }
@@ -424,7 +423,7 @@ input { font-family: inherit; }
 
 /* Stat cards */
 .dash-stats { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; margin-bottom: 24px; }
-.dash-stat-card { padding: 20px; border-radius: 16px; }
+.dash-stat-card { padding: 20px; border-radius: 16px; transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease, background-color .15s ease !important; cursor: pointer; }
 .dash-stat-label { font-size: 12px; margin-bottom: 8px; font-weight: 500; }
 .dash-stat-value { font-size: 24px; font-weight: 700; }
 .dash-stat-sub { font-size: 12px; margin-top: 4px; font-weight: 400; }
