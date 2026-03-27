@@ -281,6 +281,7 @@ export default function Dashboard() {
 
   /* Services page state */
   const [svcPlatform, setSvcPlatform] = useState("instagram");
+  const [svcCatModal, setSvcCatModal] = useState(false);
 
   /* Theme */
   useEffect(() => { const saved = localStorage.getItem("nitro-theme") || "auto"; setThemeMode(saved); if (saved === "day") setDark(false); else if (saved === "night") setDark(true); else setDark(getAuto()); }, []);
@@ -352,7 +353,7 @@ export default function Dashboard() {
       case "referrals":
         return <ReferralsPage user={user} dark={dark} t={t} />;
       case "services":
-        return <ServicesPage dark={dark} t={t} svcPlatform={svcPlatform} setSvcPlatform={setSvcPlatform} onOrderNav={(plat) => { if (plat) setNoPlatform(plat); setActive("new-order"); }} />;
+        return <ServicesPage dark={dark} t={t} svcPlatform={svcPlatform} setSvcPlatform={setSvcPlatform} onOrderNav={(plat) => { if (plat) setNoPlatform(plat); setActive("new-order"); }} catModal={svcCatModal} setCatModal={setSvcCatModal} />;
       default:
         return (
           <div className="dash-placeholder" style={{ background: t.cardBg, borderWidth: 1, borderStyle: "solid", borderColor: t.cardBorder }}>

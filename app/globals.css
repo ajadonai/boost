@@ -692,10 +692,8 @@ input { font-family: inherit; }
 .svc-title { font-size: 22px; font-weight: 700; margin-bottom: 2px; }
 .svc-subtitle { font-size: 13px; }
 
-/* Platform pills (tablet/mobile) */
+/* Platform button (tablet/mobile — reuses no-plat-btn from new-order) */
 .svc-plat-btn-wrap { display: none; margin-bottom: 10px; }
-.svc-plat-scroll { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; }
-.svc-plat-pill { flex-shrink: 0; display: flex; align-items: center; gap: 5px; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 500; cursor: pointer; }
 
 /* Search */
 .svc-search { width: 100%; max-width: 400px; padding: 10px 14px; border-radius: 10px; border-width: 1px; border-style: solid; font-size: 12px; outline: none; margin-bottom: 12px; box-sizing: border-box; }

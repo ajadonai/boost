@@ -13,7 +13,7 @@ const TS = {
 /* ═══════════════════════════════════════════ */
 /* ═══ SERVICES PAGE                       ═══ */
 /* ═══════════════════════════════════════════ */
-export default function ServicesPage({ dark, t, svcPlatform, setSvcPlatform, onOrderNav }) {
+export default function ServicesPage({ dark, t, svcPlatform, setSvcPlatform, onOrderNav, catModal, setCatModal }) {
   const [search, setSearch] = useState("");
 
   /* TODO: Replace with real API — fetch services for active platform */
@@ -81,19 +81,13 @@ export default function ServicesPage({ dark, t, svcPlatform, setSvcPlatform, onO
         <div className="svc-subtitle" style={{ color: t.textMuted }}>28 social platforms + SEO & reviews — prices per 1,000</div>
       </div>
 
-      {/* Platform selector — tablet/mobile only */}
+      {/* Platform selector — tablet/mobile: button opens grid modal */}
       <div className="svc-plat-btn-wrap">
-        <div className="svc-plat-scroll">
-          {PLATFORMS.map(p => {
-            const act = svcPlatform === p.id;
-            return (
-              <button key={p.id} onClick={() => setSvcPlatform(p.id)} className="svc-plat-pill" style={{ borderWidth: act ? 2 : 1, borderStyle: "solid", borderColor: act ? t.accent : t.cardBorder, background: act ? (dark ? "#2a1a22" : "#fdf2f4") : (dark ? "#0e1120" : "#ffffff"), color: act ? t.accent : t.text }}>
-                <span style={{ display: "flex", alignItems: "center" }}>{p.icon}</span>
-                {p.label}
-              </button>
-            );
-          })}
-        </div>
+        <button onClick={() => setCatModal(true)} className="no-plat-btn" style={{ borderWidth: 1, borderStyle: "solid", borderColor: t.accent, background: dark ? "#2a1a22" : "#fdf2f4", color: t.accent }}>
+          <span style={{ display: "flex", alignItems: "center" }}>{platInfo?.icon}</span>
+          {platInfo?.label}
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" style={{ marginLeft: "auto" }}><polyline points="6 9 12 15 18 9" /></svg>
+        </button>
       </div>
 
       {/* Search */}
@@ -128,6 +122,36 @@ export default function ServicesPage({ dark, t, svcPlatform, setSvcPlatform, onO
           <div className="svc-empty" style={{ color: t.textMuted }}>No services found</div>
         )}
       </div>
+
+      {/* Category modal — tablet/mobile */}
+      {catModal && (
+        <div className="no-cat-overlay" onClick={() => setCatModal(false)}>
+          <div className="no-cat-modal" onClick={e => e.stopPropagation()} style={{ background: dark ? "#0e1120" : "#ffffff" }}>
+            <div className="no-cat-header">
+              <div className="no-cat-title" style={{ color: t.text }}>Select Platform</div>
+              <button onClick={() => setCatModal(false)} className="no-cat-close" style={{ borderColor: t.cardBorder, color: t.textSoft }}>✕</button>
+            </div>
+            <div className="no-cat-scroll">
+              {PLATFORM_GROUPS.map(group => (
+                <div key={group.label} className="no-cat-group">
+                  <div className="no-cat-group-label" style={{ color: t.textMuted }}>{group.label}</div>
+                  <div className="no-cat-grid">
+                    {group.platforms.map(p => {
+                      const act = svcPlatform === p.id;
+                      return (
+                        <button key={p.id} onClick={() => { setSvcPlatform(p.id); setCatModal(false); }} className="no-cat-item" style={{ borderWidth: act ? 2 : 1, borderStyle: "solid", borderColor: act ? t.accent : t.cardBorder, background: act ? (dark ? "#2a1a22" : "#fdf2f4") : "transparent", color: act ? t.accent : t.text }}>
+                          <span className="no-cat-icon">{p.icon}</span>
+                          <span className="no-cat-label">{p.label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
