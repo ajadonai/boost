@@ -311,49 +311,6 @@ input { font-family: inherit; }
 .dash-root { height: 100dvh; display: flex; flex-direction: column; }
 .dash-body { display: flex; flex: 1; position: relative; overflow: hidden; }
 
-/* ── HOVER EFFECTS ── */
-.dash-stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.08); border-color: rgba(196,125,142,.25) !important; }
-.dash-order-row { transition: background-color .15s ease !important; cursor: pointer; }
-.dash-order-row:hover { background: rgba(196,125,142,.04); }
-.dash-nav-item { transition: background-color .15s ease, color .15s ease !important; }
-.dash-nav-item:hover { background: rgba(196,125,142,.06); }
-.dash-bell { transition: background-color .15s ease !important; border-radius: 8px; }
-.dash-bell:hover { background: rgba(196,125,142,.08); }
-.dash-avatar-btn { transition: background-color .15s ease !important; border-radius: 10px; padding: 4px 8px 4px 4px; }
-.dash-avatar-btn:hover { background: rgba(196,125,142,.06); }
-.dash-notif-item { transition: background-color .15s ease !important; }
-.dash-notif-item:hover { background: rgba(196,125,142,.05) !important; }
-.dash-logout { transition: opacity .15s ease !important; }
-.dash-logout:hover { opacity: 1 !important; }
-.no-plat-item { transition: background-color .15s ease, color .15s ease !important; }
-.no-plat-item:hover { background: rgba(196,125,142,.06); }
-.no-svc-row { transition: background-color .15s ease !important; }
-.no-svc-row:hover { background: rgba(196,125,142,.03); }
-.no-filter-pill { transition: border-color .15s ease, background-color .15s ease, color .15s ease !important; }
-.no-filter-pill:hover { border-color: rgba(196,125,142,.4); color: #c47d8e; }
-.svc-row { transition: background-color .15s ease !important; }
-.svc-row:hover { background: rgba(196,125,142,.03); }
-.svc-order-btn { transition: background-color .15s ease, transform .15s ease !important; }
-.svc-order-btn:hover { transform: translateY(-1px); }
-.ord-row { transition: background-color .15s ease !important; }
-.ord-row:hover { background: rgba(196,125,142,.03); }
-.ref-info-row { transition: background-color .15s ease !important; }
-.ref-info-row:hover { background: rgba(196,125,142,.03); }
-.fund-preset { transition: border-color .15s ease, background-color .15s ease, color .15s ease, transform .15s ease !important; }
-.fund-preset:hover { transform: translateY(-1px); }
-.fund-method-row { transition: background-color .15s ease !important; }
-.fund-method-row:hover { background: rgba(196,125,142,.04); }
-.fund-pay-btn { transition: transform .2s ease, box-shadow .2s ease !important; }
-.fund-pay-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(196,125,142,.25); }
-.set-btn-primary { transition: transform .2s ease, box-shadow .2s ease !important; }
-.set-btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(196,125,142,.25); }
-.sup-quick-btn { transition: border-color .15s ease, background-color .15s ease !important; }
-.sup-quick-btn:hover { border-color: rgba(196,125,142,.3); }
-.sup-send-btn { transition: transform .15s ease, box-shadow .15s ease !important; }
-.sup-send-btn:hover { transform: translateY(-1px); }
-.sup-tkt-row { transition: background-color .15s ease !important; }
-.sup-tkt-row:hover { background: rgba(196,125,142,.03); }
-
 /* ── SKELETON LOADING ── */
 @keyframes skeletonShimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
 @keyframes fadeInUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
@@ -1507,3 +1464,49 @@ input { font-family: inherit; }
   .section-divider { padding: 0 20px; gap: 10px; }
   .section-divider-dot { width: 5px; height: 5px; }
 }
+
+/* ══════════════════════════════════════ */
+/* ══ HOVER EFFECTS (must be last) ══ */
+/* ══════════════════════════════════════ */
+.dash-stat-card { transition: transform .2s ease, box-shadow .2s ease, border-color .15s ease, background-color .15s ease !important; cursor: pointer; }
+.dash-stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.08); border-color: rgba(196,125,142,.25) !important; }
+.dash-order-row { transition: background-color .15s ease !important; cursor: pointer; }
+.dash-order-row:hover { background-color: rgba(196,125,142,.04) !important; }
+.dash-nav-item { transition: background-color .15s ease, color .15s ease !important; }
+.dash-nav-item:hover { background-color: rgba(196,125,142,.06) !important; }
+.dash-bell { transition: background-color .15s ease !important; }
+.dash-bell:hover { background-color: rgba(196,125,142,.08) !important; }
+.dash-avatar-btn { transition: background-color .15s ease !important; }
+.dash-avatar-btn:hover { background-color: rgba(196,125,142,.06) !important; }
+.dash-notif-item { transition: background-color .15s ease !important; }
+.dash-notif-item:hover { background-color: rgba(196,125,142,.05) !important; }
+.dash-logout { transition: opacity .15s ease !important; }
+.dash-logout:hover { opacity: 1 !important; }
+.no-plat-item { transition: background-color .15s ease, color .15s ease !important; }
+.no-plat-item:hover { background-color: rgba(196,125,142,.06) !important; }
+.no-svc-row { transition: background-color .15s ease !important; }
+.no-svc-row:hover { background-color: rgba(196,125,142,.03) !important; }
+.no-filter-pill { transition: border-color .15s ease, background-color .15s ease, color .15s ease !important; }
+.no-filter-pill:hover { border-color: rgba(196,125,142,.4) !important; color: #c47d8e !important; }
+.svc-row { transition: background-color .15s ease !important; }
+.svc-row:hover { background-color: rgba(196,125,142,.03) !important; }
+.svc-order-btn { transition: transform .15s ease !important; }
+.svc-order-btn:hover { transform: translateY(-1px); }
+.ord-row { transition: background-color .15s ease !important; }
+.ord-row:hover { background-color: rgba(196,125,142,.03) !important; }
+.ref-info-row { transition: background-color .15s ease !important; }
+.ref-info-row:hover { background-color: rgba(196,125,142,.03) !important; }
+.fund-preset { transition: border-color .15s ease, background-color .15s ease, color .15s ease, transform .15s ease !important; }
+.fund-preset:hover { transform: translateY(-1px); }
+.fund-method-row { transition: background-color .15s ease !important; }
+.fund-method-row:hover { background-color: rgba(196,125,142,.04) !important; }
+.fund-pay-btn { transition: transform .2s ease, box-shadow .2s ease !important; }
+.fund-pay-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(196,125,142,.25); }
+.set-btn-primary { transition: transform .2s ease, box-shadow .2s ease !important; }
+.set-btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(196,125,142,.25); }
+.sup-quick-btn { transition: border-color .15s ease, background-color .15s ease !important; }
+.sup-quick-btn:hover { border-color: rgba(196,125,142,.3) !important; }
+.sup-send-btn { transition: transform .15s ease !important; }
+.sup-send-btn:hover { transform: translateY(-1px); }
+.sup-tkt-row { transition: background-color .15s ease !important; }
+.sup-tkt-row:hover { background-color: rgba(196,125,142,.03) !important; }
