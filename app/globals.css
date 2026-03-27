@@ -686,6 +686,71 @@ input { font-family: inherit; }
 }
 
 /* ══════════════════════════════════════ */
+/* ══ SERVICES PAGE ══ */
+/* ══════════════════════════════════════ */
+.svc-header { padding: 0 0 14px; }
+.svc-title { font-size: 22px; font-weight: 700; margin-bottom: 2px; }
+.svc-subtitle { font-size: 13px; }
+
+/* Platform pills (tablet/mobile) */
+.svc-plat-btn-wrap { display: none; margin-bottom: 10px; }
+.svc-plat-scroll { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; }
+.svc-plat-pill { flex-shrink: 0; display: flex; align-items: center; gap: 5px; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 500; cursor: pointer; }
+
+/* Search */
+.svc-search { width: 100%; max-width: 400px; padding: 10px 14px; border-radius: 10px; border-width: 1px; border-style: solid; font-size: 12px; outline: none; margin-bottom: 12px; box-sizing: border-box; }
+
+/* Platform name */
+.svc-plat-name { font-size: 16px; font-weight: 600; margin-bottom: 10px; display: flex; align-items: baseline; gap: 8px; }
+.svc-plat-name .m { font-size: 11px; font-weight: 400; }
+
+/* Service list */
+.svc-list { border-radius: 14px; overflow: hidden; }
+.svc-row { display: flex; align-items: center; gap: 12px; padding: 12px 16px; }
+.svc-row-name { flex: 1; min-width: 0; font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.svc-row-right { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; flex-shrink: 0; }
+.svc-tier-badge { display: flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 6px; }
+.svc-tier-badge span:first-child { font-size: 10px; }
+.svc-tier-price { font-size: 12px; font-weight: 700; }
+.svc-tier-per { font-size: 8px; opacity: .6; }
+.svc-order-btn { padding: 5px 12px; border-radius: 6px; background: linear-gradient(135deg, #c47d8e, #8b5e6b); color: #fff; font-size: 10px; font-weight: 600; border: none; cursor: pointer; white-space: nowrap; }
+.svc-empty { padding: 40px 20px; text-align: center; font-size: 13px; }
+
+/* Right sidebar */
+.svc-rs-title { font-size: 10px; font-weight: 650; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 12px; padding-left: 4px; }
+.svc-rs-tier-card { padding: 12px; border-radius: 10px; margin-bottom: 8px; }
+.svc-rs-divider { height: 1px; margin: 8px 0 16px; }
+.svc-rs-cta { padding: 16px; border-radius: 12px; text-align: center; }
+.svc-rs-cta-btn { padding: 10px 24px; border-radius: 8px; background: linear-gradient(135deg, #c47d8e, #8b5e6b); color: #fff; font-size: 13px; font-weight: 600; border: none; cursor: pointer; }
+
+/* ── TABLET: 768-1199px ── */
+@media (max-width: 1199px) {
+  .svc-title { font-size: 18px; }
+  .svc-subtitle { font-size: 12px; }
+  .svc-plat-btn-wrap { display: block; }
+  .svc-search { max-width: 100%; }
+  .svc-row { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .svc-row-right { flex-wrap: wrap; }
+}
+
+/* ── MOBILE: 0-767px ── */
+@media (max-width: 767px) {
+  .svc-header { padding: 0 0 8px; }
+  .svc-title { font-size: 18px; }
+  .svc-subtitle { font-size: 11px; }
+  .svc-plat-btn-wrap { display: block; }
+  .svc-plat-pill { padding: 5px 10px; font-size: 11px; }
+  .svc-search { padding: 9px 12px; margin-bottom: 8px; }
+  .svc-plat-name { font-size: 14px; }
+  .svc-list { border-radius: 12px; }
+  .svc-row { flex-direction: column; align-items: flex-start; gap: 6px; padding: 10px 12px; }
+  .svc-row-name { font-size: 12px; }
+  .svc-tier-badge { padding: 3px 8px; }
+  .svc-tier-price { font-size: 11px; }
+  .svc-order-btn { padding: 4px 10px; font-size: 9px; }
+}
+
+/* ══════════════════════════════════════ */
 /* ══ REFERRALS PAGE ══ */
 /* ══════════════════════════════════════ */
 .ref-header { padding: 0 0 14px; }

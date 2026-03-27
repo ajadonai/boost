@@ -3,6 +3,7 @@ import { useState, useEffect, useMemo, useRef } from "react";
 import NewOrderPage, { PLATFORMS, PLATFORM_GROUPS, OrderForm } from "./new-order";
 import OrdersPage, { OrdersSidebar } from "./orders-page";
 import ReferralsPage, { ReferralsSidebar } from "./referrals-page";
+import ServicesPage, { ServicesSidebar } from "./services-page";
 
 /* ═══════════════════════════════════════════ */
 /* ═══ SVG ICONS                          ═══ */
@@ -275,7 +276,11 @@ export default function Dashboard() {
   const isNewOrder = active === "new-order";
   const isOrders = active === "orders";
   const isReferrals = active === "referrals";
+  const isServices = active === "services";
   const noHasOrder = noSelSvc && noSelTier;
+
+  /* Services page state */
+  const [svcPlatform, setSvcPlatform] = useState("instagram");
 
   /* Theme */
   useEffect(() => { const saved = localStorage.getItem("nitro-theme") || "auto"; setThemeMode(saved); if (saved === "day") setDark(false); else if (saved === "night") setDark(true); else setDark(getAuto()); }, []);
@@ -346,6 +351,8 @@ export default function Dashboard() {
         return <OrdersPage orders={orders} txs={txs} dark={dark} t={t} />;
       case "referrals":
         return <ReferralsPage user={user} dark={dark} t={t} />;
+      case "services":
+        return <ServicesPage dark={dark} t={t} svcPlatform={svcPlatform} setSvcPlatform={setSvcPlatform} onOrderNav={(plat) => { if (plat) setNoPlatform(plat); setActive("new-order"); }} />;
       default:
         return (
           <div className="dash-placeholder" style={{ background: t.cardBg, borderWidth: 1, borderStyle: "solid", borderColor: t.cardBorder }}>
@@ -407,24 +414,28 @@ export default function Dashboard() {
         {/* ── LEFT SIDEBAR ── */}
         <aside className="dash-left" style={{ background: t.sidebarBg, borderRight: `1px solid ${t.sidebarBorder}`, left: leftOpen ? 0 : undefined }}>
 
-          {isNewOrder ? (
-            /* ── Platform categories for New Order ── */
+          {(isNewOrder || isServices) ? (
+            /* ── Platform categories for New Order / Services ── */
             <>
               <button onClick={() => { setActive("overview"); setLeftOpen(false); }} className="dash-nav-item" style={{ color: t.accent, fontWeight: 550, marginBottom: 8 }}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><polyline points="15 18 9 12 15 6"/></svg>
-                Back to menu
+                ← Back to menu
               </button>
               <div style={{ fontSize: 10, fontWeight: 650, color: t.textMuted, textTransform: "uppercase", letterSpacing: 1.5, padding: "0 14px 8px" }}>Platforms</div>
               <div className="dash-plat-list">
                 {PLATFORM_GROUPS.map(group => (
                   <div key={group.label}>
                     <div style={{ fontSize: 9, fontWeight: 600, color: t.accent, textTransform: "uppercase", letterSpacing: 1, padding: "10px 14px 4px", opacity: .7 }}>{group.label}</div>
-                    {group.platforms.map(p => (
-                      <button key={p.id} onClick={() => { setNoPlatform(p.id); setLeftOpen(false); }} className="dash-nav-item" style={{ background: noPlatform === p.id ? t.navActive : "transparent", color: noPlatform === p.id ? t.accent : t.textSoft, fontWeight: noPlatform === p.id ? 600 : 430 }}>
-                        <span style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 18, opacity: noPlatform === p.id ? 1 : .5, flexShrink: 0 }}>{p.icon}</span>
-                        {p.label}
-                      </button>
-                    ))}
+                    {group.platforms.map(p => {
+                      const currentPlat = isNewOrder ? noPlatform : svcPlatform;
+                      const setPlat = isNewOrder ? setNoPlatform : setSvcPlatform;
+                      return (
+                        <button key={p.id} onClick={() => { setPlat(p.id); setLeftOpen(false); }} className="dash-nav-item" style={{ background: currentPlat === p.id ? t.navActive : "transparent", color: currentPlat === p.id ? t.accent : t.textSoft, fontWeight: currentPlat === p.id ? 600 : 430 }}>
+                          <span style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 18, opacity: currentPlat === p.id ? 1 : .5, flexShrink: 0 }}>{p.icon}</span>
+                          {p.label}
+                        </button>
+                      );
+                    })}
                   </div>
                 ))}
               </div>
@@ -459,7 +470,7 @@ export default function Dashboard() {
 
         {/* ── MAIN ── */}
         <main className="dash-main" style={{ background: t.bg }}>
-          {!isNewOrder && !isOrders && !isReferrals && <>
+          {!isNewOrder && !isOrders && !isReferrals && !isServices && <>
             <div className="dash-welcome" style={{ color: t.text }}>Welcome back, {firstName.toUpperCase()}</div>
             <div className="dash-welcome-sub" style={{ color: t.textMuted }}>Here's what's happening with your account.</div>
           </>}
@@ -498,6 +509,8 @@ export default function Dashboard() {
             <OrdersSidebar orders={orders} dark={dark} t={t} />
           ) : isReferrals ? (
             <ReferralsSidebar user={user} dark={dark} t={t} />
+          ) : isServices ? (
+            <ServicesSidebar dark={dark} t={t} onOrderNav={() => setActive("new-order")} />
           ) : (
             <RightSidebar orders={orders} user={user} dark={dark} t={t} />
           )}
