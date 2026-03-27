@@ -42,6 +42,7 @@ export default function SettingsPage({ user, dark, t, themeMode, setThemeMode, s
       <div className="set-header">
         <div className="set-title" style={{ color: t.text }}>Settings</div>
         <div className="set-subtitle" style={{ color: t.textMuted }}>Manage your account preferences</div>
+        <div className="page-divider" style={{ background: t.cardBorder }} />
       </div>
 
       <div className="set-content">

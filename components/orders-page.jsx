@@ -88,6 +88,7 @@ export default function OrdersPage({ orders, txs, dark, t }) {
       <div className="ord-header">
         <div className="ord-title" style={{ color: t.text }}>Orders</div>
         <div className="ord-subtitle" style={{ color: t.textMuted }}>Track your orders and transactions</div>
+        <div className="page-divider" style={{ background: t.cardBorder }} />
       </div>
 
       {/* Tab switcher */}

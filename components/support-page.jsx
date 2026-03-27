@@ -97,6 +97,7 @@ export default function SupportPage({ dark, t, tickets: ticketsProp }) {
       <div className="sup-header">
         <div className="sup-title" style={{ color: t.text }}>Support</div>
         <div className="sup-subtitle" style={{ color: t.textMuted }}>Get instant help or create a ticket</div>
+        <div className="page-divider" style={{ background: t.cardBorder }} />
         <div className="sup-tabs" style={{ background: dark ? "rgba(255,255,255,.04)" : "rgba(0,0,0,.03)", borderColor: t.cardBorder }}>
           {[["chat", "💬 Chat"], ["tickets", "🎫 Tickets"]].map(([id, lb]) => (
             <button key={id} onClick={() => { setTab(id); if (id === "tickets") setTicketView("list"); }} className="sup-tab" style={{ background: tab === id ? t.navActive : "transparent", color: tab === id ? t.accent : t.textMuted }}>

@@ -79,6 +79,7 @@ export default function ServicesPage({ dark, t, svcPlatform, setSvcPlatform, onO
       <div className="svc-header">
         <div className="svc-title" style={{ color: t.text }}>Services</div>
         <div className="svc-subtitle" style={{ color: t.textMuted }}>28 social platforms + SEO & reviews — prices per 1,000</div>
+        <div className="page-divider" style={{ background: t.cardBorder }} />
       </div>
 
       {/* Platform selector — tablet/mobile: button opens grid modal */}

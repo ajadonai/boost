@@ -37,6 +37,7 @@ export default function ReferralsPage({ user, dark, t }) {
       <div className="ref-header">
         <div className="ref-title" style={{ color: t.text }}>Referrals</div>
         <div className="ref-subtitle" style={{ color: t.textMuted }}>Earn rewards by inviting friends to Nitro</div>
+        <div className="page-divider" style={{ background: t.cardBorder }} />
       </div>
 
       {/* Share card */}

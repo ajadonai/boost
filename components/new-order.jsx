@@ -201,6 +201,7 @@ export default function NewOrderPage({ dark, t, platform, setPlatform, selSvc, s
       <div className="no-header">
         <div className="no-title" style={{ color: t.text }}>New Order</div>
         <div className="no-subtitle" style={{ color: t.textMuted }}>28 social platforms + SEO & reviews</div>
+        <div className="page-divider" style={{ background: t.cardBorder }} />
       </div>
 
       {/* Platform selector — tablet/mobile only */}

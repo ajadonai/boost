@@ -311,6 +311,9 @@ input { font-family: inherit; }
 .dash-root { height: 100dvh; display: flex; flex-direction: column; }
 .dash-body { display: flex; flex: 1; position: relative; overflow: hidden; }
 
+/* Page header divider — shared across all pages */
+.page-divider { height: 1px; margin-top: 12px; }
+
 /* Nav */
 .dash-nav { display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; z-index: 20; height: 56px; padding: 0 24px; }
 .dash-nav-left { display: flex; align-items: center; gap: 12px; }
