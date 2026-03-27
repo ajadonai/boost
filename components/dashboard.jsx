@@ -434,9 +434,67 @@ export default function Dashboard() {
   const firstName = user ? user.name.split(" ")[0] : "";
   const balance = user ? fN(user.balance) : "₦0";
 
-  /* Loading */
-  const sp = dark ? "rgba(196,125,142,.3)" : "rgba(196,125,142,.2)";
-  if (!user) return <div style={{ height: "100dvh", display: "flex", alignItems: "center", justifyContent: "center", background: t.bg }}><div style={{ width: 24, height: 24, borderWidth: 2, borderStyle: "solid", borderTopColor: t.accent, borderRightColor: sp, borderBottomColor: sp, borderLeftColor: sp, borderRadius: "50%", animation: "spin .6s linear infinite" }} /></div>;
+  /* Loading — skeleton */
+  if (!user) {
+    const skBone = `skel-bone ${dark ? "skel-dark" : "skel-light"}`;
+    return (
+      <div className="dash-root" style={{ background: t.bg }}>
+        <style>{`@keyframes spin{to{transform:rotate(360deg)}}@keyframes skeletonShimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}`}</style>
+        <nav className="dash-nav" style={{ background: t.sidebarBg, borderBottom: `1px solid ${t.sidebarBorder}` }}>
+          <div className="dash-nav-left">
+            <div className="dash-logo-static">
+              <div className="dash-logo-box"><svg width="11" height="11" viewBox="0 0 20 20" fill="none"><path d="M4,16 L4,4 L16,16 L16,4" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
+              <span className="dash-logo-text" style={{ color: t.text }}>NITRO</span>
+            </div>
+          </div>
+          <div className="dash-nav-right">
+            <div className={skBone} style={{ width: 44, height: 24, borderRadius: 12 }} />
+            <div className={skBone} style={{ width: 30, height: 30, borderRadius: 10 }} />
+          </div>
+        </nav>
+        <div className="dash-body">
+          <aside className="dash-left" style={{ background: t.sidebarBg, borderRight: `1px solid ${t.sidebarBorder}` }}>
+            {[1,2,3,4,5,6,7,8].map(i => <div key={i} className={skBone} style={{ height: 36, borderRadius: 12, margin: "0 0 4px" }} />)}
+          </aside>
+          <main className="dash-main" style={{ background: t.bg }}>
+            <div className={skBone} style={{ width: 260, height: 24, marginBottom: 8 }} />
+            <div className={skBone} style={{ width: 200, height: 14, marginBottom: 24 }} />
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 12, marginBottom: 24 }}>
+              {[1,2,3,4].map(i => (
+                <div key={i} style={{ padding: 20, borderRadius: 16, background: t.cardBg, borderWidth: 1, borderStyle: "solid", borderColor: t.cardBorder }}>
+                  <div className={skBone} style={{ width: "60%", height: 10, marginBottom: 10 }} />
+                  <div className={skBone} style={{ width: "45%", height: 24, marginBottom: 8 }} />
+                  <div className={skBone} style={{ width: "70%", height: 9 }} />
+                </div>
+              ))}
+            </div>
+            <div className={skBone} style={{ width: 120, height: 10, marginBottom: 12 }} />
+            <div style={{ borderRadius: 16, background: t.cardBg, borderWidth: 1, borderStyle: "solid", borderColor: t.cardBorder, padding: "4px 16px" }}>
+              {[1,2,3,4].map(i => (
+                <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px 0", borderBottom: i < 4 ? `1px solid ${t.cardBorder}` : "none" }}>
+                  <div>
+                    <div className={skBone} style={{ width: 220, height: 13, marginBottom: 8 }} />
+                    <div style={{ display: "flex", gap: 12 }}>
+                      <div className={skBone} style={{ width: 70, height: 10 }} />
+                      <div className={skBone} style={{ width: 50, height: 10 }} />
+                    </div>
+                  </div>
+                  <div className={skBone} style={{ width: 60, height: 13 }} />
+                </div>
+              ))}
+            </div>
+          </main>
+          <div className="dash-right" style={{ background: t.sidebarBg, borderLeft: `1px solid ${t.sidebarBorder}` }}>
+            <div className={skBone} style={{ width: 100, height: 8, marginBottom: 14 }} />
+            {[1,2,3].map(i => <div key={i} className={skBone} style={{ height: 50, borderRadius: 10, marginBottom: 6 }} />)}
+            <div style={{ height: 2, background: t.sidebarBorder, margin: "12px 0" }} />
+            <div className={skBone} style={{ width: 80, height: 8, marginBottom: 14 }} />
+            <div className={skBone} style={{ height: 80, borderRadius: 12 }} />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   /* Render active page */
   const renderPage = () => {
@@ -561,7 +619,9 @@ export default function Dashboard() {
             <div className="dash-welcome-sub" style={{ color: t.textMuted }}>Here's what's happening with your account.</div>
           </>}
 
-          {renderPage()}
+          <div key={active} className="dash-page-enter">
+            {renderPage()}
+          </div>
 
           {/* Footer */}
           <div className="dash-footer" style={{ borderTopColor: t.sidebarBorder }}>
