@@ -51,7 +51,7 @@ function AdminOverview({ data, dark, t }) {
           ["Processing", String(stats.processing || 0), t.amber, "Est. 1-2 hrs"],
           ["Deposits (Today)", fN(stats.deposits || 0), t.green, `${stats.depositsChange || 0}% vs yesterday`],
         ].map(([label, val, color, sub]) => (
-          <div key={label} className="dash-stat-card" style={{ background: dark ? "rgba(255,255,255,.06)" : "rgba(255,255,255,.95)", borderWidth: 1, borderStyle: "solid", borderColor: dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)", borderLeftWidth: 3, borderLeftColor: color, boxShadow: dark ? "0 4px 20px rgba(0,0,0,.25)" : "0 4px 20px rgba(0,0,0,.04)" }}>
+          <div key={label} className="dash-stat-card" style={{ background: dark ? "rgba(255,255,255,.06)" : "rgba(255,255,255,.95)", borderTopWidth: 1, borderRightWidth: 1, borderBottomWidth: 1, borderLeftWidth: 3, borderStyle: "solid", borderTopColor: dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)", borderRightColor: dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)", borderBottomColor: dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)", borderLeftColor: color, boxShadow: dark ? "0 4px 20px rgba(0,0,0,.25)" : "0 4px 20px rgba(0,0,0,.04)" }}>
             <div className="dash-stat-label" style={{ color: t.textMuted }}>{label}</div>
             <div className="m dash-stat-value" style={{ color }}>{val}</div>
             <div className="dash-stat-sub" style={{ color: t.textMuted }}>{sub}</div>
