@@ -209,7 +209,7 @@ export function AdminAlertsPage({ dark, t }) {
         {loading ? (
           <div className="adm-empty" style={{ color: t.textMuted }}>Loading alerts...</div>
         ) : alerts.length > 0 ? alerts.map((a, i) => (
-          <div key={a.id} className="adm-list-row" style={{ borderBottom: i < alerts.length - 1 ? `1px solid ${t.cardBorder}` : "none" }}>
+          <div key={`${a.id}-${i}`} className="adm-list-row" style={{ borderBottom: i < alerts.length - 1 ? `1px solid ${t.cardBorder}` : "none" }}>
             <div style={{ flex: 1 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <span style={{ fontSize: 15 }}>{a.type === "warning" ? "⚠️" : "📢"}</span>
