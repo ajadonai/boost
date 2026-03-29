@@ -86,24 +86,16 @@ export default function HowToPage({ dark, t }) {
 export function HowToSidebar({ dark, t }) {
   return (
     <>
-      <div style={{ fontSize: 11, fontWeight: 600, color: t.textMuted, textTransform: "uppercase", letterSpacing: 1, marginBottom: 10 }}>Quick Links</div>
-      {[
-        ["How to place an order", "📦"],
-        ["How to add funds", "💳"],
-        ["Understanding tiers", "💡"],
-        ["Referral program", "🎁"],
-      ].map(([label, icon]) => (
-        <div key={label} style={{ padding: "10px 12px", borderRadius: 10, background: dark ? "rgba(255,255,255,.04)" : "rgba(255,255,255,.8)", borderWidth: 1, borderStyle: "solid", borderColor: dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)", marginBottom: 6, display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}>
-          <span style={{ fontSize: 16 }}>{icon}</span>
-          <span style={{ fontSize: 13, color: t.text, fontWeight: 450 }}>{label}</span>
-        </div>
-      ))}
-
-      <div style={{ height: 1, background: t.sidebarBorder, margin: "16px 0" }} />
+      <div style={{ fontSize: 11, fontWeight: 600, color: t.textMuted, textTransform: "uppercase", letterSpacing: 1, marginBottom: 10 }}>About How To</div>
+      <div style={{ fontSize: 13, color: t.textSoft, lineHeight: 1.7, marginBottom: 16 }}>Step-by-step guides and tutorials to help you get the most out of Nitro. New content is added regularly.</div>
 
       <div style={{ padding: "12px 14px", borderRadius: 10, background: dark ? "rgba(196,125,142,.06)" : "rgba(196,125,142,.04)", borderWidth: 1, borderStyle: "solid", borderColor: dark ? "rgba(196,125,142,.12)" : "rgba(196,125,142,.08)" }}>
         <div style={{ fontSize: 13, fontWeight: 600, color: t.text, marginBottom: 4 }}>Need more help?</div>
-        <div style={{ fontSize: 12, color: t.textMuted, lineHeight: 1.5 }}>Visit our full blog for detailed guides and updates.</div>
+        <div style={{ fontSize: 12, color: t.textMuted, lineHeight: 1.5, marginBottom: 10 }}>Visit our full blog for more guides, tips, and updates.</div>
+        <a href="https://blog.nitro.ng" target="_blank" rel="noopener" style={{ fontSize: 12, fontWeight: 600, color: "#c47d8e", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 4 }}>
+          Visit blog
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        </a>
       </div>
     </>
   );
