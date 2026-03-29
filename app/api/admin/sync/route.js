@@ -2,6 +2,19 @@ import prisma from '@/lib/prisma';
 import { requireAdmin, logActivity } from '@/lib/admin';
 import { getServices, getBalance } from '@/lib/mtp';
 
+export async function GET() {
+  const { admin, error } = await requireAdmin('services');
+  if (error) return error;
+
+  return Response.json({
+    status: {
+      mtp: !!process.env.MTP_API_KEY,
+      jap: !!process.env.JAP_API_KEY,
+      dao: !!process.env.DAO_API_KEY,
+    },
+  });
+}
+
 export async function POST(req) {
   const { admin, error } = await requireAdmin('services', true);
   if (error) return error;
