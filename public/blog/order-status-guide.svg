@@ -1,13 +1,27 @@
-<svg width="1200" height="630" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#a87dc4"/>
-      <stop offset="100%" stop-color="#7a5e8b"/>
-    </linearGradient>
-  </defs>
-  <rect width="1200" height="630" fill="url(#bg)" rx="0"/>
-  <rect x="60" y="60" width="64" height="64" rx="16" fill="rgba(255,255,255,0.15)"/>
-  <text x="92" y="102" font-family="Arial" font-size="32" fill="white" text-anchor="middle">📊</text>
-  <text x="60" y="520" font-family="Arial" font-size="18" fill="rgba(255,255,255,0.6)" font-weight="400">NITRO BLOG</text>
-  <text x="60" y="580" font-family="Georgia, serif" font-size="48" fill="white" font-weight="600">Status</text>
+<svg width="1200" height="640" xmlns="http://www.w3.org/2000/svg">
+<rect width="1200" height="640" fill="#0a1420"/>
+<rect x="640" y="80" width="480" height="88" rx="16" fill="rgba(96,165,250,0.06)" stroke="rgba(96,165,250,0.1)" stroke-width="2"/>
+<circle cx="688" cy="124" r="12" fill="#6ee7b7"/>
+<rect x="720" y="112" width="140" height="12" rx="6" fill="rgba(255,255,255,0.15)"/>
+<rect x="1000" y="108" width="88" height="36" rx="8" fill="rgba(110,231,183,0.1)"/>
+<text x="1020" y="132" font-family="system-ui" font-size="18" fill="#6ee7b7" font-weight="500">Done</text>
+<rect x="640" y="188" width="480" height="88" rx="16" fill="rgba(96,165,250,0.06)" stroke="rgba(96,165,250,0.1)" stroke-width="2"/>
+<circle cx="688" cy="232" r="12" fill="#a5b4fc"/>
+<rect x="720" y="220" width="180" height="12" rx="6" fill="rgba(255,255,255,0.12)"/>
+<rect x="976" y="216" width="116" height="36" rx="8" fill="rgba(165,180,252,0.1)"/>
+<text x="990" y="240" font-family="system-ui" font-size="18" fill="#a5b4fc" font-weight="500">Running</text>
+<rect x="640" y="296" width="480" height="88" rx="16" fill="rgba(96,165,250,0.06)" stroke="rgba(96,165,250,0.1)" stroke-width="2"/>
+<circle cx="688" cy="340" r="12" fill="#fcd34d"/>
+<rect x="720" y="328" width="120" height="12" rx="6" fill="rgba(255,255,255,0.1)"/>
+<rect x="980" y="324" width="108" height="36" rx="8" fill="rgba(252,211,77,0.1)"/>
+<text x="996" y="348" font-family="system-ui" font-size="18" fill="#fcd34d" font-weight="500">Waiting</text>
+<polygon points="0,640 0,460 400,640" fill="rgba(96,165,250,0.04)"/>
+<polygon points="0,640 0,540 200,640" fill="rgba(96,165,250,0.06)"/>
+<rect x="72" y="72" width="104" height="104" rx="28" fill="#1d4ed8"/>
+<rect x="100" y="100" width="48" height="10" rx="5" fill="rgba(255,255,255,0.7)"/>
+<rect x="100" y="120" width="32" height="8" rx="4" fill="rgba(255,255,255,0.45)"/>
+<rect x="100" y="138" width="40" height="8" rx="4" fill="rgba(255,255,255,0.3)"/>
+<text x="80" y="460" font-family="Georgia, serif" font-size="64" fill="white" font-weight="700" letter-spacing="-1">Order status</text>
+<text x="80" y="536" font-family="Georgia, serif" font-size="64" fill="#93c5fd" font-weight="700" letter-spacing="-1">guide</text>
+<text x="80" y="600" font-family="system-ui" font-size="24" fill="rgba(255,255,255,0.35)" letter-spacing="6">NITRO BLOG</text>
 </svg>
