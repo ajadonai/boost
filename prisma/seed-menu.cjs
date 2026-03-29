@@ -1,327 +1,162 @@
-// Nitro Menu Seed Script
-// Run: node prisma/seed-menu.js
-// Creates service groups + tiers using real MTP service IDs from your DB
-
+// Nitro Full Menu Seed — Run: node prisma/seed-menu.cjs
 const { PrismaClient } = require('@prisma/client');
 const p = new PrismaClient();
 
-// Markup: cost → sell price (in kobo). Using Nitro's tiered markup strategy.
-// Budget = ~2.5-3x, Standard = ~2x, Premium = ~1.7x
-// Prices below are sell prices per 1K in KOBO (₦1 = 100 kobo)
-
-const MENU = [
-  // ═══════════════════════════════════════════
-  // INSTAGRAM
-  // ═══════════════════════════════════════════
-  {
-    name: "Instagram Followers", platform: "Instagram", type: "followers",
-    tiers: [
-      { tier: "Budget",   apiId: 1402, sellPer1k: 50000,  speed: "1-5K/day",    refill: true  }, // FB followers repurposed — use IG one below
-      { tier: "Standard", apiId: 8927, sellPer1k: 85000,  speed: "1-5K/day",    refill: true  },
-      { tier: "Premium",  apiId: 8927, sellPer1k: 140000, speed: "1-5K/day",    refill: true  },
-    ]
-  },
-  {
-    name: "Instagram Post Likes", platform: "Instagram", type: "likes",
-    tiers: [
-      { tier: "Budget",   apiId: 578,  sellPer1k: 8000,   speed: "500-1K/day",  refill: false },
-      { tier: "Standard", apiId: 578,  sellPer1k: 25000,  speed: "500-1K/day",  refill: false },
-    ]
-  },
-  {
-    name: "Instagram Reel/Video Views", platform: "Instagram", type: "views",
-    tiers: [
-      { tier: "Budget",   apiId: 7661, sellPer1k: 300,    speed: "10-20M/day",  refill: false },
-      { tier: "Standard", apiId: 2127, sellPer1k: 800,    speed: "100-500K/day", refill: true },
-      { tier: "Premium",  apiId: 2504, sellPer1k: 1500,   speed: "400-800K/day", refill: true },
-    ]
-  },
-  {
-    name: "Instagram Photo Views", platform: "Instagram", type: "views",
-    tiers: [
-      { tier: "Standard", apiId: 8703, sellPer1k: 1500,   speed: "50-300K/day", refill: false },
-    ]
-  },
-  {
-    name: "Instagram Shares", platform: "Instagram", type: "engagement",
-    tiers: [
-      { tier: "Standard", apiId: 5707, sellPer1k: 1000,   speed: "50-100K/day", refill: false },
-    ]
-  },
-  {
-    name: "Instagram Story Views", platform: "Instagram", type: "views",
-    tiers: [
-      { tier: "Standard", apiId: 9035, sellPer1k: 1200,   speed: "100-150K/day", refill: true },
-    ]
-  },
-
-  // ═══════════════════════════════════════════
-  // TIKTOK
-  // ═══════════════════════════════════════════
-  {
-    name: "TikTok Video Views", platform: "TikTok", type: "views",
-    tiers: [
-      { tier: "Budget",   apiId: 2026, sellPer1k: 300,    speed: "5-50K/day",   refill: false },
-      { tier: "Standard", apiId: 9349, sellPer1k: 1000,   speed: "500-1M/day",  refill: true  },
-      { tier: "Premium",  apiId: 1130, sellPer1k: 2000,   speed: "50-500K/day", refill: true  },
-    ]
-  },
-  {
-    name: "TikTok Saves", platform: "TikTok", type: "engagement",
-    tiers: [
-      { tier: "Budget",   apiId: 5025, sellPer1k: 1500,   speed: "50-100K/day", refill: false },
-      { tier: "Standard", apiId: 5827, sellPer1k: 2500,   speed: "100-200K/day", refill: true },
-    ]
-  },
-
-  // ═══════════════════════════════════════════
-  // YOUTUBE
-  // ═══════════════════════════════════════════
-  {
-    name: "YouTube Likes", platform: "YouTube", type: "likes",
-    tiers: [
-      { tier: "Budget",   apiId: 935,  sellPer1k: 3000,   speed: "10-100K/day", refill: false },
-    ]
-  },
-  {
-    name: "YouTube Subscribers", platform: "YouTube", type: "followers",
-    tiers: [
-      { tier: "Budget",   apiId: 2386, sellPer1k: 3500,   speed: "10-50K/day",  refill: false },
-    ]
-  },
-  {
-    name: "YouTube Comment Likes", platform: "YouTube", type: "engagement",
-    tiers: [
-      { tier: "Standard", apiId: 912,  sellPer1k: 8000,   speed: "5-10K/day",   refill: true  },
-    ]
-  },
-
-  // ═══════════════════════════════════════════
-  // TWITTER / X
-  // ═══════════════════════════════════════════
-  {
-    name: "X/Twitter Tweet Views", platform: "Twitter/X", type: "views",
-    tiers: [
-      { tier: "Budget",   apiId: 981,  sellPer1k: 300,    speed: "100-500K/day", refill: false },
-      { tier: "Standard", apiId: 2990, sellPer1k: 500,    speed: "100-200K/day", refill: false },
-    ]
-  },
-  {
-    name: "X/Twitter Video Views", platform: "Twitter/X", type: "views",
-    tiers: [
-      { tier: "Standard", apiId: 350,  sellPer1k: 400,    speed: "Fast",        refill: false },
-    ]
-  },
-
-  // ═══════════════════════════════════════════
-  // FACEBOOK
-  // ═══════════════════════════════════════════
-  {
-    name: "Facebook Video Views", platform: "Facebook", type: "views",
-    tiers: [
-      { tier: "Budget",   apiId: 680,  sellPer1k: 3000,   speed: "20-30K/day",  refill: true  },
-      { tier: "Standard", apiId: 7654, sellPer1k: 4500,   speed: "5-15K/day",   refill: true  },
-      { tier: "Premium",  apiId: 6336, sellPer1k: 6000,   speed: "50-100K/day", refill: true  },
-    ]
-  },
-  {
-    name: "Facebook Reel Views", platform: "Facebook", type: "views",
-    tiers: [
-      { tier: "Standard", apiId: 6337, sellPer1k: 4500,   speed: "20-30K/day",  refill: true  },
-      { tier: "Premium",  apiId: 6339, sellPer1k: 6000,   speed: "50-100K/day", refill: true  },
-    ]
-  },
-  {
-    name: "Facebook Followers", platform: "Facebook", type: "followers",
-    tiers: [
-      { tier: "Budget",   apiId: 1402, sellPer1k: 60000,  speed: "1-5K/day",    refill: true  },
-      { tier: "Standard", apiId: 8927, sellPer1k: 85000,  speed: "1-5K/day",    refill: true  },
-    ]
-  },
-  {
-    name: "Facebook Post Likes", platform: "Facebook", type: "likes",
-    tiers: [
-      { tier: "Budget",   apiId: 578,  sellPer1k: 8000,   speed: "500-1K/day",  refill: false },
-    ]
-  },
-  {
-    name: "Facebook Group Members", platform: "Facebook", type: "followers",
-    tiers: [
-      { tier: "Standard", apiId: 1724, sellPer1k: 8000,   speed: "1-5K/day",    refill: false },
-    ]
-  },
-
-  // ═══════════════════════════════════════════
-  // TELEGRAM
-  // ═══════════════════════════════════════════
-  {
-    name: "Telegram Post Views", platform: "Telegram", type: "views",
-    tiers: [
-      { tier: "Budget",   apiId: 4880, sellPer1k: 800,    speed: "100-200K/day", refill: false },
-      { tier: "Standard", apiId: 2949, sellPer1k: 1500,   speed: "100-200K/day", refill: false },
-    ]
-  },
-  {
-    name: "Telegram Reactions (Positive)", platform: "Telegram", type: "engagement",
-    tiers: [
-      { tier: "Standard", apiId: 2737, sellPer1k: 1200,   speed: "Fast",        refill: false },
-    ]
-  },
-
-  // ═══════════════════════════════════════════
-  // SPOTIFY
-  // ═══════════════════════════════════════════
-  {
-    name: "Spotify Plays — Global", platform: "Spotify", type: "plays",
-    tiers: [
-      { tier: "Standard", apiId: 1612, sellPer1k: 6000,   speed: "20-30K/day",  refill: true  },
-    ]
-  },
-  {
-    name: "Spotify Plays — USA", platform: "Spotify", type: "plays",
-    tiers: [
-      { tier: "Premium",  apiId: 2482, sellPer1k: 6500,   speed: "20-30K/day",  refill: true  },
-    ]
-  },
-  {
-    name: "Spotify Followers", platform: "Spotify", type: "followers",
-    tiers: [
-      { tier: "Standard", apiId: 1981, sellPer1k: 6500,   speed: "100K-2M/day", refill: true  },
-    ]
-  },
-  {
-    name: "Spotify Followers — Nigeria 🇳🇬", platform: "Spotify", type: "followers", nigerian: true,
-    tiers: [
-      { tier: "Standard", apiId: 4453, sellPer1k: 7000,   speed: "1M/day",      refill: true  },
-    ]
-  },
-
-  // ═══════════════════════════════════════════
-  // SNAPCHAT
-  // ═══════════════════════════════════════════
-  {
-    name: "Snapchat Followers", platform: "Snapchat", type: "followers",
-    tiers: [
-      { tier: "Budget",   apiId: 8384, sellPer1k: 350000, speed: "50-200/day",  refill: false },
-      { tier: "Standard", apiId: 8385, sellPer1k: 500000, speed: "500-1K/day",  refill: true  },
-      { tier: "Premium",  apiId: 8386, sellPer1k: 650000, speed: "500-1K/day",  refill: true  },
-    ]
-  },
-  {
-    name: "Snapchat Likes", platform: "Snapchat", type: "likes",
-    tiers: [
-      { tier: "Budget",   apiId: 8387, sellPer1k: 260000, speed: "100-200/day", refill: false },
-      { tier: "Standard", apiId: 8388, sellPer1k: 280000, speed: "500-1K/day",  refill: true  },
-    ]
-  },
-
-  // ═══════════════════════════════════════════
-  // LINKEDIN
-  // ═══════════════════════════════════════════
-  {
-    name: "LinkedIn Post Likes", platform: "LinkedIn", type: "likes",
-    tiers: [
-      { tier: "Standard", apiId: 5472, sellPer1k: 350000, speed: "500-2K/day",  refill: false },
-      { tier: "Premium",  apiId: 9417, sellPer1k: 550000, speed: "200-500/day", refill: true  },
-    ]
-  },
-  {
-    name: "LinkedIn Followers", platform: "LinkedIn", type: "followers",
-    tiers: [
-      { tier: "Standard", apiId: 5466, sellPer1k: 600000, speed: "100-500/day", refill: false },
-    ]
-  },
-  {
-    name: "LinkedIn Company Followers", platform: "LinkedIn", type: "followers",
-    tiers: [
-      { tier: "Standard", apiId: 5467, sellPer1k: 600000, speed: "100-500/day", refill: false },
-    ]
-  },
-
-  // ═══════════════════════════════════════════
-  // THREADS
-  // ═══════════════════════════════════════════
-  {
-    name: "Threads Likes", platform: "Threads", type: "likes",
-    tiers: [
-      { tier: "Standard", apiId: 2776, sellPer1k: 350000, speed: "200-1K/day",  refill: false },
-    ]
-  },
-  {
-    name: "Threads Followers", platform: "Threads", type: "followers",
-    tiers: [
-      { tier: "Standard", apiId: 2775, sellPer1k: 600000, speed: "200-1K/day",  refill: false },
-    ]
-  },
+// sellPer1k in KOBO. Markup: Budget ~2.5-3x, Standard ~2x, Premium ~1.7x
+const M = [
+// ─── INSTAGRAM (9) ───
+{n:"Instagram Followers",p:"Instagram",y:"followers",t:[{t:"Budget",a:5752,s:45000,sp:"1-5K/day",r:0},{t:"Standard",a:1402,s:70000,sp:"1-5K/day",r:1},{t:"Premium",a:8927,s:100000,sp:"1-5K/day",r:1}]},
+{n:"Instagram Likes",p:"Instagram",y:"likes",t:[{t:"Budget",a:2847,s:5000,sp:"5-10K/day",r:0},{t:"Standard",a:2499,s:6000,sp:"5-15K/day",r:1},{t:"Premium",a:2498,s:8000,sp:"5-15K/day",r:1}]},
+{n:"Instagram Reel/Video Views",p:"Instagram",y:"views",t:[{t:"Budget",a:7661,s:200,sp:"10-20M/day",r:0},{t:"Standard",a:2127,s:800,sp:"100-500K/day",r:1},{t:"Premium",a:2504,s:1500,sp:"400-800K/day",r:1}]},
+{n:"Instagram Photo Views",p:"Instagram",y:"views",t:[{t:"Budget",a:8702,s:1000,sp:"50-100K/day",r:0},{t:"Standard",a:8703,s:1500,sp:"50-300K/day",r:0}]},
+{n:"Instagram Story Views",p:"Instagram",y:"views",t:[{t:"Budget",a:3516,s:5000,sp:"50-100K/day",r:0},{t:"Standard",a:5214,s:7000,sp:"Fast",r:0}]},
+{n:"Instagram Shares",p:"Instagram",y:"engagement",t:[{t:"Budget",a:5707,s:800,sp:"50-100K/day",r:0},{t:"Standard",a:2960,s:1000,sp:"Fast",r:0}]},
+{n:"Instagram Saves",p:"Instagram",y:"engagement",t:[{t:"Budget",a:2947,s:2500,sp:"50-100K/day",r:0},{t:"Standard",a:5031,s:3500,sp:"10-100K/day",r:0}]},
+{n:"Instagram Reach + Impressions",p:"Instagram",y:"engagement",t:[{t:"Standard",a:5030,s:2500,sp:"Fast",r:0}]},
+{n:"Instagram Auto Views (Reels)",p:"Instagram",y:"views",t:[{t:"Standard",a:6228,s:3500,sp:"100-200K/day",r:0}]},
+// ─── TIKTOK (5) ───
+{n:"TikTok Video Views",p:"TikTok",y:"views",t:[{t:"Budget",a:2026,s:200,sp:"5-50K/day",r:0},{t:"Standard",a:9349,s:1000,sp:"500-1M/day",r:1},{t:"Premium",a:1130,s:2200,sp:"50-500K/day",r:1}]},
+{n:"TikTok Likes",p:"TikTok",y:"likes",t:[{t:"Budget",a:1128,s:3000,sp:"5-50K/day",r:0},{t:"Standard",a:1126,s:4000,sp:"5-50K/day",r:1},{t:"Premium",a:1106,s:5000,sp:"5-50K/day",r:1}]},
+{n:"TikTok Saves",p:"TikTok",y:"engagement",t:[{t:"Budget",a:5025,s:1500,sp:"50-100K/day",r:0},{t:"Standard",a:1116,s:4000,sp:"50-100K/day",r:1},{t:"Premium",a:5827,s:2500,sp:"100-200K/day",r:1}]},
+{n:"TikTok Shares",p:"TikTok",y:"engagement",t:[{t:"Budget",a:5026,s:4000,sp:"10-50K/day",r:0}]},
+{n:"TikTok Followers",p:"TikTok",y:"followers",t:[{t:"Standard",a:2594,s:30000,sp:"500-2K/day",r:0}]},
+// ─── YOUTUBE (5) ───
+{n:"YouTube Views",p:"YouTube",y:"views",t:[{t:"Standard",a:1573,s:15000,sp:"100-500/day",r:1}]},
+{n:"YouTube Likes",p:"YouTube",y:"likes",t:[{t:"Budget",a:935,s:3000,sp:"10-100K/day",r:0},{t:"Standard",a:918,s:12000,sp:"5-10K/day",r:1},{t:"Premium",a:6233,s:18000,sp:"10-20K/day",r:1}]},
+{n:"YouTube Shorts Likes",p:"YouTube",y:"likes",t:[{t:"Standard",a:6234,s:15000,sp:"10-20K/day",r:1},{t:"Premium",a:6235,s:18000,sp:"10-20K/day",r:1}]},
+{n:"YouTube Subscribers",p:"YouTube",y:"followers",t:[{t:"Budget",a:2386,s:3500,sp:"10-50K/day",r:0}]},
+{n:"YouTube Comment Likes",p:"YouTube",y:"engagement",t:[{t:"Standard",a:912,s:8000,sp:"5-10K/day",r:1}]},
+// ─── TWITTER/X (8) ───
+{n:"X/Twitter Tweet Views",p:"Twitter/X",y:"views",t:[{t:"Budget",a:981,s:200,sp:"100-500K/day",r:0},{t:"Standard",a:2990,s:500,sp:"100-200K/day",r:0}]},
+{n:"X/Twitter Video Views (USA)",p:"Twitter/X",y:"views",t:[{t:"Standard",a:350,s:400,sp:"Fast",r:0}]},
+{n:"X/Twitter Followers",p:"Twitter/X",y:"followers",t:[{t:"Budget",a:5125,s:40000,sp:"1-5K/day",r:0},{t:"Standard",a:2594,s:30000,sp:"500-2K/day",r:0}]},
+{n:"X/Twitter Likes",p:"Twitter/X",y:"likes",t:[{t:"Budget",a:3663,s:35000,sp:"500-1K/day",r:0}]},
+{n:"X/Twitter Retweets",p:"Twitter/X",y:"engagement",t:[{t:"Budget",a:1604,s:40000,sp:"500-1K/day",r:0}]},
+{n:"X/Twitter Bookmarks",p:"Twitter/X",y:"engagement",t:[{t:"Standard",a:7484,s:35000,sp:"5-10K/day",r:0}]},
+{n:"X/Twitter Poll Votes",p:"Twitter/X",y:"engagement",t:[{t:"Standard",a:2994,s:12000,sp:"20K/day",r:1}]},
+{n:"X/Twitter Impressions",p:"Twitter/X",y:"engagement",t:[{t:"Standard",a:4033,s:7000,sp:"5-10K/day",r:0}]},
+// ─── FACEBOOK (9) ───
+{n:"Facebook Video Views",p:"Facebook",y:"views",t:[{t:"Budget",a:680,s:3000,sp:"20-30K/day",r:1},{t:"Standard",a:7654,s:4500,sp:"5-15K/day",r:1},{t:"Premium",a:6336,s:6000,sp:"50-100K/day",r:1}]},
+{n:"Facebook Reel Views",p:"Facebook",y:"views",t:[{t:"Standard",a:6337,s:4500,sp:"20-30K/day",r:1},{t:"Premium",a:6339,s:6000,sp:"50-100K/day",r:1}]},
+{n:"Facebook Page Followers",p:"Facebook",y:"followers",t:[{t:"Budget",a:4138,s:12000,sp:"1-5K/day",r:0},{t:"Standard",a:9028,s:18000,sp:"5-15K/day",r:1},{t:"Premium",a:9058,s:24000,sp:"5-10K/day",r:1}]},
+{n:"Facebook Profile Followers",p:"Facebook",y:"followers",t:[{t:"Standard",a:9342,s:16000,sp:"5-50K/day",r:1},{t:"Premium",a:9042,s:20000,sp:"10-30K/day",r:1}]},
+{n:"Facebook Post Likes",p:"Facebook",y:"likes",t:[{t:"Budget",a:578,s:8000,sp:"500-1K/day",r:0},{t:"Standard",a:9345,s:18000,sp:"1-10K/day",r:1}]},
+{n:"Facebook Page Likes + Followers",p:"Facebook",y:"followers",t:[{t:"Budget",a:985,s:12000,sp:"1-5K/day",r:0},{t:"Standard",a:9044,s:22000,sp:"5-10K/day",r:1}]},
+{n:"Facebook Group Members",p:"Facebook",y:"followers",t:[{t:"Standard",a:1724,s:8000,sp:"1-5K/day",r:0}]},
+{n:"Facebook Post Reactions (Love ❤️)",p:"Facebook",y:"engagement",t:[{t:"Standard",a:5986,s:14000,sp:"50-200/day",r:0}]},
+{n:"Facebook Live Stream Views",p:"Facebook",y:"views",t:[{t:"Budget",a:618,s:12000,sp:"15 min",r:0},{t:"Standard",a:619,s:25000,sp:"30 min",r:0}]},
+// ─── TELEGRAM (5) ───
+{n:"Telegram Post Views",p:"Telegram",y:"views",t:[{t:"Budget",a:4880,s:800,sp:"100-200K/day",r:0},{t:"Standard",a:2949,s:1500,sp:"100-200K/day",r:0}]},
+{n:"Telegram Channel Members",p:"Telegram",y:"followers",t:[{t:"Budget",a:1640,s:2000,sp:"5-10K/day",r:0},{t:"Standard",a:1639,s:8000,sp:"5-10K/day",r:1},{t:"Premium",a:2098,s:18000,sp:"10-30K/day",r:1}]},
+{n:"Telegram Reactions (Positive)",p:"Telegram",y:"engagement",t:[{t:"Standard",a:2737,s:1200,sp:"Fast",r:0}]},
+{n:"Telegram Reactions (❤️)",p:"Telegram",y:"engagement",t:[{t:"Standard",a:7680,s:1500,sp:"Fast",r:0}]},
+{n:"Telegram Reactions (🔥)",p:"Telegram",y:"engagement",t:[{t:"Standard",a:7681,s:1500,sp:"Fast",r:0}]},
+// ─── SPOTIFY (7) ───
+{n:"Spotify Plays — Global",p:"Spotify",y:"plays",t:[{t:"Standard",a:1612,s:6000,sp:"20-30K/day",r:1}]},
+{n:"Spotify Plays — USA",p:"Spotify",y:"plays",t:[{t:"Premium",a:2482,s:6500,sp:"20-30K/day",r:1}]},
+{n:"Spotify Plays — Europe",p:"Spotify",y:"plays",t:[{t:"Standard",a:2024,s:6500,sp:"20-30K/day",r:1}]},
+{n:"Spotify Followers",p:"Spotify",y:"followers",t:[{t:"Standard",a:1981,s:6500,sp:"100K-2M/day",r:1}]},
+{n:"Spotify Followers — Nigeria 🇳🇬",p:"Spotify",y:"followers",ng:1,t:[{t:"Standard",a:4453,s:7000,sp:"1M/day",r:1}]},
+{n:"Spotify Followers — USA",p:"Spotify",y:"followers",t:[{t:"Premium",a:2720,s:7500,sp:"1M/day",r:1}]},
+{n:"Spotify Followers — UK",p:"Spotify",y:"followers",t:[{t:"Premium",a:2719,s:7500,sp:"1M/day",r:1}]},
+// ─── SNAPCHAT (4) ───
+{n:"Snapchat Followers",p:"Snapchat",y:"followers",t:[{t:"Budget",a:8384,s:350000,sp:"50-200/day",r:0},{t:"Standard",a:8385,s:500000,sp:"500-1K/day",r:1},{t:"Premium",a:8386,s:650000,sp:"500-1K/day",r:1}]},
+{n:"Snapchat Likes",p:"Snapchat",y:"likes",t:[{t:"Budget",a:8387,s:260000,sp:"100-200/day",r:0},{t:"Standard",a:8388,s:280000,sp:"500-1K/day",r:1},{t:"Premium",a:8389,s:350000,sp:"500-1K/day",r:1}]},
+{n:"Snapchat Story Views",p:"Snapchat",y:"views",t:[{t:"Standard",a:8393,s:700000,sp:"500-1K/day",r:0},{t:"Premium",a:8394,s:1000000,sp:"500-1K/day",r:0}]},
+{n:"Snapchat Video Likes",p:"Snapchat",y:"likes",t:[{t:"Standard",a:7334,s:350000,sp:"500-2K/day",r:0}]},
+// ─── LINKEDIN (5) ───
+{n:"LinkedIn Post Likes",p:"LinkedIn",y:"likes",t:[{t:"Standard",a:5472,s:350000,sp:"500-2K/day",r:0},{t:"Premium",a:9417,s:550000,sp:"200-500/day",r:1}]},
+{n:"LinkedIn Profile Followers",p:"LinkedIn",y:"followers",t:[{t:"Standard",a:5466,s:600000,sp:"100-500/day",r:0},{t:"Premium",a:9109,s:750000,sp:"250-1K/day",r:1}]},
+{n:"LinkedIn Company Followers",p:"LinkedIn",y:"followers",t:[{t:"Standard",a:5467,s:600000,sp:"100-500/day",r:0},{t:"Premium",a:9110,s:750000,sp:"250-1K/day",r:1}]},
+{n:"LinkedIn Connections",p:"LinkedIn",y:"followers",t:[{t:"Standard",a:5471,s:600000,sp:"500-2K/day",r:0}]},
+{n:"LinkedIn Post Share",p:"LinkedIn",y:"engagement",t:[{t:"Standard",a:5473,s:800000,sp:"500-2K/day",r:0}]},
+// ─── THREADS (3) ───
+{n:"Threads Likes",p:"Threads",y:"likes",t:[{t:"Standard",a:2776,s:350000,sp:"200-1K/day",r:0}]},
+{n:"Threads Followers",p:"Threads",y:"followers",t:[{t:"Standard",a:2775,s:600000,sp:"200-1K/day",r:0}]},
+{n:"Threads Reposts",p:"Threads",y:"engagement",t:[{t:"Standard",a:2461,s:650000,sp:"200-1K/day",r:0}]},
+// ─── AUDIOMACK (5) ───
+{n:"Audiomack Plays",p:"Audiomack",y:"plays",t:[{t:"Standard",a:310,s:800,sp:"Fast",r:0},{t:"Premium",a:2095,s:800,sp:"1M/day",r:1}]},
+{n:"Audiomack Followers",p:"Audiomack",y:"followers",t:[{t:"Standard",a:306,s:3500,sp:"Fast",r:0}]},
+{n:"Audiomack Likes",p:"Audiomack",y:"likes",t:[{t:"Standard",a:307,s:3500,sp:"Fast",r:0}]},
+{n:"Audiomack Streams — Nigeria 🇳🇬",p:"Audiomack",y:"plays",ng:1,t:[{t:"Premium",a:320,s:18000,sp:"1M/day",r:0}]},
+{n:"Audiomack Streams — Ghana 🇬🇭",p:"Audiomack",y:"plays",t:[{t:"Premium",a:321,s:18000,sp:"1M/day",r:0}]},
+// ─── BOOMPLAY (3) ───
+{n:"Boomplay Streams",p:"Boomplay",y:"plays",t:[{t:"Standard",a:1712,s:10000,sp:"1-12 hrs",r:0}]},
+{n:"Boomplay Streams — Nigeria 🇳🇬",p:"Boomplay",y:"plays",ng:1,t:[{t:"Standard",a:1714,s:10000,sp:"1-12 hrs",r:0}]},
+{n:"Boomplay Followers",p:"Boomplay",y:"followers",t:[{t:"Standard",a:1719,s:120000,sp:"200/day",r:0}]},
+// ─── APPLE MUSIC (2) ───
+{n:"Apple Music Plays — Global",p:"Apple Music",y:"plays",t:[{t:"Standard",a:4549,s:18000,sp:"250-1K/day",r:1}]},
+{n:"Apple Music Plays — USA",p:"Apple Music",y:"plays",t:[{t:"Premium",a:4550,s:20000,sp:"250-1K/day",r:1}]},
+// ─── SOUNDCLOUD (4) ───
+{n:"SoundCloud Plays",p:"SoundCloud",y:"plays",t:[{t:"Standard",a:2197,s:1500,sp:"100-500/day",r:1}]},
+{n:"SoundCloud Followers",p:"SoundCloud",y:"followers",t:[{t:"Standard",a:2198,s:40000,sp:"200-500/day",r:1}]},
+{n:"SoundCloud Likes",p:"SoundCloud",y:"likes",t:[{t:"Standard",a:2205,s:40000,sp:"100-500/day",r:1}]},
+{n:"SoundCloud Reposts",p:"SoundCloud",y:"engagement",t:[{t:"Standard",a:2207,s:40000,sp:"100-500/day",r:1}]},
+// ─── DEEZER (2) ───
+{n:"Deezer Followers",p:"Deezer",y:"followers",t:[{t:"Standard",a:293,s:2500,sp:"100K/day",r:1}]},
+{n:"Deezer Likes",p:"Deezer",y:"likes",t:[{t:"Standard",a:294,s:2500,sp:"100K/day",r:1}]},
+// ─── SHAZAM (1) ───
+{n:"Shazam Plays — USA",p:"Shazam",y:"plays",t:[{t:"Standard",a:1601,s:7000,sp:"100-500/day",r:0}]},
+// ─── MIXCLOUD (3) ───
+{n:"Mixcloud Plays",p:"Mixcloud",y:"plays",t:[{t:"Standard",a:7929,s:3500,sp:"Fast",r:0}]},
+{n:"Mixcloud Followers",p:"Mixcloud",y:"followers",t:[{t:"Standard",a:1598,s:12000,sp:"Fast",r:0}]},
+{n:"Mixcloud Likes",p:"Mixcloud",y:"likes",t:[{t:"Standard",a:1600,s:12000,sp:"Fast",r:0}]},
+// ─── VIMEO (1) ───
+{n:"Vimeo Views",p:"Vimeo",y:"views",t:[{t:"Standard",a:794,s:2000,sp:"24hrs",r:0}]},
+// ─── DISCORD (3) ───
+{n:"Discord Members (Offline)",p:"Discord",y:"followers",t:[{t:"Standard",a:7344,s:8000,sp:"Fast",r:1},{t:"Premium",a:2892,s:14000,sp:"Fast",r:1}]},
+{n:"Discord Server Boost (2x, 1mo)",p:"Discord",y:"engagement",t:[{t:"Standard",a:5135,s:8000,sp:"1 month",r:1}]},
+{n:"Discord Server Boost (2x, 3mo)",p:"Discord",y:"engagement",t:[{t:"Premium",a:5142,s:14000,sp:"3 months",r:1}]},
+// ─── REDDIT (4) ───
+{n:"Reddit Views",p:"Reddit",y:"views",t:[{t:"Budget",a:1955,s:400,sp:"100K/day",r:1},{t:"Standard",a:8107,s:600,sp:"1-2M/day",r:0}]},
+{n:"Reddit Shares",p:"Reddit",y:"engagement",t:[{t:"Standard",a:8108,s:600,sp:"1-2M/day",r:0}]},
+{n:"Reddit Views — USA",p:"Reddit",y:"views",t:[{t:"Premium",a:8110,s:700,sp:"1-2M/day",r:0}]},
+{n:"Reddit Views + Shares",p:"Reddit",y:"views",t:[{t:"Standard",a:1957,s:500,sp:"100K/day",r:1}]},
+// ─── PINTEREST (3) ───
+{n:"Pinterest Likes",p:"Pinterest",y:"likes",t:[{t:"Standard",a:2913,s:350000,sp:"100-1K/day",r:0}]},
+{n:"Pinterest Followers",p:"Pinterest",y:"followers",t:[{t:"Standard",a:2922,s:500000,sp:"1-2K/day",r:0}]},
+{n:"Pinterest Saves",p:"Pinterest",y:"engagement",t:[{t:"Standard",a:2912,s:600000,sp:"100-1K/day",r:0}]},
+// ─── TUMBLR (3) ───
+{n:"Tumblr Likes",p:"Tumblr",y:"likes",t:[{t:"Standard",a:7976,s:300000,sp:"50-200/day",r:0}]},
+{n:"Tumblr Reblogs",p:"Tumblr",y:"engagement",t:[{t:"Standard",a:7977,s:500000,sp:"50-200/day",r:0}]},
+{n:"Tumblr Followers",p:"Tumblr",y:"followers",t:[{t:"Premium",a:7975,s:9000000,sp:"50-200/day",r:0}]},
+// ─── KICK (3) ───
+{n:"Kick Clip Views",p:"Kick",y:"views",t:[{t:"Standard",a:7512,s:1200,sp:"10-50K/day",r:0}]},
+{n:"Kick Followers",p:"Kick",y:"followers",t:[{t:"Standard",a:7265,s:50000,sp:"1-5K/day",r:0}]},
+{n:"Kick Video Views",p:"Kick",y:"views",t:[{t:"Standard",a:8050,s:1200,sp:"10-50K/day",r:0}]},
+// ─── QUORA (3) ───
+{n:"Quora Views",p:"Quora",y:"views",t:[{t:"Standard",a:5963,s:1000,sp:"100-500K/day",r:1}]},
+{n:"Quora Followers",p:"Quora",y:"followers",t:[{t:"Standard",a:8045,s:6000,sp:"500-1K/day",r:1}]},
+{n:"Quora Upvotes",p:"Quora",y:"engagement",t:[{t:"Standard",a:957,s:6000,sp:"1-5K/day",r:1}]},
+// ─── WHATSAPP (1) ───
+{n:"WhatsApp Channel Members",p:"WhatsApp",y:"followers",t:[{t:"Standard",a:4885,s:50000,sp:"500-2K/day",r:0}]},
+// ─── ONLYFANS (2) ───
+{n:"OnlyFans Followers",p:"OnlyFans",y:"followers",t:[{t:"Budget",a:8402,s:850000,sp:"500-1K/day",r:0},{t:"Standard",a:8403,s:900000,sp:"500-1K/day",r:1},{t:"Premium",a:8404,s:1000000,sp:"500-1K/day",r:1}]},
+{n:"OnlyFans Likes",p:"OnlyFans",y:"likes",t:[{t:"Budget",a:8405,s:850000,sp:"500-1K/day",r:0},{t:"Standard",a:8406,s:900000,sp:"500-1K/day",r:1}]},
+// ─── TRUSTPILOT (1) ───
+{n:"TrustPilot Reviews (5 Stars)",p:"TrustPilot",y:"reviews",t:[{t:"Premium",a:1616,s:15000000,sp:"Custom",r:1}]},
+// ─── GOOGLE (1) ───
+{n:"Google Review Likes",p:"Google",y:"reviews",t:[{t:"Standard",a:8653,s:2700000,sp:"Custom",r:0}]},
 ];
 
-async function seed() {
-  console.log('🌱 Seeding Nitro menu...\n');
-
-  // Build apiId → service.id map
-  const allApiIds = [...new Set(MENU.flatMap(g => g.tiers.map(t => t.apiId)))];
-  const services = await p.service.findMany({
-    where: { apiId: { in: allApiIds } },
-    select: { id: true, apiId: true },
-  });
-  const svcMap = {};
-  services.forEach(s => { svcMap[s.apiId] = s.id; });
-
-  const missing = allApiIds.filter(id => !svcMap[id]);
-  if (missing.length) {
-    console.log(`⚠️  Missing MTP service IDs (not in DB): ${missing.join(', ')}`);
-    console.log('   Run Sync in admin first, then re-run this script.\n');
-  }
-
-  // Clear existing menu
-  await p.serviceTier.deleteMany();
-  await p.serviceGroup.deleteMany();
-  console.log('🗑️  Cleared existing menu\n');
-
-  let groupCount = 0, tierCount = 0, skipped = 0;
-
-  for (let i = 0; i < MENU.length; i++) {
-    const g = MENU[i];
-    const group = await p.serviceGroup.create({
-      data: {
-        name: g.name,
-        platform: g.platform,
-        type: g.type || 'Standard',
-        nigerian: g.nigerian || false,
-        enabled: true,
-        sortOrder: i + 1,
-      },
-    });
-    groupCount++;
-
-    for (let j = 0; j < g.tiers.length; j++) {
-      const t = g.tiers[j];
-      const serviceId = svcMap[t.apiId];
-      if (!serviceId) {
-        console.log(`   ⏭️  Skipping ${g.name} → ${t.tier} (apiId ${t.apiId} not found)`);
-        skipped++;
-        continue;
-      }
-
-      await p.serviceTier.create({
-        data: {
-          groupId: group.id,
-          serviceId,
-          tier: t.tier,
-          sellPer1k: t.sellPer1k,
-          refill: t.refill,
-          speed: t.speed,
-          enabled: true,
-          sortOrder: j + 1,
-        },
-      });
-      tierCount++;
-    }
-
-    console.log(`   ✅ ${g.platform} → ${g.name} (${g.tiers.length} tiers)`);
-  }
-
-  console.log(`\n🎉 Done! ${groupCount} groups, ${tierCount} tiers created, ${skipped} skipped.`);
+async function seed(){
+console.log('🌱 Seeding Nitro full menu...\n');
+const allApi=[...new Set(M.flatMap(g=>g.t.map(x=>x.a)))];
+const svcs=await p.service.findMany({where:{apiId:{in:allApi}},select:{id:true,apiId:true}});
+const m={};svcs.forEach(s=>{m[s.apiId]=s.id;});
+const miss=allApi.filter(id=>!m[id]);
+if(miss.length)console.log('⚠️  Missing apiIds:',miss.join(', '));
+await p.serviceTier.deleteMany();await p.serviceGroup.deleteMany();
+console.log('🗑️  Cleared existing menu\n');
+let gc=0,tc=0,sk=0;
+for(let i=0;i<M.length;i++){const g=M[i];
+const grp=await p.serviceGroup.create({data:{name:g.n,platform:g.p,type:g.y||'Standard',nigerian:!!g.ng,enabled:true,sortOrder:i+1}});gc++;
+for(let j=0;j<g.t.length;j++){const x=g.t[j];const sid=m[x.a];
+if(!sid){console.log('   ⏭️  Skip:',g.n,'→',x.t,'(apiId',x.a,'missing)');sk++;continue;}
+await p.serviceTier.create({data:{groupId:grp.id,serviceId:sid,tier:x.t,sellPer1k:x.s,refill:!!x.r,speed:x.sp,enabled:true,sortOrder:j+1}});tc++;}
+console.log('   ✅',g.p,'→',g.n,'('+g.t.length+' tiers)');}
+const plats=[...new Set(M.map(g=>g.p))];
+console.log('\n🎉 Done!',gc,'groups,',tc,'tiers,',sk,'skipped');
+console.log('📊',plats.length,'platforms:',plats.join(', '));
 }
-
-seed().catch(e => { console.error('❌ Seed failed:', e.message); }).finally(() => p.$disconnect());
+seed().catch(e=>{console.error('❌',e.message);}).finally(()=>p.$disconnect());
