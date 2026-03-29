@@ -339,63 +339,81 @@ export function AdminNotificationsPage({ dark, t }) {
 export function AdminMaintenancePage({ dark, t }) {
   const confirm = useConfirm();
   const [enabled, setEnabled] = useState(false);
-  const [msg, setMsg] = useState("We're performing scheduled upgrades. Everything will be back shortly.");
-  const [eta, setEta] = useState("~30 minutes");
+  const [msg, setMsg] = useState("We're upgrading our systems to serve you better. We'll be back shortly!");
+  const [duration, setDuration] = useState(60);
+  const [useCustom, setUseCustom] = useState(false);
+  const [customH, setCustomH] = useState("");
+  const [customM, setCustomM] = useState("");
   const [loading, setLoading] = useState(true);
 
+  const PRESETS = [{ label: "30 min", m: 30 }, { label: "1 hour", m: 60 }, { label: "2 hours", m: 120 }, { label: "6 hours", m: 360 }, { label: "12 hours", m: 720 }, { label: "24 hours", m: 1440 }];
+
+  const formatDuration = (mins) => { if (mins < 60) return `~${mins} minutes`; const h = Math.floor(mins / 60); const m = mins % 60; return m ? `~${h}h ${m}m` : `~${h} hour${h > 1 ? "s" : ""}`; };
+
   useEffect(() => {
-    fetch("/api/admin/maintenance").then(r => r.json()).then(d => { setEnabled(d.enabled || false); setMsg(d.message || msg); setEta(d.estimatedReturn || eta); setLoading(false); }).catch(() => setLoading(false));
+    fetch("/api/admin/maintenance").then(r => r.json()).then(d => { setEnabled(d.enabled || false); if (d.message) setMsg(d.message); if (d.durationMinutes) setDuration(d.durationMinutes); setLoading(false); }).catch(() => setLoading(false));
   }, []);
 
   const save = async (newEnabled) => {
     const e = newEnabled !== undefined ? newEnabled : enabled;
+    const mins = useCustom ? ((Number(customH) || 0) * 60 + (Number(customM) || 0)) : duration;
     try {
-      await fetch("/api/admin/maintenance", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ enabled: e, message: msg, estimatedReturn: eta }) });
+      await fetch("/api/admin/maintenance", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ enabled: e, message: msg, durationMinutes: mins, estimatedReturn: formatDuration(mins) }) });
       if (newEnabled !== undefined) setEnabled(e);
     } catch {}
   };
 
-  const inputStyle = { width: "100%", padding: "10px 14px", borderRadius: 8, borderWidth: 1, borderStyle: "solid", borderColor: t.cardBorder, background: dark ? "#0d1020" : "#fff", color: t.text, fontSize: 14, outline: "none", boxSizing: "border-box", fontFamily: "inherit" };
-
   return (
     <>
       <div className="adm-header">
-        <div className="adm-title" style={{ color: t.text }}>Maintenance</div>
-        <div className="adm-subtitle" style={{ color: t.textMuted }}>Control maintenance mode</div>
+        <div className="adm-title" style={{ color: t.text }}>Maintenance Mode</div>
+        <div className="adm-subtitle" style={{ color: t.textMuted }}>Take the platform offline for updates</div>
         <div className="page-divider" style={{ background: t.cardBorder }} />
       </div>
 
       {loading ? null : (
-        <div style={{ maxWidth: 550, marginTop: 16 }}>
-          {/* Toggle */}
-          <div className="adm-card" style={{ background: dark ? "rgba(255,255,255,.06)" : "rgba(255,255,255,.95)", borderWidth: 1, borderStyle: "solid", borderColor: enabled ? (dark ? "rgba(252,165,165,.2)" : "rgba(220,38,38,.15)") : (dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)"), padding: 20, marginBottom: 20, boxShadow: dark ? "0 4px 20px rgba(0,0,0,.25)" : "0 4px 20px rgba(0,0,0,.04)", borderRadius: 14 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: enabled ? 16 : 0 }}>
+        <div style={{ maxWidth: 600, marginTop: 16 }}>
+          {/* Status card */}
+          <div style={{ borderRadius: 16, background: dark ? "rgba(255,255,255,.06)" : "rgba(255,255,255,.95)", borderWidth: 1, borderStyle: "solid", borderColor: t.cardBorder, boxShadow: dark ? "0 4px 20px rgba(0,0,0,.25)" : "0 4px 20px rgba(0,0,0,.04)", padding: 24, marginBottom: 20 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
               <div>
-                <div style={{ fontSize: 15, fontWeight: 600, color: t.text }}>Maintenance Mode</div>
-                <div style={{ fontSize: 13, color: t.textMuted, marginTop: 2 }}>When enabled, users see a maintenance page instead of the dashboard</div>
+                <div style={{ fontSize: 16, fontWeight: 700, color: t.text, marginBottom: 4 }}>Platform Status</div>
+                <div style={{ fontSize: 14, color: t.textMuted }}>{enabled ? "⚠️ Platform is currently offline" : "✅ Platform is online and operational"}</div>
               </div>
-              <button onClick={async () => { const ok = await confirm({ title: enabled ? "Disable Maintenance" : "Enable Maintenance Mode", message: enabled ? "Bring the platform back online for all users?" : "This will take the platform offline. All users will see a maintenance page.", confirmLabel: enabled ? "Go Online" : "Enable Maintenance", danger: !enabled }); if (ok) save(!enabled); }} style={{ padding: "8px 20px", borderRadius: 8, fontWeight: 600, fontSize: 14, border: "none", cursor: "pointer", background: enabled ? (dark ? "rgba(252,165,165,.15)" : "rgba(220,38,38,.08)") : `linear-gradient(135deg,#c47d8e,#8b5e6b)`, color: enabled ? t.red : "#fff" }}>
-                {enabled ? "Disable" : "Enable"}
+              <button onClick={() => { setEnabled(!enabled); }} style={{ width: 52, height: 28, borderRadius: 14, position: "relative", border: "none", cursor: "pointer", background: enabled ? "rgba(252,165,165,.2)" : (dark ? "rgba(110,231,183,.15)" : "rgba(5,150,105,.1)"), borderWidth: 1, borderStyle: "solid", borderColor: enabled ? (dark ? "rgba(252,165,165,.3)" : "rgba(220,38,38,.2)") : (dark ? "rgba(110,231,183,.3)" : "rgba(5,150,105,.2)") }}>
+                <div style={{ width: 22, height: 22, borderRadius: "50%", position: "absolute", top: 2, left: enabled ? 27 : 3, transition: "left .3s ease", background: enabled ? (dark ? "#fca5a5" : "#dc2626") : (dark ? "#6ee7b7" : "#059669") }} />
               </button>
             </div>
-            {enabled && (
-              <div style={{ padding: "12px 14px", borderRadius: 10, background: dark ? "rgba(252,165,165,.06)" : "rgba(220,38,38,.03)", borderWidth: 1, borderStyle: "solid", borderColor: dark ? "rgba(252,165,165,.1)" : "rgba(220,38,38,.06)" }}>
-                <div style={{ fontSize: 13, fontWeight: 600, color: t.red, display: "flex", alignItems: "center", gap: 6 }}>⚠️ Maintenance mode is ACTIVE</div>
-                <div style={{ fontSize: 13, color: t.textMuted, marginTop: 4 }}>Users cannot access the platform right now</div>
+
+            {/* Duration presets */}
+            <div style={{ fontSize: 12, fontWeight: 600, color: t.textMuted, textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 12 }}>Estimated Duration</div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8, marginBottom: 12 }}>
+              {PRESETS.map(p => {
+                const active = !useCustom && duration === p.m;
+                return (<button key={p.m} onClick={() => { setDuration(p.m); setUseCustom(false); }} className="m" style={{ padding: "10px 0", borderRadius: 10, fontSize: 13, fontWeight: 600, textAlign: "center", borderWidth: active ? 2 : 1, borderStyle: "solid", borderColor: active ? t.accent : t.cardBorder, background: active ? (dark ? "rgba(196,125,142,.1)" : "rgba(196,125,142,.06)") : "transparent", color: active ? t.accent : t.textSoft, cursor: "pointer" }}>{p.label}</button>);
+              })}
+            </div>
+            <button onClick={() => setUseCustom(!useCustom)} style={{ fontSize: 14, color: useCustom ? t.accent : t.textSoft, fontWeight: 500, background: "none", marginBottom: useCustom ? 12 : 0, cursor: "pointer" }}>{useCustom ? "▾ Custom duration" : "▸ Custom duration"}</button>
+            {useCustom && (
+              <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+                <div style={{ flex: 1 }}><label style={{ fontSize: 12, color: t.textMuted, display: "block", marginBottom: 4 }}>Hours</label><input type="number" min="0" max="72" value={customH} onChange={e => setCustomH(e.target.value)} placeholder="0" className="m" style={{ width: "100%", padding: "10px 14px", borderRadius: 10, background: dark ? "#0d1020" : "#fff", borderWidth: 1, borderStyle: "solid", borderColor: t.cardBorder, color: t.text, fontSize: 16, fontWeight: 600, outline: "none", textAlign: "center", boxSizing: "border-box" }} /></div>
+                <span style={{ fontSize: 20, color: t.textMuted, marginTop: 16 }}>:</span>
+                <div style={{ flex: 1 }}><label style={{ fontSize: 12, color: t.textMuted, display: "block", marginBottom: 4 }}>Minutes</label><input type="number" min="0" max="59" value={customM} onChange={e => setCustomM(e.target.value)} placeholder="0" className="m" style={{ width: "100%", padding: "10px 14px", borderRadius: 10, background: dark ? "#0d1020" : "#fff", borderWidth: 1, borderStyle: "solid", borderColor: t.cardBorder, color: t.text, fontSize: 16, fontWeight: 600, outline: "none", textAlign: "center", boxSizing: "border-box" }} /></div>
+                <div className="m" style={{ flex: 1, fontSize: 13, color: t.textMuted, marginTop: 16 }}>= {(Number(customH) || 0) * 60 + (Number(customM) || 0)} min</div>
               </div>
             )}
           </div>
 
-          {/* Message */}
-          <div style={{ marginBottom: 16 }}>
-            <label style={{ fontSize: 13, color: t.textMuted, display: "block", marginBottom: 4 }}>Maintenance Message</label>
-            <textarea value={msg} onChange={e => setMsg(e.target.value)} rows={3} style={{ ...inputStyle, resize: "vertical", lineHeight: 1.5 }} />
+          {/* Message card */}
+          <div style={{ borderRadius: 16, background: dark ? "rgba(255,255,255,.06)" : "rgba(255,255,255,.95)", borderWidth: 1, borderStyle: "solid", borderColor: t.cardBorder, boxShadow: dark ? "0 4px 20px rgba(0,0,0,.25)" : "0 4px 20px rgba(0,0,0,.04)", padding: 24, marginBottom: 20 }}>
+            <div style={{ fontSize: 12, fontWeight: 600, color: t.textMuted, textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 8 }}>Maintenance Message</div>
+            <div style={{ fontSize: 13, color: t.textMuted, marginBottom: 10 }}>This is what users will see on the maintenance page</div>
+            <textarea value={msg} onChange={e => setMsg(e.target.value)} rows={3} style={{ width: "100%", padding: "12px 14px", borderRadius: 12, background: dark ? "#0d1020" : "#fff", resize: "vertical", borderWidth: 1, borderStyle: "solid", borderColor: t.cardBorder, color: t.text, fontSize: 14, outline: "none", fontFamily: "inherit", lineHeight: 1.6, boxSizing: "border-box" }} />
           </div>
-          <div style={{ marginBottom: 16 }}>
-            <label style={{ fontSize: 13, color: t.textMuted, display: "block", marginBottom: 4 }}>Estimated Return Time</label>
-            <input value={eta} onChange={e => setEta(e.target.value)} placeholder="~30 minutes" style={inputStyle} />
-          </div>
-          <button onClick={() => save()} className="adm-btn-primary">Save Settings</button>
+
+          {/* Action */}
+          <button onClick={async () => { const ok = await confirm({ title: enabled ? "Bring Platform Online" : "Take Platform Offline", message: enabled ? "Bring the platform back online for all users?" : "This will take the platform offline. All users will see a maintenance page.", confirmLabel: enabled ? "Go Online" : "Take Offline", danger: !enabled }); if (ok) save(!enabled); }} style={{ width: "100%", padding: "14px 0", borderRadius: 12, fontSize: 15, fontWeight: 700, border: "none", cursor: "pointer", background: enabled ? (dark ? "rgba(110,231,183,.12)" : "rgba(5,150,105,.08)") : `linear-gradient(135deg,#c47d8e,#8b5e6b)`, color: enabled ? t.green : "#fff", boxShadow: enabled ? "none" : "0 4px 16px rgba(196,125,142,.25)" }}>{enabled ? "🟢 Bring Platform Online" : "🔴 Take Platform Offline"}</button>
+          <button onClick={() => save()} style={{ width: "100%", padding: "12px 0", borderRadius: 10, marginTop: 10, background: "none", color: t.textSoft, fontSize: 14, fontWeight: 500, cursor: "pointer", borderWidth: 1, borderStyle: "solid", borderColor: t.cardBorder }}>Save Settings</button>
         </div>
       )}
     </>

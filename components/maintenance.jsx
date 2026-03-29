@@ -1,97 +1,62 @@
 'use client';
-import NitroLogo from './nitro-logo';
 import { useState, useEffect } from "react";
 
-export default function Maintenance(){
-  const getAuto=()=>{const h=new Date().getHours();return h>=7&&h<18?false:true;};
-  const [dark,setDark]=useState(getAuto);
-  const [mo,setMo]=useState(false);
-  const toggleTheme=()=>{setMo(true);setDark(d=>{const next=!d;try{localStorage.setItem("nitro-theme",next?"night":"day");}catch{}return next;});};
-  useEffect(()=>{try{const s=localStorage.getItem("nitro-theme");if(s==="night"||s==="dark"){setDark(true);setMo(true);}else if(s==="day"||s==="light"){setDark(false);setMo(true);}}catch{}},[]);
-  useEffect(()=>{if(mo)return;const iv=setInterval(()=>setDark(getAuto()),60000);return()=>clearInterval(iv);},[mo]);
-  const [dots,setDots]=useState("");
-  useEffect(()=>{const iv=setInterval(()=>setDots(d=>d.length>=3?"":d+"."),500);return()=>clearInterval(iv);},[]);
+export default function Maintenance() {
+  const getAuto = () => { const h = new Date().getHours(); return h >= 19 || h < 7; };
+  const [dark, setDark] = useState(false);
+  const [dots, setDots] = useState(0);
 
-  const t={
-    bg:dark?"#080b14":"#f4f1ed",text:dark?"#e8e4df":"#1a1a1a",textSoft:dark?"#8a8680":"#888580",textMuted:dark?"#555250":"#b0ada8",
-    accent:"#c47d8e",green:dark?"#6ee7b7":"#059669",
-    surface:dark?"rgba(15,18,30,0.92)":"rgba(255,255,255,0.92)",surfaceBorder:dark?"rgba(255,255,255,0.06)":"rgba(0,0,0,0.08)",
-    logoGrad:"linear-gradient(135deg,#c47d8e,#8b5e6b)",
-  };
+  useEffect(() => {
+    try { const s = localStorage.getItem("nitro-theme") || "auto"; if (s === "night") setDark(true); else if (s === "day") setDark(false); else setDark(getAuto()); } catch {}
+  }, []);
+  useEffect(() => { const iv = setInterval(() => setDots(d => (d + 1) % 4), 500); return () => clearInterval(iv); }, []);
 
-  return(
-    <div className="root">
-      
-      <style>{`
-        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-        .root{min-height:100vh;background:${t.bg};font-family:'Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;display:flex;flex-direction:column;position:relative;overflow:hidden}
-        .serif{font-family:'Plus Jakarta Sans',-apple-system,sans-serif}.m{font-family:'JetBrains Mono',monospace}
-        @keyframes float1{0%,100%{transform:translate(0,0)}50%{transform:translate(20px,-15px)}}
-        @keyframes pulse{0%,100%{opacity:.4;transform:scale(1)}50%{opacity:.8;transform:scale(1.02)}}
-        @keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
-        .orb{position:absolute;border-radius:50%;pointer-events:none;filter:blur(80px)}
-      `}</style>
+  const t = { bg: dark ? "#080b14" : "#f4f1ed", tx: dark ? "#f5f3f0" : "#1a1917", ts: dark ? "#a09b95" : "#555250", tm: dark ? "#706c68" : "#757170", ac: "#c47d8e", cbd: dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)", amber: dark ? "#e0a458" : "#d97706" };
 
-      <div style={{padding:"14px 0",borderBottom:`1px solid ${t.surfaceBorder}`,position:"sticky",top:0,zIndex:50,background:dark?"rgba(8,11,20,0.8)":"rgba(244,241,237,0.8)",backdropFilter:"blur(20px)",transition:"background 1.5s ease"}}>
-        <div style={{maxWidth:800,margin:"0 auto",padding:"0 24px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-          <button onClick={()=>window.scrollTo({top:0,behavior:"smooth"})} style={{display:"flex",alignItems:"center",gap:10,background:"none",padding:0,border:"none",outline:"none",cursor:"pointer"}}>
-            <NitroLogo size={32} variant="mark"/>
-            <span className="serif" style={{fontSize:18,fontWeight:600,color:t.text}}>Nitro</span>
-          </button>
-          <button onClick={toggleTheme} style={{display:"flex",alignItems:"center",background:dark?"rgba(255,255,255,0.06)":"rgba(0,0,0,0.06)",borderRadius:20,padding:3,width:52,height:28,border:`1px solid ${dark?"rgba(255,255,255,0.08)":"rgba(0,0,0,0.1)"}`,position:"relative",flexShrink:0,transition:"background 1.5s cubic-bezier(.4,0,.2,1),border-color 1.5s ease"}}><div style={{width:22,height:22,borderRadius:"50%",background:dark?"#c47d8e":"#e0a458",display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,position:"absolute",left:dark?3:27,transition:"left 0.4s cubic-bezier(.4,0,.2,1),background 1.5s cubic-bezier(.4,0,.2,1)",boxShadow:"0 1px 4px rgba(0,0,0,0.2)"}}>{dark?"🌙":"☀️"}</div></button>
+  return (
+    <div style={{ minHeight: "100dvh", background: t.bg, fontFamily: "'Outfit',system-ui,sans-serif", display: "flex", flexDirection: "column", position: "relative", overflow: "hidden" }}>
+      <div style={{ position: "absolute", width: 300, height: 300, borderRadius: "50%", top: "10%", left: "-10%", background: dark ? "rgba(224,164,88,.04)" : "rgba(224,164,88,.03)", filter: "blur(80px)", pointerEvents: "none" }} />
+      <div style={{ position: "absolute", width: 200, height: 200, borderRadius: "50%", bottom: "10%", right: "-5%", background: dark ? "rgba(196,125,142,.04)" : "rgba(196,125,142,.03)", filter: "blur(60px)", pointerEvents: "none" }} />
+
+      <nav style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "0 24px", height: 56, borderBottom: `1px solid ${t.cbd}`, background: dark ? "rgba(8,11,20,.8)" : "rgba(244,241,237,.8)", backdropFilter: "blur(20px)", position: "relative", zIndex: 10, flexShrink: 0 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <div style={{ width: 26, height: 26, borderRadius: 7, background: "linear-gradient(135deg,#c47d8e,#8b5e6b)", display: "flex", alignItems: "center", justifyContent: "center" }}><svg width="11" height="11" viewBox="0 0 20 20" fill="none"><path d="M4,16 L4,4 L16,16 L16,4" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
+          <span style={{ fontSize: 15, fontWeight: 700, color: t.tx, letterSpacing: 1.5 }}>NITRO</span>
         </div>
-      </div>
-      <div style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center"}}>
-      <div className="orb" style={{width:300,height:300,top:"-10%",left:"-8%",background:dark?"rgba(196,125,142,0.08)":"rgba(196,125,142,0.06)",animation:"float1 18s ease-in-out infinite"}}/>
-      <div className="orb" style={{width:250,height:250,bottom:"-10%",right:"-8%",background:dark?"rgba(100,120,200,0.06)":"rgba(100,120,200,0.04)",animation:"float1 22s ease-in-out infinite 5s"}}/>
-      <div style={{position:"absolute",inset:0,backgroundImage:`linear-gradient(${dark?"rgba(255,255,255,0.015)":"rgba(0,0,0,0.015)"} 1px,transparent 1px),linear-gradient(90deg,${dark?"rgba(255,255,255,0.015)":"rgba(0,0,0,0.015)"} 1px,transparent 1px)`,backgroundSize:"60px 60px",pointerEvents:"none"}}/>
+      </nav>
 
-      <div style={{textAlign:"center",position:"relative",zIndex:1,padding:24,maxWidth:480}}>
-        <div style={{background:t.surface,border:`1px solid ${t.surfaceBorder}`,borderRadius:24,padding:"48px 36px",backdropFilter:"blur(20px)",boxShadow:dark?"0 20px 60px rgba(0,0,0,0.4)":"0 20px 60px rgba(0,0,0,0.08)"}}>
+      <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", position: "relative", zIndex: 1 }}>
+        <div style={{ textAlign: "center", padding: 24, maxWidth: 480 }}>
+          <svg width="80" height="80" viewBox="0 0 96 96" fill="none" style={{ marginBottom: 28, opacity: .6 }}>
+            <circle cx="48" cy="48" r="20" stroke={t.amber} strokeWidth="2" opacity=".3" />
+            <circle cx="48" cy="48" r="12" stroke={t.amber} strokeWidth="2" opacity=".2" />
+            <circle cx="48" cy="48" r="4" fill={t.amber} opacity=".3" />
+            {[0, 45, 90, 135, 180, 225, 270, 315].map(deg => (
+              <line key={deg} x1="48" y1="24" x2="48" y2="18" stroke={t.amber} strokeWidth="3" opacity=".25" strokeLinecap="round" transform={`rotate(${deg} 48 48)`} />
+            ))}
+            <path d="M62 34l12-12 4 4-12 12" stroke={t.amber} strokeWidth="2" opacity=".35" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M30 62l-8 8 4 4 8-8" stroke={t.amber} strokeWidth="2" opacity=".35" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
 
-          {/* Animated gear */}
-          <div style={{width:64,height:64,borderRadius:"50%",border:`3px solid ${t.surfaceBorder}`,borderTopColor:t.accent,animation:"spin 3s linear infinite",margin:"0 auto 24px"}}/>
+          <h1 style={{ fontSize: "clamp(28px, 5vw, 36px)", fontWeight: 600, color: t.tx, marginBottom: 8, fontFamily: "'Cormorant Garamond',serif" }}>We'll be right back</h1>
+          <p style={{ fontSize: 15, color: t.ts, lineHeight: 1.7, maxWidth: 380, margin: "0 auto 24px" }}>We're upgrading our systems to serve you better. This won't take long — grab a coffee and check back soon.</p>
 
-          <div style={{display:"inline-flex",alignItems:"center",gap:10,marginBottom:20}}>
-            <NitroLogo size={36} variant="mark"/>
-            <span className="serif" style={{fontSize:20,fontWeight:600,color:t.text}}>Nitro</span>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 10, padding: "10px 20px", borderRadius: 12, background: dark ? "rgba(224,164,88,.08)" : "rgba(224,164,88,.04)", borderWidth: 1, borderStyle: "solid", borderColor: dark ? "rgba(224,164,88,.15)" : "rgba(224,164,88,.08)" }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={t.amber} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
+            <span className="m" style={{ fontSize: 13, fontWeight: 600, color: t.amber, fontFamily: "'JetBrains Mono',monospace" }}>Estimated: ~1 hour</span>
           </div>
 
-          <h1 className="serif" style={{fontSize:"clamp(24px,5vw,36px)",fontWeight:600,color:t.text,marginBottom:10}}>Under Maintenance</h1>
-          <p style={{fontSize:15,color:t.textSoft,lineHeight:1.7,marginBottom:8}}>
-            We're performing scheduled upgrades to improve your experience. Everything will be back to normal shortly.
-          </p>
-          <p className="m" style={{fontSize:14,color:t.accent,fontWeight:500,animation:"pulse 2s ease-in-out infinite"}}>
-            Working on it{dots}
-          </p>
-
-          <div style={{marginTop:28,padding:16,borderRadius:14,background:dark?"#0a0d18":"#faf8f5",border:`1px solid ${t.surfaceBorder}`}}>
-            <div style={{fontSize:11,color:t.textMuted,fontWeight:600,textTransform:"uppercase",letterSpacing:1.5,marginBottom:10}}>Estimated Return</div>
-            <div className="m" style={{fontSize:20,fontWeight:700,color:t.green}}>~30 minutes</div>
-            <div style={{fontSize:12,color:t.textMuted,marginTop:6}}>Orders in progress will not be affected</div>
+          <div style={{ marginTop: 28, display: "flex", justifyContent: "center", gap: 6 }}>
+            {[0, 1, 2].map(i => (<div key={i} style={{ width: 8, height: 8, borderRadius: "50%", background: i <= dots ? t.amber : (dark ? "rgba(255,255,255,.08)" : "rgba(0,0,0,.06)"), transition: "background .3s ease" }} />))}
           </div>
 
-          <div style={{marginTop:24,display:"flex",gap:12,justifyContent:"center",flexWrap:"wrap"}}>
-            <a href="https://twitter.com/nitro" style={{fontSize:13,color:t.accent,textDecoration:"none",fontWeight:500}}>Follow @nitro for updates</a>
-          </div>
-        </div>
-
-        <div style={{marginTop:20,fontSize:12,color:t.textMuted}}>
-          Questions? Email <a href="mailto:support@thenitro.ng" style={{color:t.accent,textDecoration:"none"}}>support@thenitro.ng</a>
+          <div style={{ marginTop: 32, fontSize: 14, color: t.tm }}>Follow updates on <a href="https://x.com/TheNitroNG" style={{ color: t.ac, fontWeight: 500, textDecoration: "none" }}>X @TheNitroNG</a> or <a href="#" style={{ color: "#25d366", fontWeight: 500, textDecoration: "none" }}>WhatsApp</a></div>
         </div>
       </div>
 
-      </div>
-      <footer style={{position:"relative",bottom:0,left:0,right:0,borderTop:`1px solid ${t.surfaceBorder}`}}>
-        <div style={{maxWidth:800,margin:"0 auto",padding:"16px 24px"}}>
-          <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:12}}>
-            <div style={{fontSize:12,color:t.textMuted}}>© 2026 Nitro. All rights reserved.</div>
-            <div style={{display:"flex",flexDirection:"column",alignItems:"flex-end",gap:8}}>
-              <div style={{display:"flex",gap:16}}>{["Twitter","Instagram"].map(s=><a key={s} href="#" style={{fontSize:12,color:t.textSoft,textDecoration:"none"}}>{s}</a>)}</div>
-              <div style={{display:"flex",gap:16}}>{[["Terms","/terms"],["Privacy","/privacy"],["Refund","/refund"],["Cookie","/cookie"]].map(([l,h])=><a key={l} href={h} style={{fontSize:11,color:t.textMuted,textDecoration:"none"}}>{l}</a>)}</div>
-            </div>
-          </div>
-        </div>
+      <footer style={{ borderTop: `1px solid ${t.cbd}`, padding: "14px 24px", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0, position: "relative", zIndex: 10 }}>
+        <span style={{ fontSize: 13, color: t.tm }}>© 2026 Nitro</span>
+        <div style={{ display: "flex", gap: 16 }}><a href="/terms" style={{ fontSize: 13, color: t.tm, textDecoration: "none" }}>Terms</a><a href="/privacy" style={{ fontSize: 13, color: t.tm, textDecoration: "none" }}>Privacy</a></div>
       </footer>
     </div>
   );

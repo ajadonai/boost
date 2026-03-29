@@ -27,7 +27,7 @@ export async function POST(req) {
     }
 
     if (user.status === 'Suspended') {
-      return error('Your account has been suspended. Contact support.', 403);
+      return Response.json({ error: 'Account suspended', banned: true }, { status: 403 });
     }
 
     const valid = await bcrypt.compare(password, user.password);
