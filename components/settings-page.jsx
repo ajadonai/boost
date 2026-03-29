@@ -38,6 +38,32 @@ export default function SettingsPage({ user, dark, t, themeMode, setThemeMode, s
     fetch("/api/auth/api-key").then(r => r.json()).then(d => { if (d.apiKey) setApiKey(d.apiKey); }).catch(() => {});
   }, []);
 
+  // Sessions state
+  const [sessions, setSessions] = useState([]);
+  const [sessionsLoading, setSessionsLoading] = useState(true);
+  const [revoking, setRevoking] = useState(null);
+
+  useEffect(() => {
+    fetch("/api/auth/sessions").then(r => r.json()).then(d => setSessions(d.sessions || [])).catch(() => {}).finally(() => setSessionsLoading(false));
+  }, []);
+
+  const revokeSession = async (id) => {
+    setRevoking(id);
+    try {
+      const res = await fetch("/api/auth/sessions", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sessionId: id }) });
+      if (res.ok) setSessions(prev => prev.filter(s => s.id !== id));
+    } catch {}
+    setRevoking(null);
+  };
+
+  const fDSession = (d) => {
+    const diff = Date.now() - new Date(d).getTime();
+    if (diff < 60000) return "Now";
+    if (diff < 3600000) return `${Math.floor(diff / 60000)} min ago`;
+    if (diff < 86400000) return `${Math.floor(diff / 3600000)} hrs ago`;
+    return new Date(d).toLocaleDateString("en-NG", { month: "short", day: "numeric" });
+  };
+
   const applyTheme = (mode) => {
     setThemeMode(mode);
     localStorage.setItem("nitro-theme", mode);
@@ -182,24 +208,30 @@ export default function SettingsPage({ user, dark, t, themeMode, setThemeMode, s
         {/* ── ACTIVE SESSIONS ── */}
         <div className="set-section">
           <div className="set-section-title" style={{ color: t.text }}>Active Sessions</div>
-          <div className="set-section-desc" style={{ color: t.textMuted }}>Devices currently logged into your account.</div>
+          <div className="set-section-desc" style={{ color: t.textMuted }}>Devices currently logged into your account. Max 1 web + 1 mobile.</div>
           <div className="set-card set-notif-card" style={{ background: t.cardBg, borderWidth: 1, borderStyle: "solid", borderColor: t.cardBorder }}>
-            {[
-              { device: "Chrome · macOS", location: "Lagos, NG", current: true, time: "Now" },
-              { device: "Safari · iPhone", location: "Lagos, NG", current: false, time: "2 hrs ago" },
-            ].map((s, i, arr) => (
-              <div key={i} className="set-session-row" style={{ borderBottom: i < arr.length - 1 ? `1px solid ${t.cardBorder}` : "none" }}>
+            {sessionsLoading ? (
+              <div style={{ padding: 16, textAlign: "center", color: t.textMuted, fontSize: 13 }}>Loading sessions...</div>
+            ) : sessions.length === 0 ? (
+              <div style={{ padding: 16, textAlign: "center", color: t.textMuted, fontSize: 13 }}>No active sessions</div>
+            ) : sessions.map((s, i, arr) => (
+              <div key={s.id} className="set-session-row" style={{ borderBottom: i < arr.length - 1 ? `1px solid ${t.cardBorder}` : "none" }}>
                 <div className="set-session-icon" style={{ background: s.current ? (dark ? "rgba(110,231,183,.08)" : "rgba(5,150,105,.05)") : (dark ? "rgba(255,255,255,.03)" : "rgba(0,0,0,.02)") }}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={s.current ? t.green : t.textMuted} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                  {s.deviceType === "mobile" ? (
+                    <svg width="14" height="16" viewBox="0 0 24 24" fill="none" stroke={s.current ? t.green : t.textMuted} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+                  ) : (
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={s.current ? t.green : t.textMuted} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                  )}
                 </div>
                 <div style={{ flex: 1 }}>
                   <div className="set-session-device" style={{ color: t.text }}>
-                    {s.device}
+                    {s.deviceInfo || s.deviceType}
                     {s.current && <span className="set-session-badge" style={{ background: dark ? "#0a2416" : "#ecfdf5", color: t.green, borderColor: dark ? "#166534" : "#a7f3d0" }}>Current</span>}
+                    <span className="m" style={{ fontSize: 10, padding: "1px 5px", borderRadius: 4, background: dark ? "rgba(255,255,255,.04)" : "rgba(0,0,0,.03)", color: t.textMuted, marginLeft: 4 }}>{s.deviceType}</span>
                   </div>
-                  <div className="set-session-meta" style={{ color: t.textMuted }}>{s.location} · {s.time}</div>
+                  <div className="set-session-meta" style={{ color: t.textMuted }}>{s.ip || "—"} · {fDSession(s.lastActive)}</div>
                 </div>
-                {!s.current && <button className="set-btn-danger-sm" style={{ borderColor: dark ? "rgba(252,165,165,.2)" : "rgba(220,38,38,.15)", color: dark ? "#fca5a5" : "#dc2626" }}>Revoke</button>}
+                {!s.current && <button onClick={() => revokeSession(s.id)} disabled={revoking === s.id} className="set-btn-danger-sm" style={{ borderColor: dark ? "rgba(252,165,165,.2)" : "rgba(220,38,38,.15)", color: dark ? "#fca5a5" : "#dc2626" }}>{revoking === s.id ? "..." : "Revoke"}</button>}
               </div>
             ))}
           </div>

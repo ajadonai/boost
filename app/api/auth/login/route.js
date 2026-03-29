@@ -1,9 +1,10 @@
 import prisma from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
-import { signUserToken, setUserCookie } from '@/lib/auth';
+import { signUserToken, setUserCookie, detectDevice, hashToken } from '@/lib/auth';
 import { ok, error } from '@/lib/utils';
 import { rateLimit, tooManyRequests } from '@/lib/rate-limit';
 import { sanitizeEmail } from '@/lib/validate';
+import { headers } from 'next/headers';
 
 export async function POST(req) {
   try {
@@ -38,6 +39,29 @@ export async function POST(req) {
     // Sign JWT and set cookie
     const token = signUserToken(user);
     await setUserCookie(token);
+
+    // Session management — 1 web + 1 mobile
+    const hdrs = await headers();
+    const ua = hdrs.get('user-agent') || '';
+    const ip = hdrs.get('x-forwarded-for')?.split(',')[0]?.trim() || hdrs.get('x-real-ip') || 'unknown';
+    const device = detectDevice(ua);
+    const tHash = hashToken(token);
+
+    // Kill existing session of same device type for this user
+    await prisma.session.deleteMany({
+      where: { userId: user.id, deviceType: device.type },
+    });
+
+    // Create new session
+    await prisma.session.create({
+      data: {
+        userId: user.id,
+        tokenHash: tHash,
+        deviceType: device.type,
+        deviceInfo: device.info,
+        ip,
+      },
+    });
 
     return ok({
       user: {

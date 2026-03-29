@@ -35,8 +35,30 @@ model User {
   orders       Order[]
   transactions Transaction[]
   tickets      Ticket[]
+  sessions     Session[]
 
   @@map("users")
+}
+
+// ──────────────────────────────────────
+// SESSIONS
+// ──────────────────────────────────────
+
+model Session {
+  id          String   @id @default(cuid())
+  userId      String
+  tokenHash   String   @unique
+  deviceType  String   @default("web") // "web" or "mobile"
+  deviceInfo  String?  // e.g. "Chrome · macOS", "Safari · iPhone"
+  ip          String?
+  lastActive  DateTime @default(now())
+  createdAt   DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([deviceType])
+  @@map("sessions")
 }
 
 // ──────────────────────────────────────
