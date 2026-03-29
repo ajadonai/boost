@@ -16,13 +16,18 @@ export async function GET(req) {
     else if (range === '90d') since = new Date(now - 90 * 24 * 60 * 60 * 1000);
     else since = new Date(now - 30 * 24 * 60 * 60 * 1000);
 
-    const [ordersAgg, userCount, ordersByStatus, topServices] = await Promise.all([
+    const [ordersAgg, userCount, depositAgg, ordersByStatus, topServices, allOrders] = await Promise.all([
       prisma.order.aggregate({
         where: { createdAt: { gte: since }, deletedAt: null },
         _sum: { charge: true, cost: true },
         _count: true,
       }),
       prisma.user.count({ where: { createdAt: { gte: since } } }),
+      prisma.transaction.aggregate({
+        where: { type: 'deposit', status: 'Completed', createdAt: { gte: since } },
+        _sum: { amount: true },
+        _count: true,
+      }),
       prisma.order.groupBy({
         by: ['status'],
         where: { createdAt: { gte: since }, deletedAt: null },
@@ -37,9 +42,14 @@ export async function GET(req) {
         orderBy: { _count: { serviceId: 'desc' } },
         take: 10,
       }),
+      // For platform aggregation — get orders with service category
+      prisma.order.findMany({
+        where: { createdAt: { gte: since }, deletedAt: null },
+        select: { charge: true, service: { select: { category: true } } },
+      }),
     ]);
 
-    // Resolve service names for top services
+    // Resolve service names
     const serviceIds = topServices.map(s => s.serviceId);
     const serviceNames = await prisma.service.findMany({
       where: { id: { in: serviceIds } },
@@ -47,6 +57,20 @@ export async function GET(req) {
     });
     const nameMap = {};
     serviceNames.forEach(s => { nameMap[s.id] = s; });
+
+    // Aggregate by platform
+    const platformMap = {};
+    allOrders.forEach(o => {
+      const cat = o.service?.category || 'unknown';
+      const name = cat.charAt(0).toUpperCase() + cat.slice(1);
+      if (!platformMap[name]) platformMap[name] = { name, orders: 0, revenue: 0 };
+      platformMap[name].orders++;
+      platformMap[name].revenue += (o.charge || 0) / 100;
+    });
+    const topPlatforms = Object.values(platformMap)
+      .sort((a, b) => b.revenue - a.revenue)
+      .slice(0, 5)
+      .map(p => ({ ...p, revenue: Math.round(p.revenue) }));
 
     const totalRevenue = (ordersAgg._sum.charge || 0) / 100;
     const totalCost = (ordersAgg._sum.cost || 0) / 100;
@@ -64,11 +88,14 @@ export async function GET(req) {
       avgOrderValue: Math.round(avgOrderValue),
       conversionRate,
       newUsers: userCount,
+      totalDeposits: (depositAgg._sum.amount || 0) / 100,
+      depositCount: depositAgg._count || 0,
       byStatus: ordersByStatus.map(s => ({
         status: s.status,
         count: s._count,
         revenue: (s._sum.charge || 0) / 100,
       })),
+      topPlatforms,
       topServices: topServices.map(s => ({
         name: nameMap[s.serviceId]?.name || s.serviceId,
         category: nameMap[s.serviceId]?.category || 'unknown',

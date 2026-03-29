@@ -63,10 +63,15 @@ export function AdminPaymentsPage({ dark, t }) {
 export function AdminAnalyticsPage({ dark, t }) {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [range, setRange] = useState("30d");
 
-  useEffect(() => {
-    fetch("/api/admin/analytics").then(r => r.json()).then(d => { setStats(d); setLoading(false); }).catch(() => setLoading(false));
-  }, []);
+  const load = (r) => {
+    setLoading(true);
+    fetch(`/api/admin/analytics?range=${r}`).then(res => res.json()).then(d => { setStats(d); setLoading(false); }).catch(() => setLoading(false));
+  };
+  useEffect(() => { load(range); }, []);
+
+  const changeRange = (r) => { setRange(r); load(r); };
 
   if (loading) return <><div className="adm-header"><div className="adm-title" style={{ color: t.text }}>Analytics</div><div className="adm-subtitle" style={{ color: t.textMuted }}>Loading...</div><div className="page-divider" style={{ background: t.cardBorder }} /></div></>;
 
@@ -74,18 +79,30 @@ export function AdminAnalyticsPage({ dark, t }) {
   return (
     <>
       <div className="adm-header">
-        <div className="adm-title" style={{ color: t.text }}>Analytics</div>
-        <div className="adm-subtitle" style={{ color: t.textMuted }}>Revenue, growth, and performance</div>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 10 }}>
+          <div>
+            <div className="adm-title" style={{ color: t.text }}>Analytics</div>
+            <div className="adm-subtitle" style={{ color: t.textMuted }}>Revenue, growth, and performance</div>
+          </div>
+          <div style={{ display: "flex", gap: 4 }}>
+            {[["24h", "24h"], ["7d", "7 days"], ["30d", "30 days"], ["90d", "90 days"]].map(([id, lb]) => (
+              <button key={id} onClick={() => changeRange(id)} style={{ padding: "6px 12px", borderRadius: 6, fontSize: 12, fontWeight: range === id ? 600 : 400, background: range === id ? (dark ? "#2a1a22" : "#fdf2f4") : "transparent", color: range === id ? t.accent : t.textMuted, borderWidth: 1, borderStyle: "solid", borderColor: range === id ? t.accent : t.cardBorder }}>{lb}</button>
+            ))}
+          </div>
+        </div>
         <div className="page-divider" style={{ background: t.cardBorder }} />
       </div>
 
       <div className="adm-stats" style={{ marginTop: 16 }}>
         {[
           ["Total Revenue", fN(s.totalRevenue || 0), t.green],
-          ["Total Cost", fN(s.totalCost || 0), t.red],
-          ["Profit", fN(s.profit || 0), t.green],
+          ["Total Cost", fN(s.totalCost || 0), dark ? "#fca5a5" : "#dc2626"],
+          ["Profit", fN(s.profit || 0), s.profit >= 0 ? t.green : (dark ? "#fca5a5" : "#dc2626")],
           ["Avg Order Value", fN(s.avgOrderValue || 0), t.accent],
-          ["Conversion Rate", `${s.conversionRate || 0}%`, t.blue],
+          ["Completion Rate", `${s.conversionRate || 0}%`, t.blue],
+          ["Orders", String(s.orderCount || 0), t.amber],
+          ["New Users", String(s.newUsers || 0), t.blue],
+          ["Deposits", fN(s.totalDeposits || 0), t.green],
         ].map(([label, val, color]) => (
           <div key={label} className="dash-stat-card" style={{ background: dark ? "rgba(255,255,255,.06)" : "rgba(255,255,255,.95)", borderTopWidth: 1, borderRightWidth: 1, borderBottomWidth: 1, borderLeftWidth: 3, borderStyle: "solid", borderTopColor: dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)", borderRightColor: dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)", borderBottomColor: dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)", borderLeftColor: color, boxShadow: dark ? "0 4px 20px rgba(0,0,0,.25)" : "0 4px 20px rgba(0,0,0,.04)" }}>
             <div className="dash-stat-label" style={{ color: t.textMuted }}>{label}</div>
@@ -98,18 +115,18 @@ export function AdminAnalyticsPage({ dark, t }) {
         <div>
           <div className="adm-section-title" style={{ color: t.textMuted, marginBottom: 10 }}>Top Platforms</div>
           <div className="adm-card" style={{ background: dark ? "rgba(255,255,255,.06)" : "rgba(255,255,255,.95)", borderWidth: 1, borderStyle: "solid", borderColor: dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)", boxShadow: dark ? "0 4px 20px rgba(0,0,0,.25)" : "0 4px 20px rgba(0,0,0,.04)" }}>
-            {(s.topPlatforms || [{ name: "Instagram", orders: 0, revenue: 0 }, { name: "TikTok", orders: 0, revenue: 0 }, { name: "YouTube", orders: 0, revenue: 0 }]).map((p, i, arr) => (
+            {(s.topPlatforms || []).length > 0 ? s.topPlatforms.map((p, i, arr) => (
               <div key={p.name} className="adm-list-row" style={{ borderBottom: i < arr.length - 1 ? `1px solid ${t.cardBorder}` : "none" }}>
                 <div><div style={{ fontSize: 14, fontWeight: 500, color: t.text }}>{p.name}</div><div style={{ fontSize: 13, color: t.textMuted }}>{p.orders} orders</div></div>
                 <div className="m" style={{ fontSize: 14, fontWeight: 600, color: t.green }}>{fN(p.revenue || 0)}</div>
               </div>
-            ))}
+            )) : <div className="adm-empty" style={{ color: t.textMuted }}>No platform data yet</div>}
           </div>
         </div>
         <div>
           <div className="adm-section-title" style={{ color: t.textMuted, marginBottom: 10 }}>Order Status Breakdown</div>
           <div className="adm-card" style={{ background: dark ? "rgba(255,255,255,.06)" : "rgba(255,255,255,.95)", borderWidth: 1, borderStyle: "solid", borderColor: dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)", boxShadow: dark ? "0 4px 20px rgba(0,0,0,.25)" : "0 4px 20px rgba(0,0,0,.04)" }}>
-            {[["Completed", s.byStatus?.find(x => x.status === "Completed")?.count || 0, t.green], ["Processing", s.byStatus?.find(x => x.status === "Processing")?.count || 0, t.blue], ["Pending", s.byStatus?.find(x => x.status === "Pending")?.count || 0, t.amber], ["Canceled", s.byStatus?.find(x => x.status === "Canceled")?.count || 0, t.red]].map(([label, count, color], i, arr) => (
+            {[["Completed", s.byStatus?.find(x => x.status === "Completed")?.count || 0, t.green], ["Processing", s.byStatus?.find(x => x.status === "Processing")?.count || 0, t.blue], ["Pending", s.byStatus?.find(x => x.status === "Pending")?.count || 0, t.amber], ["Canceled", s.byStatus?.find(x => x.status === "Canceled")?.count || 0, dark ? "#fca5a5" : "#dc2626"]].map(([label, count, color], i, arr) => (
               <div key={label} className="adm-list-row" style={{ borderBottom: i < arr.length - 1 ? `1px solid ${t.cardBorder}` : "none" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                   <div style={{ width: 8, height: 8, borderRadius: 4, background: color }} />
@@ -121,6 +138,24 @@ export function AdminAnalyticsPage({ dark, t }) {
           </div>
         </div>
       </div>
+
+      {/* Top Services */}
+      {(s.topServices || []).length > 0 && (
+        <div style={{ marginTop: 24 }}>
+          <div className="adm-section-title" style={{ color: t.textMuted, marginBottom: 10 }}>Top Services by Revenue</div>
+          <div className="adm-card" style={{ background: dark ? "rgba(255,255,255,.06)" : "rgba(255,255,255,.95)", borderWidth: 1, borderStyle: "solid", borderColor: dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)", boxShadow: dark ? "0 4px 20px rgba(0,0,0,.25)" : "0 4px 20px rgba(0,0,0,.04)" }}>
+            {s.topServices.map((sv, i, arr) => (
+              <div key={i} className="adm-list-row" style={{ borderBottom: i < arr.length - 1 ? `1px solid ${t.cardBorder}` : "none" }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 14, fontWeight: 500, color: t.text, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{sv.name}</div>
+                  <div style={{ fontSize: 12, color: t.textMuted }}>{sv.category} · {sv.orders} orders</div>
+                </div>
+                <div className="m" style={{ fontSize: 14, fontWeight: 600, color: t.green }}>{fN(sv.revenue || 0)}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </>
   );
 }
