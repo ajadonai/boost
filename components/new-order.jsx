@@ -123,6 +123,7 @@ export function OrderForm({ selSvc, selTier, platform, qty, setQty, link, setLin
 /* ═══════════════════════════════════════════ */
 export default function NewOrderPage({ dark, t, user, onOrderSuccess, platform, setPlatform, selSvc, setSelSvc, selTier, setSelTier, qty, setQty, link, setLink, catModal, setCatModal }) {
   const [filterType, setFilterType] = useState("all");
+  const [search, setSearch] = useState("");
   const [orderModal, setOrderModal] = useState(false);
   const [menuData, setMenuData] = useState(null);
   const [menuLoading, setMenuLoading] = useState(true);
@@ -150,11 +151,17 @@ export default function NewOrderPage({ dark, t, user, onOrderSuccess, platform, 
     return map[name] || name.toLowerCase().replace(/[^a-z]/g, "");
   };
 
+  /* Platform counts for sidebar badges */
+  const allGroups = menuData?.groups || [];
+  const platformCounts = {};
+  allGroups.forEach(g => { const k = normPlatform(g.platform); platformCounts[k] = (platformCounts[k] || 0) + 1; });
+
   /* Map API groups to per-platform service list matching existing shape */
   const services = (() => {
     if (!menuData?.groups) return [];
     return menuData.groups
       .filter(g => normPlatform(g.platform) === platform)
+      .filter(g => !search || g.name.toLowerCase().includes(search.toLowerCase()))
       .map(g => ({
         id: g.id,
         name: g.name,
@@ -179,7 +186,7 @@ export default function NewOrderPage({ dark, t, user, onOrderSuccess, platform, 
   const price = selTier ? Math.round((qty / 1000) * selTier.price) : 0;
   const activePlat = PLATFORMS.find(p => p.id === platform);
 
-  useEffect(() => { setSelSvc(null); setSelTier(null); setFilterType("all"); setOrderModal(false); setOrderResult(null); }, [platform]);
+  useEffect(() => { setSelSvc(null); setSelTier(null); setFilterType("all"); setOrderModal(false); setOrderResult(null); setSearch(""); }, [platform]);
 
   const pickService = (svc) => {
     if (selSvc?.id === svc.id) { setSelSvc(null); setSelTier(null); }
@@ -248,8 +255,8 @@ export default function NewOrderPage({ dark, t, user, onOrderSuccess, platform, 
   return (
     <>
       <div className="no-header">
-        <div className="no-title" style={{ color: t.text }}>New Order</div>
-        <div className="no-subtitle" style={{ color: t.textMuted }}>{menuData ? `${menuData.platforms?.length || 0} platforms available` : "28 social platforms + SEO & reviews"}</div>
+        <div className="no-title" style={{ color: t.text }}>Services</div>
+        <div className="no-subtitle" style={{ color: t.textMuted }}>{menuData ? `${allGroups.length} services across ${Object.keys(platformCounts).length} platforms — prices per 1,000` : "Loading services..."}</div>
         <div className="page-divider" style={{ background: t.cardBorder }} />
       </div>
 
@@ -275,10 +282,12 @@ export default function NewOrderPage({ dark, t, user, onOrderSuccess, platform, 
               <div className="no-plat-group-label" style={{ color: t.accent }}>{group.label}</div>
               {group.platforms.map(p => {
                 const active = platform === p.id;
+                const count = platformCounts[p.id] || 0;
                 return (
                   <button key={p.id} onClick={() => setPlatform(p.id)} className="no-plat-item" style={{ background: active ? t.navActive : "transparent", color: active ? t.accent : t.textSoft, fontWeight: active ? 600 : 430 }}>
                     <span className="no-plat-item-icon" style={{ opacity: active ? 1 : .5 }}>{p.icon}</span>
                     {p.label}
+                    {count > 0 && <span className="m" style={{ marginLeft: "auto", fontSize: 10, fontWeight: 600, color: active ? t.accent : t.textMuted, background: active ? (dark ? "rgba(196,125,142,.15)" : "rgba(196,125,142,.1)") : (dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.04)"), padding: "1px 6px", borderRadius: 8, minWidth: 18, textAlign: "center" }}>{count}</span>}
                   </button>
                 );
               })}
@@ -305,6 +314,15 @@ export default function NewOrderPage({ dark, t, user, onOrderSuccess, platform, 
               ))}
             </div>
           )}
+
+          {/* Search */}
+          <input placeholder="Search services..." value={search} onChange={e => setSearch(e.target.value)} className="m" style={{ width: "100%", boxSizing: "border-box", padding: "9px 12px", borderRadius: 8, borderWidth: 1, borderStyle: "solid", borderColor: t.cardBorder, background: dark ? "#0d1020" : "#fff", color: t.text, fontSize: 12, outline: "none", marginBottom: 10, fontFamily: "'JetBrains Mono', monospace" }} />
+
+          {/* Platform name + count */}
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+            <span style={{ fontSize: 15, fontWeight: 600, color: t.text }}>{activePlat?.label}</span>
+            <span className="m" style={{ fontSize: 12, color: t.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>({filtered.length} services)</span>
+          </div>
 
           <div className="no-svc-list">
             {filtered.map(svc => <ServiceRow key={svc.id} svc={svc} />)}
@@ -354,10 +372,12 @@ export default function NewOrderPage({ dark, t, user, onOrderSuccess, platform, 
                   <div className="no-cat-grid">
                     {group.platforms.map(p => {
                       const act = platform === p.id;
+                      const count = platformCounts[p.id] || 0;
                       return (
-                        <button key={p.id} onClick={() => { setPlatform(p.id); setCatModal(false); }} className="no-cat-item" style={{ borderWidth: act ? 2 : 1, borderStyle: "solid", borderColor: act ? t.accent : t.cardBorder, background: act ? (dark ? "#2a1a22" : "#fdf2f4") : "transparent", color: act ? t.accent : t.text }}>
+                        <button key={p.id} onClick={() => { setPlatform(p.id); setCatModal(false); }} className="no-cat-item" style={{ borderWidth: act ? 2 : 1, borderStyle: "solid", borderColor: act ? t.accent : t.cardBorder, background: act ? (dark ? "#2a1a22" : "#fdf2f4") : "transparent", color: act ? t.accent : t.text, position: "relative" }}>
                           <span className="no-cat-icon">{p.icon}</span>
                           <span className="no-cat-label">{p.label}</span>
+                          {count > 0 && <span className="m" style={{ fontSize: 9, fontWeight: 600, color: act ? t.accent : t.textMuted, position: "absolute", top: 4, right: 6 }}>{count}</span>}
                         </button>
                       );
                     })}
@@ -369,6 +389,30 @@ export default function NewOrderPage({ dark, t, user, onOrderSuccess, platform, 
         </div>
       )}
       </>}
+    </>
+  );
+}
+
+/* ═══════════════════════════════════════════ */
+/* ═══ SERVICES RIGHT SIDEBAR              ═══ */
+/* ═══════════════════════════════════════════ */
+export function ServicesSidebar({ dark, t }) {
+  return (
+    <>
+      <div style={{ fontSize: 11, fontWeight: 600, color: t.textMuted, textTransform: "uppercase", letterSpacing: 1, marginBottom: 10 }}>Pricing Guide</div>
+      {[
+        ["Budget", "💰", "Cheapest. May drop. Good for testing."],
+        ["Standard", "⚡", "Best value. Stable with refill guarantee."],
+        ["Premium", "👑", "Top quality. Non-drop. Lifetime refill."],
+      ].map(([tier, icon, desc]) => {
+        const s = TS[tier];
+        return (
+          <div key={tier} style={{ padding: "10px 12px", borderRadius: 10, background: dark ? s.bgD : s.bg, borderWidth: 1, borderStyle: "solid", borderColor: dark ? s.borderD : s.border, marginBottom: 6 }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: s.text, marginBottom: 3 }}>{icon} {tier}</div>
+            <div style={{ fontSize: 13, color: t.textMuted, lineHeight: 1.4 }}>{desc}</div>
+          </div>
+        );
+      })}
     </>
   );
 }

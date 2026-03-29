@@ -1,10 +1,9 @@
 'use client';
 import { useState, useEffect, useMemo, useRef } from "react";
 import { ThemeProvider, useTheme } from "./shared-nav";
-import NewOrderPage, { PLATFORMS, PLATFORM_GROUPS, OrderForm } from "./new-order";
+import NewOrderPage, { PLATFORMS, PLATFORM_GROUPS, OrderForm, ServicesSidebar } from "./new-order";
 import OrdersPage, { OrdersSidebar } from "./orders-page";
 import ReferralsPage, { ReferralsSidebar } from "./referrals-page";
-import ServicesPage, { ServicesSidebar } from "./services-page";
 import SettingsPage, { SettingsSidebar } from "./settings-page";
 import SupportPage, { SupportSidebar } from "./support-page";
 import AddFundsPage, { AddFundsSidebar } from "./addfunds-page";
@@ -17,7 +16,6 @@ import { ConfirmProvider } from "./confirm-dialog";
 /* ═══════════════════════════════════════════ */
 const I = {
   overview: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>,
-  "new-order": <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>,
   orders: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>,
   "add-funds": <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/><path d="M7 15h2"/></svg>,
   "how-to": <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>,
@@ -29,11 +27,10 @@ const I = {
 
 const NAV_ITEMS = [
   { id: "overview", label: "Overview" },
-  { id: "new-order", label: "New Order" },
+  { id: "services", label: "Services" },
   { id: "orders", label: "Orders" },
   { id: "add-funds", label: "Add Funds" },
   { id: "how-to", label: "How To" },
-  { id: "services", label: "Services" },
   { id: "referrals", label: "Referrals" },
   { id: "support", label: "Support" },
   { id: "settings", label: "Settings" },
@@ -133,7 +130,7 @@ function OverviewPage({ user, orders, alerts, dark, t, setActive }) {
             </svg>
             <div style={{ fontSize: 17, fontWeight: 600, color: t.textSoft, marginBottom: 6 }}>No orders yet — let's fix that 🔥</div>
             <div style={{ color: t.textMuted, fontSize: 14, marginBottom: 16, lineHeight: 1.5 }}>Boost your first Instagram post in under 60 seconds</div>
-            <button onClick={() => setActive("new-order")} style={{ padding: "12px 28px", borderRadius: 10, background: `linear-gradient(135deg,${t.accent},#8b5e6b)`, color: "#fff", fontSize: 14, fontWeight: 600, border: "none", boxShadow: "0 4px 16px rgba(196,125,142,.25)" }}>Place your first order →</button>
+            <button onClick={() => setActive("services")} style={{ padding: "12px 28px", borderRadius: 10, background: `linear-gradient(135deg,${t.accent},#8b5e6b)`, color: "#fff", fontSize: 14, fontWeight: 600, border: "none", boxShadow: "0 4px 16px rgba(196,125,142,.25)" }}>Place your first order →</button>
           </div>
         )}
         {orders.length > 5 && (
@@ -349,19 +346,14 @@ function DashboardInner() {
   const [noQty, setNoQty] = useState(1000);
   const [noLink, setNoLink] = useState("");
   const [noCatModal, setNoCatModal] = useState(false);
-  const isNewOrder = active === "new-order";
+  const isServices = active === "services";
   const isOrders = active === "orders";
   const isReferrals = active === "referrals";
-  const isServices = active === "services";
   const isSettings = active === "settings";
   const isSupport = active === "support";
   const isAddFunds = active === "add-funds";
   const isHowTo = active === "how-to";
   const noHasOrder = noSelSvc && noSelTier;
-
-  /* Services page state */
-  const [svcPlatform, setSvcPlatform] = useState("instagram");
-  const [svcCatModal, setSvcCatModal] = useState(false);
 
   /* Theme — provided by ThemeProvider */
 
@@ -450,8 +442,8 @@ function DashboardInner() {
 
   const handleLogout = async () => { try { await fetch("/api/auth/logout", { method: "POST" }); } catch {} window.location.replace("/?logout=1"); };
 
-  /* Reset new-order state when leaving */
-  useEffect(() => { if (!isNewOrder) { setNoSelSvc(null); setNoSelTier(null); setNoLink(""); setNoCatModal(false); } }, [active]);
+  /* Reset services state when leaving */
+  useEffect(() => { if (!isServices) { setNoSelSvc(null); setNoSelTier(null); setNoLink(""); setNoCatModal(false); } }, [active]);
 
   const t = useMemo(() => ({
     ...baseT,
@@ -533,14 +525,12 @@ function DashboardInner() {
     switch (active) {
       case "overview":
         return <OverviewPage user={user} orders={orders} alerts={alerts} dark={dark} t={t} setActive={setActive} />;
-      case "new-order":
+      case "services":
         return <NewOrderPage dark={dark} t={t} user={user} onOrderSuccess={refreshDashboard} platform={noPlatform} setPlatform={setNoPlatform} selSvc={noSelSvc} setSelSvc={setNoSelSvc} selTier={noSelTier} setSelTier={setNoSelTier} qty={noQty} setQty={setNoQty} link={noLink} setLink={setNoLink} catModal={noCatModal} setCatModal={setNoCatModal} />;
       case "orders":
         return <OrdersPage orders={orders} txs={txs} dark={dark} t={t} />;
       case "referrals":
         return <ReferralsPage user={user} dark={dark} t={t} />;
-      case "services":
-        return <ServicesPage dark={dark} t={t} svcPlatform={svcPlatform} setSvcPlatform={setSvcPlatform} onOrderNav={(plat) => { if (plat) setNoPlatform(plat); setActive("new-order"); }} catModal={svcCatModal} setCatModal={setSvcCatModal} />;
       case "settings":
         return <SettingsPage user={user} dark={dark} t={t} themeMode={themeMode} setThemeMode={setThemeMode} setDark={setDark} />;
       case "support":
@@ -668,7 +658,7 @@ function DashboardInner() {
 
         {/* ── MAIN ── */}
         <main className="dash-main" style={{ background: t.bg }}>
-          {!isNewOrder && !isOrders && !isReferrals && !isServices && !isSettings && !isSupport && !isAddFunds && !isHowTo && <>
+          {!isServices && !isOrders && !isReferrals && !isSettings && !isSupport && !isAddFunds && !isHowTo && <>
             <div className="dash-welcome" style={{ color: t.text }}>What's good, {firstName.toUpperCase()} 💰</div>
             <div className="dash-welcome-sub" style={{ color: t.textMuted }}>Here's your empire at a glance</div>
           </>}
@@ -695,22 +685,23 @@ function DashboardInner() {
 
         {/* ── RIGHT SIDEBAR ── */}
         <aside className="dash-right" style={{ background: t.sidebarBg, borderLeft: `1px solid ${t.sidebarBorder}` }}>
-          {isNewOrder ? (
+          {isServices ? (
             noHasOrder ? (
               <OrderForm selSvc={noSelSvc} selTier={noSelTier} platform={noPlatform} qty={noQty} setQty={setNoQty} link={noLink} setLink={setNoLink} dark={dark} t={t} compact />
             ) : (
-              <div className="dash-rs-empty">
+              <>
+              <ServicesSidebar dark={dark} t={t} />
+              <div className="dash-rs-empty" style={{ marginTop: 16 }}>
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke={t.textMuted} strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: .3, marginBottom: 12 }}><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
                 <div style={{ fontSize: 14, color: t.textMuted, textAlign: "center", fontWeight: 450 }}>Select a service</div>
                 <div style={{ fontSize: 13, color: t.textMuted, opacity: .5, marginTop: 4, textAlign: "center" }}>Choose a platform and service to place an order</div>
               </div>
+              </>
             )
           ) : isOrders ? (
             <OrdersSidebar orders={orders} dark={dark} t={t} />
           ) : isReferrals ? (
             <ReferralsSidebar user={user} dark={dark} t={t} />
-          ) : isServices ? (
-            <ServicesSidebar dark={dark} t={t} onOrderNav={() => setActive("new-order")} />
           ) : isSettings ? (
             <SettingsSidebar user={user} dark={dark} t={t} />
           ) : isSupport ? (
