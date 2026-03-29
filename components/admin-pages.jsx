@@ -234,6 +234,27 @@ export function AdminAlertsPage({ dark, t }) {
 /* ═══ SETTINGS PAGE                       ═══ */
 /* ═══════════════════════════════════════════ */
 export function AdminSettingsPage({ admin, dark, t, themeMode, setThemeMode, setDark }) {
+  const [social, setSocial] = useState({ social_whatsapp: "", social_telegram: "", social_instagram: "", social_twitter: "", social_whatsapp_support: "" });
+  const [socialLoading, setSocialLoading] = useState(true);
+  const [socialSaving, setSocialSaving] = useState(false);
+  const [socialMsg, setSocialMsg] = useState(null);
+
+  useEffect(() => {
+    fetch("/api/admin/settings").then(r => r.json()).then(d => {
+      if (d.settings) setSocial(prev => ({ ...prev, ...Object.fromEntries(Object.entries(d.settings).filter(([k]) => k.startsWith("social_"))) }));
+    }).finally(() => setSocialLoading(false));
+  }, []);
+
+  const saveSocial = async () => {
+    setSocialSaving(true); setSocialMsg(null);
+    try {
+      const res = await fetch("/api/admin/settings", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ settings: social }) });
+      const data = await res.json();
+      setSocialMsg(res.ok ? { type: "success", text: "Social links saved" } : { type: "error", text: data.error || "Failed" });
+    } catch { setSocialMsg({ type: "error", text: "Request failed" }); }
+    setSocialSaving(false);
+  };
+
   const applyTheme = (mode) => {
     setThemeMode(mode);
     localStorage.setItem("nitro-admin-theme", mode);
@@ -284,6 +305,32 @@ export function AdminSettingsPage({ admin, dark, t, themeMode, setThemeMode, set
               </div>
             ))}
             <button className="adm-btn-primary">Update Password</button>
+          </div>
+        </div>
+
+        {/* Social Links & Community */}
+        <div style={{ marginBottom: 20 }}>
+          <div style={{ fontSize: 15, fontWeight: 600, color: t.text, marginBottom: 10 }}>Social Links & Community</div>
+          <div className="adm-card" style={{ background: dark ? "rgba(255,255,255,.06)" : "rgba(255,255,255,.95)", borderWidth: 1, borderStyle: "solid", borderColor: dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)", padding: 18, borderRadius: 14, boxShadow: dark ? "0 4px 20px rgba(0,0,0,.25)" : "0 4px 20px rgba(0,0,0,.04)" }}>
+            <div style={{ fontSize: 12, color: t.textMuted, marginBottom: 14, lineHeight: 1.5 }}>These links appear in the user dashboard sidebar, landing page footer, and support page. Leave blank to hide.</div>
+
+            {socialMsg && <div style={{ padding: "8px 12px", borderRadius: 8, marginBottom: 12, fontSize: 13, background: socialMsg.type === "success" ? (dark ? "rgba(110,231,183,.08)" : "#ecfdf5") : (dark ? "rgba(220,38,38,.08)" : "#fef2f2"), color: socialMsg.type === "success" ? (dark ? "#6ee7b7" : "#059669") : (dark ? "#fca5a5" : "#dc2626") }}>{socialMsg.type === "success" ? "✓" : "⚠️"} {socialMsg.text}</div>}
+
+            {[
+              ["social_whatsapp", "WhatsApp Group Link", "https://chat.whatsapp.com/...", "Group invite link for community"],
+              ["social_telegram", "Telegram Channel", "https://t.me/...", "Channel or group link"],
+              ["social_whatsapp_support", "WhatsApp Support Number", "2348012345678", "Number for wa.me link (no + prefix)"],
+              ["social_instagram", "Instagram Handle", "Nitro.ng", "Without the @ symbol"],
+              ["social_twitter", "X / Twitter Handle", "TheNitroNG", "Without the @ symbol"],
+            ].map(([key, label, placeholder, hint]) => (
+              <div key={key} style={{ marginBottom: 12 }}>
+                <label style={{ fontSize: 13, color: t.textMuted, display: "block", marginBottom: 3 }}>{label}</label>
+                <input value={social[key] || ""} onChange={e => setSocial(prev => ({ ...prev, [key]: e.target.value }))} placeholder={placeholder} style={{ width: "100%", padding: "10px 14px", borderRadius: 8, borderWidth: 1, borderStyle: "solid", borderColor: t.cardBorder, background: dark ? "#0d1020" : "#fff", color: t.text, fontSize: 14, outline: "none", boxSizing: "border-box", fontFamily: "inherit" }} />
+                <div style={{ fontSize: 11, color: t.textMuted, marginTop: 2, opacity: .7 }}>{hint}</div>
+              </div>
+            ))}
+
+            <button onClick={saveSocial} disabled={socialSaving} className="adm-btn-primary" style={{ opacity: socialSaving ? .5 : 1 }}>{socialSaving ? "Saving..." : "Save Social Links"}</button>
           </div>
         </div>
       </div>

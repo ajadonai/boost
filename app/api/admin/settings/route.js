@@ -21,9 +21,8 @@ export async function POST(req) {
   const { admin, error } = await requireAdmin('settings', true);
   if (error) return error;
 
-  // Only superadmin can change settings
-  if (admin.role !== 'superadmin') {
-    return Response.json({ error: 'Only superadmin can change settings' }, { status: 403 });
+  if (admin.role !== 'superadmin' && admin.role !== 'owner') {
+    return Response.json({ error: 'Only owner or superadmin can change settings' }, { status: 403 });
   }
 
   try {
