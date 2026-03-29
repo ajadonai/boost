@@ -20,7 +20,7 @@ export async function GET() {
       yesterdayRevenueAgg, yesterdayDepositsAgg,
       recentOrders, recentUsers, openTickets, activityLogs,
     ] = await Promise.all([
-      prisma.user.count(),
+      prisma.user.count({ where: { emailVerified: true } }),
       prisma.order.count({ where: { deletedAt: null } }),
       prisma.order.count({ where: { status: 'Processing', deletedAt: null } }),
       prisma.order.aggregate({ where: { deletedAt: null }, _sum: { charge: true } }),
@@ -29,7 +29,7 @@ export async function GET() {
       // Today
       prisma.order.count({ where: { createdAt: { gte: todayStart }, deletedAt: null } }),
       prisma.order.aggregate({ where: { createdAt: { gte: todayStart }, deletedAt: null }, _sum: { charge: true } }),
-      prisma.user.count({ where: { createdAt: { gte: todayStart } } }),
+      prisma.user.count({ where: { createdAt: { gte: todayStart }, emailVerified: true } }),
       prisma.transaction.aggregate({ where: { type: 'deposit', status: 'Completed', createdAt: { gte: todayStart } }, _sum: { amount: true } }),
       // Yesterday (for % change)
       prisma.order.aggregate({ where: { createdAt: { gte: yesterdayStart, lt: todayStart }, deletedAt: null }, _sum: { charge: true } }),

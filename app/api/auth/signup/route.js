@@ -22,6 +22,14 @@ export async function POST(req) {
     const referralCode = sanitizeString(body.referralCode, 20);
 
     if (!validateName(name)) return error('Name can only contain letters, spaces, hyphens, and apostrophes');
+    
+    // Check name blacklist
+    const { checkName } = await import('@/lib/name-filter');
+    const nameCheck = checkName(name);
+    if (nameCheck.blocked) return error(nameCheck.reason);
+    if (firstName) { const fnCheck = checkName(firstName); if (fnCheck.blocked) return error(fnCheck.reason); }
+    if (lastName) { const lnCheck = checkName(lastName); if (lnCheck.blocked) return error(lnCheck.reason); }
+
     if (!validateEmail(email)) return error('Please enter a valid email address');
     if (!validatePassword(password)) return error('Password must be 6-128 characters');
 

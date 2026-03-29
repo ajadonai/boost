@@ -268,6 +268,35 @@ export function AdminAlertsPage({ dark, t }) {
 /* ═══════════════════════════════════════════ */
 /* ═══ SETTINGS PAGE                       ═══ */
 /* ═══════════════════════════════════════════ */
+function CleanupButton({ dark, t }) {
+  const [info, setInfo] = useState(null);
+  const [cleaning, setCleaning] = useState(false);
+  const [result, setResult] = useState(null);
+
+  useEffect(() => {
+    fetch("/api/admin/cleanup").then(r => r.json()).then(d => setInfo(d)).catch(() => {});
+  }, []);
+
+  const run = async () => {
+    setCleaning(true); setResult(null);
+    try {
+      const res = await fetch("/api/admin/cleanup", { method: "POST" });
+      const data = await res.json();
+      setResult(res.ok ? { type: "success", text: data.message } : { type: "error", text: data.error });
+      if (res.ok) fetch("/api/admin/cleanup").then(r => r.json()).then(d => setInfo(d)).catch(() => {});
+    } catch { setResult({ type: "error", text: "Failed" }); }
+    setCleaning(false);
+  };
+
+  return (
+    <>
+      {info && <div style={{ fontSize: 13, color: t.text, marginBottom: 10 }}>{info.unverifiedTotal || 0} unverified accounts total · {info.staleCount || 0} older than 7 days</div>}
+      {result && <div style={{ padding: "8px 12px", borderRadius: 8, marginBottom: 10, fontSize: 13, background: result.type === "success" ? (dark ? "rgba(110,231,183,.08)" : "#ecfdf5") : (dark ? "rgba(220,38,38,.08)" : "#fef2f2"), color: result.type === "success" ? (dark ? "#6ee7b7" : "#059669") : (dark ? "#fca5a5" : "#dc2626") }}>{result.type === "success" ? "✓" : "⚠️"} {result.text}</div>}
+      <button onClick={run} disabled={cleaning} className="adm-btn-primary" style={{ opacity: cleaning ? .5 : 1 }}>{cleaning ? "Cleaning..." : "Clean Up Stale Accounts"}</button>
+    </>
+  );
+}
+
 export function AdminSettingsPage({ admin, dark, t, themeMode, setThemeMode, setDark }) {
   const [social, setSocial] = useState({ social_whatsapp: "", social_telegram: "", social_instagram: "", social_twitter: "", social_whatsapp_support: "" });
   const [refSettings, setRefSettings] = useState({ ref_referrer_bonus: "50000", ref_invitee_bonus: "50000" });
@@ -474,6 +503,15 @@ export function AdminSettingsPage({ admin, dark, t, themeMode, setThemeMode, set
               } catch { setRefMsg({ type: "error", text: "Request failed" }); }
               setRefSaving(false);
             }} disabled={refSaving} className="adm-btn-primary" style={{ opacity: refSaving ? .5 : 1 }}>{refSaving ? "Saving..." : "Save Referral Settings"}</button>
+          </div>
+        </div>
+
+        {/* Cleanup */}
+        <div style={{ marginBottom: 20 }}>
+          <div style={{ fontSize: 15, fontWeight: 600, color: t.text, marginBottom: 10 }}>Cleanup</div>
+          <div className="adm-card" style={{ background: dark ? "rgba(255,255,255,.06)" : "rgba(255,255,255,.95)", borderWidth: 1, borderStyle: "solid", borderColor: dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)", padding: 18, borderRadius: 14, boxShadow: dark ? "0 4px 20px rgba(0,0,0,.25)" : "0 4px 20px rgba(0,0,0,.04)" }}>
+            <div style={{ fontSize: 13, color: t.textMuted, marginBottom: 12, lineHeight: 1.5 }}>Remove unverified accounts older than 7 days that have no orders or transactions.</div>
+            <CleanupButton dark={dark} t={t} />
           </div>
         </div>
       </div>

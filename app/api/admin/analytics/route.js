@@ -22,7 +22,7 @@ export async function GET(req) {
         _sum: { charge: true, cost: true },
         _count: true,
       }),
-      prisma.user.count({ where: { createdAt: { gte: since } } }),
+      prisma.user.count({ where: { createdAt: { gte: since }, emailVerified: true } }),
       prisma.transaction.aggregate({
         where: { type: 'deposit', status: 'Completed', createdAt: { gte: since } },
         _sum: { amount: true },
