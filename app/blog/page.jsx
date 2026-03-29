@@ -116,7 +116,11 @@ export default function BlogPage() {
           <div className="blog-empty" style={{ color: v.mut }}>Loading posts...</div>
         ) : filtered.length > 0 ? filtered.map(p => (
           <article key={p.id} onClick={() => openPost(p.slug)} className="blog-card" style={{ background: v.card, borderRadius: 12, overflow: "hidden", cursor: "pointer", border: "1px solid " + v.bdr }}>
-            <div style={{ height: 160, backgroundImage: p.thumbnail ? "url(" + p.thumbnail + ")" : "none", background: p.thumbnail ? undefined : v.grd, backgroundSize: "cover", backgroundPosition: "center", backgroundColor: v.tbg }} />
+            {p.thumbnail ? (
+              <div style={{ height: 160, background: `url(${p.thumbnail}) center/cover no-repeat ${v.tbg}` }} />
+            ) : (
+              <div style={{ height: 160, background: v.grd }} />
+            )}
             <div style={{ padding: "16px 18px" }}>
               <div style={{ fontSize: 10, fontWeight: 600, textTransform: "uppercase", letterSpacing: .8, color: v.acc, marginBottom: 7 }}>{p.category}</div>
               <h2 style={{ fontSize: 16, fontWeight: 600, margin: "0 0 6px", color: v.txt, lineHeight: 1.3 }}>{p.title}</h2>
