@@ -134,7 +134,7 @@ function OverviewPage({ user, orders, alerts, dark, t, setActive }) {
           </div>
         )}
         {orders.length > 5 && (
-          <div className="dash-view-all"><button style={{ color: t.accent }}>View all orders →</button></div>
+          <div className="dash-view-all"><button onClick={() => setActive("orders")} style={{ color: t.accent }}>View all orders →</button></div>
         )}
       </div>
 
@@ -151,7 +151,7 @@ function OverviewPage({ user, orders, alerts, dark, t, setActive }) {
 /* ═══════════════════════════════════════════ */
 /* ═══ RIGHT SIDEBAR                      ═══ */
 /* ═══════════════════════════════════════════ */
-function RightSidebar({ orders, user, dark, t }) {
+function RightSidebar({ orders, user, dark, t, setActive }) {
   const activeOrders = orders.filter(o => o.status === "Processing" || o.status === "Pending" || o.status === "Partial");
   const prc = orders.filter(o => o.status === "Processing").length;
   const pnd = orders.filter(o => o.status === "Pending").length;
@@ -185,7 +185,7 @@ function RightSidebar({ orders, user, dark, t }) {
           ))}
         </div>
         {activeOrders.length > 3 && (
-          <button className="dash-rs-viewall" style={{ color: t.accent }}>View all {activeOrders.length} active →</button>
+          <button onClick={() => setActive("orders")} className="dash-rs-viewall" style={{ color: t.accent }}>View all {activeOrders.length} active →</button>
         )}
       </div>
 
@@ -728,7 +728,7 @@ function DashboardInner() {
           ) : isHowTo ? (
             <HowToSidebar dark={dark} t={t} />
           ) : (
-            <RightSidebar orders={orders} user={user} dark={dark} t={t} />
+            <RightSidebar orders={orders} user={user} dark={dark} t={t} setActive={setActive} />
           )}
         </aside>
       </div>

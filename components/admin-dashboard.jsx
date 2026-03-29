@@ -50,7 +50,7 @@ const ADMIN_NAV = [
 /* ═══════════════════════════════════════════ */
 /* ═══ ADMIN OVERVIEW                      ═══ */
 /* ═══════════════════════════════════════════ */
-function AdminOverview({ data, dark, t }) {
+function AdminOverview({ data, dark, t, setActive }) {
   const { stats, recentOrders, recentUsers } = data;
   return (
     <>
@@ -82,7 +82,7 @@ function AdminOverview({ data, dark, t }) {
         <div>
           <div className="adm-section-header">
             <span className="adm-section-title" style={{ color: t.textMuted }}>Recent Orders</span>
-            <button className="adm-section-link" style={{ color: t.accent }}>View all →</button>
+            <button onClick={() => setActive("orders")} className="adm-section-link" style={{ color: t.accent }}>View all →</button>
           </div>
           <div className="adm-card" style={{ background: dark ? "rgba(255,255,255,.06)" : "rgba(255,255,255,.95)", borderWidth: 1, borderStyle: "solid", borderColor: dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)", boxShadow: dark ? "0 4px 20px rgba(0,0,0,.25)" : "0 4px 20px rgba(0,0,0,.04)" }}>
             {(recentOrders || []).length > 0 ? (recentOrders || []).slice(0, 5).map((o, i, arr) => (
@@ -105,7 +105,7 @@ function AdminOverview({ data, dark, t }) {
         <div>
           <div className="adm-section-header">
             <span className="adm-section-title" style={{ color: t.textMuted }}>New Users</span>
-            <button className="adm-section-link" style={{ color: t.accent }}>View all →</button>
+            <button onClick={() => setActive("users")} className="adm-section-link" style={{ color: t.accent }}>View all →</button>
           </div>
           <div className="adm-card" style={{ background: dark ? "rgba(255,255,255,.06)" : "rgba(255,255,255,.95)", borderWidth: 1, borderStyle: "solid", borderColor: dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)", boxShadow: dark ? "0 4px 20px rgba(0,0,0,.25)" : "0 4px 20px rgba(0,0,0,.04)" }}>
             {(recentUsers || []).length > 0 ? (recentUsers || []).slice(0, 5).map((u, i, arr) => (
@@ -130,8 +130,8 @@ function AdminOverview({ data, dark, t }) {
       {/* Quick actions */}
       <div className="adm-section-title" style={{ color: t.textMuted, marginTop: 24, marginBottom: 10 }}>Quick Actions</div>
       <div className="adm-quick-actions">
-        {[["Send Alert", "🔔"], ["Credit User", "💰"], ["Add Service", "➕"], ["View Analytics", "📈"]].map(([label, icon]) => (
-          <button key={label} className="adm-action-btn" style={{ background: dark ? "rgba(255,255,255,.06)" : "rgba(255,255,255,.95)", borderWidth: 1, borderStyle: "solid", borderColor: dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)", color: t.text, boxShadow: dark ? "0 4px 20px rgba(0,0,0,.25)" : "0 4px 20px rgba(0,0,0,.04)" }}>
+        {[["Send Alert", "🔔", "alerts"], ["Credit User", "💰", "users"], ["Add Service", "➕", "menu-builder"], ["View Analytics", "📈", "analytics"]].map(([label, icon, page]) => (
+          <button key={label} onClick={() => setActive(page)} className="adm-action-btn" style={{ background: dark ? "rgba(255,255,255,.06)" : "rgba(255,255,255,.95)", borderWidth: 1, borderStyle: "solid", borderColor: dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)", color: t.text, boxShadow: dark ? "0 4px 20px rgba(0,0,0,.25)" : "0 4px 20px rgba(0,0,0,.04)" }}>
             <span>{icon}</span> {label}
           </button>
         ))}
@@ -300,7 +300,7 @@ function AdminDashboardInner() {
   /* Render page */
   const renderPage = () => {
     switch (active) {
-      case "overview": return <AdminOverview data={data} dark={dark} t={t} />;
+      case "overview": return <AdminOverview data={data} dark={dark} t={t} setActive={setActive} />;
       case "orders": return <AdminOrdersPage dark={dark} t={t} />;
       case "users": return <AdminUsersPage dark={dark} t={t} />;
       case "tickets": return <AdminTicketsPage dark={dark} t={t} />;
@@ -317,7 +317,7 @@ function AdminDashboardInner() {
       case "maintenance": return <AdminMaintenancePage dark={dark} t={t} />;
       case "api": return <AdminAPIPage dark={dark} t={t} />;
       case "settings": return <AdminSettingsPage admin={admin} dark={dark} t={t} themeMode={themeMode} setThemeMode={setThemeMode} setDark={setDark} />;
-      default: return <AdminOverview data={data} dark={dark} t={t} />;
+      default: return <AdminOverview data={data} dark={dark} t={t} setActive={setActive} />;
     }
   };
 
