@@ -37,10 +37,21 @@ export async function GET() {
     } catch (e) { console.error('[Dashboard] Transactions query failed:', e.message); }
 
     let referralCount = 0;
+    let referralList = [];
     try {
-      referralCount = await prisma.user.count({
+      const referred = await prisma.user.findMany({
         where: { referredBy: user.referralCode },
+        select: { id: true, name: true, emailVerified: true, createdAt: true },
+        orderBy: { createdAt: 'desc' },
+        take: 50,
       });
+      referralCount = referred.length;
+      referralList = referred.map(r => ({
+        id: r.id,
+        name: r.name,
+        status: r.emailVerified ? "Active" : "Pending",
+        joined: r.createdAt.toISOString(),
+      }));
     } catch (e) { console.error('[Dashboard] Referral count failed:', e.message); }
 
     let referralEarnings = 0;
@@ -80,6 +91,7 @@ export async function GET() {
         refs: referralCount,
         earnings: referralEarnings / 100,
         refCode: user.referralCode,
+        referralList,
       },
       orders: orders.map(o => ({
         id: o.orderId || o.id,

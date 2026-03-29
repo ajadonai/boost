@@ -50,13 +50,27 @@ export async function POST(req) {
         where: { referralCode: user.referredBy },
       });
       if (referrer) {
-        const bonus = 50000; // ₦500 in kobo
-        await prisma.$transaction([
-          prisma.user.update({ where: { id: referrer.id }, data: { balance: { increment: bonus } } }),
-          prisma.transaction.create({ data: { userId: referrer.id, type: 'referral', amount: bonus, note: `Referral bonus: ${user.name} signed up` } }),
-          prisma.user.update({ where: { id: user.id }, data: { balance: { increment: bonus } } }),
-          prisma.transaction.create({ data: { userId: user.id, type: 'referral', amount: bonus, note: 'Welcome bonus from referral' } }),
-        ]);
+        // Read bonus amounts from settings, fallback to ₦500
+        let referrerBonus = 50000;
+        let inviteeBonus = 50000;
+        try {
+          const settings = await prisma.setting.findMany({ where: { key: { in: ['ref_referrer_bonus', 'ref_invitee_bonus'] } } });
+          settings.forEach(s => {
+            if (s.key === 'ref_referrer_bonus') referrerBonus = Number(s.value) || 50000;
+            if (s.key === 'ref_invitee_bonus') inviteeBonus = Number(s.value) || 50000;
+          });
+        } catch {}
+        const ops = [
+          prisma.user.update({ where: { id: referrer.id }, data: { balance: { increment: referrerBonus } } }),
+          prisma.transaction.create({ data: { userId: referrer.id, type: 'referral', amount: referrerBonus, note: `Referral bonus: ${user.name} signed up` } }),
+        ];
+        if (inviteeBonus > 0) {
+          ops.push(
+            prisma.user.update({ where: { id: user.id }, data: { balance: { increment: inviteeBonus } } }),
+            prisma.transaction.create({ data: { userId: user.id, type: 'referral', amount: inviteeBonus, note: 'Welcome bonus from referral' } }),
+          );
+        }
+        await prisma.$transaction(ops);
       }
     }
 
