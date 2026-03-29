@@ -668,7 +668,7 @@ function DashboardInner() {
 
         {/* ── MAIN ── */}
         <main className="dash-main" style={{ background: t.bg }}>
-          {!isNewOrder && !isOrders && !isReferrals && !isServices && !isSettings && !isSupport && !isAddFunds && <>
+          {!isNewOrder && !isOrders && !isReferrals && !isServices && !isSettings && !isSupport && !isAddFunds && !isHowTo && <>
             <div className="dash-welcome" style={{ color: t.text }}>What's good, {firstName.toUpperCase()} 💰</div>
             <div className="dash-welcome-sub" style={{ color: t.textMuted }}>Here's your empire at a glance</div>
           </>}
