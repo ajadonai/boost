@@ -358,6 +358,10 @@ export default function Dashboard() {
   useEffect(() => {
     async function load() {
       try {
+        /* Check maintenance mode first */
+        const maintRes = await fetch("/api/maintenance-check");
+        if (maintRes.ok) { const m = await maintRes.json(); if (m.maintenance) { window.location.replace("/maintenance"); return; } }
+        
         const res = await fetch("/api/dashboard");
         if (res.status === 401) { window.location.href = "/?login=1"; return; }
         if (res.ok) {

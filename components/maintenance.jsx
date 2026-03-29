@@ -5,9 +5,12 @@ export default function Maintenance() {
   const getAuto = () => { const h = new Date().getHours(); return h >= 19 || h < 7; };
   const [dark, setDark] = useState(false);
   const [dots, setDots] = useState(0);
+  const [msg, setMsg] = useState("We're upgrading our systems to serve you better. This won't take long — grab a coffee and check back soon.");
+  const [eta, setEta] = useState("~1 hour");
 
   useEffect(() => {
     try { const s = localStorage.getItem("nitro-theme") || "auto"; if (s === "night") setDark(true); else if (s === "day") setDark(false); else setDark(getAuto()); } catch {}
+    fetch("/api/maintenance-check").then(r => r.json()).then(d => { if (!d.maintenance) { window.location.replace("/"); return; } if (d.message) setMsg(d.message); if (d.eta) setEta(d.eta); }).catch(() => {});
   }, []);
   useEffect(() => { const iv = setInterval(() => setDots(d => (d + 1) % 4), 500); return () => clearInterval(iv); }, []);
 
@@ -39,11 +42,11 @@ export default function Maintenance() {
           </svg>
 
           <h1 style={{ fontSize: "clamp(28px, 5vw, 36px)", fontWeight: 600, color: t.tx, marginBottom: 8, fontFamily: "'Cormorant Garamond',serif" }}>We'll be right back</h1>
-          <p style={{ fontSize: 15, color: t.ts, lineHeight: 1.7, maxWidth: 380, margin: "0 auto 24px" }}>We're upgrading our systems to serve you better. This won't take long — grab a coffee and check back soon.</p>
+          <p style={{ fontSize: 15, color: t.ts, lineHeight: 1.7, maxWidth: 380, margin: "0 auto 24px" }}>{msg}</p>
 
           <div style={{ display: "inline-flex", alignItems: "center", gap: 10, padding: "10px 20px", borderRadius: 12, background: dark ? "rgba(224,164,88,.08)" : "rgba(224,164,88,.04)", borderWidth: 1, borderStyle: "solid", borderColor: dark ? "rgba(224,164,88,.15)" : "rgba(224,164,88,.08)" }}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={t.amber} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
-            <span className="m" style={{ fontSize: 13, fontWeight: 600, color: t.amber, fontFamily: "'JetBrains Mono',monospace" }}>Estimated: ~1 hour</span>
+            <span className="m" style={{ fontSize: 13, fontWeight: 600, color: t.amber, fontFamily: "'JetBrains Mono',monospace" }}>Estimated: {eta}</span>
           </div>
 
           <div style={{ marginTop: 28, display: "flex", justifyContent: "center", gap: 6 }}>
