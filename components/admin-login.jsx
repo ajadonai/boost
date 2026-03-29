@@ -2,10 +2,10 @@
 import { useState, useEffect } from "react";
 
 const QUOTES = [
-  { text: "Your brand is what people say about you when you're not in the room.", author: "Jeff Bezos" },
-  { text: "The best time to plant a tree was 20 years ago. The second best time is now.", author: "Chinese Proverb" },
-  { text: "Don't be afraid to give up the good to go for the great.", author: "John D. Rockefeller" },
-  { text: "Success is not final, failure is not fatal: it is the courage to continue that counts.", author: "Winston Churchill" },
+  { text: "Move fast. Break nothing. Ship everything.", author: "The Nitro Way" },
+  { text: "Your users are sleeping. Their followers aren't.", author: "Dashboard Wisdom" },
+  { text: "Every panel that matters was once just an idea.", author: "Builder's Creed" },
+  { text: "Numbers don't lie. Neither does your uptime.", author: "Operator's Code" },
 ];
 
 export default function AdminLogin(){
@@ -68,8 +68,9 @@ export default function AdminLogin(){
 
       {/* ═══ LEFT PANEL — desktop & tablet ═══ */}
       <div className="admin-panel" style={{background:t.panelBg,position:"relative",overflow:"hidden",display:"flex",flexDirection:"column",justifyContent:"space-between",borderRight:`1px solid ${dark?"rgba(255,255,255,.06)":"rgba(255,255,255,.1)"}`}}>
-        {/* Orbs */}
+        {/* Orbs + Grid pattern */}
         <div style={{position:"absolute",inset:0,overflow:"hidden",pointerEvents:"none"}}>
+          <div style={{position:"absolute",inset:0,backgroundImage:`linear-gradient(${dark?"rgba(196,125,142,.03)":"rgba(255,255,255,.04)"} 1px, transparent 1px), linear-gradient(90deg, ${dark?"rgba(196,125,142,.03)":"rgba(255,255,255,.04)"} 1px, transparent 1px)`,backgroundSize:"40px 40px"}}/>
           <div style={{position:"absolute",top:"-15%",left:"-10%",width:300,height:300,borderRadius:"50%",background:dark?"rgba(196,125,142,.08)":"rgba(255,255,255,.06)",filter:"blur(80px)",animation:"float1 20s ease-in-out infinite"}}/>
           <div style={{position:"absolute",bottom:"-10%",right:"-15%",width:200,height:200,borderRadius:"50%",background:dark?"rgba(110,160,230,.05)":"rgba(255,255,255,.05)",filter:"blur(60px)",animation:"float2 25s ease-in-out infinite"}}/>
           {[["15%","70%",3,0],["40%","80%",4,1],["70%","20%",3,.5],["85%","60%",4,1.5]].map(([top,left,s,d],i)=><div key={i} style={{position:"absolute",top,left,width:s,height:s,borderRadius:"50%",background:dark?"rgba(196,125,142,.2)":"rgba(255,255,255,.2)",animation:`float3 ${3.5+i*.5}s ease-in-out infinite ${d}s`}}/>)}
@@ -81,7 +82,7 @@ export default function AdminLogin(){
             <div style={{width:28,height:28,borderRadius:7,background:"linear-gradient(135deg,#c47d8e,#8b5e6b)",display:"flex",alignItems:"center",justifyContent:"center"}}><svg width="12" height="12" viewBox="0 0 20 20" fill="none"><path d="M4,16 L4,4 L16,16 L16,4" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
             <span style={{fontSize:14,fontWeight:700,color:"#fff",letterSpacing:1.5}}>NITRO</span>
           </div>
-          <div className="m" style={{fontSize:9,fontWeight:500,color:dark?"rgba(196,125,142,.5)":"rgba(255,255,255,.4)",letterSpacing:2,textTransform:"uppercase"}}>Admin Console</div>
+          <div className="m" style={{fontSize:9,fontWeight:500,color:dark?"rgba(196,125,142,.5)":"rgba(255,255,255,.4)",letterSpacing:2,textTransform:"uppercase"}}>Command Center</div>
         </div>
 
         {/* Center: Quote */}
@@ -140,8 +141,8 @@ export default function AdminLogin(){
               </div>
             </div>
 
-            <h2 style={{fontSize:22,fontWeight:700,color:t.text,textAlign:"center",marginBottom:4}}>Admin Portal</h2>
-            <p style={{fontSize:13,color:t.textSoft,textAlign:"center",marginBottom:24,fontWeight:430}}>Restricted access. Authorized personnel only.</p>
+            <h2 style={{fontSize:22,fontWeight:700,color:t.text,textAlign:"center",marginBottom:4}}>Command Center</h2>
+            <p style={{fontSize:14,color:t.textSoft,textAlign:"center",marginBottom:24,fontWeight:430}}>Authorized operators only.</p>
 
             <div style={{minHeight:36,marginBottom:4,display:"flex",alignItems:"center"}}>{error?<div style={{width:"100%",padding:"8px 12px",borderRadius:8,background:dark?"rgba(220,38,38,0.1)":"#fef2f2",border:`1px solid ${dark?"rgba(220,38,38,0.2)":"#fecaca"}`,color:t.red,fontSize:12,lineHeight:1.2}}>⚠️ {error}</div>:null}</div>
 
@@ -161,9 +162,9 @@ export default function AdminLogin(){
               <label style={{display:"flex",alignItems:"center",gap:6,cursor:"pointer"}}><input type="checkbox" checked={remember} onChange={e=>setRemember(e.target.checked)} style={{accentColor:t.accent,width:14,height:14}}/><span style={{fontSize:12,color:t.textSoft}}>Remember me</span></label>
             </div>
 
-            <button onClick={handleLogin} disabled={loading} style={{width:"100%",padding:"14px 0",borderRadius:12,background:loading?"#999":t.btnPrimary,color:"#fff",fontSize:15,fontWeight:700,marginBottom:16,display:"flex",alignItems:"center",justifyContent:"center",gap:8,opacity:loading?.7:1,border:"none"}}>
+            <button onClick={handleLogin} disabled={loading} style={{width:"100%",padding:"14px 0",borderRadius:12,background:loading?"#999":t.btnPrimary,color:"#fff",fontSize:16,fontWeight:700,marginBottom:16,display:"flex",alignItems:"center",justifyContent:"center",gap:8,opacity:loading?.7:1,border:"none",boxShadow:loading?"none":"0 6px 24px rgba(196,125,142,.35)",letterSpacing:.5}}>
               {loading&&<span style={{width:16,height:16,border:"2px solid rgba(255,255,255,.3)",borderTopColor:"#fff",borderRadius:"50%",animation:"spin .6s linear infinite"}}/>}
-              {loading?"Authenticating...":"Sign In"}
+              {loading?"Authenticating...":"Access Dashboard"}
             </button>
 
             <div style={{textAlign:"center",padding:"12px 0 0",borderTop:`1px solid ${t.cardBorder}`}}>

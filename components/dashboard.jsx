@@ -79,15 +79,21 @@ function OverviewPage({ user, orders, alerts, dark, t }) {
       {/* Stat cards */}
       <div className="dash-stats">
         {[
-          ["Wallet Balance", balance, t.green, "+₦2,000 this week"],
-          ["Total Orders", String(total), dark ? "#a5b4fc" : "#4f46e5", "3 this week"],
-          ["Processing", String(processing), dark ? "#e0a458" : "#d97706", "Est. 1-2 hrs"],
-          ["Completed", String(completed), dark ? "#6ee7b7" : "#059669", rate + "% success"],
-        ].map(([label, val, color, sub]) => (
-          <div key={label} className="dash-stat-card" style={{ background: dark ? "rgba(255,255,255,.06)" : "rgba(255,255,255,.95)", borderTopWidth: 1, borderRightWidth: 1, borderBottomWidth: 1, borderLeftWidth: 3, borderStyle: "solid", borderTopColor: dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)", borderRightColor: dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)", borderBottomColor: dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)", borderLeftColor: color, boxShadow: dark ? "0 4px 20px rgba(0,0,0,.25)" : "0 4px 20px rgba(0,0,0,.04)" }}>
-            <div className="dash-stat-label" style={{ color: t.textMuted }}>{label}</div>
-            <div className="m dash-stat-value" style={{ color }}>{val}</div>
-            <div className="dash-stat-sub" style={{ color: t.textMuted }}>{sub}</div>
+          ["Wallet", balance, t.green, "+₦2,000 this week", "↑"],
+          ["Orders", String(total), dark ? "#a5b4fc" : "#4f46e5", "3 this week", null],
+          ["Processing", String(processing), dark ? "#e0a458" : "#d97706", "Est. 1-2 hrs", "⏳"],
+          ["Completed", String(completed), dark ? "#6ee7b7" : "#059669", rate + "% success", "✓"],
+        ].map(([label, val, color, sub, icon]) => (
+          <div key={label} className="dash-stat-card" style={{ background: dark ? "rgba(255,255,255,.06)" : "rgba(255,255,255,.95)", borderTopWidth: 1, borderRightWidth: 1, borderBottomWidth: 1, borderLeftWidth: 3, borderStyle: "solid", borderTopColor: dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)", borderRightColor: dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)", borderBottomColor: dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)", borderLeftColor: color, boxShadow: dark ? "0 4px 20px rgba(0,0,0,.25)" : "0 4px 20px rgba(0,0,0,.04)", position: "relative", overflow: "hidden" }}>
+            <div style={{ position: "absolute", top: -20, left: -20, width: 60, height: 60, borderRadius: "50%", background: `${color}10`, filter: "blur(20px)", pointerEvents: "none" }} />
+            <div style={{ position: "relative" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <div className="dash-stat-label" style={{ color: t.textMuted }}>{label}</div>
+                {icon && <span style={{ fontSize: 13, opacity: .35 }}>{icon}</span>}
+              </div>
+              <div className="m dash-stat-value" style={{ color }}>{val}</div>
+              <div className="dash-stat-sub" style={{ color: t.textMuted }}>{sub}</div>
+            </div>
           </div>
         ))}
       </div>
@@ -121,9 +127,9 @@ function OverviewPage({ user, orders, alerts, dark, t }) {
               <line x1="28" y1="32" x2="36" y2="32" stroke={t.accent} strokeWidth="2" strokeLinecap="round" opacity=".4" />
               <line x1="32" y1="28" x2="32" y2="36" stroke={t.accent} strokeWidth="2" strokeLinecap="round" opacity=".4" />
             </svg>
-            <div style={{ fontSize: 16, fontWeight: 600, color: t.textSoft, marginBottom: 6 }}>No orders yet</div>
-            <div style={{ color: t.textMuted, fontSize: 13, marginBottom: 16, lineHeight: 1.5 }}>Place your first order and watch your stats come alive</div>
-            <button onClick={() => {}} style={{ padding: "10px 24px", borderRadius: 8, background: `linear-gradient(135deg,${t.accent},#8b5e6b)`, color: "#fff", fontSize: 14, fontWeight: 600, border: "none" }}>Place your first order</button>
+            <div style={{ fontSize: 17, fontWeight: 600, color: t.textSoft, marginBottom: 6 }}>No orders yet — let's fix that 🔥</div>
+            <div style={{ color: t.textMuted, fontSize: 14, marginBottom: 16, lineHeight: 1.5 }}>Boost your first Instagram post in under 60 seconds</div>
+            <button onClick={() => {}} style={{ padding: "12px 28px", borderRadius: 10, background: `linear-gradient(135deg,${t.accent},#8b5e6b)`, color: "#fff", fontSize: 14, fontWeight: 600, border: "none", boxShadow: "0 4px 16px rgba(196,125,142,.25)" }}>Place your first order →</button>
           </div>
         )}
         {orders.length > 5 && (
@@ -637,8 +643,8 @@ export default function Dashboard() {
         {/* ── MAIN ── */}
         <main className="dash-main" style={{ background: t.bg }}>
           {!isNewOrder && !isOrders && !isReferrals && !isServices && !isSettings && !isSupport && !isAddFunds && <>
-            <div className="dash-welcome" style={{ color: t.text }}>Welcome back, {firstName.toUpperCase()}</div>
-            <div className="dash-welcome-sub" style={{ color: t.textMuted }}>Here's what's happening with your account.</div>
+            <div className="dash-welcome" style={{ color: t.text }}>What's good, {firstName.toUpperCase()} 💰</div>
+            <div className="dash-welcome-sub" style={{ color: t.textMuted }}>Here's your empire at a glance</div>
           </>}
 
           <div key={active} className="dash-page-enter">
