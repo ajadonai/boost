@@ -382,17 +382,23 @@ export function AdminNotificationsPage({ dark, t }) {
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
   const [target, setTarget] = useState("all");
+  const [sending, setSending] = useState(false);
+  const [msg, setMsg] = useState(null);
 
   useEffect(() => {
     fetch("/api/admin/notifications").then(r => r.json()).then(d => { setHistory(d.history || []); setLoading(false); }).catch(() => setLoading(false));
   }, []);
 
   const send = async () => {
-    if (!message.trim()) return;
+    if (!message.trim() || sending) return;
+    setSending(true); setMsg(null);
     try {
       const res = await fetch("/api/admin/notifications", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ subject, message, target }) });
-      if (res.ok) { setSubject(""); setMessage(""); fetch("/api/admin/notifications").then(r => r.json()).then(d => setHistory(d.history || [])); }
-    } catch {}
+      const data = await res.json();
+      if (res.ok) { setMsg({ type: "success", text: data.message || "Sent" }); setSubject(""); setMessage(""); fetch("/api/admin/notifications").then(r => r.json()).then(d => setHistory(d.history || [])); }
+      else setMsg({ type: "error", text: data.error || "Failed" });
+    } catch { setMsg({ type: "error", text: "Request failed" }); }
+    setSending(false);
   };
 
   const inputStyle = { width: "100%", padding: "10px 14px", borderRadius: 8, borderWidth: 1, borderStyle: "solid", borderColor: t.cardBorder, background: dark ? "#0d1020" : "#fff", color: t.text, fontSize: 14, outline: "none", boxSizing: "border-box", fontFamily: "inherit" };
@@ -408,6 +414,7 @@ export function AdminNotificationsPage({ dark, t }) {
       {/* Compose */}
       <div className="adm-card" style={{ background: dark ? "rgba(255,255,255,.06)" : "rgba(255,255,255,.95)", borderWidth: 1, borderStyle: "solid", borderColor: dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)", padding: 18, marginTop: 16, marginBottom: 20, boxShadow: dark ? "0 4px 20px rgba(0,0,0,.25)" : "0 4px 20px rgba(0,0,0,.04)", borderRadius: 14 }}>
         <div style={{ fontSize: 15, fontWeight: 600, color: t.text, marginBottom: 12 }}>Compose Notification</div>
+        {msg && <div style={{ padding: "8px 12px", borderRadius: 8, marginBottom: 12, fontSize: 13, background: msg.type === "success" ? (dark ? "rgba(110,231,183,.08)" : "#ecfdf5") : (dark ? "rgba(220,38,38,.08)" : "#fef2f2"), color: msg.type === "success" ? (dark ? "#6ee7b7" : "#059669") : (dark ? "#fca5a5" : "#dc2626") }}>{msg.type === "success" ? "✓" : "⚠️"} {msg.text}</div>}
         <div style={{ marginBottom: 12 }}>
           <label style={{ fontSize: 13, color: t.textMuted, display: "block", marginBottom: 4 }}>Subject</label>
           <input value={subject} onChange={e => setSubject(e.target.value)} placeholder="Notification subject..." style={inputStyle} />
@@ -423,7 +430,7 @@ export function AdminNotificationsPage({ dark, t }) {
               <button key={tg} onClick={() => setTarget(tg)} className="adm-filter-pill" style={{ borderWidth: 1, borderStyle: "solid", borderColor: target === tg ? t.accent : t.cardBorder, background: target === tg ? (dark ? "#2a1a22" : "#fdf2f4") : "transparent", color: target === tg ? t.accent : t.textMuted, textTransform: "capitalize" }}>{tg} users</button>
             ))}
           </div>
-          <button onClick={send} className="adm-btn-primary" style={{ opacity: message.trim() ? 1 : .4 }}>Send Notification</button>
+          <button onClick={send} disabled={sending || !message.trim()} className="adm-btn-primary" style={{ opacity: message.trim() && !sending ? 1 : .4 }}>{sending ? "Sending..." : "Send Notification"}</button>
         </div>
       </div>
 
@@ -437,7 +444,7 @@ export function AdminNotificationsPage({ dark, t }) {
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontSize: 14, fontWeight: 500, color: t.text }}>{n.subject || "Notification"}</div>
               <div style={{ fontSize: 13, color: t.textSoft, marginTop: 2 }}>{n.message}</div>
-              <div style={{ fontSize: 12, color: t.textMuted, marginTop: 4 }}>To: {n.target} · By: {n.sentBy} · {n.sentAt ? fD(n.sentAt) : ""}</div>
+              <div style={{ fontSize: 12, color: t.textMuted, marginTop: 4 }}>To: {n.target} · {n.recipients ? `${n.sent || 0}/${n.recipients} delivered` : ""} · By: {n.sentBy} · {n.sentAt ? fD(n.sentAt) : ""}</div>
             </div>
             <span className="m" style={{ fontSize: 11, padding: "2px 7px", borderRadius: 4, fontWeight: 600, background: n.status === "sent" ? (dark ? "rgba(110,231,183,.1)" : "rgba(5,150,105,.06)") : (dark ? "rgba(252,211,77,.1)" : "rgba(217,119,6,.06)"), color: n.status === "sent" ? t.green : t.amber }}>{n.status}</span>
           </div>
