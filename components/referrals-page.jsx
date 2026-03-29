@@ -114,8 +114,8 @@ export default function ReferralsPage({ user, dark, t }) {
               <path d="M24 36c-8 0-14 4-14 10v2h28v-2c0-6-6-10-14-10z" stroke={t.accent} strokeWidth="1.5" opacity=".2" />
               <path d="M26 16l6-4 6 4" stroke={t.accent} strokeWidth="1.5" opacity=".2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
-            <div style={{ fontSize: 15, fontWeight: 600, color: t.textSoft, marginBottom: 4 }}>No referrals yet</div>
-            <div style={{ fontSize: 13, color: t.textMuted, lineHeight: 1.5 }}>Share your link and earn ₦500 for every friend who joins</div>
+            <div style={{ fontSize: 16, fontWeight: 600, color: t.textSoft, marginBottom: 4 }}>No referrals yet — share the love 🤝</div>
+            <div style={{ fontSize: 14, color: t.textMuted, lineHeight: 1.5 }}>Invite friends, earn ₦500 each time they sign up and order</div>
           </div>
         )}
       </div>

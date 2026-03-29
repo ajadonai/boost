@@ -178,10 +178,11 @@ export default function OrdersPage({ orders, txs, dark, t }) {
                 <rect x="12" y="8" width="40" height="48" rx="6" stroke={t.accent} strokeWidth="1.5" opacity=".3" />
                 <line x1="20" y1="22" x2="44" y2="22" stroke={t.accent} strokeWidth="1.5" opacity=".2" strokeLinecap="round" />
                 <line x1="20" y1="30" x2="38" y2="30" stroke={t.accent} strokeWidth="1.5" opacity=".15" strokeLinecap="round" />
-                <line x1="20" y1="38" x2="34" y2="38" stroke={t.accent} strokeWidth="1.5" opacity=".1" strokeLinecap="round" />
+                <circle cx="32" cy="38" r="8" stroke={t.accent} strokeWidth="1.5" opacity=".2" />
+                <path d="M29 38l2 2 4-4" stroke={t.accent} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity=".4" />
               </svg>
-              <div style={{ fontSize: 15, fontWeight: 600, color: t.textSoft, marginBottom: 4 }}>No orders found</div>
-              <div style={{ fontSize: 13, color: t.textMuted }}>Your order history will appear here</div>
+              <div style={{ fontSize: 16, fontWeight: 600, color: t.textSoft, marginBottom: 4 }}>No orders yet — let's change that 🚀</div>
+              <div style={{ fontSize: 14, color: t.textMuted }}>Your order history will show up here once you start boosting</div>
             </div>
           )}
         </div>
@@ -219,8 +220,8 @@ export default function OrdersPage({ orders, txs, dark, t }) {
                 <circle cx="46" cy="32" r="2" stroke={t.accent} strokeWidth="1.5" opacity=".3" />
                 <line x1="16" y1="24" x2="30" y2="24" stroke={t.accent} strokeWidth="1.5" opacity=".15" strokeLinecap="round" />
               </svg>
-              <div style={{ fontSize: 15, fontWeight: 600, color: t.textSoft, marginBottom: 4 }}>No transactions yet</div>
-              <div style={{ fontSize: 13, color: t.textMuted }}>Deposits and spending will show up here</div>
+              <div style={{ fontSize: 16, fontWeight: 600, color: t.textSoft, marginBottom: 4 }}>No transactions yet 💳</div>
+              <div style={{ fontSize: 14, color: t.textMuted }}>Add funds to your wallet and start boosting</div>
             </div>
           )}
         </div>

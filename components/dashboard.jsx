@@ -50,7 +50,7 @@ function Badge({ status, dark }) {
 /* ═══════════════════════════════════════════ */
 /* ═══ OVERVIEW PAGE                      ═══ */
 /* ═══════════════════════════════════════════ */
-function OverviewPage({ user, orders, alerts, dark, t }) {
+function OverviewPage({ user, orders, alerts, dark, t, setActive }) {
   const balance = user ? fN(user.balance) : "₦0";
   const total = orders.length;
   const processing = orders.filter(o => o.status === "Processing" || o.status === "Pending").length;
@@ -129,7 +129,7 @@ function OverviewPage({ user, orders, alerts, dark, t }) {
             </svg>
             <div style={{ fontSize: 17, fontWeight: 600, color: t.textSoft, marginBottom: 6 }}>No orders yet — let's fix that 🔥</div>
             <div style={{ color: t.textMuted, fontSize: 14, marginBottom: 16, lineHeight: 1.5 }}>Boost your first Instagram post in under 60 seconds</div>
-            <button onClick={() => {}} style={{ padding: "12px 28px", borderRadius: 10, background: `linear-gradient(135deg,${t.accent},#8b5e6b)`, color: "#fff", fontSize: 14, fontWeight: 600, border: "none", boxShadow: "0 4px 16px rgba(196,125,142,.25)" }}>Place your first order →</button>
+            <button onClick={() => setActive("new-order")} style={{ padding: "12px 28px", borderRadius: 10, background: `linear-gradient(135deg,${t.accent},#8b5e6b)`, color: "#fff", fontSize: 14, fontWeight: 600, border: "none", boxShadow: "0 4px 16px rgba(196,125,142,.25)" }}>Place your first order →</button>
           </div>
         )}
         {orders.length > 5 && (
@@ -508,7 +508,7 @@ export default function Dashboard() {
   const renderPage = () => {
     switch (active) {
       case "overview":
-        return <OverviewPage user={user} orders={orders} alerts={alerts} dark={dark} t={t} />;
+        return <OverviewPage user={user} orders={orders} alerts={alerts} dark={dark} t={t} setActive={setActive} />;
       case "new-order":
         return <NewOrderPage dark={dark} t={t} platform={noPlatform} setPlatform={setNoPlatform} selSvc={noSelSvc} setSelSvc={setNoSelSvc} selTier={noSelTier} setSelTier={setNoSelTier} qty={noQty} setQty={setNoQty} link={noLink} setLink={setNoLink} catModal={noCatModal} setCatModal={setNoCatModal} />;
       case "orders":
