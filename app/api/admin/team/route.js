@@ -11,7 +11,7 @@ export async function GET() {
       orderBy: { createdAt: 'asc' },
       select: {
         id: true, name: true, email: true, role: true,
-        status: true, lastActive: true, createdAt: true,
+        status: true, customPages: true, lastActive: true, createdAt: true,
       },
     });
 
@@ -20,7 +20,7 @@ export async function GET() {
         ...a,
         lastActive: a.lastActive.toISOString(),
         joined: a.createdAt.toISOString(),
-        customPages: null,
+        customPages: a.customPages ? JSON.parse(a.customPages) : null,
       })),
     });
   } catch (err) {
@@ -38,7 +38,7 @@ export async function POST(req) {
   }
 
   try {
-    const { action, adminId, name, email, password, role, status } = await req.json();
+    const { action, adminId, name, email, password, role, status, pages, newPassword } = await req.json();
 
     // Prevent creating owner or superadmin via API
     const ASSIGNABLE = ['admin', 'support', 'finance'];
@@ -80,6 +80,33 @@ export async function POST(req) {
       await prisma.admin.update({ where: { id: adminId }, data: { status: newStatus } });
       await logActivity(admin.name, `${newStatus === 'Active' ? 'Activated' : 'Deactivated'} admin: ${target.name}`, 'admin');
       return Response.json({ success: true, status: newStatus });
+    }
+
+    if (action === 'updatePermissions') {
+      if (!adminId) return Response.json({ error: 'Admin ID required' }, { status: 400 });
+      const target = await prisma.admin.findUnique({ where: { id: adminId } });
+      if (!target) return Response.json({ error: 'Admin not found' }, { status: 404 });
+      if (target.role === 'owner') return Response.json({ error: 'Cannot modify owner' }, { status: 403 });
+
+      // pages = null means reset to default, pages = [...] means custom
+      const customPages = Array.isArray(pages) ? JSON.stringify(pages) : null;
+      await prisma.admin.update({ where: { id: adminId }, data: { customPages } });
+      await logActivity(admin.name, `Updated permissions for ${target.name}${customPages ? ' (custom)' : ' (reset to default)'}`, 'admin');
+      return Response.json({ success: true });
+    }
+
+    if (action === 'resetPassword') {
+      if (!adminId) return Response.json({ error: 'Admin ID required' }, { status: 400 });
+      const target = await prisma.admin.findUnique({ where: { id: adminId } });
+      if (!target) return Response.json({ error: 'Admin not found' }, { status: 404 });
+      if (target.role === 'owner' && target.id !== admin.id) return Response.json({ error: 'Cannot reset owner password' }, { status: 403 });
+
+      if (!newPassword || newPassword.length < 6) return Response.json({ error: 'Password must be at least 6 characters' }, { status: 400 });
+
+      const hash = await bcrypt.hash(newPassword, 12);
+      await prisma.admin.update({ where: { id: adminId }, data: { password: hash } });
+      await logActivity(admin.name, `Reset password for ${target.name}`, 'admin');
+      return Response.json({ success: true });
     }
 
     return Response.json({ error: 'Unknown action' }, { status: 400 });

@@ -67,16 +67,30 @@ export function AdminActivityPage({ dark, t }) {
 }
 
 /* ═══════════════════════════════════════════ */
+
+/* ═══════════════════════════════════════════ */
 /* ═══ TEAM MANAGEMENT                     ═══ */
 /* ═══════════════════════════════════════════ */
 const ROLE_INFO = {
-  owner:      { color: "#e0a458", desc: "Full platform access. Cannot be deactivated or demoted. Only one owner exists." },
-  superadmin: { color: "#c47d8e", desc: "Full access to all admin features. Can manage team, settings, and all operations." },
-  admin:      { color: "#a5b4fc", desc: "Can manage orders, users, services, tickets, blog, and view analytics." },
-  support:    { color: "#6ee7b7", desc: "Can view and respond to tickets, view orders and users. No access to settings or team." },
-  finance:    { color: "#fcd34d", desc: "Can view payments, analytics, and financial reports. No access to users or settings." },
+  owner:      { color: "#e0a458", desc: "Full platform access. Cannot be modified. Only one owner exists." },
+  superadmin: { color: "#c47d8e", desc: "Full access to all admin features. Can manage team and settings." },
+  admin:      { color: "#a5b4fc", desc: "Default access to most features. Permissions customizable." },
+  support:    { color: "#6ee7b7", desc: "Tickets, orders, users only. Permissions customizable." },
+  finance:    { color: "#fcd34d", desc: "Payments and analytics only. Permissions customizable." },
 };
 const ASSIGNABLE_ROLES = ["admin", "support", "finance"];
+const ALL_PAGES = [
+  { id:"overview", label:"Overview", g:"Main" },{ id:"orders", label:"Orders", g:"Main" },{ id:"users", label:"Users", g:"Main" },{ id:"tickets", label:"Tickets", g:"Main" },
+  { id:"services", label:"Services", g:"Catalog" },{ id:"menu-builder", label:"Menu Builder", g:"Catalog" },{ id:"blog", label:"Blog", g:"Catalog" },{ id:"payments", label:"Payments", g:"Catalog" },
+  { id:"analytics", label:"Analytics", g:"Insights" },{ id:"activity", label:"Activity Log", g:"Insights" },
+  { id:"alerts", label:"Alerts", g:"System" },{ id:"team", label:"Team", g:"System" },{ id:"coupons", label:"Coupons", g:"System" },{ id:"notifications", label:"Notifications", g:"System" },{ id:"maintenance", label:"Maintenance", g:"System" },{ id:"api", label:"API Management", g:"System" },{ id:"settings", label:"Settings", g:"System" },
+];
+const DEFAULT_PAGES = {
+  admin: ["overview","orders","users","services","menu-builder","api","payments","tickets","activity","alerts","analytics","coupons","notifications","maintenance","blog"],
+  support: ["overview","orders","users","tickets"],
+  finance: ["overview","orders","payments","analytics"],
+};
+const PAGE_GROUPS = [...new Set(ALL_PAGES.map(p => p.g))];
 
 export function AdminTeamPage({ admin: currentAdmin, dark, t }) {
   const confirm = useConfirm();
@@ -84,42 +98,42 @@ export function AdminTeamPage({ admin: currentAdmin, dark, t }) {
   const [loading, setLoading] = useState(true);
   const [showAdd, setShowAdd] = useState(false);
   const [showGuide, setShowGuide] = useState(false);
+  const [expandedId, setExpandedId] = useState(null);
+  const [permTab, setPermTab] = useState("permissions");
   const [newName, setNewName] = useState("");
   const [newEmail, setNewEmail] = useState("");
   const [newPw, setNewPw] = useState("");
   const [newRole, setNewRole] = useState("admin");
+  const [resetPw, setResetPw] = useState("");
+  const [localPages, setLocalPages] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const [msg, setMsg] = useState(null);
 
-  useEffect(() => {
-    fetch("/api/admin/team").then(r => r.json()).then(d => { setAdmins(d.admins || []); setLoading(false); }).catch(() => setLoading(false));
-  }, []);
+  const reload = () => fetch("/api/admin/team").then(r => r.json()).then(d => setAdmins(d.admins || []));
+  useEffect(() => { reload().finally(() => setLoading(false)); }, []);
+
+  const act = async (body) => {
+    setSaving(true); setMsg(null);
+    try {
+      const res = await fetch("/api/admin/team", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+      const data = await res.json();
+      if (!res.ok) { setMsg({ type: "error", text: data.error || "Failed" }); setSaving(false); return false; }
+      await reload(); setSaving(false); return data;
+    } catch { setMsg({ type: "error", text: "Request failed" }); setSaving(false); return false; }
+  };
 
   const createAdmin = async () => {
     if (!newName.trim() || !newEmail.trim() || !newPw.trim()) return;
-    try {
-      const res = await fetch("/api/admin/team", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "create", name: newName, email: newEmail, password: newPw, role: newRole }) });
-      if (res.ok) { setShowAdd(false); setNewName(""); setNewEmail(""); setNewPw(""); fetch("/api/admin/team").then(r => r.json()).then(d => setAdmins(d.admins || [])); }
-    } catch {}
+    const ok = await act({ action: "create", name: newName, email: newEmail, password: newPw, role: newRole });
+    if (ok) { setShowAdd(false); setNewName(""); setNewEmail(""); setNewPw(""); setMsg({ type: "success", text: "Admin created" }); }
   };
 
-  const toggleStatus = async (id) => {
-    try {
-      const res = await fetch("/api/admin/team", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "toggleStatus", adminId: id }) });
-      const data = await res.json();
-      if (data.success) setAdmins(prev => prev.map(a => a.id === id ? { ...a, status: data.status } : a));
-    } catch {}
+  const getEffective = (a) => {
+    if (a.role === "owner" || a.role === "superadmin") return ALL_PAGES.map(p => p.id);
+    return a.customPages || DEFAULT_PAGES[a.role] || [];
   };
 
-  const changeRole = async (id, role) => {
-    try {
-      await fetch("/api/admin/team", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "updateRole", adminId: id, role }) });
-      setAdmins(prev => prev.map(a => a.id === id ? { ...a, role } : a));
-    } catch {}
-  };
-
-  const isOwner = (a) => a.role === "owner";
-  const isProtected = (a) => a.role === "owner" || a.role === "superadmin";
   const canManage = currentAdmin?.role === "owner" || currentAdmin?.role === "superadmin";
-
   const inputStyle = { width: "100%", padding: "10px 14px", borderRadius: 8, borderWidth: 1, borderStyle: "solid", borderColor: t.cardBorder, background: dark ? "#0d1020" : "#fff", color: t.text, fontSize: 14, outline: "none", boxSizing: "border-box", fontFamily: "inherit" };
 
   return (
@@ -128,7 +142,7 @@ export function AdminTeamPage({ admin: currentAdmin, dark, t }) {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
           <div>
             <div className="adm-title" style={{ color: t.text }}>Team</div>
-            <div className="adm-subtitle" style={{ color: t.textMuted }}>Manage admin accounts and roles</div>
+            <div className="adm-subtitle" style={{ color: t.textMuted }}>{admins.length} members · Manage roles, permissions & passwords</div>
           </div>
           <div style={{ display: "flex", gap: 8 }}>
             <button onClick={() => { setShowGuide(!showGuide); if (!showGuide) setShowAdd(false); }} className="adm-btn-sm" style={{ borderColor: t.cardBorder, color: t.accent }}>{showGuide ? "Hide Guide" : "Role Guide"}</button>
@@ -138,20 +152,20 @@ export function AdminTeamPage({ admin: currentAdmin, dark, t }) {
         <div className="page-divider" style={{ background: t.cardBorder }} />
       </div>
 
-      {/* Role Guide */}
+      {msg && <div style={{ padding: "8px 14px", borderRadius: 8, marginTop: 12, fontSize: 13, background: msg.type === "success" ? (dark ? "rgba(110,231,183,.08)" : "#ecfdf5") : (dark ? "rgba(220,38,38,.08)" : "#fef2f2"), color: msg.type === "success" ? (dark ? "#6ee7b7" : "#059669") : (dark ? "#fca5a5" : "#dc2626"), display: "flex", justifyContent: "space-between", alignItems: "center" }}><span>{msg.type === "success" ? "✓" : "⚠️"} {msg.text}</span><button onClick={() => setMsg(null)} style={{ background: "none", color: "inherit", border: "none", fontSize: 15, cursor: "pointer" }}>✕</button></div>}
+
       {showGuide && (
         <div className="adm-card" style={{ background: dark ? "rgba(255,255,255,.06)" : "rgba(255,255,255,.95)", borderWidth: 1, borderStyle: "solid", borderColor: dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)", padding: 18, marginTop: 16, marginBottom: 16, boxShadow: dark ? "0 4px 20px rgba(0,0,0,.25)" : "0 4px 20px rgba(0,0,0,.04)", borderRadius: 14 }}>
           <div style={{ fontSize: 14, fontWeight: 600, color: t.text, marginBottom: 14 }}>Role Permissions</div>
           {Object.entries(ROLE_INFO).map(([role, info], idx, arr) => (
             <div key={role} style={{ display: "flex", gap: 12, alignItems: "flex-start", marginBottom: idx < arr.length - 1 ? 12 : 0, paddingBottom: idx < arr.length - 1 ? 12 : 0, borderBottom: idx < arr.length - 1 ? `1px solid ${t.cardBorder}` : "none" }}>
-              <span className="m" style={{ fontSize: 11, padding: "2px 8px", borderRadius: 4, fontWeight: 600, background: `${info.color}20`, color: info.color, textTransform: "capitalize", flexShrink: 0, marginTop: 1 }}>{role === "owner" ? "👑 owner" : role}</span>
+              <span className="m" style={{ fontSize: 11, padding: "2px 8px", borderRadius: 4, fontWeight: 600, background: `${info.color}20`, color: info.color, textTransform: "capitalize", flexShrink: 0 }}>{role === "owner" ? "👑 owner" : role}</span>
               <span style={{ fontSize: 13, color: t.textMuted, lineHeight: 1.5 }}>{info.desc}</span>
             </div>
           ))}
         </div>
       )}
 
-      {/* Add admin form */}
       {showAdd && (
         <div className="adm-card" style={{ background: dark ? "rgba(255,255,255,.06)" : "rgba(255,255,255,.95)", borderWidth: 1, borderStyle: "solid", borderColor: dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)", padding: 18, marginTop: 16, marginBottom: 16, boxShadow: dark ? "0 4px 20px rgba(0,0,0,.25)" : "0 4px 20px rgba(0,0,0,.04)", borderRadius: 14 }}>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
@@ -166,44 +180,104 @@ export function AdminTeamPage({ admin: currentAdmin, dark, t }) {
               </div>
             </div>
           </div>
-          <button onClick={createAdmin} className="adm-btn-primary" style={{ opacity: newName && newEmail && newPw ? 1 : .4 }}>Create Admin</button>
+          <button onClick={createAdmin} disabled={saving} className="adm-btn-primary" style={{ opacity: newName && newEmail && newPw && !saving ? 1 : .4 }}>{saving ? "Creating..." : "Create Admin"}</button>
         </div>
       )}
 
-      {/* Team list */}
       <div className="adm-card" style={{ background: dark ? "rgba(255,255,255,.06)" : "rgba(255,255,255,.95)", borderWidth: 1, borderStyle: "solid", borderColor: dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)", boxShadow: dark ? "0 4px 20px rgba(0,0,0,.25)" : "0 4px 20px rgba(0,0,0,.04)", marginTop: showAdd || showGuide ? 0 : 16 }}>
-        {loading ? (
-          <div className="adm-empty" style={{ color: t.textMuted }}>Loading team...</div>
-        ) : admins.map((a, i) => {
-          const owner = isOwner(a);
-          const roleInfo = ROLE_INFO[a.role] || { color: "#888" };
+        {loading ? <div className="adm-empty" style={{ color: t.textMuted }}>Loading team...</div> : admins.map((a, i) => {
+          const owner = a.role === "owner";
+          const ri = ROLE_INFO[a.role] || { color: "#888" };
+          const expanded = expandedId === a.id && !owner && canManage;
+          const hasCustom = a.customPages !== null && !owner && a.role !== "superadmin";
+          const pages = expanded && localPages !== null ? localPages : (a.customPages || DEFAULT_PAGES[a.role] || []);
+
           return (
-            <div key={a.id} className="adm-list-row" style={{ borderBottom: i < admins.length - 1 ? `1px solid ${t.cardBorder}` : "none", flexWrap: "wrap", gap: 10 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 10, flex: 1, minWidth: 180 }}>
-                <div className="adm-user-avatar" style={{ background: roleInfo.color }}>{(a.name || "A")[0]}</div>
-                <div>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <span style={{ fontSize: 14, fontWeight: 500, color: t.text }}>{a.name}</span>
-                    <span className="m" style={{ fontSize: 11, padding: "1px 6px", borderRadius: 4, fontWeight: 600, background: `${roleInfo.color}20`, color: roleInfo.color, textTransform: "capitalize" }}>{a.role}</span>
-                    {owner && <span style={{ fontSize: 11 }}>👑</span>}
-                    {a.status !== "Active" && <span style={{ fontSize: 11, padding: "1px 6px", borderRadius: 4, background: dark ? "rgba(252,165,165,.1)" : "rgba(220,38,38,.06)", color: dark ? "#fca5a5" : "#dc2626", fontWeight: 600 }}>Inactive</span>}
+            <div key={a.id} style={{ borderBottom: i < admins.length - 1 ? `1px solid ${t.cardBorder}` : "none" }}>
+              <div onClick={() => { if (!owner && canManage) { if (expanded) { setExpandedId(null); } else { setExpandedId(a.id); setPermTab("permissions"); setResetPw(""); setLocalPages(null); setMsg(null); } } }} style={{ padding: "12px 16px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, flexWrap: "wrap", cursor: owner || !canManage ? "default" : "pointer", background: expanded ? (dark ? "rgba(196,125,142,.03)" : "rgba(196,125,142,.02)") : "transparent" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10, flex: 1, minWidth: 180 }}>
+                  <div className="adm-user-avatar" style={{ background: ri.color }}>{(a.name || "A")[0]}</div>
+                  <div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+                      <span style={{ fontSize: 14, fontWeight: 500, color: t.text }}>{a.name}</span>
+                      <span className="m" style={{ fontSize: 11, padding: "1px 6px", borderRadius: 4, fontWeight: 600, background: `${ri.color}20`, color: ri.color, textTransform: "capitalize" }}>{a.role}</span>
+                      {owner && <span style={{ fontSize: 11 }}>👑</span>}
+                      {hasCustom && <span style={{ fontSize: 10, padding: "1px 5px", borderRadius: 4, background: dark ? "rgba(196,125,142,.12)" : "rgba(196,125,142,.06)", color: t.accent, fontWeight: 600 }}>custom</span>}
+                      {a.status !== "Active" && <span style={{ fontSize: 11, padding: "1px 6px", borderRadius: 4, background: dark ? "rgba(252,165,165,.1)" : "rgba(220,38,38,.06)", color: dark ? "#fca5a5" : "#dc2626", fontWeight: 600 }}>Inactive</span>}
+                    </div>
+                    <div style={{ fontSize: 13, color: t.textMuted, marginTop: 1 }}>{a.email}</div>
                   </div>
-                  <div style={{ fontSize: 13, color: t.textMuted, marginTop: 1 }}>{a.email}</div>
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <span style={{ fontSize: 12, color: t.textMuted }}>{a.lastActive ? fD(a.lastActive) : "Never"}</span>
+                  {owner ? <span style={{ fontSize: 12, color: t.textMuted, fontStyle: "italic" }}>Protected</span> : canManage ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={t.textMuted} strokeWidth="2" strokeLinecap="round" style={{ transform: expanded ? "rotate(180deg)" : "none", transition: "transform .2s" }}><polyline points="6 9 12 15 18 9" /></svg> : null}
                 </div>
               </div>
-              <div style={{ display: "flex", gap: 4, alignItems: "center", flexWrap: "wrap" }}>
-                <span style={{ fontSize: 12, color: t.textMuted }}>Last active: {a.lastActive ? fD(a.lastActive) : "Never"}</span>
-                {owner ? (
-                  <span style={{ fontSize: 12, color: t.textMuted, fontStyle: "italic", padding: "0 8px" }}>Protected</span>
-                ) : canManage ? (
-                  <>
-                    <select value={a.role} onChange={e => changeRole(a.id, e.target.value)} style={{ padding: "3px 8px", borderRadius: 6, background: dark ? "#0d1020" : "#fff", borderWidth: 1, borderStyle: "solid", borderColor: t.cardBorder, color: t.text, fontSize: 13, outline: "none" }}>
-                      {ASSIGNABLE_ROLES.map(r => <option key={r} value={r}>{r}</option>)}
-                    </select>
-                    <button onClick={async () => { const ok = await confirm({ title: a.status === "Active" ? "Deactivate Admin" : "Activate Admin", message: a.status === "Active" ? `Deactivate ${a.name}? They will lose admin access.` : `Reactivate ${a.name}'s admin access?`, confirmLabel: a.status === "Active" ? "Deactivate" : "Activate", danger: a.status === "Active" }); if (ok) toggleStatus(a.id); }} className="adm-btn-sm" style={{ borderColor: t.cardBorder, color: a.status === "Active" ? (dark ? "#fca5a5" : "#dc2626") : (dark ? "#6ee7b7" : "#059669") }}>{a.status === "Active" ? "Deactivate" : "Activate"}</button>
-                  </>
-                ) : null}
-              </div>
+
+              {expanded && (
+                <div style={{ padding: "0 16px 16px", background: dark ? "rgba(0,0,0,.15)" : "rgba(0,0,0,.02)" }}>
+                  <div style={{ display: "flex", gap: 4, marginBottom: 14, background: dark ? "rgba(255,255,255,.04)" : "rgba(0,0,0,.03)", borderRadius: 8, padding: 3 }}>
+                    {[["permissions","🔐 Permissions"],["password","🔑 Password"],["role","🏷️ Role"]].map(([id, label]) => (
+                      <button key={id} onClick={e => { e.stopPropagation(); setPermTab(id); }} style={{ flex: 1, padding: "7px 0", borderRadius: 6, fontSize: 12, fontWeight: permTab === id ? 600 : 430, background: permTab === id ? (dark ? "rgba(196,125,142,.15)" : "rgba(196,125,142,.08)") : "transparent", color: permTab === id ? t.accent : t.textMuted, border: "none", cursor: "pointer" }}>{label}</button>
+                    ))}
+                  </div>
+
+                  {permTab === "permissions" && (a.role !== "superadmin" ? (
+                    <div>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+                        <span style={{ fontSize: 12, color: t.textSoft }}>{pages.length} of {ALL_PAGES.length} pages enabled</span>
+                        {(localPages !== null || a.customPages !== null) && <button onClick={e => { e.stopPropagation(); setLocalPages(null); act({ action: "updatePermissions", adminId: a.id, pages: null }).then(() => setMsg({ type: "success", text: "Reset to default" })); }} style={{ fontSize: 11, color: t.textMuted, background: "none", border: "none", cursor: "pointer", textDecoration: "underline" }}>Reset to default</button>}
+                      </div>
+                      {PAGE_GROUPS.map(group => (
+                        <div key={group} style={{ marginBottom: 12 }}>
+                          <div style={{ fontSize: 10, fontWeight: 600, color: t.accent, textTransform: "uppercase", letterSpacing: 1, marginBottom: 6 }}>{group}</div>
+                          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 4 }}>
+                            {ALL_PAGES.filter(p => p.g === group).map(page => {
+                              const enabled = pages.includes(page.id);
+                              const defEnabled = (DEFAULT_PAGES[a.role] || []).includes(page.id);
+                              const customized = (localPages !== null || a.customPages !== null) && enabled !== defEnabled;
+                              return (
+                                <button key={page.id} onClick={e => { e.stopPropagation(); const next = enabled ? pages.filter(p => p !== page.id) : [...pages, page.id]; setLocalPages(next); }} style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 10px", borderRadius: 8, borderWidth: 1, borderStyle: "solid", borderColor: enabled ? t.accent : t.cardBorder, background: enabled ? (dark ? "rgba(196,125,142,.08)" : "rgba(196,125,142,.04)") : "transparent", cursor: "pointer", textAlign: "left" }}>
+                                  <div style={{ width: 14, height: 14, borderRadius: 4, borderWidth: 1.5, borderStyle: "solid", borderColor: enabled ? t.accent : t.textMuted, background: enabled ? t.accent : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                    {enabled && <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>}
+                                  </div>
+                                  <span style={{ fontSize: 12, color: enabled ? t.text : t.textMuted, fontWeight: enabled ? 500 : 400 }}>{page.label}</span>
+                                  {customized && <span style={{ width: 5, height: 5, borderRadius: "50%", background: t.accent, flexShrink: 0 }} />}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      ))}
+                      <button onClick={e => { e.stopPropagation(); act({ action: "updatePermissions", adminId: a.id, pages: localPages || pages }).then(ok => { if (ok) { setMsg({ type: "success", text: "Permissions saved" }); setLocalPages(null); } }); }} disabled={saving} className="adm-btn-primary" style={{ width: "100%", marginTop: 4, opacity: saving ? .5 : 1 }}>{saving ? "Saving..." : "Save Permissions"}</button>
+                    </div>
+                  ) : <div style={{ padding: "16px 0", textAlign: "center", color: t.textMuted, fontSize: 13 }}>Superadmin has full access. No customization needed.</div>)}
+
+                  {permTab === "password" && (
+                    <div>
+                      <div style={{ fontSize: 13, color: t.textMuted, marginBottom: 12, lineHeight: 1.6 }}>Set a new password for <strong style={{ color: t.text }}>{a.name}</strong>.</div>
+                      <div style={{ marginBottom: 12 }}>
+                        <label style={{ fontSize: 11, color: t.textMuted, fontWeight: 600, display: "block", marginBottom: 4, textTransform: "uppercase", letterSpacing: 1 }}>New Password</label>
+                        <input type="password" placeholder="Min. 6 characters" value={resetPw} onChange={e => setResetPw(e.target.value)} onClick={e => e.stopPropagation()} style={inputStyle} />
+                      </div>
+                      <button onClick={e => { e.stopPropagation(); act({ action: "resetPassword", adminId: a.id, newPassword: resetPw }).then(ok => { if (ok) { setMsg({ type: "success", text: `Password reset for ${a.name}` }); setResetPw(""); } }); }} disabled={resetPw.length < 6 || saving} className="adm-btn-primary" style={{ width: "100%", opacity: resetPw.length >= 6 && !saving ? 1 : .4 }}>{saving ? "Resetting..." : "Reset Password"}</button>
+                    </div>
+                  )}
+
+                  {permTab === "role" && (
+                    <div>
+                      <div style={{ fontSize: 13, color: t.textMuted, marginBottom: 12, lineHeight: 1.6 }}>Change <strong style={{ color: t.text }}>{a.name}</strong>'s role. Custom permissions are preserved.</div>
+                      <div style={{ display: "flex", gap: 6, marginBottom: 14, flexWrap: "wrap" }}>
+                        {ASSIGNABLE_ROLES.map(r => {
+                          const ri2 = ROLE_INFO[r]; const active = a.role === r;
+                          return <button key={r} onClick={e => { e.stopPropagation(); act({ action: "updateRole", adminId: a.id, role: r }).then(ok => { if (ok) setMsg({ type: "success", text: `${a.name} is now ${r}` }); }); }} style={{ padding: "8px 16px", borderRadius: 8, borderWidth: active ? 2 : 1, borderStyle: "solid", borderColor: active ? ri2.color : t.cardBorder, background: active ? `${ri2.color}15` : "transparent", color: active ? ri2.color : t.textMuted, fontSize: 13, fontWeight: active ? 600 : 430, cursor: "pointer", textTransform: "capitalize" }}>{r}</button>;
+                        })}
+                      </div>
+                      <button onClick={async e => { e.stopPropagation(); const ok = await confirm({ title: a.status === "Active" ? "Deactivate Admin" : "Activate Admin", message: a.status === "Active" ? `Deactivate ${a.name}?` : `Reactivate ${a.name}?`, confirmLabel: a.status === "Active" ? "Deactivate" : "Activate", danger: a.status === "Active" }); if (ok) { const r = await act({ action: "toggleStatus", adminId: a.id }); if (r) setMsg({ type: "success", text: `${a.name} ${r.status === "Active" ? "activated" : "deactivated"}` }); } }} className="adm-btn-sm" style={{ borderColor: t.cardBorder, color: a.status === "Active" ? (dark ? "#fca5a5" : "#dc2626") : (dark ? "#6ee7b7" : "#059669") }}>{a.status === "Active" ? "Deactivate" : "Activate"}</button>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           );
         })}
@@ -212,7 +286,6 @@ export function AdminTeamPage({ admin: currentAdmin, dark, t }) {
   );
 }
 
-/* ═══════════════════════════════════════════ */
 /* ═══ COUPONS                             ═══ */
 /* ═══════════════════════════════════════════ */
 export function AdminCouponsPage({ dark, t }) {
