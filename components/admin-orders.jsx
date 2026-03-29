@@ -46,14 +46,20 @@ export default function AdminOrdersPage({ dark, t }) {
   const counts = { all: orders.length };
   ["Completed", "Processing", "Pending", "Partial", "Canceled"].forEach(s => { counts[s] = orders.filter(o => o.status === s).length; });
 
+  const [msg, setMsg] = useState(null);
+
   const doAction = async (orderId, action) => {
+    setMsg(null);
     try {
       const res = await fetch("/api/admin/orders", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action, orderId }) });
       const data = await res.json();
-      if (data.success && data.status) {
+      if (!res.ok) { setMsg({ type: "error", text: data.error || "Action failed" }); return; }
+      if (data.status) {
         setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: data.status } : o));
       }
-    } catch {}
+      const label = action === "check" ? `Status: ${data.status || "unknown"}${data.remains != null ? ` · ${data.remains} remaining` : ""}` : action === "cancel" ? "Order cancelled" : "Refill requested";
+      setMsg({ type: "success", text: `${orderId} — ${label}` });
+    } catch { setMsg({ type: "error", text: "Request failed" }); }
   };
 
   return (
@@ -63,6 +69,8 @@ export default function AdminOrdersPage({ dark, t }) {
         <div className="adm-subtitle" style={{ color: t.textMuted }}>{orders.length} total orders</div>
         <div className="page-divider" style={{ background: t.cardBorder }} />
       </div>
+
+      {msg && <div style={{ padding: "8px 14px", borderRadius: 8, marginBottom: 12, fontSize: 13, background: msg.type === "success" ? (dark ? "rgba(110,231,183,.08)" : "#ecfdf5") : (dark ? "rgba(220,38,38,.08)" : "#fef2f2"), color: msg.type === "success" ? (dark ? "#6ee7b7" : "#059669") : (dark ? "#fca5a5" : "#dc2626"), display: "flex", justifyContent: "space-between", alignItems: "center" }}><span>{msg.type === "success" ? "✓" : "⚠️"} {msg.text}</span><button onClick={() => setMsg(null)} style={{ background: "none", color: "inherit", border: "none", cursor: "pointer" }}>✕</button></div>}
 
       {/* Filters */}
       <div className="adm-filters">
