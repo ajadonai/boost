@@ -8,6 +8,7 @@ import ServicesPage, { ServicesSidebar } from "./services-page";
 import SettingsPage, { SettingsSidebar } from "./settings-page";
 import SupportPage, { SupportSidebar } from "./support-page";
 import AddFundsPage, { AddFundsSidebar } from "./addfunds-page";
+import HowToPage, { HowToSidebar } from "./howto-page";
 import { ToastProvider } from "./toast";
 import { ConfirmProvider } from "./confirm-dialog";
 
@@ -30,6 +31,7 @@ const NAV_ITEMS = [
   { id: "new-order", label: "New Order" },
   { id: "orders", label: "Orders" },
   { id: "add-funds", label: "Add Funds" },
+  { id: "how-to", label: "How To" },
   { id: "services", label: "Services" },
   { id: "referrals", label: "Referrals" },
   { id: "support", label: "Support" },
@@ -353,6 +355,7 @@ function DashboardInner() {
   const isSettings = active === "settings";
   const isSupport = active === "support";
   const isAddFunds = active === "add-funds";
+  const isHowTo = active === "how-to";
   const noHasOrder = noSelSvc && noSelTier;
 
   /* Services page state */
@@ -543,6 +546,8 @@ function DashboardInner() {
         return <SupportPage dark={dark} t={t} tickets={[]} />;
       case "add-funds":
         return <AddFundsPage user={user} dark={dark} t={t} paymentStatus={paymentStatus} setPaymentStatus={setPaymentStatus} />;
+      case "how-to":
+        return <HowToPage dark={dark} t={t} />;
       default:
         return (
           <div className="dash-placeholder" style={{ background: t.cardBg, borderWidth: 1, borderStyle: "solid", borderColor: t.cardBorder }}>
@@ -711,6 +716,8 @@ function DashboardInner() {
             <SupportSidebar dark={dark} t={t} tickets={[]} />
           ) : isAddFunds ? (
             <AddFundsSidebar user={user} txs={txs} dark={dark} t={t} />
+          ) : isHowTo ? (
+            <HowToSidebar dark={dark} t={t} />
           ) : (
             <RightSidebar orders={orders} user={user} dark={dark} t={t} />
           )}
