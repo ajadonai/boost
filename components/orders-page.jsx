@@ -54,7 +54,8 @@ function Pagination({ total, page, setPage, perPage, setPerPage, t }) {
 /* ═══════════════════════════════════════════ */
 /* ═══ ORDERS PAGE                         ═══ */
 /* ═══════════════════════════════════════════ */
-export default function OrdersPage({ orders, txs, dark, t }) {
+export default function OrdersPage({ orders: initialOrders, txs, dark, t }) {
+  const [orders, setOrders] = useState(initialOrders);
   const [tab, setTab] = useState("orders");
   const [filter, setFilter] = useState("all");
   const [search, setSearch] = useState("");
@@ -62,6 +63,29 @@ export default function OrdersPage({ orders, txs, dark, t }) {
   const [expanded, setExpanded] = useState(null);
   const [oPage, setOPage] = useState(1);
   const [tPage, setTPage] = useState(1);
+  const [actionLoading, setActionLoading] = useState(null);
+  const [msg, setMsg] = useState(null);
+
+  useEffect(() => { setOrders(initialOrders); }, [initialOrders]);
+
+  const doAction = async (orderId, action) => {
+    setActionLoading(orderId); setMsg(null);
+    try {
+      const res = await fetch("/api/orders", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action, orderId }) });
+      const data = await res.json();
+      if (!res.ok) { setMsg({ type: "error", text: data.error || "Action failed" }); setActionLoading(null); return; }
+      if (action === "check") {
+        if (data.status) setOrders(prev => prev.map(o => (o.id === orderId ? { ...o, status: data.status } : o)));
+        setMsg({ type: "success", text: `Status: ${data.status}${data.remains != null ? ` · ${data.remains} remaining` : ""}` });
+      } else if (action === "cancel") {
+        setOrders(prev => prev.map(o => (o.id === orderId ? { ...o, status: "Canceled" } : o)));
+        setMsg({ type: "success", text: `Order cancelled${data.refunded ? ` · ₦${data.refunded.toLocaleString()} refunded` : ""}` });
+      } else if (action === "reorder") {
+        setMsg({ type: "success", text: `Reorder placed! ${data.order?.id || ""}` });
+      }
+    } catch { setMsg({ type: "error", text: "Request failed" }); }
+    setActionLoading(null);
+  };
 
   /* Per-page preference from localStorage */
   const [perPage, setPerPage] = useState(10);
@@ -90,6 +114,8 @@ export default function OrdersPage({ orders, txs, dark, t }) {
         <div className="ord-subtitle" style={{ color: t.textMuted }}>Track your orders and transactions</div>
         <div className="page-divider" style={{ background: t.cardBorder }} />
       </div>
+
+      {msg && <div style={{ padding: "8px 14px", borderRadius: 8, marginBottom: 10, fontSize: 13, background: msg.type === "success" ? (dark ? "rgba(110,231,183,.08)" : "#ecfdf5") : (dark ? "rgba(220,38,38,.08)" : "#fef2f2"), color: msg.type === "success" ? (dark ? "#6ee7b7" : "#059669") : (dark ? "#fca5a5" : "#dc2626"), display: "flex", justifyContent: "space-between", alignItems: "center" }}><span>{msg.type === "success" ? "✓" : "⚠️"} {msg.text}</span><button onClick={() => setMsg(null)} style={{ background: "none", color: "inherit", border: "none", cursor: "pointer" }}>✕</button></div>}
 
       {/* Tab switcher */}
       <div className="ord-tabs" style={{ background: dark ? "rgba(255,255,255,.04)" : "rgba(0,0,0,.03)", borderColor: t.cardBorder }}>
@@ -160,13 +186,13 @@ export default function OrdersPage({ orders, txs, dark, t }) {
                   </div>
                   {(o.status === "Processing" || o.status === "Pending") && (
                     <div className="ord-actions">
-                      <button className="m ord-action-btn" style={{ borderColor: t.cardBorder, color: t.textSoft }}>Check Status</button>
-                      <button className="m ord-action-btn" style={{ borderColor: dark ? "rgba(252,165,165,.2)" : "rgba(220,38,38,.15)", color: dark ? "#fca5a5" : "#dc2626" }}>Cancel</button>
+                      <button onClick={() => doAction(o.id, "check")} disabled={actionLoading === o.id} className="m ord-action-btn" style={{ borderColor: t.cardBorder, color: t.textSoft }}>{actionLoading === o.id ? "..." : "Check Status"}</button>
+                      <button onClick={() => { if (confirm(`Cancel order ${o.id}? Your wallet will be refunded.`)) doAction(o.id, "cancel"); }} disabled={actionLoading === o.id} className="m ord-action-btn" style={{ borderColor: dark ? "rgba(252,165,165,.2)" : "rgba(220,38,38,.15)", color: dark ? "#fca5a5" : "#dc2626" }}>Cancel</button>
                     </div>
                   )}
                   {o.status === "Completed" && (
                     <div className="ord-actions">
-                      <button className="m ord-action-btn" style={{ borderColor: t.cardBorder, color: t.textSoft }}>Reorder</button>
+                      <button onClick={() => { if (confirm(`Reorder ${o.service}? ₦${o.charge?.toLocaleString()} will be charged.`)) doAction(o.id, "reorder"); }} disabled={actionLoading === o.id} className="m ord-action-btn" style={{ borderColor: t.cardBorder, color: t.accent }}>{actionLoading === o.id ? "..." : "Reorder"}</button>
                     </div>
                   )}
                 </div>
