@@ -31,7 +31,7 @@ export default function HowToPage({ dark, t }) {
           <div style={{ fontSize: 48, marginBottom: 16, opacity: .4 }}>📖</div>
           <div style={{ fontSize: 16, fontWeight: 600, color: t.text, marginBottom: 6 }}>Tutorials coming soon</div>
           <div style={{ fontSize: 13, color: t.textMuted, marginBottom: 16 }}>We're working on guides to help you get the most out of Nitro.</div>
-          <a href="https://blog.nitro.ng" target="_blank" rel="noopener" style={{ fontSize: 13, fontWeight: 600, color: t.accent, textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 4 }}>
+          <a href="/blog" target="_blank" rel="noopener" style={{ fontSize: 13, fontWeight: 600, color: t.accent, textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 4 }}>
             Visit our blog
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
           </a>
@@ -71,7 +71,7 @@ export default function HowToPage({ dark, t }) {
           ))}
         </div>
         <div style={{ marginTop: 20, textAlign: "center" }}>
-          <a href="https://blog.nitro.ng" target="_blank" rel="noopener" style={{ fontSize: 13, fontWeight: 600, color: t.accent, textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 4 }}>
+          <a href="/blog" target="_blank" rel="noopener" style={{ fontSize: 13, fontWeight: 600, color: t.accent, textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 4 }}>
             View all posts on our blog
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
           </a>
@@ -92,7 +92,7 @@ export function HowToSidebar({ dark, t }) {
       <div style={{ padding: "12px 14px", borderRadius: 10, background: dark ? "rgba(196,125,142,.06)" : "rgba(196,125,142,.04)", borderWidth: 1, borderStyle: "solid", borderColor: dark ? "rgba(196,125,142,.12)" : "rgba(196,125,142,.08)" }}>
         <div style={{ fontSize: 13, fontWeight: 600, color: t.text, marginBottom: 4 }}>Need more help?</div>
         <div style={{ fontSize: 12, color: t.textMuted, lineHeight: 1.5, marginBottom: 10 }}>Visit our full blog for more guides, tips, and updates.</div>
-        <a href="https://blog.nitro.ng" target="_blank" rel="noopener" style={{ fontSize: 12, fontWeight: 600, color: "#c47d8e", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 4 }}>
+        <a href="/blog" target="_blank" rel="noopener" style={{ fontSize: 12, fontWeight: 600, color: "#c47d8e", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 4 }}>
           Visit blog
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
         </a>
