@@ -1403,7 +1403,7 @@ input { font-family: inherit; }
   .s3-deposit-title { font-size: 14px; }
   .s3-deposit-desc { font-size: 13px; }
   /* Section 4 mobile */
-  .s4 { padding: 40px 0; }
+  .s4 { padding: 40px 0; min-height: auto; }
   .s4-header { margin-bottom: 24px; padding: 0 20px; }
   .s4-label { font-size: 11px; margin-bottom: 10px; }
   .s4-heading { font-size: 26px; margin-bottom: 4px; }
