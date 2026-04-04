@@ -153,6 +153,29 @@ function LandingInner(){
             <div style={{position:"absolute",top:"-8%",left:"25%",width:500,height:400,borderRadius:"50%",background:dark?"rgba(196,125,142,.06)":"rgba(255,255,255,.08)",filter:"blur(100px)",animation:"float1 20s ease-in-out infinite"}}/>
             <div style={{position:"absolute",bottom:"5%",right:"10%",width:250,height:250,borderRadius:"50%",background:dark?"rgba(110,160,230,.04)":"rgba(255,255,255,.06)",filter:"blur(80px)",animation:"float2 25s ease-in-out infinite"}}/>
             {[["12%","20%",4,0],["22%","70%",3,1.2],["55%","12%",3,.6],["45%","85%",5,1.8],["75%","30%",3,2.4],["65%","65%",4,.9],["30%","45%",3,1.5],["85%","55%",4,2]].map(([top,left,s,d],i)=><div key={i} className="hero-particle" style={{position:"absolute",top,left,width:s,height:s,borderRadius:"50%",background:dark?"rgba(196,125,142,.2)":"rgba(255,255,255,.2)",animation:`float3 ${3.5+i*.5}s ease-in-out infinite ${d}s`}}/>)}
+            {/* Social network constellation */}
+            <svg className="hero-constellation" style={{position:"absolute",right:0,top:0,width:"60%",height:"100%",opacity:dark?.6:.5}} viewBox="0 0 600 420" preserveAspectRatio="xMidYMid slice" fill="none">
+              <line x1="180" y1="80" x2="280" y2="140" stroke={dark?"rgba(196,125,142,.06)":"rgba(255,255,255,.1)"} strokeWidth="1"/>
+              <line x1="280" y1="140" x2="400" y2="100" stroke={dark?"rgba(196,125,142,.05)":"rgba(255,255,255,.08)"} strokeWidth="1"/>
+              <line x1="400" y1="100" x2="500" y2="180" stroke={dark?"rgba(196,125,142,.06)":"rgba(255,255,255,.1)"} strokeWidth="1"/>
+              <line x1="250" y1="250" x2="350" y2="300" stroke={dark?"rgba(196,125,142,.05)":"rgba(255,255,255,.08)"} strokeWidth="1"/>
+              <line x1="350" y1="300" x2="480" y2="260" stroke={dark?"rgba(196,125,142,.06)":"rgba(255,255,255,.1)"} strokeWidth="1"/>
+              <line x1="180" y1="80" x2="250" y2="250" stroke={dark?"rgba(196,125,142,.03)":"rgba(255,255,255,.05)"} strokeWidth="1"/>
+              <line x1="400" y1="100" x2="350" y2="300" stroke={dark?"rgba(196,125,142,.03)":"rgba(255,255,255,.05)"} strokeWidth="1"/>
+              <g opacity={dark?"0.07":"0.12"}><rect x="160" y="60" width="40" height="40" rx="10" stroke={dark?"rgba(196,125,142,.5)":"rgba(255,255,255,.5)"} strokeWidth="1"/><rect x="168" y="68" width="24" height="24" rx="6" stroke={dark?"rgba(196,125,142,.5)":"rgba(255,255,255,.5)"} strokeWidth=".8"/><circle cx="184" cy="80" r="5" stroke={dark?"rgba(196,125,142,.5)":"rgba(255,255,255,.5)"} strokeWidth=".8"/><circle cx="188" cy="73" r="1.5" fill={dark?"rgba(196,125,142,.5)":"rgba(255,255,255,.5)"}/></g>
+              <g opacity={dark?"0.06":"0.1"}><rect x="380" y="80" width="40" height="40" rx="10" stroke={dark?"rgba(110,231,183,.5)":"rgba(255,255,255,.5)"} strokeWidth="1"/><path d="M393 93 L400 100 L407 93 L407 107 L393 107 Z" stroke={dark?"rgba(110,231,183,.5)":"rgba(255,255,255,.5)"} strokeWidth=".8"/></g>
+              <g opacity={dark?"0.06":"0.1"}><rect x="260" y="120" width="40" height="40" rx="10" stroke={dark?"rgba(165,180,252,.5)":"rgba(255,255,255,.5)"} strokeWidth="1"/><circle cx="280" cy="140" r="10" stroke={dark?"rgba(165,180,252,.5)":"rgba(255,255,255,.5)"} strokeWidth=".8"/><polygon points="277,136 285,140 277,144" fill={dark?"rgba(165,180,252,.5)":"rgba(255,255,255,.5)"}/></g>
+              <g opacity={dark?"0.05":"0.08"}><rect x="480" y="160" width="40" height="40" rx="10" stroke={dark?"rgba(251,191,36,.4)":"rgba(255,255,255,.4)"} strokeWidth="1"/><circle cx="500" cy="180" r="8" stroke={dark?"rgba(251,191,36,.4)":"rgba(255,255,255,.4)"} strokeWidth=".8"/><path d="M497 175 L497 183 M493 179 L501 179" stroke={dark?"rgba(251,191,36,.4)":"rgba(255,255,255,.4)"} strokeWidth=".8"/></g>
+              <g opacity={dark?"0.04":"0.07"}><rect x="230" y="230" width="40" height="40" rx="10" stroke={dark?"rgba(196,125,142,.5)":"rgba(255,255,255,.4)"} strokeWidth="1"/><path d="M243 243 C243 238 250 234 250 243 C250 234 257 238 257 243 C257 250 250 255 250 255 C250 255 243 250 243 243" stroke={dark?"rgba(196,125,142,.5)":"rgba(255,255,255,.4)"} strokeWidth=".8"/></g>
+              <g opacity={dark?"0.04":"0.07"}><rect x="330" y="280" width="40" height="40" rx="10" stroke={dark?"rgba(110,231,183,.4)":"rgba(255,255,255,.4)"} strokeWidth="1"/><path d="M343 295 L350 300 L357 295 M343 305 L350 300 L357 305" stroke={dark?"rgba(110,231,183,.4)":"rgba(255,255,255,.4)"} strokeWidth=".8"/></g>
+              <circle cx="180" cy="80" r="3" fill={dark?"rgba(196,125,142,.15)":"rgba(255,255,255,.15)"}/>
+              <circle cx="280" cy="140" r="3" fill={dark?"rgba(165,180,252,.12)":"rgba(255,255,255,.12)"}/>
+              <circle cx="400" cy="100" r="3" fill={dark?"rgba(110,231,183,.12)":"rgba(255,255,255,.12)"}/>
+              <circle cx="500" cy="180" r="3" fill={dark?"rgba(251,191,36,.1)":"rgba(255,255,255,.1)"}/>
+              <circle cx="250" cy="250" r="2" fill={dark?"rgba(196,125,142,.1)":"rgba(255,255,255,.1)"}/>
+              <circle cx="350" cy="300" r="2" fill={dark?"rgba(110,231,183,.08)":"rgba(255,255,255,.08)"}/>
+              <circle cx="320" cy="160" r="180" fill={dark?"rgba(196,125,142,.015)":"rgba(255,255,255,.03)"}/>
+            </svg>
           </div>
 
           <div className="hero-split">
