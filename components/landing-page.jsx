@@ -48,6 +48,7 @@ function LandingInner(){
   const [siteStats,setSiteStats]=useState({users:"12K+",orders:"2M+"});
   const [promoBanner,setPromoBanner]=useState(null);
   const [siteAlerts,setSiteAlerts]=useState([]);
+  const [socialLinks,setSocialLinks]=useState({});
 
   const stepsHover=useRef(false);
   useEffect(()=>{const iv=setInterval(()=>{if(!stepsHover.current)setActiveStep(s=>(s+1)%4)},3500);return()=>clearInterval(iv);},[]);
@@ -55,7 +56,7 @@ function LandingInner(){
   const [logoutMsg,setLogoutMsg]=useState(false);
   const [googleError,setGoogleError]=useState(false);
   useEffect(()=>{const p=new URLSearchParams(window.location.search);if(p.get("login"))setModal("login");if(p.get("signup"))setModal("signup");if(p.get("ref"))setModal("signup");if(p.get("logout")){setLogoutMsg(true);window.history.replaceState({},"","/");setTimeout(()=>setLogoutMsg(false),4000);}if(p.get("google_error")){setGoogleError(true);window.history.replaceState({},"","/");setTimeout(()=>setGoogleError(false),5000);setModal("login");}},[]);
-  useEffect(()=>{(async()=>{try{const res=await fetch("/api/site-info");if(res.ok){const d=await res.json();if(d.stats)setSiteStats(d.stats);if(d.promo)setPromoBanner(d.promo);if(d.alerts?.length)setSiteAlerts(d.alerts);}}catch{}})();},[]);
+  useEffect(()=>{(async()=>{try{const [siRes,stRes]=await Promise.all([fetch("/api/site-info"),fetch("/api/settings")]);if(siRes.ok){const d=await siRes.json();if(d.stats)setSiteStats(d.stats);if(d.promo)setPromoBanner(d.promo);if(d.alerts?.length)setSiteAlerts(d.alerts);}if(stRes.ok){const d=await stRes.json();setSocialLinks(d.settings||{});}}catch{}})();},[]);
   const closeModal=useCallback(()=>setModal(null),[]);
 
   // Hero card auth handlers
@@ -465,8 +466,8 @@ function LandingInner(){
           <div className="s6-footer-bottom">
             <span className="s6-copyright" style={{color:dark?"#8a8680":"#777"}}>© 2026 Nitro. All rights reserved.</span>
             <div className="s6-social-icons">
-              <a href="https://instagram.com/Nitro.ng" target="_blank" rel="noopener" className="s6-sico" style={{color:dark?"#b0aca8":"#555"}}><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
-              <a href="https://x.com/TheNitroNG" target="_blank" rel="noopener" className="s6-sico" style={{color:dark?"#b0aca8":"#555"}}><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
+              {(socialLinks.social_instagram||"Nitro.ng")&&<a href={`https://instagram.com/${socialLinks.social_instagram||"Nitro.ng"}`} target="_blank" rel="noopener" className="s6-sico" style={{color:dark?"#b0aca8":"#555"}}><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>}
+              {(socialLinks.social_twitter||"TheNitroNG")&&<a href={`https://x.com/${socialLinks.social_twitter||"TheNitroNG"}`} target="_blank" rel="noopener" className="s6-sico" style={{color:dark?"#b0aca8":"#555"}}><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>}
               <a href="mailto:TheNitroNG@gmail.com" className="s6-sico" style={{color:dark?"#b0aca8":"#555"}}><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="22,6 12,13 2,6"/></svg></a>
             </div>
           </div>

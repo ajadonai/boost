@@ -5,6 +5,7 @@ import { calculateTierPrice, koboToNaira, marginPercent, getMarkupForTier, MARKU
 export default function AdminServiceGroupsPage({ dark, t }) {
   const [groups, setGroups] = useState([]);
   const [services, setServices] = useState([]);
+  const [markupSettings, setMarkupSettings] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
@@ -28,11 +29,20 @@ export default function AdminServiceGroupsPage({ dark, t }) {
 
   const load = async () => {
     try {
-      const res = await fetch("/api/admin/service-groups");
-      if (!res.ok) throw new Error("Failed to load");
-      const data = await res.json();
-      setGroups(data.groups || []);
-      setServices(data.services || []);
+      const [sgRes, stRes] = await Promise.all([
+        fetch("/api/admin/service-groups"),
+        fetch("/api/admin/settings"),
+      ]);
+      if (!sgRes.ok) throw new Error("Failed to load");
+      const sgData = await sgRes.json();
+      setGroups(sgData.groups || []);
+      setServices(sgData.services || []);
+      if (stRes.ok) {
+        const stData = await stRes.json();
+        const ms = {};
+        Object.entries(stData.settings || {}).filter(([k]) => k.startsWith("markup_")).forEach(([k, v]) => { ms[k] = v; });
+        setMarkupSettings(ms);
+      }
     } catch (e) { setError(e.message); }
     setLoading(false);
   };
@@ -148,7 +158,7 @@ export default function AdminServiceGroupsPage({ dark, t }) {
                 {tierSvcSearch && (
                   <div style={{ maxHeight: 150, overflowY: "auto", borderRadius: 8, border: `1px solid ${dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)"}` }}>
                     {filteredSvcs.map(s => (
-                      <div key={s.id} onClick={() => { setTierSvcId(s.id); setTierSvcSearch(s.name); const suggested = calculateTierPrice(s.costPer1k, tierLevel); setTierPrice((suggested / 100).toFixed(2)); }} style={{ padding: "6px 10px", fontSize: 12, color: tierSvcId === s.id ? "#c47d8e" : t.text, background: tierSvcId === s.id ? (dark ? "rgba(196,125,142,.08)" : "rgba(196,125,142,.04)") : "transparent", cursor: "pointer" }}>
+                      <div key={s.id} onClick={() => { setTierSvcId(s.id); setTierSvcSearch(s.name); const suggested = calculateTierPrice(s.costPer1k, tierLevel, markupSettings); setTierPrice((suggested / 100).toFixed(2)); }} style={{ padding: "6px 10px", fontSize: 12, color: tierSvcId === s.id ? "#c47d8e" : t.text, background: tierSvcId === s.id ? (dark ? "rgba(196,125,142,.08)" : "rgba(196,125,142,.04)") : "transparent", cursor: "pointer" }}>
                         <span style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 10, color: t.textMuted, marginRight: 6 }}>#{s.apiId}</span>
                         {s.name} <span style={{ color: t.textMuted, fontSize: 10 }}>— ₦{(s.costPer1k / 100).toFixed(2)}/1k</span>
                       </div>
@@ -171,8 +181,8 @@ export default function AdminServiceGroupsPage({ dark, t }) {
                 if (!svc) return null;
                 const cost = svc.costPer1k;
                 const sell = Math.round(Number(tierPrice) * 100);
-                const suggested = calculateTierPrice(cost, tierLevel);
-                const { markupPercent } = getMarkupForTier(tierLevel);
+                const suggested = calculateTierPrice(cost, tierLevel, markupSettings);
+                const { markupPercent } = getMarkupForTier(tierLevel, markupSettings);
                 const margin = sell > 0 ? marginPercent(cost, sell) : 0;
                 const isLow = sell > 0 && sell < Math.ceil(cost * 1.5);
                 return (
