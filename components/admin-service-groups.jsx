@@ -167,7 +167,7 @@ export default function AdminServiceGroupsPage({ dark, t }) {
                 )}
               </div>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 8 }}>
-                <select value={tierLevel} onChange={e => setTierLevel(e.target.value)} style={{ ...inputStyle, width: 110 }}>
+                <select value={tierLevel} onChange={e => { setTierLevel(e.target.value); if (tierSvcId) { const svc = services.find(s => s.id === tierSvcId); if (svc) { const suggested = calculateTierPrice(svc.costPer1k, e.target.value, markupSettings); setTierPrice((suggested / 100).toFixed(2)); } } }} style={{ ...inputStyle, width: 110 }}>
                   <option>Budget</option><option>Standard</option><option>Premium</option>
                 </select>
                 <input placeholder="Sell price ₦/1k" value={tierPrice} onChange={e => setTierPrice(e.target.value.replace(/[^0-9.]/g, ""))} style={{ ...inputStyle, width: 120 }} />
