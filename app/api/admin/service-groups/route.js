@@ -127,7 +127,6 @@ export async function POST(req) {
     if (action === 'add-tier') {
       const { groupId, serviceId, tier, sellPer1k, refill, speed } = body;
       if (!groupId || !serviceId) return Response.json({ error: 'Group ID and service ID required' }, { status: 400 });
-      if (!sellPer1k || sellPer1k <= 0) return Response.json({ error: 'Valid sell price required' }, { status: 400 });
 
       const group = await prisma.serviceGroup.findUnique({ where: { id: groupId } });
       if (!group) return Response.json({ error: 'Group not found' }, { status: 404 });
@@ -135,13 +134,20 @@ export async function POST(req) {
       const service = await prisma.service.findUnique({ where: { id: serviceId } });
       if (!service) return Response.json({ error: 'Service not found' }, { status: 404 });
 
+      // Auto-calculate sell price from markup if not provided
+      let finalSellPer1k = Number(sellPer1k);
+      if (!finalSellPer1k || finalSellPer1k <= 0) {
+        const { calculateMarkup } = await import('../../../lib/markup.js');
+        finalSellPer1k = calculateMarkup(service.costPer1k);
+      }
+
       const maxSort = await prisma.serviceTier.aggregate({ where: { groupId }, _max: { sortOrder: true } });
       const newTier = await prisma.serviceTier.create({
         data: {
           groupId,
           serviceId,
           tier: tier || 'Standard',
-          sellPer1k: Number(sellPer1k),
+          sellPer1k: finalSellPer1k,
           refill: !!refill,
           speed: speed || service.avgTime || '0-2 hrs',
           sortOrder: (maxSort._max.sortOrder || 0) + 1,
