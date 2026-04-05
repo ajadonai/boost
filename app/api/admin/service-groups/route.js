@@ -137,7 +137,7 @@ export async function POST(req) {
       // Auto-calculate sell price from markup if not provided
       let finalSellPer1k = Number(sellPer1k);
       if (!finalSellPer1k || finalSellPer1k <= 0) {
-        const { calculateTierPrice } = await import('../../../lib/markup.js');
+        const { calculateTierPrice } = await import('@/lib/markup');
         // Load markup settings from DB
         const markupSettings = {};
         const settings = await prisma.setting.findMany({ where: { key: { startsWith: 'markup_' } } });
