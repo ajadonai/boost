@@ -1,10 +1,10 @@
 import prisma from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
-import { signUserToken, setUserCookie } from '@/lib/auth';
+import { signUserToken, setUserCookie, detectDevice, hashToken } from '@/lib/auth';
 import { generateReferralCode, generateVerifyCode, ok, error } from '@/lib/utils';
 import { rateLimit, tooManyRequests } from '@/lib/rate-limit';
 import { validateEmail, validatePassword, validateName, sanitizeEmail, sanitizeString } from '@/lib/validate';
-
+import { headers } from 'next/headers';
 import { sendVerificationEmail } from '@/lib/email';
 
 export async function POST(req) {
@@ -52,6 +52,13 @@ export async function POST(req) {
         }
         const token = signUserToken(existing);
         await setUserCookie(token);
+        // Create session for re-signup
+        const hdrs = await headers();
+        const ua = hdrs.get('user-agent') || '';
+        const ip = hdrs.get('x-forwarded-for')?.split(',')[0]?.trim() || hdrs.get('x-real-ip') || 'unknown';
+        const device = detectDevice(ua);
+        await prisma.session.deleteMany({ where: { userId: existing.id, deviceType: device.type } });
+        await prisma.session.create({ data: { userId: existing.id, tokenHash: hashToken(token), deviceType: device.type, deviceInfo: device.info, ip } });
         return ok({ user: { id: existing.id, name: existing.name, email: existing.email, emailVerified: false } });
       } else {
         return error('An account with this email already exists');
@@ -112,6 +119,13 @@ export async function POST(req) {
     // Sign JWT and set cookie
     const token = signUserToken(user);
     await setUserCookie(token);
+
+    // Create session
+    const hdrs = await headers();
+    const ua = hdrs.get('user-agent') || '';
+    const ip = hdrs.get('x-forwarded-for')?.split(',')[0]?.trim() || hdrs.get('x-real-ip') || 'unknown';
+    const device = detectDevice(ua);
+    await prisma.session.create({ data: { userId: user.id, tokenHash: hashToken(token), deviceType: device.type, deviceInfo: device.info, ip } });
 
     return ok({
       user: {
