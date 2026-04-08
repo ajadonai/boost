@@ -10,9 +10,32 @@ export default function AdminTicketsPage({ dark, t }) {
   const [selected, setSelected] = useState(null);
   const [reply, setReply] = useState("");
 
+  const refreshTickets = () => {
+    fetch("/api/admin/tickets").then(r => r.json()).then(d => {
+      if (d.tickets) {
+        setTickets(d.tickets);
+        if (selected) {
+          const updated = d.tickets.find(tk => tk.id === selected.id);
+          if (updated) setSelected(updated);
+        }
+      }
+    }).catch(() => {});
+  };
+
   useEffect(() => {
     fetch("/api/admin/tickets").then(r => r.json()).then(d => { setTickets(d.tickets || []); setLoading(false); }).catch(() => setLoading(false));
   }, []);
+
+  // Poll every 10s, pause when tab hidden
+  useEffect(() => {
+    let interval = null;
+    const start = () => { interval = setInterval(refreshTickets, 10000); };
+    const stop = () => { clearInterval(interval); interval = null; };
+    const onVis = () => { document.hidden ? stop() : (refreshTickets(), start()); };
+    start();
+    document.addEventListener("visibilitychange", onVis);
+    return () => { stop(); document.removeEventListener("visibilitychange", onVis); };
+  }, [selected?.id]);
 
   const filtered = tickets.filter(tk => filter === "all" || tk.status === filter);
 
@@ -20,7 +43,7 @@ export default function AdminTicketsPage({ dark, t }) {
     if (!reply.trim() || !selected) return;
     try {
       const res = await fetch("/api/admin/tickets", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "reply", ticketId: selected.id, message: reply }) });
-      if (res.ok) { setReply(""); }
+      if (res.ok) { setReply(""); refreshTickets(); }
     } catch {}
   };
 
@@ -28,8 +51,7 @@ export default function AdminTicketsPage({ dark, t }) {
     if (!selected) return;
     try {
       await fetch("/api/admin/tickets", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "resolve", ticketId: selected.id }) });
-      setTickets(prev => prev.map(tk => tk.id === selected.id ? { ...tk, status: "Resolved" } : tk));
-      setSelected({ ...selected, status: "Resolved" });
+      refreshTickets();
     } catch {}
   };
 

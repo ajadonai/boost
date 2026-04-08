@@ -41,10 +41,29 @@ export default function SupportPage({ dark, t, tickets: ticketsProp }) {
 
   const chatEndRef = useRef(null);
 
-  // Load tickets from API
+  // Load tickets from API + poll every 15s
+  const refreshTickets = () => {
+    fetch("/api/tickets").then(r => r.json()).then(d => {
+      if (d.tickets) {
+        setTickets(d.tickets);
+        if (activeTicket) {
+          const updated = d.tickets.find(tk => tk.id === activeTicket.id);
+          if (updated) setActiveTicket(updated);
+        }
+      }
+    }).catch(() => {});
+  };
+  useEffect(() => { refreshTickets(); }, []);
   useEffect(() => {
-    fetch("/api/tickets").then(r => r.json()).then(d => { if (d.tickets) setTickets(d.tickets); }).catch(() => {});
-  }, []);
+    if (tab !== "tickets") return;
+    let interval = null;
+    const start = () => { interval = setInterval(refreshTickets, 15000); };
+    const stop = () => { clearInterval(interval); interval = null; };
+    const onVis = () => { document.hidden ? stop() : (refreshTickets(), start()); };
+    start();
+    document.addEventListener("visibilitychange", onVis);
+    return () => { stop(); document.removeEventListener("visibilitychange", onVis); };
+  }, [tab, activeTicket?.id]);
 
   const submitTicket = async () => {
     if (!newSubject?.trim() || !newMessage?.trim()) return;
