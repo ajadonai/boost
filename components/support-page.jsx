@@ -184,10 +184,10 @@ export default function SupportPage({ dark, t }) {
   const chatSub = selected ? selected.id : (isLive ? (waitingForAgent ? "Waiting for an agent..." : "Connected with support") : "Ask anything or talk to support");
 
   return (
-    <div className="sup-split" style={{ display: "flex", flex: 1, overflow: "hidden", borderRadius: 12, border: `1px solid ${dark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)"}`, minHeight: 0 }}>
+    <div className="sup-split" style={{ borderRadius: 12, border: `1px solid ${dark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)"}` }}>
 
       {/* ═══ LEFT: TICKET LIST ═══ */}
-      <div className="sup-split-list" style={{ width: 280, borderRight: `1px solid ${dark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)"}`, display: mobileView === "list" ? "flex" : undefined, flexDirection: "column", flexShrink: 0 }}>
+      <div className="sup-split-list" style={{ width: 280, borderRight: `1px solid ${dark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)"}`, flexShrink: 0 }}>
         <div style={{ padding: "14px 16px", borderBottom: `1px solid ${dark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.04)"}` }}>
           <div style={{ fontSize: 14, fontWeight: 600, color: t.text }}>Conversations</div>
           <div style={{ fontSize: 11, color: t.textMuted, marginTop: 2 }}>{activeCount} active</div>
@@ -233,7 +233,7 @@ export default function SupportPage({ dark, t }) {
       </div>
 
       {/* ═══ RIGHT: CHAT ═══ */}
-      <div className="sup-split-chat" style={{ flex: 1, display: mobileView === "chat" ? "flex" : undefined, flexDirection: "column", minWidth: 0 }}>
+      <div className="sup-split-chat">
         {/* Header */}
         <div style={{ padding: "12px 18px", borderBottom: `1px solid ${dark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.04)"}`, display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
           <button className="sup-mobile-back" onClick={() => setMobileView("list")} style={{ background: "none", border: "none", color: t.textMuted, cursor: "pointer", padding: 4, display: "none" }}>

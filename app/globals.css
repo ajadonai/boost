@@ -1651,9 +1651,9 @@ input { font-family: inherit; }
 .sup-tkt-row:hover { background-color: rgba(196,125,142,.03) !important; }
 
 /* Support split layout */
-.sup-split { min-height: 500px; }
-.sup-split-list { display: flex; flex-direction: column; }
-.sup-split-chat { display: flex; flex-direction: column; }
+.sup-split { flex: 1; display: flex; overflow: hidden; min-height: 0; }
+.sup-split-list { display: flex; flex-direction: column; overflow: hidden; }
+.sup-split-chat { display: flex; flex-direction: column; flex: 1; min-width: 0; min-height: 0; }
 .sup-mobile-back { display: none !important; }
 
 @media (max-width: 767px) {
