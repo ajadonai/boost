@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from "react";
+import { fD } from "../lib/format";
 
-const fD = (d) => new Date(d).toLocaleDateString("en-NG", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
 
 export default function AdminTicketsPage({ dark, t }) {
   const [tickets, setTickets] = useState([]);

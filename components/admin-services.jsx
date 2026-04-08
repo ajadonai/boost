@@ -1,8 +1,8 @@
 'use client';
 import { useState, useEffect } from "react";
 import { useConfirm } from "./confirm-dialog";
+import { fN } from "../lib/format";
 
-const fN = (a) => `₦${Math.abs(a).toLocaleString("en-NG")}`;
 
 const TIER_COLORS = {
   Budget: { color: "#d97706", bg: "rgba(217,119,6,.08)" },

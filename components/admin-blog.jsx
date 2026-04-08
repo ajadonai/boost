@@ -1,9 +1,9 @@
 'use client';
 import { useState, useEffect } from "react";
 import { useConfirm } from "./confirm-dialog";
+import { fD } from "../lib/format";
 
 const CATEGORIES = ["Tutorials", "Tips & Tricks", "Announcements", "Updates", "Guides"];
-const fD = (d) => new Date(d).toLocaleDateString("en-NG", { month: "short", day: "numeric", year: "numeric" });
 
 export default function AdminBlogPage({ dark, t }) {
   const confirm = useConfirm();

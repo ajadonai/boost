@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect } from "react";
+import { fN } from "../lib/format";
 
 /* ═══════════════════════════════════════════ */
 /* ═══ PLATFORM DATA — 35 platforms        ═══ */
@@ -62,7 +63,6 @@ const TS = {
   Premium: { bg: "#f5eef5", border: "#d4b8d4", text: "#534AB7", bgD: "#1a1028", borderD: "#302050", label: "👑" },
 };
 
-const fN = (a) => `₦${Math.abs(a).toLocaleString("en-NG")}`;
 
 /* ═══════════════════════════════════════════ */
 /* ═══ ORDER FORM                          ═══ */

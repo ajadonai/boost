@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect, useRef } from "react";
+import { fN } from "../lib/format";
 
-const fN = (a) => `₦${Math.abs(a).toLocaleString("en-NG")}`;
 
 function statusClr(s, dk) { return s === "Open" ? (dk ? "#fcd34d" : "#d97706") : s === "Resolved" ? (dk ? "#6ee7b7" : "#059669") : (dk ? "#888" : "#666"); }
 function statusBg(s, dk) { return s === "Open" ? (dk ? "#1c1608" : "#fffbeb") : s === "Resolved" ? (dk ? "#0a2416" : "#ecfdf5") : (dk ? "#1a1a1a" : "#f5f5f5"); }

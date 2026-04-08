@@ -1,8 +1,8 @@
 'use client';
 import { useState, useEffect } from "react";
 import { useConfirm } from "./confirm-dialog";
+import { fN } from "../lib/format";
 
-const fN = (a) => `₦${Math.abs(a).toLocaleString("en-NG")}`;
 
 function Toggle({ on, onToggle, accent }) {
   return (
@@ -80,7 +80,7 @@ export default function SettingsPage({ user, dark, t, themeMode, setThemeMode, s
 
   const applyTheme = (mode) => {
     setThemeMode(mode);
-    localStorage.setItem("nitro-theme", mode);
+    try { localStorage.setItem("nitro-theme", mode); } catch {}
     if (mode === "day") setDark(false);
     else if (mode === "night") setDark(true);
     else { const h = new Date().getHours(); setDark(h >= 19 || h < 7); }

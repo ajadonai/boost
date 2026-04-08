@@ -1,8 +1,7 @@
 'use client';
 import { useState, useEffect } from "react";
+import { fN, fD } from "../lib/format";
 
-const fN = (a) => `₦${Math.abs(a).toLocaleString("en-NG")}`;
-const fD = (d) => new Date(d).toLocaleDateString("en-NG", { month: "short", day: "numeric", year: "numeric" });
 
 /* ═══════════════════════════════════════════ */
 /* ═══ REFERRALS PAGE                      ═══ */
@@ -16,7 +15,7 @@ export default function ReferralsPage({ user, dark, t }) {
   useEffect(() => { try { const s = localStorage.getItem("nitro-per-page"); if (s) setPerPage(Number(s)); } catch {} }, []);
 
   const refCode = user?.refCode || "—";
-  const refLink = `nitro.ng/?ref=${refCode}`;
+  const refLink = `https://nitro.ng/?ref=${refCode}`;
   const referrals = user?.referralList || [];
   const totalEarnings = user?.earnings || 0;
   const totalRefs = user?.refs || referrals.length;

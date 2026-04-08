@@ -1,8 +1,7 @@
 'use client';
 import { useState, useEffect } from "react";
+import { fN, fD } from "../lib/format";
 
-const fN = (a) => `₦${Math.abs(a).toLocaleString("en-NG")}`;
-const fD = (d) => new Date(d).toLocaleDateString("en-NG", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
 const PRESETS = [1000, 2000, 5000, 10000, 20000, 50000];
 
 /* Dynamic — in production fetched from API / admin config */

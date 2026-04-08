@@ -1,9 +1,8 @@
 'use client';
 import { useState, useEffect } from "react";
 import { useConfirm } from "./confirm-dialog";
+import { fN, fD } from "../lib/format";
 
-const fN = (a) => `₦${Math.abs(a).toLocaleString("en-NG")}`;
-const fD = (d) => new Date(d).toLocaleDateString("en-NG", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
 
 /* ═══════════════════════════════════════════ */
 /* ═══ PAYMENTS PAGE                       ═══ */
@@ -328,7 +327,7 @@ export function AdminSettingsPage({ admin, dark, t, themeMode, setThemeMode, set
 
   const applyTheme = (mode) => {
     setThemeMode(mode);
-    localStorage.setItem("nitro-admin-theme", mode);
+    try { localStorage.setItem("nitro-admin-theme", mode); } catch {}
     if (mode === "day") setDark(false);
     else if (mode === "night") setDark(true);
     else { const h = new Date().getHours(); setDark(h >= 19 || h < 7); }
@@ -462,7 +461,7 @@ export function AdminSettingsPage({ admin, dark, t, themeMode, setThemeMode, set
             {[
               ["social_whatsapp", "WhatsApp Group Link", "https://chat.whatsapp.com/...", "Group invite link for community"],
               ["social_telegram", "Telegram Channel", "https://t.me/...", "Channel or group link"],
-              ["social_whatsapp_support", "WhatsApp Support Number", "2348012345678", "Number for wa.me link (no + prefix)"],
+              ["social_whatsapp_support", "WhatsApp Support Number", "", "Number for wa.me link (no + prefix)"],
               ["social_instagram", "Instagram Handle", "Nitro.ng", "Without the @ symbol"],
               ["social_twitter", "X / Twitter Handle", "TheNitroNG", "Without the @ symbol"],
             ].map(([key, label, placeholder, hint]) => (

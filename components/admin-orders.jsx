@@ -1,9 +1,8 @@
 'use client';
 import { useState, useEffect } from "react";
 import { useConfirm } from "./confirm-dialog";
+import { fN, fD } from "../lib/format";
 
-const fN = (a) => `₦${Math.abs(a).toLocaleString("en-NG")}`;
-const fD = (d) => new Date(d).toLocaleDateString("en-NG", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
 
 const STATUS_COLORS = {
   Completed: { bg: "rgba(110,231,183,.1)", bgL: "rgba(5,150,105,.06)", text: "#6ee7b7", textL: "#059669" },

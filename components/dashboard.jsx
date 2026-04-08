@@ -10,6 +10,7 @@ import AddFundsPage, { AddFundsSidebar } from "./addfunds-page";
 import HowToPage, { HowToSidebar } from "./howto-page";
 import { ToastProvider } from "./toast";
 import { ConfirmProvider } from "./confirm-dialog";
+import { fN, fD } from "../lib/format";
 
 /* ═══════════════════════════════════════════ */
 /* ═══ SVG ICONS                          ═══ */
@@ -36,8 +37,6 @@ const NAV_ITEMS = [
   { id: "settings", label: "Settings" },
 ];
 
-const fN = (a) => `₦${Math.abs(a).toLocaleString("en-NG")}`;
-const fD = (d) => new Date(d).toLocaleDateString("en-NG", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
 
 /* ── Status helpers ── */
 function sClr(s, dk) { return s === "Completed" ? (dk ? "#6ee7b7" : "#059669") : s === "Processing" ? (dk ? "#a5b4fc" : "#4f46e5") : s === "Pending" ? (dk ? "#fcd34d" : "#d97706") : s === "Partial" ? (dk ? "#fca5a5" : "#dc2626") : (dk ? "#555250" : "#8a8785"); }
@@ -468,9 +467,9 @@ function DashboardInner() {
       if (res.ok) {
         const data = await res.json();
         setUser(data.user);
-        if (data.orders?.length) setOrders(data.orders);
-        if (data.transactions?.length) setTxs(data.transactions);
-        if (data.alerts?.length) setAlerts(data.alerts);
+        if (data.orders) setOrders(data.orders);
+        if (data.transactions) setTxs(data.transactions);
+        if (data.alerts) setAlerts(data.alerts);
       }
     } catch {}
   };
@@ -488,9 +487,9 @@ function DashboardInner() {
         if (res.ok) {
           const data = await res.json();
           setUser(data.user);
-          if (data.orders?.length) setOrders(data.orders);
-          if (data.transactions?.length) setTxs(data.transactions);
-          if (data.alerts?.length) setAlerts(data.alerts);
+          if (data.orders) setOrders(data.orders);
+          if (data.transactions) setTxs(data.transactions);
+          if (data.alerts) setAlerts(data.alerts);
         } else setUser({ name: "User", email: "", balance: 0, refCode: "—", refs: 0, earnings: 0 });
         /* Fetch social links */
         try { const sr = await fetch("/api/settings"); if (sr.ok) { const sd = await sr.json(); setSocialLinks(sd.settings || {}); } } catch {}
@@ -574,7 +573,7 @@ function DashboardInner() {
             if (dashRes.ok) {
               const dashData = await dashRes.json();
               setUser(dashData.user);
-              if (dashData.transactions?.length) setTxs(dashData.transactions);
+              if (dashData.transactions) setTxs(dashData.transactions);
             }
           } catch {}
         } else {

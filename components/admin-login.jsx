@@ -21,11 +21,11 @@ export default function AdminLogin(){
   const [quoteIdx,setQuoteIdx]=useState(0);
   const [logoutMsg,setLogoutMsg]=useState(false);
 
-  useEffect(()=>{const saved=localStorage.getItem("nitro-theme")||"auto";setThemeMode(saved);if(saved==="day")setDark(false);else if(saved==="night")setDark(true);else setDark(getAuto());},[]);
+  useEffect(()=>{const saved=(typeof window!=="undefined"?localStorage.getItem("nitro-theme"):null)||"auto";setThemeMode(saved);if(saved==="day")setDark(false);else if(saved==="night")setDark(true);else setDark(getAuto());},[]);
   useEffect(()=>{if(themeMode!=="auto")return;const iv=setInterval(()=>setDark(getAuto()),60000);return()=>clearInterval(iv);},[themeMode]);
   useEffect(()=>{const iv=setInterval(()=>setQuoteIdx(q=>(q+1)%QUOTES.length),6000);return()=>clearInterval(iv);},[]);
   useEffect(()=>{const p=new URLSearchParams(window.location.search);if(p.get("logout")){setLogoutMsg(true);window.history.replaceState({},"","/admin/login");setTimeout(()=>setLogoutMsg(false),4000);}},[]);
-  const toggleTheme=()=>{const next=!dark;setDark(next);const mode=next?"night":"day";setThemeMode(mode);localStorage.setItem("nitro-theme",mode);};
+  const toggleTheme=()=>{const next=!dark;setDark(next);const mode=next?"night":"day";setThemeMode(mode);try{localStorage.setItem("nitro-theme",mode)}catch{};};
 
   const handleLogin=async()=>{
     setError("");

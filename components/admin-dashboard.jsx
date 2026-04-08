@@ -12,12 +12,11 @@ import AdminPricingPage from "./admin-pricing";
 import { AdminPaymentsPage, AdminAnalyticsPage, AdminAlertsPage, AdminSettingsPage } from "./admin-pages";
 import { AdminActivityPage, AdminTeamPage, AdminCouponsPage, AdminNotificationsPage, AdminMaintenancePage, AdminAPIPage } from "./admin-extra-pages";
 import AdminBlogPage from "./admin-blog";
+import { fN, fD } from "../lib/format";
 
 /* ═══════════════════════════════════════════ */
 /* ═══ HELPERS                             ═══ */
 /* ═══════════════════════════════════════════ */
-const fN = (a) => `₦${Math.abs(a).toLocaleString("en-NG")}`;
-const fD = (d) => new Date(d).toLocaleDateString("en-NG", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
 
 /* ═══════════════════════════════════════════ */
 /* ═══ NAV CONFIG                          ═══ */
@@ -241,7 +240,7 @@ function AdminDashboardInner() {
         }
         if (res.ok) {
           const d = await res.json();
-          setAdmin({ name: d.admin?.name || "Admin", role: d.admin?.role || "superadmin", email: d.admin?.email || "admin@thenitro.ng" });
+          setAdmin({ name: d.admin?.name || "Admin", role: d.admin?.role || "superadmin", email: d.admin?.email || "" });
           setData({
             stats: d || {},
             recentOrders: d.recentOrders || [],
@@ -261,7 +260,7 @@ function AdminDashboardInner() {
           window.location.replace("/admin/login");
         }
       } catch {
-        setAdmin({ name: "Admin", role: "superadmin", email: "admin@thenitro.ng" });
+        setAdmin({ name: "Admin", role: "superadmin", email: "" });
       }
     }
     load();

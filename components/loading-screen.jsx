@@ -5,7 +5,7 @@ export default function LoadingScreen() {
   const [dark, setDark] = useState(false);
   useEffect(() => {
     try {
-      const s = localStorage.getItem("nitro-theme");
+      const s = typeof window !== "undefined" ? localStorage.getItem("nitro-theme") : null;
       if (s === "night") setDark(true);
       else if (s === "day") setDark(false);
       else { const h = new Date().getHours(), m = new Date().getMinutes(); setDark(h >= 19 || h < 6 || (h === 6 && m < 30) || (h === 18 && m >= 30)); }
