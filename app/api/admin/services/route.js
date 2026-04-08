@@ -8,7 +8,9 @@ export async function GET() {
   try {
     const services = await prisma.service.findMany({
       orderBy: { category: 'asc' },
-      include: { _count: { select: { orders: true } } },
+      include: {
+        _count: { select: { orders: true, tiers: true } },
+      },
     });
 
     return Response.json({
@@ -26,6 +28,7 @@ export async function GET() {
         avgTime: s.avgTime,
         enabled: s.enabled,
         orders: s._count.orders,
+        tiers: s._count.tiers,
       })),
     });
   } catch (err) {
@@ -47,9 +50,39 @@ export async function POST(req) {
     if (!service) return Response.json({ error: 'Service not found' }, { status: 404 });
 
     if (action === 'toggle') {
-      await prisma.service.update({ where: { id: serviceId }, data: { enabled: !service.enabled } });
+      const newEnabled = !service.enabled;
+      // If disabling, check for active tiers
+      if (!newEnabled) {
+        const activeTiers = await prisma.serviceTier.count({ where: { serviceId, enabled: true } });
+        if (activeTiers > 0) {
+          // Disable the tiers too
+          await prisma.serviceTier.updateMany({ where: { serviceId, enabled: true }, data: { enabled: false } });
+          await prisma.service.update({ where: { id: serviceId }, data: { enabled: false } });
+          await logActivity(admin.name, `Disabled service + ${activeTiers} tier(s): ${service.name}`, 'service');
+          return Response.json({ success: true, enabled: false, cascaded: activeTiers, message: `Disabled service and ${activeTiers} tier(s) in Menu Builder` });
+        }
+      }
+      await prisma.service.update({ where: { id: serviceId }, data: { enabled: newEnabled } });
       await logActivity(admin.name, `${service.enabled ? 'Disabled' : 'Enabled'} service: ${service.name}`, 'service');
-      return Response.json({ success: true, enabled: !service.enabled });
+      return Response.json({ success: true, enabled: newEnabled });
+    }
+
+    if (action === 'sync-enable') {
+      // Enable all raw services that have active tiers pointing to them
+      const usedServiceIds = await prisma.serviceTier.findMany({
+        where: { enabled: true },
+        select: { serviceId: true },
+        distinct: ['serviceId'],
+      });
+      const ids = usedServiceIds.map(t => t.serviceId);
+      if (ids.length === 0) return Response.json({ success: true, enabled: 0, message: 'No active tiers found' });
+
+      const result = await prisma.service.updateMany({
+        where: { id: { in: ids }, enabled: false },
+        data: { enabled: true },
+      });
+      await logActivity(admin.name, `Sync-enabled ${result.count} services used by active tiers`, 'service');
+      return Response.json({ success: true, enabled: result.count, total: ids.length, message: `Enabled ${result.count} services (${ids.length} total in use)` });
     }
 
     if (action === 'markup') {

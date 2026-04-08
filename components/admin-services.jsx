@@ -27,9 +27,13 @@ export default function AdminServicesPage({ dark, t }) {
   const categories = [...new Set(services.map(s => s.category))].filter(Boolean);
   const activeCount = services.filter(s => s.enabled).length;
   const inactiveCount = services.filter(s => !s.enabled).length;
+  const inUseCount = services.filter(s => s.tiers > 0).length;
+  const inUseDisabledCount = services.filter(s => s.tiers > 0 && !s.enabled).length;
   const filtered = services.filter(s => {
     if (statusFilter === "active" && !s.enabled) return false;
     if (statusFilter === "inactive" && s.enabled) return false;
+    if (statusFilter === "in-use" && s.tiers === 0) return false;
+    if (statusFilter === "in-use-disabled" && !(s.tiers > 0 && !s.enabled)) return false;
     if (catFilter !== "all" && s.category !== catFilter) return false;
     if (search) { const q = search.toLowerCase(); return s.name?.toLowerCase().includes(q) || s.category?.toLowerCase().includes(q); }
     return true;
@@ -38,12 +42,34 @@ export default function AdminServicesPage({ dark, t }) {
   const [editData, setEditData] = useState({});
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState(null);
+  const [syncing, setSyncing] = useState(false);
 
   const toggleEnabled = async (id, enabled) => {
     try {
-      await fetch("/api/admin/services", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "toggle", serviceId: id, enabled: !enabled }) });
-      setServices(prev => prev.map(s => s.id === id ? { ...s, enabled: !enabled } : s));
+      const res = await fetch("/api/admin/services", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "toggle", serviceId: id }) });
+      const data = await res.json();
+      if (res.ok) {
+        setServices(prev => prev.map(s => s.id === id ? { ...s, enabled: data.enabled } : s));
+        if (data.cascaded) setMsg({ type: "success", text: data.message });
+      }
     } catch {}
+  };
+
+  const syncEnable = async () => {
+    setSyncing(true); setMsg(null);
+    try {
+      const res = await fetch("/api/admin/services", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "sync-enable", serviceId: "_" }) });
+      const data = await res.json();
+      if (res.ok) {
+        setMsg({ type: "success", text: data.message });
+        // Refresh list
+        const r = await fetch("/api/admin/services");
+        if (r.ok) { const d = await r.json(); setServices(d.services || []); }
+      } else {
+        setMsg({ type: "error", text: data.error || "Sync failed" });
+      }
+    } catch { setMsg({ type: "error", text: "Request failed" }); }
+    setSyncing(false);
   };
 
   const startEdit = (s) => {
@@ -93,16 +119,20 @@ export default function AdminServicesPage({ dark, t }) {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
           <div>
             <div className="adm-title" style={{ color: t.text }}>Raw Services</div>
-            <div className="adm-subtitle" style={{ color: t.textMuted }}>{services.length} services across {categories.length} platforms</div>
+            <div className="adm-subtitle" style={{ color: t.textMuted }}>{services.length} services · {activeCount} active · {inUseCount} in use by Menu Builder</div>
           </div>
-          <button className="adm-btn-primary">+ Add Service</button>
+          <div style={{ display: "flex", gap: 8 }}>
+            {inUseDisabledCount > 0 && <button onClick={syncEnable} disabled={syncing} style={{ padding: "8px 16px", borderRadius: 8, border: `1px solid ${dark ? "rgba(110,231,183,.2)" : "rgba(5,150,105,.15)"}`, background: dark ? "rgba(110,231,183,.06)" : "rgba(5,150,105,.04)", color: dark ? "#6ee7b7" : "#059669", fontSize: 12, fontWeight: 600, cursor: syncing ? "wait" : "pointer", opacity: syncing ? .5 : 1 }}>{syncing ? "Syncing..." : `Enable ${inUseDisabledCount} In-Use`}</button>}
+          </div>
         </div>
         <div className="page-divider" style={{ background: t.cardBorder }} />
       </div>
 
+      {inUseDisabledCount > 0 && <div style={{ padding: "10px 14px", borderRadius: 8, marginBottom: 12, background: dark ? "rgba(224,164,88,.06)" : "rgba(217,119,6,.04)", border: `1px solid ${dark ? "rgba(224,164,88,.15)" : "rgba(217,119,6,.1)"}`, color: dark ? "#e0a458" : "#92400e", fontSize: 12, lineHeight: 1.5 }}>⚠️ {inUseDisabledCount} service{inUseDisabledCount > 1 ? "s" : ""} used by Menu Builder {inUseDisabledCount > 1 ? "are" : "is"} disabled. Users can see {inUseDisabledCount > 1 ? "them" : "it"} in the menu but orders may fail.</div>}
+
       <div style={{ display: "flex", gap: 6, marginBottom: 10 }}>
-        {[["all", `All (${services.length})`], ["active", `Active (${activeCount})`], ["inactive", `Inactive (${inactiveCount})`]].map(([val, label]) => (
-          <button key={val} onClick={() => setStatusFilter(val)} style={{ padding: "5px 14px", borderRadius: 8, fontSize: 12, fontWeight: 600, border: `1px solid ${statusFilter === val ? (val === "inactive" ? (dark ? "rgba(252,165,165,.3)" : "rgba(220,38,38,.2)") : val === "active" ? (dark ? "rgba(110,231,183,.3)" : "rgba(5,150,105,.2)") : t.accent) : t.cardBorder}`, background: statusFilter === val ? (val === "inactive" ? (dark ? "rgba(252,165,165,.06)" : "rgba(220,38,38,.04)") : val === "active" ? (dark ? "rgba(110,231,183,.06)" : "rgba(5,150,105,.04)") : (dark ? "#2a1a22" : "#fdf2f4")) : "transparent", color: statusFilter === val ? (val === "inactive" ? (dark ? "#fca5a5" : "#dc2626") : val === "active" ? (dark ? "#6ee7b7" : "#059669") : t.accent) : t.textMuted, cursor: "pointer" }}>{label}</button>
+        {[["all", `All (${services.length})`], ["active", `Active (${activeCount})`], ["inactive", `Inactive (${inactiveCount})`], ["in-use", `In Use (${inUseCount})`], ...(inUseDisabledCount > 0 ? [["in-use-disabled", `⚠️ In Use + Disabled (${inUseDisabledCount})`]] : [])].map(([val, label]) => (
+          <button key={val} onClick={() => setStatusFilter(val)} style={{ padding: "5px 14px", borderRadius: 8, fontSize: 12, fontWeight: 600, border: `1px solid ${statusFilter === val ? (val === "in-use-disabled" ? (dark ? "rgba(224,164,88,.3)" : "rgba(217,119,6,.2)") : val === "inactive" ? (dark ? "rgba(252,165,165,.3)" : "rgba(220,38,38,.2)") : val === "active" ? (dark ? "rgba(110,231,183,.3)" : "rgba(5,150,105,.2)") : val === "in-use" ? (dark ? "rgba(96,165,250,.3)" : "rgba(37,99,235,.2)") : t.accent) : t.cardBorder}`, background: statusFilter === val ? (val === "in-use-disabled" ? (dark ? "rgba(224,164,88,.06)" : "rgba(217,119,6,.04)") : val === "inactive" ? (dark ? "rgba(252,165,165,.06)" : "rgba(220,38,38,.04)") : val === "active" ? (dark ? "rgba(110,231,183,.06)" : "rgba(5,150,105,.04)") : val === "in-use" ? (dark ? "rgba(96,165,250,.06)" : "rgba(37,99,235,.04)") : (dark ? "#2a1a22" : "#fdf2f4")) : "transparent", color: statusFilter === val ? (val === "in-use-disabled" ? (dark ? "#e0a458" : "#d97706") : val === "inactive" ? (dark ? "#fca5a5" : "#dc2626") : val === "active" ? (dark ? "#6ee7b7" : "#059669") : val === "in-use" ? (dark ? "#60a5fa" : "#2563eb") : t.accent) : t.textMuted, cursor: "pointer" }}>{label}</button>
         ))}
       </div>
 
@@ -130,7 +160,9 @@ export default function AdminServicesPage({ dark, t }) {
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                   <span style={{ fontSize: 14, fontWeight: 500, color: t.text }}>{s.name}</span>
+                  {s.tiers > 0 && <span style={{ fontSize: 11, padding: "1px 6px", borderRadius: 4, background: dark ? "rgba(96,165,250,.1)" : "rgba(37,99,235,.06)", color: dark ? "#60a5fa" : "#2563eb", fontWeight: 600 }}>In Use · {s.tiers}</span>}
                   {!s.enabled && <span style={{ fontSize: 11, padding: "1px 6px", borderRadius: 4, background: dark ? "rgba(252,165,165,.1)" : "rgba(220,38,38,.06)", color: t.red, fontWeight: 600 }}>Disabled</span>}
+                  {s.tiers > 0 && !s.enabled && <span style={{ fontSize: 11, padding: "1px 6px", borderRadius: 4, background: dark ? "rgba(224,164,88,.1)" : "rgba(217,119,6,.06)", color: dark ? "#e0a458" : "#d97706", fontWeight: 600 }}>⚠️</span>}
                 </div>
                 <div style={{ fontSize: 13, color: t.textMuted, marginTop: 2 }}>{s.category} · API #{s.apiId} · {s.orders || 0} orders</div>
               </div>
