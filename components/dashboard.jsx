@@ -271,7 +271,7 @@ function RightSidebar({ orders, user, dark, t, setActive }) {
 /* ═══════════════════════════════════════════ */
 /* ═══ NOTIFICATION DROPDOWN              ═══ */
 /* ═══════════════════════════════════════════ */
-function NotifDropdown({ orders, txs, dark, t, onClose, readIds, setReadIds, clearedIds, setClearedIds, notifClearedAt }) {
+function NotifDropdown({ orders, txs, dark, t, onClose, readIds, setReadIds, clearedIds, setClearedIds, notifClearedAt, setClearedAt }) {
   const [filter, setFilter] = useState("all");
 
   /* Build ALL notification items from real data */
@@ -320,6 +320,8 @@ function NotifDropdown({ orders, txs, dark, t, onClose, readIds, setReadIds, cle
   };
   const clearAll = () => {
     setClearedIds(new Set([...clearedIds, ...items.map(n => n.id)]));
+    const now = new Date();
+    if (typeof setClearedAt === "function") setClearedAt(now);
     fetch("/api/auth/notifications", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ clearAll: true }) }).catch(() => {});
   };
 
@@ -403,11 +405,15 @@ function DashboardInner() {
     if (typeof window === 'undefined') return new Set();
     try { const s = localStorage.getItem("nitro-notif-cleared"); return s ? new Set(JSON.parse(s)) : new Set(); } catch { return new Set(); }
   });
-  const [notifClearedAt, setNotifClearedAt] = useState(null);
+  const [notifClearedAt, setNotifClearedAt] = useState(() => {
+    if (typeof window === 'undefined') return null;
+    try { const s = localStorage.getItem("nitro-notif-cleared-at"); return s ? new Date(s) : null; } catch { return null; }
+  });
 
   // Persist to localStorage on change
   useEffect(() => { try { localStorage.setItem("nitro-notif-read", JSON.stringify([...readNotifIds])); } catch {} }, [readNotifIds]);
   useEffect(() => { try { localStorage.setItem("nitro-notif-cleared", JSON.stringify([...clearedNotifIds])); } catch {} }, [clearedNotifIds]);
+  useEffect(() => { if (notifClearedAt) { try { localStorage.setItem("nitro-notif-cleared-at", notifClearedAt.toISOString()); } catch {} } }, [notifClearedAt]);
 
   // Scroll lock when sidebar or notification panel is open (mobile/tablet)
   useEffect(() => { document.body.style.overflow = leftOpen || notifOpen ? "hidden" : ""; return () => { document.body.style.overflow = ""; }; }, [leftOpen, notifOpen]);
@@ -724,7 +730,7 @@ function DashboardInner() {
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
               {bellUnread > 0 && <div className="dash-bell-badge">{bellUnread > 10 ? "10+" : bellUnread}</div>}
             </button>
-            {notifOpen && <NotifDropdown orders={orders} txs={txs} dark={dark} t={t} onClose={() => setNotifOpen(false)} readIds={readNotifIds} setReadIds={setReadNotifIds} clearedIds={clearedNotifIds} setClearedIds={setClearedNotifIds} notifClearedAt={notifClearedAt} />}
+            {notifOpen && <NotifDropdown orders={orders} txs={txs} dark={dark} t={t} onClose={() => setNotifOpen(false)} readIds={readNotifIds} setReadIds={setReadNotifIds} clearedIds={clearedNotifIds} setClearedIds={setClearedNotifIds} notifClearedAt={notifClearedAt} setClearedAt={setNotifClearedAt} />}
           </div>
           {/* Avatar → Settings */}
           <button onClick={() => { setActive("settings"); setLeftOpen(false); }} className="dash-avatar-btn">
