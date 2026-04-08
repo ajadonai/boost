@@ -44,6 +44,25 @@ export async function POST(req) {
   try {
     const body = await req.json();
     const { action, serviceId } = body;
+
+    // Actions that don't need a serviceId
+    if (action === 'sync-enable') {
+      const usedServiceIds = await prisma.serviceTier.findMany({
+        where: { enabled: true },
+        select: { serviceId: true },
+        distinct: ['serviceId'],
+      });
+      const ids = usedServiceIds.map(t => t.serviceId);
+      if (ids.length === 0) return Response.json({ success: true, enabled: 0, message: 'No active tiers found' });
+
+      const result = await prisma.service.updateMany({
+        where: { id: { in: ids }, enabled: false },
+        data: { enabled: true },
+      });
+      await logActivity(admin.name, `Sync-enabled ${result.count} services used by active tiers`, 'service');
+      return Response.json({ success: true, enabled: result.count, total: ids.length, message: `Enabled ${result.count} services (${ids.length} total in use)` });
+    }
+
     if (!serviceId) return Response.json({ error: 'Service ID required' }, { status: 400 });
 
     const service = await prisma.service.findUnique({ where: { id: serviceId } });
@@ -67,23 +86,6 @@ export async function POST(req) {
       return Response.json({ success: true, enabled: newEnabled });
     }
 
-    if (action === 'sync-enable') {
-      // Enable all raw services that have active tiers pointing to them
-      const usedServiceIds = await prisma.serviceTier.findMany({
-        where: { enabled: true },
-        select: { serviceId: true },
-        distinct: ['serviceId'],
-      });
-      const ids = usedServiceIds.map(t => t.serviceId);
-      if (ids.length === 0) return Response.json({ success: true, enabled: 0, message: 'No active tiers found' });
-
-      const result = await prisma.service.updateMany({
-        where: { id: { in: ids }, enabled: false },
-        data: { enabled: true },
-      });
-      await logActivity(admin.name, `Sync-enabled ${result.count} services used by active tiers`, 'service');
-      return Response.json({ success: true, enabled: result.count, total: ids.length, message: `Enabled ${result.count} services (${ids.length} total in use)` });
-    }
 
     if (action === 'markup') {
       const m = Math.max(0, Math.min(999, Number(body.markup)));

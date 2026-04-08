@@ -58,7 +58,7 @@ export default function AdminServicesPage({ dark, t }) {
   const syncEnable = async () => {
     setSyncing(true); setMsg(null);
     try {
-      const res = await fetch("/api/admin/services", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "sync-enable", serviceId: "_" }) });
+      const res = await fetch("/api/admin/services", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "sync-enable" }) });
       const data = await res.json();
       if (res.ok) {
         setMsg({ type: "success", text: data.message });
@@ -136,18 +136,13 @@ export default function AdminServicesPage({ dark, t }) {
         ))}
       </div>
 
-      <div className="adm-filters" style={{ marginBottom: 0 }}>
-        <button onClick={() => setCatFilter("all")} className="adm-filter-pill" style={{ borderWidth: 1, borderStyle: "solid", borderColor: catFilter === "all" ? t.accent : t.cardBorder, background: catFilter === "all" ? (dark ? "#2a1a22" : "#fdf2f4") : "transparent", color: catFilter === "all" ? t.accent : t.textMuted }}>
-          All <span className="m">({services.length})</span>
-        </button>
-        {categories.map(cat => (
-          <button key={cat} onClick={() => setCatFilter(cat)} className="adm-filter-pill" style={{ borderWidth: 1, borderStyle: "solid", borderColor: catFilter === cat ? t.accent : t.cardBorder, background: catFilter === cat ? (dark ? "#2a1a22" : "#fdf2f4") : "transparent", color: catFilter === cat ? t.accent : t.textMuted }}>
-            {cat} <span className="m">({services.filter(s => s.category === cat).length})</span>
-          </button>
-        ))}
+      <div style={{ display: "flex", gap: 8, marginBottom: 12, flexWrap: "wrap", alignItems: "center" }}>
+        <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search services..." className="m" style={{ flex: 1, minWidth: 160, padding: "8px 12px", borderRadius: 8, borderWidth: 1, borderStyle: "solid", borderColor: t.cardBorder, background: dark ? "#0d1020" : "#fff", color: t.text, fontSize: 13, outline: "none" }} />
+        <select value={catFilter} onChange={e => setCatFilter(e.target.value)} style={{ padding: "8px 12px", borderRadius: 8, borderWidth: 1, borderStyle: "solid", borderColor: t.cardBorder, background: dark ? "#0d1020" : "#fff", color: t.text, fontSize: 13, outline: "none" }}>
+          <option value="all">All Platforms ({services.length})</option>
+          {categories.map(cat => <option key={cat} value={cat}>{cat} ({services.filter(s => s.category === cat).length})</option>)}
+        </select>
       </div>
-
-      <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search services..." className="m adm-search" style={{ borderColor: t.cardBorder, background: dark ? "#0d1020" : "#fff", color: t.text }} />
 
       {msg && <div style={{ padding: "10px 14px", borderRadius: 8, marginBottom: 12, background: msg.type === "success" ? (dark ? "rgba(110,231,183,.08)" : "#f0fdf4") : (dark ? "rgba(220,38,38,.08)" : "#fef2f2"), color: msg.type === "success" ? (dark ? "#6ee7b7" : "#059669") : (dark ? "#fca5a5" : "#dc2626"), fontSize: 12, display: "flex", justifyContent: "space-between", alignItems: "center" }}><span>{msg.text}</span><button onClick={() => setMsg(null)} style={{ background: "none", color: "inherit", fontSize: 14, border: "none", cursor: "pointer" }}>✕</button></div>}
 
