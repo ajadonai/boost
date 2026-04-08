@@ -16,6 +16,7 @@ export default function AdminServicesPage({ dark, t }) {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [catFilter, setCatFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
   const [expanded, setExpanded] = useState(null);
   const [editMode, setEditMode] = useState(null);
 
@@ -24,7 +25,11 @@ export default function AdminServicesPage({ dark, t }) {
   }, []);
 
   const categories = [...new Set(services.map(s => s.category))].filter(Boolean);
+  const activeCount = services.filter(s => s.enabled).length;
+  const inactiveCount = services.filter(s => !s.enabled).length;
   const filtered = services.filter(s => {
+    if (statusFilter === "active" && !s.enabled) return false;
+    if (statusFilter === "inactive" && s.enabled) return false;
     if (catFilter !== "all" && s.category !== catFilter) return false;
     if (search) { const q = search.toLowerCase(); return s.name?.toLowerCase().includes(q) || s.category?.toLowerCase().includes(q); }
     return true;
@@ -93,6 +98,12 @@ export default function AdminServicesPage({ dark, t }) {
           <button className="adm-btn-primary">+ Add Service</button>
         </div>
         <div className="page-divider" style={{ background: t.cardBorder }} />
+      </div>
+
+      <div style={{ display: "flex", gap: 6, marginBottom: 10 }}>
+        {[["all", `All (${services.length})`], ["active", `Active (${activeCount})`], ["inactive", `Inactive (${inactiveCount})`]].map(([val, label]) => (
+          <button key={val} onClick={() => setStatusFilter(val)} style={{ padding: "5px 14px", borderRadius: 8, fontSize: 12, fontWeight: 600, border: `1px solid ${statusFilter === val ? (val === "inactive" ? (dark ? "rgba(252,165,165,.3)" : "rgba(220,38,38,.2)") : val === "active" ? (dark ? "rgba(110,231,183,.3)" : "rgba(5,150,105,.2)") : t.accent) : t.cardBorder}`, background: statusFilter === val ? (val === "inactive" ? (dark ? "rgba(252,165,165,.06)" : "rgba(220,38,38,.04)") : val === "active" ? (dark ? "rgba(110,231,183,.06)" : "rgba(5,150,105,.04)") : (dark ? "#2a1a22" : "#fdf2f4")) : "transparent", color: statusFilter === val ? (val === "inactive" ? (dark ? "#fca5a5" : "#dc2626") : val === "active" ? (dark ? "#6ee7b7" : "#059669") : t.accent) : t.textMuted, cursor: "pointer" }}>{label}</button>
+        ))}
       </div>
 
       <div className="adm-filters" style={{ marginBottom: 0 }}>

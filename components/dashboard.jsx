@@ -231,9 +231,8 @@ function RightSidebar({ orders, user, dark, t, setActive }) {
 /* ═══════════════════════════════════════════ */
 /* ═══ NOTIFICATION DROPDOWN              ═══ */
 /* ═══════════════════════════════════════════ */
-function NotifDropdown({ orders, txs, dark, t, onClose }) {
+function NotifDropdown({ orders, txs, dark, t, onClose, readIds, setReadIds }) {
   const [filter, setFilter] = useState("all");
-  const [readIds, setReadIds] = useState(new Set());
 
   /* Build notification items from real data */
   const items = [
@@ -332,6 +331,7 @@ function DashboardInner() {
   }, []);
   const [leftOpen, setLeftOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
+  const [readNotifIds, setReadNotifIds] = useState(new Set());
   const [user, setUser] = useState(null);
   const [orders, setOrders] = useState([]);
   const [txs, setTxs] = useState([]);
@@ -339,6 +339,16 @@ function DashboardInner() {
   const [socialLinks, setSocialLinks] = useState({});
   const [paymentStatus, setPaymentStatus] = useState(null); // { type: "success"|"error", message, amount }
   const notifRef = useRef(null);
+
+  // Compute notification item IDs for bell dot
+  const notifItemIds = useMemo(() => {
+    const ids = [];
+    orders.filter(o => o.status === "Completed").slice(0, 3).forEach(o => ids.push(`ord-${o.id}`));
+    orders.filter(o => o.status === "Processing" || o.status === "Pending").slice(0, 2).forEach(o => ids.push(`proc-${o.id}`));
+    txs.filter(tx => tx.type === "deposit").slice(0, 2).forEach(tx => ids.push(`dep-${tx.id || tx.reference}`));
+    return ids;
+  }, [orders, txs]);
+  const bellUnread = notifItemIds.filter(id => !readNotifIds.has(id)).length;
 
   /* New Order state (lifted so sidebars can access) */
   const [noPlatform, setNoPlatform] = useState("instagram");
@@ -597,9 +607,9 @@ function DashboardInner() {
           <div ref={notifRef} style={{ position: "relative" }}>
             <button onClick={() => setNotifOpen(!notifOpen)} className="dash-bell" style={{ color: t.textSoft }}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
-              <div className="dash-bell-dot" />
+              {bellUnread > 0 && <div className="dash-bell-dot" />}
             </button>
-            {notifOpen && <NotifDropdown orders={orders} txs={txs} dark={dark} t={t} onClose={() => setNotifOpen(false)} />}
+            {notifOpen && <NotifDropdown orders={orders} txs={txs} dark={dark} t={t} onClose={() => setNotifOpen(false)} readIds={readNotifIds} setReadIds={setReadNotifIds} />}
           </div>
           {/* Avatar → Settings */}
           <button onClick={() => { setActive("settings"); setLeftOpen(false); }} className="dash-avatar-btn">
