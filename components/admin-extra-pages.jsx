@@ -406,8 +406,8 @@ export function AdminNotificationsPage({ dark, t }) {
   return (
     <>
       <div className="adm-header">
-        <div className="adm-title" style={{ color: t.text }}>Notifications</div>
-        <div className="adm-subtitle" style={{ color: t.textMuted }}>Send announcements to users</div>
+        <div className="adm-title" style={{ color: t.text }}>Email Blasts</div>
+        <div className="adm-subtitle" style={{ color: t.textMuted }}>Send email blasts to users</div>
         <div className="page-divider" style={{ background: t.cardBorder }} />
       </div>
 

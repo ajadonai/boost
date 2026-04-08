@@ -204,8 +204,8 @@ export function AdminAlertsPage({ dark, t }) {
       <div className="adm-header">
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
           <div>
-            <div className="adm-title" style={{ color: t.text }}>Alerts</div>
-            <div className="adm-subtitle" style={{ color: t.textMuted }}>User-facing notifications and banners</div>
+            <div className="adm-title" style={{ color: t.text }}>Announcements</div>
+            <div className="adm-subtitle" style={{ color: t.textMuted }}>User-facing announcements and banners</div>
           </div>
           <button onClick={() => setShowNew(!showNew)} className="adm-btn-primary">{showNew ? "Cancel" : "+ New Alert"}</button>
         </div>

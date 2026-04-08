@@ -36,8 +36,8 @@ export default function AdminTicketsPage({ dark, t }) {
   return (
     <>
       <div className="adm-header">
-        <div className="adm-title" style={{ color: t.text }}>Tickets</div>
-        <div className="adm-subtitle" style={{ color: t.textMuted }}>{tickets.filter(tk => tk.status === "Open").length} open tickets</div>
+        <div className="adm-title" style={{ color: t.text }}>Support</div>
+        <div className="adm-subtitle" style={{ color: t.textMuted }}>{tickets.filter(tk => tk.status === "Open").length} open support tickets</div>
         <div className="page-divider" style={{ background: t.cardBorder }} />
       </div>
 

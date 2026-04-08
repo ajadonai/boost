@@ -113,8 +113,8 @@ export default function OrdersPage({ orders: initialOrders, txs, dark, t }) {
     <>
       {/* Header */}
       <div className="ord-header">
-        <div className="ord-title" style={{ color: t.text }}>Orders</div>
-        <div className="ord-subtitle" style={{ color: t.textMuted }}>Track your orders and transactions</div>
+        <div className="ord-title" style={{ color: t.text }}>History</div>
+        <div className="ord-subtitle" style={{ color: t.textMuted }}>Your order history and transactions</div>
         <div className="page-divider" style={{ background: t.cardBorder }} />
       </div>
 

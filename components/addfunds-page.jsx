@@ -73,8 +73,8 @@ export default function AddFundsPage({ user, dark, t, paymentStatus, setPaymentS
       )}
 
       <div className="fund-header">
-        <div className="fund-title" style={{ color: t.text }}>Add Funds</div>
-        <div className="fund-subtitle" style={{ color: t.textMuted }}>Top up your wallet to place orders</div>
+        <div className="fund-title" style={{ color: t.text }}>Wallet</div>
+        <div className="fund-subtitle" style={{ color: t.textMuted }}>Top up your balance to place orders</div>
         <div className="page-divider" style={{ background: t.cardBorder }} />
       </div>
 

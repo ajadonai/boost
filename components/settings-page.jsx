@@ -298,7 +298,7 @@ export default function SettingsPage({ user, dark, t, themeMode, setThemeMode, s
 
         {/* ── DANGER ZONE ── */}
         <div id="set-danger-zone" className="set-section">
-          <div className="set-section-title" style={{ color: t.text }}>Danger Zone</div>
+          <div className="set-section-title" style={{ color: t.text }}>Account</div>
           <div className="set-danger-card" style={{ background: dark ? "rgba(220,38,38,.06)" : "rgba(220,38,38,.03)", borderWidth: 1, borderStyle: "solid", borderColor: dark ? "rgba(252,165,165,.1)" : "rgba(220,38,38,.08)" }}>
             <div className="set-danger-title" style={{ color: t.text }}>Delete Account</div>
             <div className="set-danger-desc" style={{ color: t.textMuted }}>Permanently delete your account. Your orders and transactions will be preserved but your personal data will be removed.</div>

@@ -19,8 +19,8 @@ export default function HowToPage({ dark, t }) {
   return (
     <>
       <div className="svc-header">
-        <div className="svc-title" style={{ color: t.text }}>How To</div>
-        <div className="svc-subtitle" style={{ color: t.textMuted }}>Learn how to use Nitro with step-by-step guides and tutorials</div>
+        <div className="svc-title" style={{ color: t.text }}>Guide</div>
+        <div className="svc-subtitle" style={{ color: t.textMuted }}>Step-by-step guides and tutorials</div>
         <div className="page-divider" style={{ background: t.cardBorder }} />
       </div>
 
