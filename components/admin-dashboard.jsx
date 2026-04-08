@@ -220,6 +220,12 @@ function AdminDashboardInner() {
   const [data, setData] = useState({ stats: {}, recentOrders: [], recentUsers: [], openTickets: [], activity: [] });
 
   /* Theme — provided by ThemeProvider */
+  // Sync admin theme preference to server when it changes (skip initial mount)
+  const adminThemeSyncRef = useRef(false);
+  useEffect(() => {
+    if (!adminThemeSyncRef.current) { adminThemeSyncRef.current = true; return; }
+    fetch("/api/auth/admin/profile", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "save-theme", themePreference: themeMode }) }).catch(() => {});
+  }, [themeMode]);
 
   /* Data fetch */
   const [redirecting, setRedirecting] = useState(false);
@@ -243,6 +249,13 @@ function AdminDashboardInner() {
             openTickets: d.openTickets || [],
             activity: d.activity || [],
           });
+          // Sync theme from server (overrides localStorage on new devices)
+          if (d.admin?.themePreference && d.admin.themePreference !== "auto") {
+            const saved = localStorage.getItem("nitro-admin-theme");
+            if (!saved || saved === "auto") {
+              setThemeMode(d.admin.themePreference);
+            }
+          }
         } else {
           setRedirecting(true);
           window.location.replace("/admin/login");

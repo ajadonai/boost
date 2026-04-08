@@ -33,6 +33,8 @@ model User {
   notifEmail    Boolean  @default(true)
   notifClearedAt DateTime?
   notifReadIds  String?  // JSON array of read notification IDs
+  themePreference String @default("auto") // "auto" | "night" | "day"
+  perPagePreference Int @default(10) // Orders per page: 10, 25, 50
   status        String   @default("Active")
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
@@ -79,6 +81,7 @@ model Admin {
   status      String   @default("Active")
   customPages String?  // JSON array of page slugs — overrides role defaults when set
   lastActive  DateTime @default(now())
+  themePreference String @default("auto") // "auto" | "night" | "day"
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 

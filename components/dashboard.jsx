@@ -417,6 +417,13 @@ function DashboardInner() {
 
   // Scroll lock when sidebar or notification panel is open (mobile/tablet)
   useEffect(() => { document.body.style.overflow = leftOpen || notifOpen ? "hidden" : ""; return () => { document.body.style.overflow = ""; }; }, [leftOpen, notifOpen]);
+
+  // Sync theme preference to server when it changes (skip initial mount)
+  const themeSyncedRef = useRef(false);
+  useEffect(() => {
+    if (!themeSyncedRef.current) { themeSyncedRef.current = true; return; }
+    fetch("/api/auth/notifications", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ themePreference: themeMode }) }).catch(() => {});
+  }, [themeMode]);
   const [user, setUser] = useState(null);
   const [orders, setOrders] = useState([]);
   const [txs, setTxs] = useState([]);
@@ -487,7 +494,7 @@ function DashboardInner() {
         } else setUser({ name: "User", email: "", balance: 0, refCode: "—", refs: 0, earnings: 0 });
         /* Fetch social links */
         try { const sr = await fetch("/api/settings"); if (sr.ok) { const sd = await sr.json(); setSocialLinks(sd.settings || {}); } } catch {}
-        /* Load notification state from server (merges with localStorage) */
+        /* Load notification state + preferences from server (merges with localStorage) */
         try {
           const nr = await fetch("/api/auth/notifications");
           if (nr.ok) {
@@ -495,6 +502,20 @@ function DashboardInner() {
             if (nd.notifClearedAt) setNotifClearedAt(new Date(nd.notifClearedAt));
             if (Array.isArray(nd.notifReadIds) && nd.notifReadIds.length > 0) {
               setReadNotifIds(prev => new Set([...prev, ...nd.notifReadIds]));
+            }
+            // Sync theme from server (overrides localStorage on new devices)
+            if (nd.themePreference && nd.themePreference !== "auto") {
+              const saved = localStorage.getItem("nitro-theme");
+              if (!saved || saved === "auto") {
+                setThemeMode(nd.themePreference);
+              }
+            }
+            // Sync perPage from server
+            if (nd.perPagePreference && nd.perPagePreference !== 10) {
+              const saved = localStorage.getItem("nitro-per-page");
+              if (!saved) {
+                try { localStorage.setItem("nitro-per-page", String(nd.perPagePreference)); } catch {}
+              }
             }
           }
         } catch {}

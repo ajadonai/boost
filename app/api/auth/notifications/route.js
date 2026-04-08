@@ -9,7 +9,7 @@ export async function GET() {
 
     const user = await prisma.user.findUnique({
       where: { id: session.id },
-      select: { notifOrders: true, notifPromo: true, notifEmail: true, notifClearedAt: true, notifReadIds: true },
+      select: { notifOrders: true, notifPromo: true, notifEmail: true, notifClearedAt: true, notifReadIds: true, themePreference: true, perPagePreference: true },
     });
 
     if (!user) return error('User not found', 404);
@@ -23,6 +23,8 @@ export async function GET() {
       notifEmail: user.notifEmail,
       notifClearedAt: user.notifClearedAt,
       notifReadIds: readIds,
+      themePreference: user.themePreference || 'auto',
+      perPagePreference: user.perPagePreference || 10,
     });
   } catch (err) {
     console.error('[Notifications GET]', err);
@@ -42,6 +44,16 @@ export async function POST(req) {
     if (typeof body.notifOrders === 'boolean') data.notifOrders = body.notifOrders;
     if (typeof body.notifPromo === 'boolean') data.notifPromo = body.notifPromo;
     if (typeof body.notifEmail === 'boolean') data.notifEmail = body.notifEmail;
+
+    // Theme preference
+    if (body.themePreference && ['auto', 'night', 'day'].includes(body.themePreference)) {
+      data.themePreference = body.themePreference;
+    }
+
+    // Per-page preference
+    if (body.perPagePreference && [10, 25, 50].includes(Number(body.perPagePreference))) {
+      data.perPagePreference = Number(body.perPagePreference);
+    }
 
     // Mark all as read — store the IDs
     if (Array.isArray(body.readIds)) {

@@ -92,6 +92,8 @@ export async function GET() {
         earnings: referralEarnings / 100,
         refCode: user.referralCode,
         referralList,
+        themePreference: user.themePreference || 'auto',
+        perPagePreference: user.perPagePreference || 10,
       },
       orders: orders.map(o => ({
         id: o.orderId || o.id,

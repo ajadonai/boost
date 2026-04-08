@@ -72,7 +72,7 @@ export async function GET() {
     };
 
     return Response.json({
-      admin: { name: admin.name, role: admin.role, email: admin.email },
+      admin: { name: admin.name, role: admin.role, email: admin.email, themePreference: admin.themePreference || 'auto' },
       revenue: todayRevenue,
       users: userCount,
       orders: orderCount,

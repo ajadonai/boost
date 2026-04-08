@@ -25,7 +25,7 @@ function Pagination({ total, page, setPage, perPage, setPerPage, t }) {
     <div className="ord-pagination">
       <div className="ord-pag-left">
         <span style={{ color: t.textMuted }}>Show</span>
-        <select value={perPage} onChange={e => { const v = Number(e.target.value); setPerPage(v); setPage(1); try { localStorage.setItem("nitro-per-page", String(v)); } catch {} }} className="m ord-pag-select" style={{ background: t.cardBg, borderColor: t.cardBorder, color: t.text }}>
+        <select value={perPage} onChange={e => { const v = Number(e.target.value); setPerPage(v); setPage(1); try { localStorage.setItem("nitro-per-page", String(v)); } catch {} fetch("/api/auth/notifications", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ perPagePreference: v }) }).catch(() => {}); }} className="m ord-pag-select" style={{ background: t.cardBg, borderColor: t.cardBorder, color: t.text }}>
           {PER_PAGE_OPTIONS.map(n => <option key={n} value={n}>{n}</option>)}
         </select>
         <span style={{ color: t.textMuted }}>{total} total</span>

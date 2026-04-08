@@ -7,7 +7,16 @@ export async function POST(req) {
   if (error) return error;
 
   try {
-    const { action, name, email, currentPassword, newPassword } = await req.json();
+    const body = await req.json();
+    const { action, name, email, currentPassword, newPassword, themePreference } = body;
+
+    if (action === 'save-theme') {
+      if (themePreference && ['auto', 'night', 'day'].includes(themePreference)) {
+        await prisma.admin.update({ where: { id: admin.id }, data: { themePreference } });
+        return Response.json({ success: true });
+      }
+      return Response.json({ error: 'Invalid theme' }, { status: 400 });
+    }
 
     if (action === 'update-profile') {
       const updates = {};
