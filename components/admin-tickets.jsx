@@ -40,7 +40,7 @@ export default function AdminTicketsPage({ dark, t }) {
 
   useEffect(() => { setTimeout(() => msgsEnd.current?.scrollIntoView({ behavior: "smooth" }), 50); }, [selected, tickets]);
 
-  const filtered = filter === "all" ? tickets : tickets.filter(tk => tk.status === filter);
+  const filtered = filter === "all" ? tickets : filter === "unread" ? tickets.filter(tk => { const last = tk.replies?.[tk.replies.length - 1]; return (!last && tk.status !== "Resolved") || (last?.from === "user"); }) : tickets.filter(tk => tk.status === filter);
   const openCount = tickets.filter(tk => tk.status === "Open" || tk.status === "In Progress").length;
 
   const doReply = async () => {
@@ -74,7 +74,7 @@ export default function AdminTicketsPage({ dark, t }) {
           <div style={{ fontSize: 11, color: t.textMuted, marginTop: 2 }}>{openCount} active</div>
         </div>
         <div style={{ display: "flex", gap: 3, padding: "8px 10px", borderBottom: `1px solid ${t.cardBorder}` }}>
-          {[["all", "All"], ["Open", "Open"], ["In Progress", "Active"], ["Resolved", "Done"]].map(([v, l]) => (
+          {[["all", "All"], ["unread", "Unread"], ["Open", "Open"], ["In Progress", "Active"], ["Resolved", "Done"]].map(([v, l]) => (
             <button key={v} onClick={() => setFilter(v)} style={{ padding: "4px 10px", borderRadius: 5, fontSize: 10, fontWeight: filter === v ? 600 : 450, background: filter === v ? (dark ? "rgba(196,125,142,0.1)" : "rgba(196,125,142,0.06)") : "transparent", color: filter === v ? t.accent : t.textMuted, border: "none", cursor: "pointer" }}>{l}</button>
           ))}
         </div>

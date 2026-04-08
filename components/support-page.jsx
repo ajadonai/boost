@@ -75,6 +75,9 @@ export default function SupportPage({ dark, t }) {
   const [typing, setTyping] = useState(false);
   const [showQuick, setShowQuick] = useState(true);
   const [ticketLoading, setTicketLoading] = useState(false);
+  const [newSubject, setNewSubject] = useState("");
+  const [newMessage, setNewMessage] = useState("");
+  const [newCat, setNewCat] = useState("Order Issue");
   const [mobileView, setMobileView] = useState("chat"); // mobile only: "list" | "chat"
 
   const msgsEnd = useRef(null);
@@ -137,7 +140,7 @@ export default function SupportPage({ dark, t }) {
   const addMsg = (m) => setMsgs(prev => [...prev, m]);
   const botReply = (text, delay, extra = {}) => { setTyping(true); setTimeout(() => { setTyping(false); addMsg({ from: "bot", name: "Nitro Bot", text, time: "Now", formatted: true, ...extra }); }, delay + Math.random() * 300); };
   const activeCount = tickets.filter(tk => tk.status !== "Resolved").length;
-  const filtered = filter === "all" ? tickets : filter === "unread" ? tickets.filter(tk => { const last = tk.messages?.[tk.messages.length - 1]; return last?.from === "admin"; }) : tickets.filter(tk => tk.status === filter);
+  const filtered = filter === "all" ? tickets : tickets.filter(tk => tk.status === filter);
 
   const handleQuick = (id) => {
     setShowQuick(false);
@@ -179,23 +182,27 @@ export default function SupportPage({ dark, t }) {
   const selectTicket = (tk) => { setSelected(tk); setInput(""); setMobileView("chat"); };
   const backToBot = () => { setSelected(null); setInput(""); setMobileView("chat"); };
 
-  const chatMsgs = selected ? (selected.messages || []).map(m => ({ ...m, from: m.from === "admin" ? "support" : m.from, name: m.from === "admin" ? (m.name || "Support") : m.from === "user" ? undefined : m.name })) : msgs;
-  const chatTitle = selected ? selected.subject : "Support";
-  const chatSub = selected ? selected.id : (isLive ? (waitingForAgent ? "Waiting for an agent..." : "Connected with support") : "Ask anything or talk to support");
+  const isNewTicket = selected === "new";
+  const chatMsgs = isNewTicket ? [] : selected ? (selected.messages || []).map(m => ({ ...m, from: m.from === "admin" ? "support" : m.from, name: m.from === "admin" ? (m.name || "Support") : m.from === "user" ? undefined : m.name })) : msgs;
+  const chatTitle = isNewTicket ? "New Ticket" : selected ? selected.subject : "Support";
+  const chatSub = isNewTicket ? "Describe your issue" : selected ? selected.id : (isLive ? (waitingForAgent ? "Waiting for an agent..." : "Connected with support") : "Ask anything or talk to support");
 
   return (
     <div className="sup-split" style={{ borderRadius: 12, border: `1px solid ${dark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)"}` }}>
 
       {/* ═══ LEFT: TICKET LIST ═══ */}
       <div className="sup-split-list" style={{ width: 280, borderRight: `1px solid ${dark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)"}`, flexShrink: 0 }}>
-        <div style={{ padding: "14px 16px", borderBottom: `1px solid ${dark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.04)"}` }}>
-          <div style={{ fontSize: 14, fontWeight: 600, color: t.text }}>Conversations</div>
-          <div style={{ fontSize: 11, color: t.textMuted, marginTop: 2 }}>{activeCount} active</div>
+        <div style={{ padding: "14px 16px", borderBottom: `1px solid ${dark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.04)"}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div>
+            <div style={{ fontSize: 14, fontWeight: 600, color: t.text }}>Conversations</div>
+            <div style={{ fontSize: 11, color: t.textMuted, marginTop: 2 }}>{activeCount} active</div>
+          </div>
+          <button onClick={() => { setSelected("new"); setMobileView("chat"); }} style={{ padding: "4px 10px", borderRadius: 6, background: "linear-gradient(135deg,#c47d8e,#a3586b)", color: "#fff", fontSize: 10, fontWeight: 600, border: "none", cursor: "pointer" }}>+ New</button>
         </div>
 
         {/* Filters — always visible */}
         <div style={{ display: "flex", gap: 3, padding: "6px 10px", borderBottom: `1px solid ${dark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.04)"}`, flexShrink: 0, flexWrap: "wrap" }}>
-          {[["all","All"],["unread","Unread"],["Open","Open"],["In Progress","Active"],["Resolved","Done"]].map(([v,l])=>
+          {[["all","All"],["Open","Open"],["In Progress","Active"],["Resolved","Done"]].map(([v,l])=>
             <button key={v} onClick={()=>setFilter(v)} style={{ padding:"3px 8px",borderRadius:4,fontSize:10,fontWeight:filter===v?600:450,background:filter===v?(dark?"rgba(196,125,142,0.1)":"rgba(196,125,142,0.06)"):"transparent",color:filter===v?t.accent:t.textMuted,border:"none",cursor:"pointer" }}>{l}</button>
           )}
         </div>
@@ -248,37 +255,66 @@ export default function SupportPage({ dark, t }) {
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 15, fontWeight: 600, color: t.text, display: "flex", alignItems: "center", gap: 8 }}>
               {chatTitle}
-              {selected && <StatusPill status={selected.status} dark={dark} />}
+              {selected && !isNewTicket && <StatusPill status={selected.status} dark={dark} />}
               {!selected && isLive && <span className="m" style={{ fontSize: 10, padding: "2px 7px", borderRadius: 4, background: dark ? "rgba(96,165,250,0.1)" : "rgba(59,130,246,0.06)", color: dark ? "#60a5fa" : "#2563eb" }}>live</span>}
             </div>
             <div className="m" style={{ fontSize: 11, color: t.textMuted, marginTop: 1 }}>{chatSub}</div>
           </div>
         </div>
 
-        {/* Messages */}
-        <div style={{ flex: 1, overflowY: "auto", minHeight: 0, padding: "12px 18px", display: "flex", flexDirection: "column", gap: 6 }}>
-          <div style={{ flex: 1 }} />
-          {chatMsgs.map((m, i) => (
-            <div key={i}>
-              <Bubble m={m} dark={dark} t={t} />
-              {m.followUp && <div style={{ marginTop: 6, paddingLeft: 4 }}><button onClick={() => handleFollowUp(m.followUp)} style={{ padding: "6px 12px", borderRadius: 8, fontSize: 11, background: dark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.02)", border: `1px solid ${dark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)"}`, color: t.textSoft, cursor: "pointer", fontFamily: "inherit" }}>{m.followUp}</button></div>}
-              {m.escalatePrompt && <div style={{ display: "flex", gap: 6, marginTop: 6, paddingLeft: 4 }}>
-                <button onClick={() => handleQuick("human")} style={{ padding: "6px 12px", borderRadius: 8, fontSize: 11, background: dark ? "rgba(196,125,142,0.08)" : "rgba(196,125,142,0.05)", border: `1px solid ${dark ? "rgba(196,125,142,0.15)" : "rgba(196,125,142,0.1)"}`, color: t.accent, cursor: "pointer", fontFamily: "inherit", fontWeight: 500 }}>Yes, connect me</button>
-                <button onClick={() => setShowQuick(true)} style={{ padding: "6px 12px", borderRadius: 8, fontSize: 11, background: dark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.02)", border: `1px solid ${dark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)"}`, color: t.textMuted, cursor: "pointer", fontFamily: "inherit" }}>Ask something else</button>
-              </div>}
+        {/* Messages or New Ticket Form */}
+        {isNewTicket ? (
+          <div style={{ flex: 1, overflowY: "auto", minHeight: 0, padding: "20px 18px", display: "flex", flexDirection: "column", gap: 0 }}>
+            <label style={{ fontSize: 11, fontWeight: 600, color: t.textMuted, textTransform: "uppercase", letterSpacing: 1, marginBottom: 8 }}>Category</label>
+            <div style={{ display: "flex", gap: 5, flexWrap: "wrap", marginBottom: 18 }}>
+              {["Order Issue","Payment","Refund","Account","Other"].map(c =>
+                <button key={c} onClick={() => setNewCat(c)} style={{ padding: "5px 12px", borderRadius: 7, fontSize: 11, fontWeight: newCat === c ? 600 : 450, background: newCat === c ? (dark ? "rgba(196,125,142,0.1)" : "rgba(196,125,142,0.06)") : (dark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.02)"), border: `1px solid ${newCat === c ? (dark ? "rgba(196,125,142,0.2)" : "rgba(196,125,142,0.12)") : (dark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)")}`, color: newCat === c ? t.accent : t.textMuted, cursor: "pointer", fontFamily: "inherit" }}>{c}</button>
+              )}
             </div>
-          ))}
-          {typing && <div style={{ alignSelf: "flex-start", padding: "10px 18px", borderRadius: 14, borderBottomLeftRadius: 4, background: dark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.03)", border: `1px solid ${dark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)"}` }}><div style={{ display: "flex", gap: 4 }}>{[0,1,2].map(j=><div key={j} className="sup-typing-dot" style={{ width:6,height:6,borderRadius:3,background:t.textMuted,animationDelay:`${j*.15}s` }}/>)}</div></div>}
-          <div ref={msgsEnd} />
-        </div>
+            <label style={{ fontSize: 11, fontWeight: 600, color: t.textMuted, textTransform: "uppercase", letterSpacing: 1, marginBottom: 6 }}>Subject</label>
+            <input value={newSubject} onChange={e => setNewSubject(e.target.value)} placeholder="Brief description of your issue" style={{ width: "100%", padding: "10px 14px", borderRadius: 10, background: dark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)", border: `1px solid ${dark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)"}`, color: t.text, fontSize: 13, outline: "none", marginBottom: 16, fontFamily: "inherit", boxSizing: "border-box" }} />
+            <label style={{ fontSize: 11, fontWeight: 600, color: t.textMuted, textTransform: "uppercase", letterSpacing: 1, marginBottom: 6 }}>Message</label>
+            <textarea value={newMessage} onChange={e => setNewMessage(e.target.value)} placeholder="Describe your issue. Include order IDs if relevant." rows={5} style={{ width: "100%", padding: "10px 14px", borderRadius: 10, background: dark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)", border: `1px solid ${dark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)"}`, color: t.text, fontSize: 13, outline: "none", fontFamily: "inherit", resize: "vertical", lineHeight: 1.5, boxSizing: "border-box" }} />
+          </div>
+        ) : (
+          <>
+            <div style={{ flex: 1, overflowY: "auto", minHeight: 0, padding: "12px 18px", display: "flex", flexDirection: "column", gap: 6 }}>
+              <div style={{ flex: 1 }} />
+              {chatMsgs.map((m, i) => (
+                <div key={i}>
+                  <Bubble m={m} dark={dark} t={t} />
+                  {m.followUp && <div style={{ marginTop: 6, paddingLeft: 4 }}><button onClick={() => handleFollowUp(m.followUp)} style={{ padding: "6px 12px", borderRadius: 8, fontSize: 11, background: dark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.02)", border: `1px solid ${dark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)"}`, color: t.textSoft, cursor: "pointer", fontFamily: "inherit" }}>{m.followUp}</button></div>}
+                  {m.escalatePrompt && <div style={{ display: "flex", gap: 6, marginTop: 6, paddingLeft: 4 }}>
+                    <button onClick={() => handleQuick("human")} style={{ padding: "6px 12px", borderRadius: 8, fontSize: 11, background: dark ? "rgba(196,125,142,0.08)" : "rgba(196,125,142,0.05)", border: `1px solid ${dark ? "rgba(196,125,142,0.15)" : "rgba(196,125,142,0.1)"}`, color: t.accent, cursor: "pointer", fontFamily: "inherit", fontWeight: 500 }}>Yes, connect me</button>
+                    <button onClick={() => setShowQuick(true)} style={{ padding: "6px 12px", borderRadius: 8, fontSize: 11, background: dark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.02)", border: `1px solid ${dark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)"}`, color: t.textMuted, cursor: "pointer", fontFamily: "inherit" }}>Ask something else</button>
+                  </div>}
+                </div>
+              ))}
+              {typing && <div style={{ alignSelf: "flex-start", padding: "10px 18px", borderRadius: 14, borderBottomLeftRadius: 4, background: dark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.03)", border: `1px solid ${dark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)"}` }}><div style={{ display: "flex", gap: 4 }}>{[0,1,2].map(j=><div key={j} className="sup-typing-dot" style={{ width:6,height:6,borderRadius:3,background:t.textMuted,animationDelay:`${j*.15}s` }}/>)}</div></div>}
+              <div ref={msgsEnd} />
+            </div>
 
-        {/* Quick actions — only for bot chat, not ticket detail */}
-        {!selected && showQuick && !isLive && <div style={{ padding: "6px 16px", display: "flex", gap: 5, flexWrap: "wrap", flexShrink: 0, borderTop: `1px solid ${dark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.04)"}` }}>
-          {QUICK_ACTIONS.map(a => <button key={a.id} onClick={() => handleQuick(a.id)} className="sup-quick-btn" style={{ padding: "6px 10px", borderRadius: 7, fontSize: 11, background: a.id === "human" ? (dark ? "rgba(196,125,142,0.06)" : "rgba(196,125,142,0.04)") : (dark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.02)"), borderWidth: 1, borderStyle: "solid", borderColor: a.id === "human" ? (dark ? "rgba(196,125,142,0.15)" : "rgba(196,125,142,0.1)") : (dark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)"), color: a.id === "human" ? t.accent : t.textSoft, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 4, fontWeight: a.id === "human" ? 550 : 400 }}><span style={{ fontSize: 12 }}>{a.icon}</span>{a.label}</button>)}
-        </div>}
+            {/* Quick actions — only for bot chat */}
+            {!selected && showQuick && !isLive && <div style={{ padding: "6px 16px", display: "flex", gap: 5, flexWrap: "wrap", flexShrink: 0, borderTop: `1px solid ${dark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.04)"}` }}>
+              {QUICK_ACTIONS.map(a => <button key={a.id} onClick={() => handleQuick(a.id)} className="sup-quick-btn" style={{ padding: "6px 10px", borderRadius: 7, fontSize: 11, background: a.id === "human" ? (dark ? "rgba(196,125,142,0.06)" : "rgba(196,125,142,0.04)") : (dark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.02)"), borderWidth: 1, borderStyle: "solid", borderColor: a.id === "human" ? (dark ? "rgba(196,125,142,0.15)" : "rgba(196,125,142,0.1)") : (dark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)"), color: a.id === "human" ? t.accent : t.textSoft, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 4, fontWeight: a.id === "human" ? 550 : 400 }}><span style={{ fontSize: 12 }}>{a.icon}</span>{a.label}</button>)}
+            </div>}
+          </>
+        )}
 
-        {/* Input — pinned at bottom */}
-        {(!selected || selected.status === "Open" || selected.status === "In Progress") ? (
+        {/* Input / Submit — pinned at bottom */}
+        {isNewTicket ? (
+          <div style={{ padding: "10px 16px", borderTop: `1px solid ${dark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)"}`, flexShrink: 0 }}>
+            <button onClick={async () => {
+              if (!newSubject.trim() || !newMessage.trim()) return;
+              setTicketLoading(true);
+              try {
+                const res = await fetch("/api/tickets", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "create", subject: newSubject, message: newMessage, category: newCat }) });
+                if (res.ok) { setNewSubject(""); setNewMessage(""); setNewCat("Order Issue"); refreshTickets(); const d = await res.json(); if (d.ticket) { refreshTickets(); setTimeout(() => { const tk = tickets.find(t2 => t2.id === d.ticket.id); if (tk) setSelected(tk); else setSelected(null); }, 500); } else { setSelected(null); } }
+              } catch {}
+              setTicketLoading(false);
+            }} disabled={!newSubject.trim() || !newMessage.trim() || ticketLoading} style={{ width: "100%", padding: "11px", borderRadius: 10, background: newSubject.trim() && newMessage.trim() ? "linear-gradient(135deg,#c47d8e,#a3586b)" : (dark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)"), color: newSubject.trim() && newMessage.trim() ? "#fff" : t.textMuted, fontSize: 13, fontWeight: 600, border: "none", cursor: newSubject.trim() && newMessage.trim() ? "pointer" : "default", fontFamily: "inherit" }}>{ticketLoading ? "Creating..." : "Create Ticket"}</button>
+          </div>
+        ) : (!selected || selected.status === "Open" || selected.status === "In Progress") ? (
           <div style={{ padding: "10px 16px", borderTop: `1px solid ${dark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)"}`, display: "flex", gap: 8, alignItems: "center", flexShrink: 0 }}>
             <input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === "Enter" && sendMsg()} placeholder={selected ? "Type a message..." : (waitingForAgent ? "Add details while you wait..." : isLive ? "Message support..." : "Ask a question...")} style={{ flex: 1, padding: "10px 16px", borderRadius: 20, background: dark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)", border: `1px solid ${dark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)"}`, color: t.text, fontSize: 13, outline: "none", fontFamily: "inherit" }} />
             <button onClick={sendMsg} style={{ width: 38, height: 38, borderRadius: "50%", background: input.trim() ? "linear-gradient(135deg,#c47d8e,#a3586b)" : (dark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)"), border: "none", cursor: input.trim() ? "pointer" : "default", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
