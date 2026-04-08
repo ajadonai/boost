@@ -94,6 +94,9 @@ function OverviewPage({ user, orders, alerts, dark, t, setActive }) {
         </div>
       ))}
 
+      {/* Mobile menu hint */}
+      <MobileMenuHint dark={dark} t={t} />
+
       {/* Stat cards */}
       <div className="dash-stats">
         {[
