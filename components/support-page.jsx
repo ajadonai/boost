@@ -37,6 +37,7 @@ function StatusPill({ status, dark }) {
 }
 
 function FormatText({ text, dark }) {
+  if (!text) return null;
   return <>{text.split(/(\*\*[^*]+\*\*|\`[^`]+\`|\n)/g).map((p, i) => {
     if (p === "\n") return <br key={i} />;
     if (p.startsWith("**") && p.endsWith("**")) return <strong key={i} style={{ fontWeight: 600 }}>{p.slice(2, -2)}</strong>;
@@ -54,9 +55,9 @@ function Bubble({ m, dark, t }) {
     <div style={{ display: "flex", flexDirection: "column", alignItems: isUser ? "flex-end" : "flex-start" }}>
       <div style={{ maxWidth: "78%", padding: "10px 14px", borderRadius: 14, borderBottomRightRadius: isUser ? 4 : 14, borderBottomLeftRadius: !isUser ? 4 : 14, background: isUser ? (dark ? "rgba(196,125,142,0.12)" : "rgba(196,125,142,0.08)") : (dark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.03)"), border: `1px solid ${isUser ? (dark ? "rgba(196,125,142,0.1)" : "rgba(196,125,142,0.12)") : (dark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)")}` }}>
         {!isUser && <div style={{ fontSize: 12, fontWeight: 600, color: isBot ? (dark ? "#6ee7b7" : "#059669") : (dark ? "#60a5fa" : "#2563eb"), marginBottom: 3 }}>{m.name || (isBot ? "Nitro Bot" : "Support")}</div>}
-        <div style={{ fontSize: 14, color: t.text, lineHeight: 1.6, whiteSpace: "pre-line" }}>{m.formatted ? <FormatText text={m.text} dark={dark} /> : m.text}</div>
+        <div style={{ fontSize: 14, color: t.text, lineHeight: 1.6, whiteSpace: "pre-line" }}>{m.formatted ? <FormatText text={m.text || ""} dark={dark} /> : (m.text || "")}</div>
       </div>
-      {m.time && <div style={{ fontSize: 10, color: t.textMuted, marginTop: 3, padding: "0 6px" }}>{m.time.includes("T") ? fD(m.time) : m.time}</div>}
+      {m.time && <div style={{ fontSize: 10, color: t.textMuted, marginTop: 3, padding: "0 6px" }}>{typeof m.time === "string" && m.time.includes("T") ? fD(m.time) : (m.time || "")}</div>}
     </div>
   );
 }
@@ -65,6 +66,11 @@ function Bubble({ m, dark, t }) {
 /* ═══ SUPPORT PAGE                        ═══ */
 /* ═══════════════════════════════════════════ */
 export default function SupportPage({ dark, t }) {
+  try { return <SupportPageInner dark={dark} t={t} />; }
+  catch (e) { return <div style={{ padding: 24, color: "red" }}>Support Error: {e?.message || "Unknown"}</div>; }
+}
+
+function SupportPageInner({ dark, t }) {
   const [tickets, setTickets] = useState([]);
   const [selected, setSelected] = useState(null); // null = bot chat, ticket object = ticket detail
   const [filter, setFilter] = useState("all");
