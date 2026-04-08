@@ -398,7 +398,7 @@ input { font-family: inherit; }
 .dash-section-title { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px; }
 
 /* Orders card */
-.dash-orders-card { border-radius: 16px; padding: 4px 16px; }
+.dash-orders-card { border-radius: 16px; padding: 4px 16px; margin-bottom: 8px; }
 .dash-order-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; gap: 12px; }
 .dash-order-service { font-size: 15px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .dash-order-meta { display: flex; gap: 12px; margin-top: 4px; flex-wrap: wrap; font-size: 13px; }
@@ -412,13 +412,13 @@ input { font-family: inherit; }
 .dash-placeholder { padding: 40px; border-radius: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 300px; }
 
 /* Mobile referral card */
-.dash-mobile-ref { display: none; margin-top: 16px; border-radius: 14px; padding: 16px; text-align: center; }
+.dash-mobile-ref { display: none; margin-top: 16px; margin-bottom: 8px; border-radius: 14px; padding: 16px; text-align: center; }
 .dash-ref-label { font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 4px; }
 .dash-ref-code { font-size: 18px; font-weight: 700; letter-spacing: 2px; }
 .dash-ref-stats { font-size: 13px; margin-top: 4px; }
 
 /* Footer */
-.dash-footer { padding: 16px 0 8px; margin-top: auto; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; font-size: 13px; border-top-width: 2px; border-top-style: solid; margin-left: -28px; margin-right: -28px; padding-left: 28px; padding-right: 28px; }
+.dash-footer { padding: 16px 0 8px; margin-top: auto; padding-top: 24px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; font-size: 13px; border-top-width: 1px; border-top-style: solid; margin-left: -28px; margin-right: -28px; padding-left: 28px; padding-right: 28px; }
 .dash-footer-links { display: flex; align-items: center; gap: 16px; }
 .dash-footer-links a { text-decoration: none; display: flex; align-items: center; }
 
