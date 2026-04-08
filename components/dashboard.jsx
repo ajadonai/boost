@@ -408,6 +408,9 @@ function DashboardInner() {
   // Persist to localStorage on change
   useEffect(() => { try { localStorage.setItem("nitro-notif-read", JSON.stringify([...readNotifIds])); } catch {} }, [readNotifIds]);
   useEffect(() => { try { localStorage.setItem("nitro-notif-cleared", JSON.stringify([...clearedNotifIds])); } catch {} }, [clearedNotifIds]);
+
+  // Scroll lock when sidebar or notification panel is open (mobile/tablet)
+  useEffect(() => { document.body.style.overflow = leftOpen || notifOpen ? "hidden" : ""; return () => { document.body.style.overflow = ""; }; }, [leftOpen, notifOpen]);
   const [user, setUser] = useState(null);
   const [orders, setOrders] = useState([]);
   const [txs, setTxs] = useState([]);
@@ -468,7 +471,7 @@ function DashboardInner() {
         if (maintRes.ok) { const m = await maintRes.json(); if (m.maintenance) { window.location.replace("/maintenance"); return; } }
         
         const res = await fetch("/api/dashboard");
-        if (res.status === 401) { try { await fetch("/api/auth/logout", { method: "POST" }); } catch {} window.location.replace("/?login=1"); return; }
+        if (res.status === 401) { try { await fetch("/api/auth/logout", { method: "POST" }); } catch {} window.location.replace("/?session_expired=1"); return; }
         if (res.ok) {
           const data = await res.json();
           setUser(data.user);
@@ -500,7 +503,7 @@ function DashboardInner() {
     const poll = async () => {
       try {
         const res = await fetch("/api/dashboard");
-        if (res.status === 401) { try { await fetch("/api/auth/logout", { method: "POST" }); } catch {} window.location.replace("/?login=1"); return; }
+        if (res.status === 401) { try { await fetch("/api/auth/logout", { method: "POST" }); } catch {} window.location.replace("/?session_expired=1"); return; }
         if (res.ok) {
           const data = await res.json();
           if (data.user) setUser(data.user);

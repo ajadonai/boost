@@ -55,9 +55,13 @@ function LandingInner(){
   useEffect(()=>{const el=scrollRef.current;if(!el)return;const onScroll=()=>setScrolled(el.scrollTop>20);el.addEventListener("scroll",onScroll);return()=>el.removeEventListener("scroll",onScroll);},[]);
   const [logoutMsg,setLogoutMsg]=useState(false);
   const [googleError,setGoogleError]=useState(false);
-  useEffect(()=>{const p=new URLSearchParams(window.location.search);if(p.get("login"))setModal("login");if(p.get("signup"))setModal("signup");if(p.get("ref"))setModal("signup");if(p.get("logout")){setLogoutMsg(true);window.history.replaceState({},"","/");setTimeout(()=>setLogoutMsg(false),4000);}if(p.get("google_error")){setGoogleError(true);window.history.replaceState({},"","/");setTimeout(()=>setGoogleError(false),5000);setModal("login");}},[]);
+  const [sessionExpired,setSessionExpired]=useState(false);
+  useEffect(()=>{const p=new URLSearchParams(window.location.search);if(p.get("login"))setModal("login");if(p.get("signup"))setModal("signup");if(p.get("ref"))setModal("signup");if(p.get("session_expired")){setSessionExpired(true);window.history.replaceState({},"","/");}if(p.get("logout")){setLogoutMsg(true);window.history.replaceState({},"","/");setTimeout(()=>setLogoutMsg(false),4000);}if(p.get("google_error")){setGoogleError(true);window.history.replaceState({},"","/");setTimeout(()=>setGoogleError(false),5000);setModal("login");}},[]);
   useEffect(()=>{(async()=>{try{const [siRes,stRes]=await Promise.all([fetch("/api/site-info"),fetch("/api/settings")]);if(siRes.ok){const d=await siRes.json();if(d.stats)setSiteStats(d.stats);if(d.promo)setPromoBanner(d.promo);if(d.alerts?.length)setSiteAlerts(d.alerts);}if(stRes.ok){const d=await stRes.json();setSocialLinks(d.settings||{});}}catch{}})();},[]);
   const closeModal=useCallback(()=>setModal(null),[]);
+
+  // Scroll lock when modal is open
+  useEffect(()=>{if(modal){document.body.style.overflow="hidden";}else{document.body.style.overflow="";}return()=>{document.body.style.overflow="";};},[modal]);
 
   // Hero card auth handlers
   const heroLoginSubmit=async()=>{
@@ -489,6 +493,22 @@ function LandingInner(){
       {logoutMsg&&<div style={{position:"fixed",top:24,left:"50%",transform:"translateX(-50%)",zIndex:9999,padding:"14px 28px",borderRadius:16,background:dark?"rgba(17,22,40,.97)":"rgba(255,255,255,.97)",border:`1px solid ${dark?"rgba(110,231,183,.2)":"rgba(5,150,105,.15)"}`,backdropFilter:"blur(16px)",boxShadow:dark?"0 12px 40px rgba(0,0,0,.5)":"0 12px 40px rgba(0,0,0,.12)",display:"flex",alignItems:"center",gap:12,animation:"fu .4s ease"}}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6ee7b7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg><span style={{fontSize:14,fontWeight:550,color:t.text}}>You've been logged out successfully</span></div>}
 
       {googleError&&<div style={{position:"fixed",top:24,left:"50%",transform:"translateX(-50%)",zIndex:9999,padding:"14px 28px",borderRadius:16,background:dark?"rgba(17,22,40,.97)":"rgba(255,255,255,.97)",border:`1px solid ${dark?"rgba(220,38,38,.2)":"rgba(220,38,38,.15)"}`,backdropFilter:"blur(16px)",boxShadow:dark?"0 12px 40px rgba(0,0,0,.5)":"0 12px 40px rgba(0,0,0,.12)",display:"flex",alignItems:"center",gap:12,animation:"fu .4s ease"}}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={dark?"#fca5a5":"#dc2626"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg><span style={{fontSize:14,fontWeight:550,color:t.text}}>Google sign-in failed. Please try again or use email.</span></div>}
+
+      {/* Session expired banner */}
+      {sessionExpired&&<div style={{position:"fixed",top:0,left:0,right:0,zIndex:9998,padding:"14px 16px",background:dark?"rgba(17,22,40,.98)":"rgba(255,255,255,.98)",borderBottom:`1px solid ${dark?"rgba(224,164,88,.2)":"rgba(217,119,6,.12)"}`,backdropFilter:"blur(16px)",animation:"fu .4s ease"}}>
+        <div style={{maxWidth:600,margin:"0 auto",display:"flex",gap:12,alignItems:"flex-start"}}>
+          <div style={{width:32,height:32,borderRadius:8,background:dark?"rgba(224,164,88,.12)":"rgba(217,119,6,.08)",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,marginTop:1}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={dark?"#e0a458":"#d97706"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+          <div style={{flex:1}}>
+            <div style={{fontSize:14,fontWeight:600,color:dark?"#fbbf24":"#92400e",marginBottom:3}}>Signed out — new login detected</div>
+            <div style={{fontSize:13,color:dark?"#a09b95":"#555250",lineHeight:1.5,marginBottom:10}}>Your account was logged in on another device. If this wasn't you, secure your account immediately.</div>
+            <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+              <button onClick={()=>{setSessionExpired(false);setModal("login");}} style={{padding:"7px 18px",borderRadius:8,background:"linear-gradient(135deg,#c47d8e,#a3586b)",color:"#fff",fontSize:13,fontWeight:600,border:"none",cursor:"pointer"}}>Log In</button>
+              <button onClick={()=>{setSessionExpired(false);setModal("forgot");}} style={{padding:"7px 18px",borderRadius:8,background:dark?"rgba(224,164,88,.1)":"rgba(217,119,6,.06)",border:`1px solid ${dark?"rgba(224,164,88,.25)":"rgba(217,119,6,.2)"}`,color:dark?"#e0a458":"#92400e",fontSize:13,fontWeight:600,cursor:"pointer"}}>Reset Password</button>
+            </div>
+          </div>
+          <button onClick={()=>setSessionExpired(false)} style={{background:"none",border:"none",color:dark?"#706c68":"#757170",fontSize:18,cursor:"pointer",padding:0,lineHeight:1,flexShrink:0}}>×</button>
+        </div>
+      </div>}
 
       
     </div>
