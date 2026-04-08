@@ -6,7 +6,7 @@ import { useConfirm } from "./confirm-dialog";
 function statusClr(s, dk) { return s === "Open" ? (dk ? "#fcd34d" : "#d97706") : s === "In Progress" ? (dk ? "#60a5fa" : "#2563eb") : (dk ? "#6ee7b7" : "#059669"); }
 function statusBg(s, dk) { return s === "Open" ? (dk ? "rgba(234,179,8,0.1)" : "rgba(234,179,8,0.06)") : s === "In Progress" ? (dk ? "rgba(96,165,250,0.08)" : "rgba(37,99,235,0.06)") : (dk ? "rgba(110,231,183,0.08)" : "rgba(16,185,129,0.06)"); }
 
-export default function AdminTicketsPage({ dark, t }) {
+export default function AdminTicketsPage({ dark, t, adminName }) {
   const confirm = useConfirm();
   const [tickets, setTickets] = useState([]);
   const [selected, setSelected] = useState(null);
@@ -68,7 +68,29 @@ export default function AdminTicketsPage({ dark, t }) {
     } catch {}
   };
 
-  const selectTicket = (tk) => { setSelected(tk); setReply(""); setMobileView("chat"); };
+  const selectTicket = (tk) => {
+    // Unlock previous ticket
+    if (selected?.id) fetch("/api/admin/tickets", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "unlock", ticketId: selected.id }) }).catch(() => {});
+    setSelected(tk); setReply(""); setMobileView("chat");
+    // Lock new ticket
+    fetch("/api/admin/tickets", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "lock", ticketId: tk.id }) }).catch(() => {});
+  };
+
+  // Heartbeat — refresh lock every 2 min while viewing
+  useEffect(() => {
+    if (!selected?.id) return;
+    const iv = setInterval(() => {
+      fetch("/api/admin/tickets", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "heartbeat", ticketId: selected.id }) }).catch(() => {});
+    }, 120000); // 2 min
+    return () => clearInterval(iv);
+  }, [selected?.id]);
+
+  // Unlock on unmount
+  useEffect(() => {
+    return () => {
+      if (selected?.id) fetch("/api/admin/tickets", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "unlock", ticketId: selected.id }) }).catch(() => {});
+    };
+  }, []);
 
   if (loading) return <div style={{ padding: 24, color: t.textMuted }}>Loading tickets...</div>;
 
@@ -103,8 +125,9 @@ export default function AdminTicketsPage({ dark, t }) {
                 </div>
                 <div style={{ fontSize: 12, color: dark ? "rgba(255,255,255,0.7)" : t.text, marginBottom: 4 }}>{tk.subject}</div>
                 <div style={{ fontSize: 11, color: t.textMuted, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", marginBottom: 5 }}>{lastText}</div>
-                <div style={{ display: "flex", gap: 5 }}>
-                  <span style={{ fontSize: 10, fontWeight: 600, padding: "2px 7px", borderRadius: 4, background: statusBg(tk.status, dark), color: statusClr(tk.status, dark) }}>{tk.status.toLowerCase()}</span>
+                <div style={{ display: "flex", gap: 5, alignItems: "center" }}>
+                  <span style={{ fontSize: 10, fontWeight: 600, padding: "2px 7px", borderRadius: 4, background: statusBg(tk.status, dark), color: statusClr(tk.status, dark) }}>{(tk.status || "").toLowerCase()}</span>
+                  {tk.lockedBy && <span style={{ fontSize: 9, color: dark ? "#fcd34d" : "#d97706" }}>🔒 {tk.lockedBy}</span>}
                 </div>
               </div>
             );
@@ -157,13 +180,20 @@ export default function AdminTicketsPage({ dark, t }) {
             <div ref={msgsEnd} />
           </div>
 
-          {selected.status !== "Resolved" ? (
-            <div style={{ padding: "12px 16px", borderTop: `1px solid ${t.cardBorder}`, display: "flex", gap: 8, alignItems: "flex-end", flexShrink: 0 }}>
-              <textarea value={reply} onChange={e => setReply(e.target.value)} onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); doReply(); } }} placeholder={`Reply to ${selected.user?.split(" ")[0]}...`} rows={1} style={{ flex: 1, padding: "10px 14px", borderRadius: 12, background: dark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.02)", border: `1px solid ${t.cardBorder}`, color: t.text, fontSize: 13, outline: "none", fontFamily: "inherit", resize: "none", lineHeight: 1.5, minHeight: 42, maxHeight: 100 }} />
-              <button onClick={doReply} style={{ padding: "9px 18px", borderRadius: 10, background: reply.trim() ? `linear-gradient(135deg,${t.accent},#a3586b)` : (dark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.02)"), color: reply.trim() ? "#fff" : t.textMuted, fontSize: 12, fontWeight: 600, border: "none", cursor: reply.trim() ? "pointer" : "default", whiteSpace: "nowrap" }}>Send</button>
-              <button onClick={doResolve} style={{ padding: "9px 14px", borderRadius: 10, background: "none", border: `1px solid ${dark ? "rgba(110,231,183,0.15)" : "rgba(16,185,129,0.12)"}`, color: dark ? "#6ee7b7" : "#059669", fontSize: 12, fontWeight: 500, cursor: "pointer", whiteSpace: "nowrap" }}>Resolve</button>
-            </div>
-          ) : (
+          {selected.status !== "Resolved" && selected.status !== "Archived" ? (() => {
+            const lockedByOther = selected.lockedBy && selected.lockedBy !== adminName;
+            return lockedByOther ? (
+              <div style={{ padding: "12px 16px", borderTop: `1px solid ${t.cardBorder}`, textAlign: "center", fontSize: 12, color: dark ? "#fcd34d" : "#d97706", flexShrink: 0, background: dark ? "rgba(234,179,8,0.04)" : "rgba(234,179,8,0.03)" }}>
+                🔒 {selected.lockedBy} is handling this ticket
+              </div>
+            ) : (
+              <div style={{ padding: "12px 16px", borderTop: `1px solid ${t.cardBorder}`, display: "flex", gap: 8, alignItems: "flex-end", flexShrink: 0 }}>
+                <textarea value={reply} onChange={e => setReply(e.target.value)} onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); doReply(); } }} placeholder={`Reply to ${selected.user?.split(" ")[0]}...`} rows={1} style={{ flex: 1, padding: "10px 14px", borderRadius: 12, background: dark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.02)", border: `1px solid ${t.cardBorder}`, color: t.text, fontSize: 13, outline: "none", fontFamily: "inherit", resize: "none", lineHeight: 1.5, minHeight: 42, maxHeight: 100 }} />
+                <button onClick={doReply} style={{ padding: "9px 18px", borderRadius: 10, background: reply.trim() ? `linear-gradient(135deg,${t.accent},#a3586b)` : (dark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.02)"), color: reply.trim() ? "#fff" : t.textMuted, fontSize: 12, fontWeight: 600, border: "none", cursor: reply.trim() ? "pointer" : "default", whiteSpace: "nowrap" }}>Send</button>
+                <button onClick={doResolve} style={{ padding: "9px 14px", borderRadius: 10, background: "none", border: `1px solid ${dark ? "rgba(110,231,183,0.15)" : "rgba(16,185,129,0.12)"}`, color: dark ? "#6ee7b7" : "#059669", fontSize: 12, fontWeight: 500, cursor: "pointer", whiteSpace: "nowrap" }}>Resolve</button>
+              </div>
+            );
+          })() : (
             <div style={{ padding: "14px 18px", borderTop: `1px solid ${t.cardBorder}`, textAlign: "center", fontSize: 12, color: t.textMuted, flexShrink: 0, display: "flex", justifyContent: "center", gap: 12 }}>
               <span>Ticket resolved</span>
               <button onClick={async () => { await fetch("/api/admin/tickets", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "reopen", ticketId: selected.id }) }); refreshTickets(); }} style={{ background: "none", border: "none", color: t.accent, fontSize: 12, cursor: "pointer", fontFamily: "inherit" }}>Reopen</button>

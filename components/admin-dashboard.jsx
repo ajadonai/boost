@@ -348,7 +348,7 @@ function AdminDashboardInner() {
       case "overview": return <AdminOverview data={data} dark={dark} t={t} setActive={setActive} />;
       case "orders": return <AdminOrdersPage dark={dark} t={t} />;
       case "users": return <AdminUsersPage dark={dark} t={t} />;
-      case "tickets": return <AdminTicketsPage dark={dark} t={t} />;
+      case "tickets": return <AdminTicketsPage dark={dark} t={t} adminName={admin?.name || "Admin"} />;
       case "services": return <AdminServicesPage dark={dark} t={t} />;
       case "menu-builder": return <AdminServiceGroupsPage dark={dark} t={t} />;
       case "pricing": return <AdminPricingPage dark={dark} t={t} />;

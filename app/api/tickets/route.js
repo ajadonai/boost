@@ -21,7 +21,7 @@ export async function GET() {
         subject: tk.subject,
         message: tk.message,
         category: tk.orderId ? 'Order Issue' : 'General',
-        status: tk.status,
+        status: tk.status === 'Archived' ? 'Resolved' : tk.status,
         created: tk.createdAt.toISOString(),
         messages: [
           { from: 'user', text: tk.message, time: tk.createdAt.toISOString() },
