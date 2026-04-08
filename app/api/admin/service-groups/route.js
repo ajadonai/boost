@@ -197,9 +197,12 @@ export async function POST(req) {
       const ms = {};
       markupRows.forEach(s => { ms[s.key] = s.value; });
 
-      // Get all tiers with their linked service
+      // Get all tiers with their linked service AND group (to check nigerian flag)
       const allTiers = await prisma.serviceTier.findMany({
-        include: { service: { select: { costPer1k: true } } },
+        include: {
+          service: { select: { costPer1k: true } },
+          group: { select: { nigerian: true } },
+        },
       });
 
       let updated = 0;
@@ -212,7 +215,18 @@ export async function POST(req) {
           skipped++;
           continue;
         }
-        const newSell = Math.min(calculateTierPrice(t.service.costPer1k, t.tier, ms), INT4_MAX);
+        // Build settings object — swap in Nigerian markup keys if this is a Nigerian group
+        let tierMs = ms;
+        if (t.group?.nigerian) {
+          tierMs = {
+            ...ms,
+            markup_budget: ms.markup_ng_budget || ms.markup_budget,
+            markup_standard: ms.markup_ng_standard || ms.markup_standard,
+            markup_premium: ms.markup_ng_premium || ms.markup_premium,
+            markup_default: ms.markup_ng_default || ms.markup_default,
+          };
+        }
+        const newSell = Math.min(calculateTierPrice(t.service.costPer1k, t.tier, tierMs), INT4_MAX);
         if (newSell !== t.sellPer1k) {
           ops.push(prisma.serviceTier.update({ where: { id: t.id }, data: { sellPer1k: newSell } }));
           updated++;
