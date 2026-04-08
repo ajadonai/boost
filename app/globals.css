@@ -1650,6 +1650,22 @@ input { font-family: inherit; }
 .sup-tkt-row { transition: background-color .15s ease !important; }
 .sup-tkt-row:hover { background-color: rgba(196,125,142,.03) !important; }
 
+/* Support split layout */
+.sup-split { min-height: 500px; }
+.sup-split-list { display: flex; flex-direction: column; }
+.sup-split-chat { display: flex; flex-direction: column; }
+.sup-mobile-back { display: none !important; }
+
+@media (max-width: 767px) {
+  .sup-split { flex-direction: column; }
+  .sup-split-list { width: 100% !important; border-right: none !important; max-height: 240px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+  .sup-split-chat { flex: 1; }
+  .sup-mobile-back { display: flex !important; }
+}
+@media (max-width: 1199px) and (min-width: 768px) {
+  .sup-split-list { width: 240px !important; }
+}
+
 /* ═══════════════════════════════════════════ */
 /* ═══ PUBLIC BLOG                          ═══ */
 /* ═══════════════════════════════════════════ */
