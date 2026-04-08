@@ -231,26 +231,26 @@ function RightSidebar({ orders, user, dark, t, setActive }) {
 /* ═══════════════════════════════════════════ */
 /* ═══ NOTIFICATION DROPDOWN              ═══ */
 /* ═══════════════════════════════════════════ */
-function NotifDropdown({ orders, txs, dark, t, onClose, readIds, setReadIds }) {
+function NotifDropdown({ orders, txs, dark, t, onClose, readIds, setReadIds, clearedIds, setClearedIds }) {
   const [filter, setFilter] = useState("all");
 
-  /* Build notification items from real data */
-  const items = [
-    ...orders.filter(o => o.status === "Completed").slice(0, 3).map(o => ({
+  /* Build ALL notification items from real data */
+  const allItems = [
+    ...orders.filter(o => o.status === "Completed").map(o => ({
       id: `ord-${o.id}`, type: "order", title: "Order completed",
       desc: `${o.id} · ${o.service || "Service"} delivered`,
       time: o.created ? fD(o.created) : "",
       color: dark ? "#60a5fa" : "#2563eb",
       icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>,
     })),
-    ...orders.filter(o => o.status === "Processing" || o.status === "Pending").slice(0, 2).map(o => ({
+    ...orders.filter(o => o.status === "Processing" || o.status === "Pending").map(o => ({
       id: `proc-${o.id}`, type: "order", title: "Order processing",
       desc: `${o.id} · ${o.service || "Service"} started`,
       time: o.created ? fD(o.created) : "",
       color: dark ? "#e0a458" : "#d97706",
       icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
     })),
-    ...txs.filter(tx => tx.type === "deposit").slice(0, 2).map(tx => ({
+    ...txs.filter(tx => tx.type === "deposit").map(tx => ({
       id: `dep-${tx.id || tx.reference}`, type: "deposit", title: "Deposit received",
       desc: `${fN(tx.amount)} added via ${tx.method || "Paystack"}`,
       time: tx.date ? fD(tx.date) : "",
@@ -259,10 +259,15 @@ function NotifDropdown({ orders, txs, dark, t, onClose, readIds, setReadIds }) {
     })),
   ];
 
+  // Filter out cleared items
+  const items = allItems.filter(n => !clearedIds.has(n.id));
   const filtered = filter === "all" ? items : items.filter(n => n.type === filter);
+  const display = filtered.slice(0, 10);
+  const hasMore = filtered.length > 10;
   const unreadCount = items.filter(n => !readIds.has(n.id)).length;
-  const markAllRead = () => setReadIds(new Set(items.map(n => n.id)));
+  const markAllRead = () => setReadIds(new Set([...readIds, ...items.map(n => n.id)]));
   const markRead = (id) => setReadIds(prev => new Set([...prev, id]));
+  const clearAll = () => { setClearedIds(new Set([...clearedIds, ...items.map(n => n.id)])); };
 
   return (
     <div className="dash-notif" style={{
@@ -276,21 +281,24 @@ function NotifDropdown({ orders, txs, dark, t, onClose, readIds, setReadIds }) {
           <span style={{ fontSize: 15, fontWeight: 700, color: t.text }}>Notifications</span>
           {unreadCount > 0 && <span className="m" style={{ fontSize: 11, padding: "2px 6px", borderRadius: 5, background: dark ? "#1c1015" : "#fdf2f4", color: t.accent, fontWeight: 700 }}>{unreadCount}</span>}
         </div>
-        {unreadCount > 0 && <button onClick={markAllRead} style={{ fontSize: 13, fontWeight: 600, color: t.accent, background: "none" }}>Mark all read</button>}
+        <div style={{ display: "flex", gap: 10 }}>
+          {unreadCount > 0 && <button onClick={markAllRead} style={{ fontSize: 12, fontWeight: 600, color: t.accent, background: "none", border: "none", cursor: "pointer" }}>Mark all read</button>}
+          {items.length > 0 && <button onClick={clearAll} style={{ fontSize: 12, fontWeight: 600, color: t.textMuted, background: "none", border: "none", cursor: "pointer" }}>Clear all</button>}
+        </div>
       </div>
       {/* Filter tabs */}
       <div style={{ display: "flex", gap: 4, padding: "0 14px 10px" }}>
         {[["all", "All"], ["order", "Orders"], ["deposit", "Deposits"]].map(([id, label]) => (
-          <button key={id} onClick={() => setFilter(id)} style={{ padding: "3px 10px", borderRadius: 7, fontSize: 12, fontWeight: 550, background: filter === id ? (dark ? "rgba(196,125,142,.1)" : "rgba(196,125,142,.06)") : "transparent", color: filter === id ? t.accent : t.textMuted }}>{label}</button>
+          <button key={id} onClick={() => setFilter(id)} style={{ padding: "3px 10px", borderRadius: 7, fontSize: 12, fontWeight: 550, background: filter === id ? (dark ? "rgba(196,125,142,.1)" : "rgba(196,125,142,.06)") : "transparent", color: filter === id ? t.accent : t.textMuted, border: "none", cursor: "pointer" }}>{label}</button>
         ))}
       </div>
       <div style={{ height: 1, background: t.cardBorder }} />
       {/* List */}
       <div className="dash-notif-list">
-        {filtered.length > 0 ? filtered.map((n, i) => {
+        {display.length > 0 ? display.map((n, i) => {
           const isRead = readIds.has(n.id);
           return (
-            <div key={n.id} onClick={() => markRead(n.id)} className="dash-notif-item" style={{ borderBottom: i < filtered.length - 1 ? `1px solid ${t.cardBorder}` : "none", background: !isRead ? (dark ? "rgba(196,125,142,.03)" : "rgba(196,125,142,.02)") : "transparent", cursor: "pointer" }}>
+            <div key={n.id} onClick={() => markRead(n.id)} className="dash-notif-item" style={{ borderBottom: i < display.length - 1 ? `1px solid ${t.cardBorder}` : "none", background: !isRead ? (dark ? "rgba(196,125,142,.03)" : "rgba(196,125,142,.02)") : "transparent", cursor: "pointer" }}>
               <div className="dash-notif-icon" style={{ background: `${n.color}15`, color: n.color }}>{n.icon}</div>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 6 }}>
@@ -306,6 +314,8 @@ function NotifDropdown({ orders, txs, dark, t, onClose, readIds, setReadIds }) {
           <div style={{ padding: "24px 14px", textAlign: "center", fontSize: 13, color: t.textMuted }}>No notifications</div>
         )}
       </div>
+      {/* Footer */}
+      {hasMore && <div style={{ padding: "8px 14px", textAlign: "center", fontSize: 11, color: t.textMuted, borderTop: `1px solid ${t.cardBorder}` }}>Showing latest 10 of {filtered.length}</div>}
     </div>
   );
 }
@@ -332,6 +342,7 @@ function DashboardInner() {
   const [leftOpen, setLeftOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const [readNotifIds, setReadNotifIds] = useState(new Set());
+  const [clearedNotifIds, setClearedNotifIds] = useState(new Set());
   const [user, setUser] = useState(null);
   const [orders, setOrders] = useState([]);
   const [txs, setTxs] = useState([]);
@@ -340,15 +351,15 @@ function DashboardInner() {
   const [paymentStatus, setPaymentStatus] = useState(null); // { type: "success"|"error", message, amount }
   const notifRef = useRef(null);
 
-  // Compute notification item IDs for bell dot
+  // Compute notification item IDs for bell badge
   const notifItemIds = useMemo(() => {
     const ids = [];
-    orders.filter(o => o.status === "Completed").slice(0, 3).forEach(o => ids.push(`ord-${o.id}`));
-    orders.filter(o => o.status === "Processing" || o.status === "Pending").slice(0, 2).forEach(o => ids.push(`proc-${o.id}`));
-    txs.filter(tx => tx.type === "deposit").slice(0, 2).forEach(tx => ids.push(`dep-${tx.id || tx.reference}`));
+    orders.filter(o => o.status === "Completed").forEach(o => ids.push(`ord-${o.id}`));
+    orders.filter(o => o.status === "Processing" || o.status === "Pending").forEach(o => ids.push(`proc-${o.id}`));
+    txs.filter(tx => tx.type === "deposit").forEach(tx => ids.push(`dep-${tx.id || tx.reference}`));
     return ids;
   }, [orders, txs]);
-  const bellUnread = notifItemIds.filter(id => !readNotifIds.has(id)).length;
+  const bellUnread = notifItemIds.filter(id => !readNotifIds.has(id) && !clearedNotifIds.has(id)).length;
 
   /* New Order state (lifted so sidebars can access) */
   const [noPlatform, setNoPlatform] = useState("instagram");
@@ -607,9 +618,9 @@ function DashboardInner() {
           <div ref={notifRef} style={{ position: "relative" }}>
             <button onClick={() => setNotifOpen(!notifOpen)} className="dash-bell" style={{ color: t.textSoft }}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
-              {bellUnread > 0 && <div className="dash-bell-dot" />}
+              {bellUnread > 0 && <div className="dash-bell-badge">{bellUnread > 10 ? "10+" : bellUnread}</div>}
             </button>
-            {notifOpen && <NotifDropdown orders={orders} txs={txs} dark={dark} t={t} onClose={() => setNotifOpen(false)} readIds={readNotifIds} setReadIds={setReadNotifIds} />}
+            {notifOpen && <NotifDropdown orders={orders} txs={txs} dark={dark} t={t} onClose={() => setNotifOpen(false)} readIds={readNotifIds} setReadIds={setReadNotifIds} clearedIds={clearedNotifIds} setClearedIds={setClearedNotifIds} />}
           </div>
           {/* Avatar → Settings */}
           <button onClick={() => { setActive("settings"); setLeftOpen(false); }} className="dash-avatar-btn">

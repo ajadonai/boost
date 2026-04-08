@@ -345,6 +345,7 @@ input { font-family: inherit; }
 /* Bell */
 .dash-bell { background: none; display: flex; position: relative; padding: 2px; }
 .dash-bell-dot { position: absolute; top: 0; right: 0; width: 7px; height: 7px; border-radius: 50%; background: #dc2626; }
+.dash-bell-badge { position: absolute; top: -4px; right: -6px; min-width: 16px; height: 16px; border-radius: 8px; background: #dc2626; color: #fff; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; padding: 0 4px; font-family: 'JetBrains Mono', monospace; line-height: 1; }
 
 /* Avatar */
 .dash-avatar-btn { background: none; display: flex; align-items: center; gap: 8px; cursor: pointer; }
