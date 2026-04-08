@@ -1546,7 +1546,7 @@ input { font-family: inherit; }
 /* Admin sidebar — distribute items evenly across full height */
 .admin-sidebar { padding: 10px 12px; display: flex; flex-direction: column; overflow: hidden; }
 .admin-sidebar .dash-nav-item { padding: 7px 14px; font-size: 13.5px; gap: 10px; margin-bottom: 0; }
-.admin-sidebar .adm-nav-section { font-size: 10px; padding: 8px 14px 3px; }
+.admin-sidebar .adm-nav-section { font-size: 10px; padding: 16px 14px 4px; }
 
 @media (max-width: 1199px) {
   .admin-sidebar { overflow: auto; justify-content: flex-start; }
