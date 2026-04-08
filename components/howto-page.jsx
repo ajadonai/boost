@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect } from "react";
+import DOMPurify from "dompurify";
 
 export default function HowToPage({ dark, t }) {
   const [posts, setPosts] = useState([]);
@@ -61,7 +62,7 @@ export default function HowToPage({ dark, t }) {
                 {/* Expanded: show full content */}
                 {expanded === p.id && (
                   <div style={{ marginTop: 14, paddingTop: 14, borderTop: `1px solid ${t.cardBorder}` }}>
-                    <div style={{ fontSize: 13, color: t.textSoft, lineHeight: 1.8 }} dangerouslySetInnerHTML={{ __html: p.content || "" }} />
+                    <div style={{ fontSize: 13, color: t.textSoft, lineHeight: 1.8 }} dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(p.content || "") }} />
                   </div>
                 )}
 
