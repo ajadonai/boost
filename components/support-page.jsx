@@ -174,9 +174,12 @@ function SupportPageInner({ dark, t }) {
   const sendMsg = () => {
     if (!input.trim()) return;
     const txt = input.trim(); setInput("");
-    if (selected && selected !== "new") { // Ticket reply
-      addMsg({ from: "user", text: txt, time: "Now" });
+    if (selected && selected !== "new" && typeof selected === "object") {
+      // Ticket reply — update selected locally + send to API
+      const newMsg = { from: "user", text: txt, time: "Now" };
+      setSelected(prev => ({ ...prev, messages: [...(prev.messages || []), newMsg] }));
       fetch("/api/tickets", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "reply", ticketId: selected.id, message: txt }) }).then(() => refreshTickets()).catch(() => {});
+      setTimeout(() => msgsEnd.current?.scrollIntoView({ behavior: "smooth" }), 100);
       return;
     }
     addMsg({ from: "user", text: txt, time: "Now" });
