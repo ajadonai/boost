@@ -206,12 +206,13 @@ export async function POST(req) {
       let skipped = 0;
       const ops = [];
 
+      const INT4_MAX = 2147483647;
       for (const t of allTiers) {
         if (!t.service || !t.service.costPer1k || t.service.costPer1k <= 0) {
           skipped++;
           continue;
         }
-        const newSell = calculateTierPrice(t.service.costPer1k, t.tier, ms);
+        const newSell = Math.min(calculateTierPrice(t.service.costPer1k, t.tier, ms), INT4_MAX);
         if (newSell !== t.sellPer1k) {
           ops.push(prisma.serviceTier.update({ where: { id: t.id }, data: { sellPer1k: newSell } }));
           updated++;
