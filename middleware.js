@@ -16,6 +16,17 @@ async function verifyToken(token, secret) {
 export async function middleware(request) {
   const { pathname } = request.nextUrl;
 
+  // ── Redirect logged-in users away from landing page ──
+  if (pathname === '/') {
+    const token = request.cookies.get('nitro_token')?.value;
+    if (token) {
+      const payload = await verifyToken(token, SECRET);
+      if (payload?.type === 'user') {
+        return NextResponse.redirect(new URL('/dashboard', request.url));
+      }
+    }
+  }
+
   // ── Protect /verify — must have a user token (unverified user) ──
   if (pathname === '/verify') {
     const token = request.cookies.get('nitro_token')?.value;
@@ -73,5 +84,5 @@ export async function middleware(request) {
 }
 
 export const config = {
-  matcher: ['/verify', '/dashboard/:path*', '/admin/:path*'],
+  matcher: ['/', '/verify', '/dashboard/:path*', '/admin/:path*'],
 };
