@@ -20,9 +20,8 @@ export async function GET() {
       },
     });
 
-    // Also return raw MTP services for the admin picker
+    // Also return raw MTP services for the admin picker (all, not just enabled)
     const services = await prisma.service.findMany({
-      where: { enabled: true },
       orderBy: { category: 'asc' },
       select: { id: true, apiId: true, name: true, category: true, costPer1k: true, sellPer1k: true, min: true, max: true, refill: true, avgTime: true },
     });
