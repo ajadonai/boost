@@ -433,12 +433,12 @@ function AdminDashboardInner() {
 
         {leftOpen && <div className="dash-overlay" onClick={() => setLeftOpen(false)} />}
 
-        <main className="dash-main" style={{ background: t.bg }}>
-          <div key={active} className="dash-page-enter">
+        <main className="dash-main" style={{ background: t.bg, ...(active === "tickets" ? { overflow: "hidden" } : {}) }}>
+          <div key={active} className="dash-page-enter" style={active === "tickets" ? { flex: 1, display: "flex", flexDirection: "column", minHeight: 0, overflow: "hidden" } : undefined}>
             {renderPage()}
           </div>
 
-          <div className="dash-footer" style={{ borderTopColor: t.sidebarBorder }}>
+          <div className="dash-footer" style={{ borderTopColor: t.sidebarBorder, flexShrink: 0 }}>
             <span style={{ color: t.textMuted }}>© {new Date().getFullYear() > 2026 ? `2026–${new Date().getFullYear()}` : "2026"} Nitro Admin</span>
             <span className="m" style={{ fontSize: 12, color: t.textMuted }}>v1.0.0</span>
           </div>

@@ -66,9 +66,9 @@ export default function AdminTicketsPage({ dark, t }) {
   if (loading) return <div style={{ padding: 24, color: t.textMuted }}>Loading tickets...</div>;
 
   return (
-    <div style={{ display: "flex", gap: 0, height: "100%", minHeight: 500 }}>
+    <div style={{ display: "flex", flex: 1, overflow: "hidden", minHeight: 0, borderRadius: 12, border: `1px solid ${t.cardBorder}` }}>
       {/* ═══ LEFT: TICKET LIST ═══ */}
-      <div style={{ width: 280, borderRight: `1px solid ${t.cardBorder}`, display: "flex", flexDirection: "column", flexShrink: 0 }}>
+      <div style={{ width: 280, borderRight: `1px solid ${t.cardBorder}`, display: "flex", flexDirection: "column", flexShrink: 0, overflow: "hidden" }}>
         <div style={{ padding: "14px 16px", borderBottom: `1px solid ${t.cardBorder}` }}>
           <div style={{ fontSize: 14, fontWeight: 600, color: t.text }}>Support inbox</div>
           <div style={{ fontSize: 11, color: t.textMuted, marginTop: 2 }}>{openCount} active</div>
@@ -106,7 +106,7 @@ export default function AdminTicketsPage({ dark, t }) {
       </div>
 
       {/* ═══ CENTER: CONVERSATION ═══ */}
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0, minHeight: 0 }}>
         {selected ? <>
           <div style={{ padding: "14px 18px", borderBottom: `1px solid ${t.cardBorder}`, flexShrink: 0 }}>
             <div style={{ fontSize: 15, fontWeight: 550, color: t.text, display: "flex", alignItems: "center", gap: 8 }}>
