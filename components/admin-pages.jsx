@@ -308,6 +308,7 @@ export function AdminSettingsPage({ admin, dark, t, themeMode, setThemeMode, set
   const [refMsg, setRefMsg] = useState(null);
   const [markupSaving, setMarkupSaving] = useState(false);
   const [markupMsg, setMarkupMsg] = useState(null);
+  const [recalculating, setRecalculating] = useState(false);
 
   useEffect(() => {
     fetch("/api/admin/settings").then(r => r.json()).then(d => {
@@ -545,6 +546,25 @@ export function AdminSettingsPage({ admin, dark, t, themeMode, setThemeMode, set
               } catch { setMarkupMsg({ type: "error", text: "Request failed" }); }
               setMarkupSaving(false);
             }} disabled={markupSaving} className="adm-btn-primary" style={{ opacity: markupSaving ? .5 : 1 }}>{markupSaving ? "Saving..." : "Save Markup Settings"}</button>
+            <div style={{ marginTop: 12, paddingTop: 12, borderTop: `1px solid ${dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)"}` }}>
+              <div style={{ fontSize: 12, color: t.textMuted, marginBottom: 8, lineHeight: 1.5 }}>Apply current markup to all existing service tiers. This will overwrite all sell prices based on each service's cost and tier level.</div>
+              <button onClick={async () => {
+                if (!await confirm({ title: "Recalculate All Prices", message: "This will overwrite ALL existing tier sell prices using the current markup percentages. Any custom prices you've set will be replaced. Continue?", confirmLabel: "Recalculate", danger: true })) return;
+                setRecalculating(true); setMarkupMsg(null);
+                try {
+                  // Save markup first, then recalculate
+                  await fetch("/api/admin/settings", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ settings: markup }) });
+                  const res = await fetch("/api/admin/service-groups", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "recalculate-prices" }) });
+                  const data = await res.json();
+                  if (res.ok) {
+                    setMarkupMsg({ type: "success", text: `Prices recalculated: ${data.updated} updated, ${data.skipped} skipped (no cost data)` });
+                  } else {
+                    setMarkupMsg({ type: "error", text: data.error || "Failed to recalculate" });
+                  }
+                } catch { setMarkupMsg({ type: "error", text: "Request failed" }); }
+                setRecalculating(false);
+              }} disabled={recalculating} style={{ padding: "8px 16px", borderRadius: 8, border: `1px solid ${dark ? "rgba(252,165,165,.2)" : "rgba(220,38,38,.15)"}`, background: dark ? "rgba(252,165,165,.06)" : "rgba(220,38,38,.04)", color: dark ? "#fca5a5" : "#dc2626", fontSize: 12, fontWeight: 600, cursor: recalculating ? "wait" : "pointer", opacity: recalculating ? .5 : 1 }}>{recalculating ? "Recalculating..." : "Recalculate All Prices"}</button>
+            </div>
           </div>
         </div>
 

@@ -190,6 +190,39 @@ export async function POST(req) {
       return Response.json({ success: true });
     }
 
+    if (action === 'recalculate-prices') {
+      const { calculateTierPrice } = await import('@/lib/markup');
+      // Load markup settings from DB
+      const markupRows = await prisma.setting.findMany({ where: { key: { startsWith: 'markup_' } } });
+      const ms = {};
+      markupRows.forEach(s => { ms[s.key] = s.value; });
+
+      // Get all tiers with their linked service
+      const allTiers = await prisma.serviceTier.findMany({
+        include: { service: { select: { costPer1k: true } } },
+      });
+
+      let updated = 0;
+      let skipped = 0;
+      const ops = [];
+
+      for (const t of allTiers) {
+        if (!t.service || !t.service.costPer1k || t.service.costPer1k <= 0) {
+          skipped++;
+          continue;
+        }
+        const newSell = calculateTierPrice(t.service.costPer1k, t.tier, ms);
+        if (newSell !== t.sellPer1k) {
+          ops.push(prisma.serviceTier.update({ where: { id: t.id }, data: { sellPer1k: newSell } }));
+          updated++;
+        }
+      }
+
+      if (ops.length > 0) await prisma.$transaction(ops);
+      await logActivity(admin.name, `Recalculated prices: ${updated} updated, ${skipped} skipped (no cost)`, 'service');
+      return Response.json({ success: true, updated, skipped, total: allTiers.length });
+    }
+
     return Response.json({ error: 'Unknown action' }, { status: 400 });
   } catch (err) {
     console.error('[Admin ServiceGroups POST]', err.message);
