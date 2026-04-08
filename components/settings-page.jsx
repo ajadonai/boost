@@ -20,6 +20,20 @@ export default function SettingsPage({ user, dark, t, themeMode, setThemeMode, s
   const [notifOrders, setNotifOrders] = useState(true);
   const [notifPromo, setNotifPromo] = useState(false);
   const [notifEmail, setNotifEmail] = useState(true);
+
+  // Load notification prefs from user data
+  useEffect(() => {
+    if (user) {
+      if (typeof user.notifOrders === 'boolean') setNotifOrders(user.notifOrders);
+      if (typeof user.notifPromo === 'boolean') setNotifPromo(user.notifPromo);
+      if (typeof user.notifEmail === 'boolean') setNotifEmail(user.notifEmail);
+    }
+  }, [user]);
+
+  // Save notification pref on toggle
+  const saveNotif = (key, value) => {
+    fetch("/api/auth/notifications", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ [key]: value }) }).catch(() => {});
+  };
   const [showApi, setShowApi] = useState(false);
   const [apiKey, setApiKey] = useState(null);
   const [apiLoading, setApiLoading] = useState(false);
@@ -188,16 +202,16 @@ export default function SettingsPage({ user, dark, t, themeMode, setThemeMode, s
           <div className="set-section-desc" style={{ color: t.textMuted }}>Control what alerts you receive.</div>
           <div className="set-card set-notif-card" style={{ background: t.cardBg, borderWidth: 1, borderStyle: "solid", borderColor: t.cardBorder }}>
             {[
-              ["Order updates", "Get notified when orders complete or fail", notifOrders, setNotifOrders],
-              ["Promotions", "Receive offers and discount alerts", notifPromo, setNotifPromo],
-              ["Email notifications", "Receive notifications via email", notifEmail, setNotifEmail],
-            ].map(([title, desc, on, setOn], i, arr) => (
+              ["Order updates", "Get notified when orders complete or fail", notifOrders, setNotifOrders, "notifOrders"],
+              ["Promotions", "Receive offers and discount alerts", notifPromo, setNotifPromo, "notifPromo"],
+              ["Email notifications", "Receive notifications via email", notifEmail, setNotifEmail, "notifEmail"],
+            ].map(([title, desc, on, setOn, key], i, arr) => (
               <div key={title} className="set-notif-row" style={{ borderBottom: i < arr.length - 1 ? `1px solid ${t.cardBorder}` : "none" }}>
                 <div className="set-notif-info">
                   <div className="set-notif-title" style={{ color: t.text }}>{title}</div>
                   <div className="set-notif-desc" style={{ color: t.textMuted }}>{desc}</div>
                 </div>
-                <Toggle on={on} onToggle={() => setOn(!on)} accent={t.accent} />
+                <Toggle on={on} onToggle={() => { setOn(!on); saveNotif(key, !on); }} accent={t.accent} />
               </div>
             ))}
           </div>

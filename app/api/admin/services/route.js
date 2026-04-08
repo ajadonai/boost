@@ -39,7 +39,8 @@ export async function POST(req) {
   if (error) return error;
 
   try {
-    const { action, serviceId, markup, enabled } = await req.json();
+    const body = await req.json();
+    const { action, serviceId } = body;
     if (!serviceId) return Response.json({ error: 'Service ID required' }, { status: 400 });
 
     const service = await prisma.service.findUnique({ where: { id: serviceId } });
@@ -52,11 +53,47 @@ export async function POST(req) {
     }
 
     if (action === 'markup') {
-      const m = Math.max(0, Math.min(999, Number(markup)));
+      const m = Math.max(0, Math.min(999, Number(body.markup)));
       const newSell = Math.round(service.costPer1k * (1 + m / 100));
       await prisma.service.update({ where: { id: serviceId }, data: { markup: m, sellPer1k: newSell } });
       await logActivity(admin.name, `Updated markup for ${service.name} to ${m}%`, 'service');
       return Response.json({ success: true, markup: m, sellPer1k: newSell / 100 });
+    }
+
+    if (action === 'edit') {
+      const data = {};
+      if (body.name !== undefined) data.name = String(body.name).trim();
+      if (body.category !== undefined) data.category = String(body.category).trim();
+      if (body.min !== undefined) data.min = Math.max(1, Number(body.min) || 1);
+      if (body.max !== undefined) data.max = Math.max(1, Number(body.max) || 100000);
+      if (typeof body.enabled === 'boolean') data.enabled = body.enabled;
+      if (typeof body.refill === 'boolean') data.refill = body.refill;
+      if (body.avgTime !== undefined) data.avgTime = String(body.avgTime).trim();
+
+      if (Object.keys(data).length === 0) return Response.json({ error: 'No changes provided' }, { status: 400 });
+
+      const updated = await prisma.service.update({ where: { id: serviceId }, data });
+      await logActivity(admin.name, `Edited service: ${updated.name}`, 'service');
+      return Response.json({ success: true, service: { id: updated.id, name: updated.name, category: updated.category, min: updated.min, max: updated.max, enabled: updated.enabled, refill: updated.refill, avgTime: updated.avgTime } });
+    }
+
+    if (action === 'delete') {
+      // Check if any tiers reference this service
+      const tierCount = await prisma.serviceTier.count({ where: { serviceId } });
+      if (tierCount > 0) {
+        return Response.json({ error: `Cannot delete — ${tierCount} tier(s) still reference this service. Remove them from Menu Builder first.` }, { status: 400 });
+      }
+      // Check if any orders reference this service
+      const orderCount = await prisma.order.count({ where: { serviceId } });
+      if (orderCount > 0) {
+        // Don't delete, just disable
+        await prisma.service.update({ where: { id: serviceId }, data: { enabled: false } });
+        await logActivity(admin.name, `Disabled service (has ${orderCount} orders): ${service.name}`, 'service');
+        return Response.json({ success: true, disabled: true, message: `Service has ${orderCount} order(s) — disabled instead of deleted to preserve history.` });
+      }
+      await prisma.service.delete({ where: { id: serviceId } });
+      await logActivity(admin.name, `Deleted service: ${service.name}`, 'service');
+      return Response.json({ success: true, deleted: true });
     }
 
     return Response.json({ error: 'Unknown action' }, { status: 400 });

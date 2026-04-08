@@ -28,6 +28,9 @@ model User {
   resetToken    String?
   resetExpires  DateTime?
   apiKey        String?   @unique
+  notifOrders   Boolean  @default(true)
+  notifPromo    Boolean  @default(false)
+  notifEmail    Boolean  @default(true)
   status        String   @default("Active")
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
