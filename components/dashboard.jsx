@@ -341,8 +341,16 @@ function DashboardInner() {
   }, []);
   const [leftOpen, setLeftOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
-  const [readNotifIds, setReadNotifIds] = useState(new Set());
-  const [clearedNotifIds, setClearedNotifIds] = useState(new Set());
+  const [readNotifIds, setReadNotifIds] = useState(() => {
+    try { const s = localStorage.getItem("nitro-notif-read"); return s ? new Set(JSON.parse(s)) : new Set(); } catch { return new Set(); }
+  });
+  const [clearedNotifIds, setClearedNotifIds] = useState(() => {
+    try { const s = localStorage.getItem("nitro-notif-cleared"); return s ? new Set(JSON.parse(s)) : new Set(); } catch { return new Set(); }
+  });
+
+  // Persist to localStorage on change
+  useEffect(() => { try { localStorage.setItem("nitro-notif-read", JSON.stringify([...readNotifIds])); } catch {} }, [readNotifIds]);
+  useEffect(() => { try { localStorage.setItem("nitro-notif-cleared", JSON.stringify([...clearedNotifIds])); } catch {} }, [clearedNotifIds]);
   const [user, setUser] = useState(null);
   const [orders, setOrders] = useState([]);
   const [txs, setTxs] = useState([]);
