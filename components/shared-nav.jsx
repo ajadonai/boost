@@ -132,7 +132,7 @@ export function SharedFooter() {
   return (
     <footer style={{ borderTop: `1px solid ${t.surfaceBrd}`, padding: "20px 24px 80px" }}>
       <div style={{ maxWidth: 780, margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
-        <span style={{ fontSize: 12, color: t.muted }}>© 2026 Nitro. All rights reserved.</span>
+        <span style={{ fontSize: 12, color: t.muted }}>© {new Date().getFullYear() > 2026 ? `2026–${new Date().getFullYear()}` : "2026"} Nitro. All rights reserved.</span>
         <div style={{ display: "flex", gap: 16 }}>
           {[["Terms", "/terms"], ["Privacy", "/privacy"], ["Refund", "/refund"], ["Cookie", "/cookie"]].map(([l, h]) => (
             <a key={l} href={h} style={{ fontSize: 11, color: t.muted, textDecoration: "none" }}>{l}</a>

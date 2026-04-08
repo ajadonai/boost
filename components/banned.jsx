@@ -51,7 +51,7 @@ export default function BannedPage() {
       </div>
 
       <footer style={{ borderTop: `1px solid ${t.cbd}`, padding: "14px 24px", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0, position: "relative", zIndex: 10 }}>
-        <span style={{ fontSize: 13, color: t.tm }}>© 2026 Nitro</span>
+        <span style={{ fontSize: 13, color: t.tm }}>© {new Date().getFullYear() > 2026 ? `2026–${new Date().getFullYear()}` : "2026"} Nitro</span>
         <div style={{ display: "flex", gap: 16 }}><a href="/terms" style={{ fontSize: 13, color: t.tm, textDecoration: "none" }}>Terms</a><a href="/privacy" style={{ fontSize: 13, color: t.tm, textDecoration: "none" }}>Privacy</a></div>
       </footer>
     </div>

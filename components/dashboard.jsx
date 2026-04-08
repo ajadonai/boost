@@ -807,7 +807,7 @@ function DashboardInner() {
 
           {/* Footer */}
           <div className="dash-footer" style={{ borderTopColor: t.sidebarBorder }}>
-            <span style={{ color: t.textMuted }}>© 2026 Nitro</span>
+            <span style={{ color: t.textMuted }}>© {new Date().getFullYear() > 2026 ? `2026–${new Date().getFullYear()}` : "2026"} Nitro</span>
             <div className="dash-footer-links">
               <a href="/terms" style={{ color: t.textMuted }}>Terms</a>
               <a href="/privacy" style={{ color: t.textMuted }}>Privacy</a>
