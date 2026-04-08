@@ -421,8 +421,7 @@ function AdminDashboardInner() {
               ))}
             </div>
           ))}
-          <div style={{ flex: 1 }} />
-          <div className="dash-sidebar-divider" style={{ background: t.sidebarBorder }} />
+          <div className="dash-sidebar-divider" style={{ background: t.sidebarBorder, marginTop: 8 }} />
           <div style={{ padding: "6px 14px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
               <div style={{ width: 6, height: 6, borderRadius: "50%", background: t.green }} />
