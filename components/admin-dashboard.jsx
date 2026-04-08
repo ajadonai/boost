@@ -252,6 +252,34 @@ function AdminDashboardInner() {
     load();
   }, [redirecting]);
 
+  /* Smart polling — refresh data every 20s, pause when tab is hidden */
+  useEffect(() => {
+    if (redirecting) return;
+    let interval = null;
+    const poll = async () => {
+      try {
+        const res = await fetch("/api/admin/overview");
+        if (res.ok) {
+          const d = await res.json();
+          setAdmin(prev => ({ ...prev, name: d.admin?.name || prev.name, role: d.admin?.role || prev.role }));
+          setData({
+            stats: d || {},
+            recentOrders: d.recentOrders || [],
+            recentUsers: d.recentUsers || [],
+            openTickets: d.openTickets || [],
+            activity: d.activity || [],
+          });
+        }
+      } catch {}
+    };
+    const start = () => { interval = setInterval(poll, 20000); };
+    const stop = () => { clearInterval(interval); interval = null; };
+    const onVisibility = () => { document.hidden ? stop() : (poll(), start()); };
+    start();
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => { stop(); document.removeEventListener("visibilitychange", onVisibility); };
+  }, [redirecting]);
+
   const handleLogout = async () => { try { await fetch("/api/auth/admin/logout", { method: "POST" }); } catch {} window.location.replace("/admin/login?logout=1"); };
 
   const t = useMemo(() => ({

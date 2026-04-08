@@ -494,6 +494,29 @@ function DashboardInner() {
     load();
   }, []);
 
+  /* Smart polling — refresh data every 45s, pause when tab is hidden */
+  useEffect(() => {
+    let interval = null;
+    const poll = async () => {
+      try {
+        const res = await fetch("/api/dashboard");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.user) setUser(data.user);
+          if (data.orders) setOrders(data.orders);
+          if (data.transactions) setTxs(data.transactions);
+          if (data.alerts) setAlerts(data.alerts);
+        }
+      } catch {}
+    };
+    const start = () => { interval = setInterval(poll, 45000); };
+    const stop = () => { clearInterval(interval); interval = null; };
+    const onVisibility = () => { document.hidden ? stop() : (poll(), start()); };
+    start();
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => { stop(); document.removeEventListener("visibilitychange", onVisibility); };
+  }, []);
+
   /* Verify payment return from gateway */
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
