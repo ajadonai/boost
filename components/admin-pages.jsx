@@ -298,6 +298,7 @@ function CleanupButton({ dark, t }) {
 }
 
 export function AdminSettingsPage({ admin, dark, t, themeMode, setThemeMode, setDark }) {
+  const confirm = useConfirm();
   const [social, setSocial] = useState({ social_whatsapp: "", social_telegram: "", social_instagram: "", social_twitter: "", social_whatsapp_support: "" });
   const [refSettings, setRefSettings] = useState({ ref_referrer_bonus: "50000", ref_invitee_bonus: "50000" });
   const [markup, setMarkup] = useState({ markup_budget: "150", markup_standard: "200", markup_premium: "250", markup_default: "200", markup_min_margin: "50", markup_usd_rate: "1600" });

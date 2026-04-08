@@ -218,7 +218,12 @@ export async function POST(req) {
         }
       }
 
-      if (ops.length > 0) await prisma.$transaction(ops);
+      if (ops.length > 0) {
+        // Process in chunks of 50 to avoid transaction limits
+        for (let i = 0; i < ops.length; i += 50) {
+          await prisma.$transaction(ops.slice(i, i + 50));
+        }
+      }
       await logActivity(admin.name, `Recalculated prices: ${updated} updated, ${skipped} skipped (no cost)`, 'service');
       return Response.json({ success: true, updated, skipped, total: allTiers.length });
     }
