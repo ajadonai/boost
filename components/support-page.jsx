@@ -35,9 +35,58 @@ export default function SupportPage({ dark, t, tickets: ticketsProp }) {
   const [newCategory, setNewCategory] = useState("Order Issue");
   const [newMessage, setNewMessage] = useState("");
   const [replyText, setReplyText] = useState("");
+  const [tickets, setTickets] = useState([]);
+  const [ticketLoading, setTicketLoading] = useState(false);
+  const [ticketMsg, setTicketMsg] = useState(null);
 
   const chatEndRef = useRef(null);
-  const tickets = ticketsProp || [];
+
+  // Load tickets from API
+  useEffect(() => {
+    fetch("/api/tickets").then(r => r.json()).then(d => { if (d.tickets) setTickets(d.tickets); }).catch(() => {});
+  }, []);
+
+  const submitTicket = async () => {
+    if (!newSubject?.trim() || !newMessage?.trim()) return;
+    setTicketLoading(true); setTicketMsg(null);
+    try {
+      const res = await fetch("/api/tickets", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "create", subject: newSubject, message: newMessage, category: newCategory }) });
+      const data = await res.json();
+      if (res.ok) {
+        setTicketMsg({ type: "success", text: `Ticket ${data.ticket?.id} created` });
+        setNewSubject(""); setNewMessage(""); setNewCategory("Order Issue");
+        setTicketView("list");
+        // Refresh tickets
+        fetch("/api/tickets").then(r => r.json()).then(d => { if (d.tickets) setTickets(d.tickets); }).catch(() => {});
+      } else {
+        setTicketMsg({ type: "error", text: data.error || "Failed to create ticket" });
+      }
+    } catch { setTicketMsg({ type: "error", text: "Request failed" }); }
+    setTicketLoading(false);
+  };
+
+  const sendReply = async () => {
+    if (!replyText?.trim() || !activeTicket) return;
+    setTicketLoading(true);
+    try {
+      const res = await fetch("/api/tickets", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "reply", ticketId: activeTicket.id, message: replyText }) });
+      const data = await res.json();
+      if (res.ok) {
+        setReplyText("");
+        // Refresh tickets and update active ticket
+        const r = await fetch("/api/tickets");
+        if (r.ok) {
+          const d = await r.json();
+          if (d.tickets) {
+            setTickets(d.tickets);
+            const updated = d.tickets.find(tk => tk.id === activeTicket.id);
+            if (updated) setActiveTicket(updated);
+          }
+        }
+      }
+    } catch {}
+    setTicketLoading(false);
+  };
 
   const filtered = tickets.filter(tk => filter === "all" || tk.status === filter);
   const counts = { all: tickets.length };
@@ -212,7 +261,8 @@ export default function SupportPage({ dark, t, tickets: ticketsProp }) {
                   <label className="sup-form-label" style={{ color: t.textMuted }}>Message</label>
                   <textarea value={newMessage} onChange={e => setNewMessage(e.target.value)} placeholder="Describe your issue. Include order IDs if relevant." rows={4} className="sup-form-textarea" style={{ borderColor: dark ? "rgba(255,255,255,.1)" : "rgba(0,0,0,.12)", background: dark ? "#0d1020" : "#fff", color: t.text }} />
                 </div>
-                <button className="sup-submit-btn" style={{ opacity: newSubject && newMessage ? 1 : .5 }}>Submit Ticket</button>
+                <button onClick={submitTicket} disabled={!newSubject || !newMessage || ticketLoading} className="sup-submit-btn" style={{ opacity: newSubject && newMessage && !ticketLoading ? 1 : .5 }}>{ticketLoading ? "Submitting..." : "Submit Ticket"}</button>
+                {ticketMsg && <div style={{ marginTop: 8, padding: "8px 12px", borderRadius: 8, fontSize: 12, background: ticketMsg.type === "success" ? (dark ? "rgba(110,231,183,.08)" : "#f0fdf4") : (dark ? "rgba(220,38,38,.08)" : "#fef2f2"), color: ticketMsg.type === "success" ? (dark ? "#6ee7b7" : "#059669") : (dark ? "#fca5a5" : "#dc2626") }}>{ticketMsg.text}</div>}
               </div>
             </div>
           )}
@@ -244,7 +294,7 @@ export default function SupportPage({ dark, t, tickets: ticketsProp }) {
               {activeTicket.status === "Open" && (
                 <div className="sup-reply-box">
                   <textarea value={replyText} onChange={e => setReplyText(e.target.value)} placeholder="Type your reply..." rows={3} className="sup-form-textarea" style={{ borderColor: dark ? "rgba(255,255,255,.1)" : "rgba(0,0,0,.12)", background: dark ? "#0d1020" : "#fff", color: t.text }} />
-                  <button className="sup-submit-btn" style={{ opacity: replyText ? 1 : .5, marginTop: 8 }}>Send Reply</button>
+                  <button onClick={sendReply} disabled={!replyText || ticketLoading} className="sup-submit-btn" style={{ opacity: replyText && !ticketLoading ? 1 : .5, marginTop: 8 }}>{ticketLoading ? "Sending..." : "Send Reply"}</button>
                 </div>
               )}
             </div>
