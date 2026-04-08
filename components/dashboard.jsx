@@ -52,19 +52,15 @@ function Badge({ status, dark }) {
 /* ═══ MOBILE MENU HINT                    ═══ */
 /* ═══════════════════════════════════════════ */
 function MobileMenuHint({ dark, t }) {
-  const [dismissed, setDismissed] = useState(() => {
-    try { return localStorage.getItem("nitro-menu-hint") === "1"; } catch { return false; }
-  });
+  const [dismissed, setDismissed] = useState(false);
   if (dismissed) return null;
-  const dismiss = () => { setDismissed(true); try { localStorage.setItem("nitro-menu-hint", "1"); } catch {} };
   return (
     <div className="dash-menu-hint" style={{ background: dark ? "rgba(196,125,142,.06)" : "rgba(196,125,142,.03)", border: `1px solid ${dark ? "rgba(196,125,142,.12)" : "rgba(196,125,142,.08)"}`, borderRadius: 12, padding: "10px 14px", marginBottom: 12, display: "flex", alignItems: "center", gap: 10 }}>
       <span style={{ fontSize: 16, flexShrink: 0 }}>👋</span>
       <div style={{ flex: 1, fontSize: 12, color: t.textMuted, lineHeight: 1.5 }}>
-        <span className="dash-hint-mobile">Tap the <b style={{ color: t.text }}>menu icon</b> (top left) to access Services, Orders, Funds, and more.</span>
-        <span className="dash-hint-desktop">Use the <b style={{ color: t.text }}>sidebar</b> to navigate between Services, Orders, Add Funds, Referrals, and Settings.</span>
+        Tap the <b style={{ color: t.text }}>menu icon</b> (top left) to access Services, Orders, Funds, and more.
       </div>
-      <button onClick={dismiss} style={{ background: "none", border: "none", color: t.textMuted, fontSize: 16, cursor: "pointer", padding: "0 2px", flexShrink: 0 }}>✕</button>
+      <button onClick={() => setDismissed(true)} style={{ background: "none", border: "none", color: t.textMuted, fontSize: 16, cursor: "pointer", padding: "0 2px", flexShrink: 0 }}>✕</button>
     </div>
   );
 }

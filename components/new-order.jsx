@@ -401,9 +401,8 @@ export default function NewOrderPage({ dark, t, user, onOrderSuccess, platform, 
 /* ═══════════════════════════════════════════ */
 /* ═══ MOBILE/TABLET GUIDE                 ═══ */
 /* ═══════════════════════════════════════════ */
-import { useState as useS } from "react";
 function MobileGuide({ dark, t }) {
-  const [open, setOpen] = useS(false);
+  const [open, setOpen] = useState(false);
   const TS_MINI = { Budget: { icon: "💰", color: "#e0a458" }, Standard: { icon: "⚡", color: "#60a5fa" }, Premium: { icon: "👑", color: "#a78bfa" } };
   return (
     <div style={{ borderRadius: 12, background: dark ? "rgba(255,255,255,.04)" : "rgba(0,0,0,.02)", border: `1px solid ${dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)"}`, overflow: "hidden", marginBottom: 12 }}>
