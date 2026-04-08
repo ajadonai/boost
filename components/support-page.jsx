@@ -214,7 +214,9 @@ function SupportPageInner({ dark, t }) {
             <div style={{ fontSize: 14, fontWeight: 600, color: t.text }}>Conversations</div>
             <div style={{ fontSize: 11, color: t.textMuted, marginTop: 2 }}>{activeCount} active</div>
           </div>
-          <button onClick={() => { setSelected("new"); setMobileView("chat"); }} style={{ padding: "4px 10px", borderRadius: 6, background: "linear-gradient(135deg,#c47d8e,#a3586b)", color: "#fff", fontSize: 10, fontWeight: 600, border: "none", cursor: "pointer" }}>+ New</button>
+          {(() => { const hasOpen = tickets.some(tk => tk.status === "Open" || tk.status === "In Progress"); return (
+            <button onClick={() => { if (!hasOpen) { setSelected("new"); setMobileView("chat"); } }} style={{ padding: "4px 10px", borderRadius: 6, background: hasOpen ? (dark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.04)") : "linear-gradient(135deg,#c47d8e,#a3586b)", color: hasOpen ? t.textMuted : "#fff", fontSize: 10, fontWeight: 600, border: "none", cursor: hasOpen ? "default" : "pointer", opacity: hasOpen ? 0.5 : 1 }} title={hasOpen ? "Close your open ticket first" : ""}>{hasOpen ? "Has open" : "+ New"}</button>
+          ); })()}
         </div>
 
         {/* Filters — always visible */}
@@ -272,11 +274,14 @@ function SupportPageInner({ dark, t }) {
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 15, fontWeight: 600, color: t.text, display: "flex", alignItems: "center", gap: 8 }}>
               {chatTitle}
-              {selected && !isNewTicket && <StatusPill status={selected.status} dark={dark} />}
+              {selected && !isNewTicket && typeof selected === "object" && <StatusPill status={selected.status} dark={dark} />}
               {!selected && isLive && <span className="m" style={{ fontSize: 10, padding: "2px 7px", borderRadius: 4, background: dark ? "rgba(96,165,250,0.1)" : "rgba(59,130,246,0.06)", color: dark ? "#60a5fa" : "#2563eb" }}>live</span>}
             </div>
             <div className="m" style={{ fontSize: 11, color: t.textMuted, marginTop: 1 }}>{chatSub}</div>
           </div>
+          {selected && !isNewTicket && typeof selected === "object" && (selected.status === "Open" || selected.status === "In Progress") && (
+            <button onClick={async () => { await fetch("/api/tickets", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "close", ticketId: selected.id }) }); refreshTickets(); setSelected(null); }} style={{ padding: "5px 12px", borderRadius: 6, fontSize: 11, fontWeight: 500, background: "none", border: `1px solid ${dark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)"}`, color: t.textMuted, cursor: "pointer", fontFamily: "inherit", flexShrink: 0 }}>Close</button>
+          )}
         </div>
 
         {/* Messages or New Ticket Form */}

@@ -100,6 +100,14 @@ export async function POST(req) {
       return Response.json({ success: true, message: 'Reply sent' });
     }
 
+    if (action === 'close') {
+      if (!ticketId) return Response.json({ error: 'Ticket ID required' }, { status: 400 });
+      const ticket = await prisma.ticket.findFirst({ where: { OR: [{ ticketId }, { id: ticketId }], userId: session.id } });
+      if (!ticket) return Response.json({ error: 'Ticket not found' }, { status: 404 });
+      await prisma.ticket.update({ where: { id: ticket.id }, data: { status: 'Resolved' } });
+      return Response.json({ success: true, message: 'Ticket closed' });
+    }
+
     return Response.json({ error: 'Unknown action' }, { status: 400 });
   } catch (err) {
     console.error('[User Tickets POST]', err.message);

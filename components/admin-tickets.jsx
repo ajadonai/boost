@@ -40,7 +40,12 @@ export default function AdminTicketsPage({ dark, t }) {
 
   useEffect(() => { setTimeout(() => msgsEnd.current?.scrollIntoView({ behavior: "smooth" }), 50); }, [selected, tickets]);
 
-  const filtered = filter === "all" ? tickets : filter === "unread" ? tickets.filter(tk => { const last = tk.replies?.[tk.replies.length - 1]; return (!last && tk.status !== "Resolved") || (last?.from === "user"); }) : tickets.filter(tk => tk.status === filter);
+  const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
+  const isArchived = (tk) => tk.status === "Resolved" && tk.created && new Date(tk.created).getTime() < thirtyDaysAgo;
+  const filtered = filter === "all" ? tickets.filter(tk => !isArchived(tk))
+    : filter === "unread" ? tickets.filter(tk => { const last = tk.replies?.[tk.replies.length - 1]; return (!last && tk.status !== "Resolved") || (last?.from === "user"); })
+    : filter === "archived" ? tickets.filter(isArchived)
+    : tickets.filter(tk => tk.status === filter);
   const openCount = tickets.filter(tk => tk.status === "Open" || tk.status === "In Progress").length;
 
   const doReply = async () => {
@@ -74,7 +79,7 @@ export default function AdminTicketsPage({ dark, t }) {
           <div style={{ fontSize: 11, color: t.textMuted, marginTop: 2 }}>{openCount} active</div>
         </div>
         <div style={{ display: "flex", gap: 3, padding: "8px 10px", borderBottom: `1px solid ${t.cardBorder}` }}>
-          {[["all", "All"], ["unread", "Unread"], ["Open", "Open"], ["In Progress", "Active"], ["Resolved", "Done"]].map(([v, l]) => (
+          {[["all", "All"], ["unread", "Unread"], ["Open", "Open"], ["In Progress", "Active"], ["Resolved", "Done"], ["archived", "Archived"]].map(([v, l]) => (
             <button key={v} onClick={() => setFilter(v)} style={{ padding: "4px 10px", borderRadius: 5, fontSize: 10, fontWeight: filter === v ? 600 : 450, background: filter === v ? (dark ? "rgba(196,125,142,0.1)" : "rgba(196,125,142,0.06)") : "transparent", color: filter === v ? t.accent : t.textMuted, border: "none", cursor: "pointer" }}>{l}</button>
           ))}
         </div>
@@ -84,7 +89,7 @@ export default function AdminTicketsPage({ dark, t }) {
             const last = tk.replies?.[tk.replies.length - 1];
             const lastText = last ? `${last.from === "admin" ? `${last.name || "You"}` : (tk.user?.split(" ")[0] || "User")}: ${last.msg?.slice(0, 50)}` : tk.message?.slice(0, 50);
             const isSel = selected?.id === tk.id;
-            const hasUnread = tk.replies?.some(r => r.from === "user") && (tk.replies?.[tk.replies.length - 1]?.from === "user");
+            const hasUnread = tk.status !== "Resolved" && tk.replies?.some(r => r.from === "user") && (tk.replies?.[tk.replies.length - 1]?.from === "user");
             return (
               <div key={tk.id} onClick={() => selectTicket(tk)} style={{ padding: "12px 14px", borderBottom: `1px solid ${t.cardBorder}`, cursor: "pointer", background: isSel ? (dark ? "rgba(196,125,142,0.04)" : "rgba(196,125,142,0.02)") : "transparent", borderLeft: isSel ? `2px solid ${t.accent}` : "2px solid transparent" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 3 }}>
@@ -136,7 +141,7 @@ export default function AdminTicketsPage({ dark, t }) {
                   background: r.from === "admin" ? (dark ? "rgba(196,125,142,0.12)" : "rgba(196,125,142,0.06)") : (dark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.03)"),
                   border: r.from === "admin" ? `1px solid ${dark ? "rgba(196,125,142,0.1)" : "rgba(196,125,142,0.08)"}` : `1px solid ${t.cardBorder}`
                 }}>
-                  <div style={{ fontSize: 11, fontWeight: 600, color: r.from === "admin" ? t.accent : (dark ? "#60a5fa" : "#2563eb"), marginBottom: 3 }}>{r.from === "admin" ? `${r.name || "You"} (Admin)` : (r.name || selected.user)}</div>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: r.from === "admin" ? t.accent : (dark ? "#60a5fa" : "#2563eb"), marginBottom: 3 }}>{r.from === "admin" ? "You" : (r.name || selected.user)}</div>
                   <div style={{ fontSize: 13, color: t.text, lineHeight: 1.55, whiteSpace: "pre-wrap" }}>{r.msg}</div>
                 </div>
                 <div style={{ fontSize: 10, color: t.textMuted, marginTop: 3, padding: "0 6px" }}>{r.time ? fD(r.time) : ""}</div>
