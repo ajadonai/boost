@@ -1,6 +1,8 @@
 'use client';
 import { useEffect } from 'react';
-import Dashboard from '@/components/dashboard';
+import dynamic from 'next/dynamic';
+
+const Dashboard = dynamic(() => import('@/components/dashboard'), { ssr: false });
 
 export default function DashboardPage() {
   useEffect(() => {
