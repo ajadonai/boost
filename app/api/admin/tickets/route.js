@@ -75,6 +75,13 @@ export async function POST(req) {
       return Response.json({ success: true, message: 'Ticket reopened' });
     }
 
+    if (action === 'archive') {
+      // Archive by setting status to Archived
+      await prisma.ticket.update({ where: { id: ticket.id }, data: { status: 'Archived' } });
+      await logActivity(admin.name, `Archived ticket ${ticketId}`, 'ticket');
+      return Response.json({ success: true, message: 'Ticket archived' });
+    }
+
     return Response.json({ error: 'Unknown action' }, { status: 400 });
   } catch (err) {
     console.error('[Admin Tickets POST]', err.message);

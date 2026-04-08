@@ -66,11 +66,6 @@ function Bubble({ m, dark, t }) {
 /* ═══ SUPPORT PAGE                        ═══ */
 /* ═══════════════════════════════════════════ */
 export default function SupportPage({ dark, t }) {
-  try { return <SupportPageInner dark={dark} t={t} />; }
-  catch (e) { return <div style={{ padding: 24, color: "red" }}>Support Error: {e?.message || "Unknown"}</div>; }
-}
-
-function SupportPageInner({ dark, t }) {
   const [tickets, setTickets] = useState([]);
   const [selected, setSelected] = useState(null); // null = bot chat, ticket object = ticket detail
   const [filter, setFilter] = useState("all");
@@ -151,7 +146,7 @@ function SupportPageInner({ dark, t }) {
   const addMsg = (m) => setMsgs(prev => [...prev, m]);
   const botReply = (text, delay, extra = {}) => { setTyping(true); setTimeout(() => { setTyping(false); addMsg({ from: "bot", name: "Nitro Bot", text, time: "Now", formatted: true, ...extra }); }, delay + Math.random() * 300); };
   const activeCount = tickets.filter(tk => tk.status !== "Resolved").length;
-  const filtered = filter === "all" ? tickets : tickets.filter(tk => tk.status === filter);
+  const filtered = filter === "all" ? tickets : filter === "active" ? tickets.filter(tk => tk.status === "Open" || tk.status === "In Progress") : tickets.filter(tk => tk.status === filter);
 
   const handleQuick = (id) => {
     setShowQuick(false);
@@ -214,14 +209,15 @@ function SupportPageInner({ dark, t }) {
             <div style={{ fontSize: 14, fontWeight: 600, color: t.text }}>Conversations</div>
             <div style={{ fontSize: 11, color: t.textMuted, marginTop: 2 }}>{activeCount} active</div>
           </div>
-          {(() => { const hasOpen = tickets.some(tk => tk.status === "Open" || tk.status === "In Progress"); return (
-            <button onClick={() => { if (!hasOpen) { setSelected("new"); setMobileView("chat"); } }} style={{ padding: "4px 10px", borderRadius: 6, background: hasOpen ? (dark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.04)") : "linear-gradient(135deg,#c47d8e,#a3586b)", color: hasOpen ? t.textMuted : "#fff", fontSize: 10, fontWeight: 600, border: "none", cursor: hasOpen ? "default" : "pointer", opacity: hasOpen ? 0.5 : 1 }} title={hasOpen ? "Close your open ticket first" : ""}>{hasOpen ? "Has open" : "+ New"}</button>
-          ); })()}
+          {tickets.some(tk => tk.status === "Open" || tk.status === "In Progress")
+            ? <span style={{ fontSize: 10, color: t.textMuted }}>Has open ticket</span>
+            : <button onClick={() => { setSelected("new"); setMobileView("chat"); }} style={{ padding: "4px 10px", borderRadius: 6, background: "linear-gradient(135deg,#c47d8e,#a3586b)", color: "#fff", fontSize: 10, fontWeight: 600, border: "none", cursor: "pointer" }}>+ New</button>
+          }
         </div>
 
         {/* Filters — always visible */}
         <div style={{ display: "flex", gap: 3, padding: "6px 10px", borderBottom: `1px solid ${dark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.04)"}`, flexShrink: 0, flexWrap: "wrap" }}>
-          {[["all","All"],["Open","Open"],["In Progress","Active"],["Resolved","Done"]].map(([v,l])=>
+          {[["all","All"],["active","Active"],["Resolved","Done"]].map(([v,l])=>
             <button key={v} onClick={()=>setFilter(v)} style={{ padding:"3px 8px",borderRadius:4,fontSize:10,fontWeight:filter===v?600:450,background:filter===v?(dark?"rgba(196,125,142,0.1)":"rgba(196,125,142,0.06)"):"transparent",color:filter===v?t.accent:t.textMuted,border:"none",cursor:"pointer" }}>{l}</button>
           )}
         </div>

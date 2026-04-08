@@ -41,9 +41,10 @@ export default function AdminTicketsPage({ dark, t }) {
   useEffect(() => { setTimeout(() => msgsEnd.current?.scrollIntoView({ behavior: "smooth" }), 50); }, [selected, tickets]);
 
   const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
-  const isArchived = (tk) => tk.status === "Resolved" && tk.created && new Date(tk.created).getTime() < thirtyDaysAgo;
+  const isArchived = (tk) => tk.status === "Archived" || (tk.status === "Resolved" && tk.created && new Date(tk.created).getTime() < thirtyDaysAgo);
   const filtered = filter === "all" ? tickets.filter(tk => !isArchived(tk))
-    : filter === "unread" ? tickets.filter(tk => { const last = tk.replies?.[tk.replies.length - 1]; return (!last && tk.status !== "Resolved") || (last?.from === "user"); })
+    : filter === "unread" ? tickets.filter(tk => { const last = tk.replies?.[tk.replies.length - 1]; return tk.status !== "Resolved" && tk.status !== "Archived" && ((!last) || last?.from === "user"); })
+    : filter === "active" ? tickets.filter(tk => tk.status === "Open" || tk.status === "In Progress")
     : filter === "archived" ? tickets.filter(isArchived)
     : tickets.filter(tk => tk.status === filter);
   const openCount = tickets.filter(tk => tk.status === "Open" || tk.status === "In Progress").length;
@@ -79,7 +80,7 @@ export default function AdminTicketsPage({ dark, t }) {
           <div style={{ fontSize: 11, color: t.textMuted, marginTop: 2 }}>{openCount} active</div>
         </div>
         <div style={{ display: "flex", gap: 3, padding: "8px 10px", borderBottom: `1px solid ${t.cardBorder}` }}>
-          {[["all", "All"], ["unread", "Unread"], ["Open", "Open"], ["In Progress", "Active"], ["Resolved", "Done"], ["archived", "Archived"]].map(([v, l]) => (
+          {[["all", "All"], ["unread", "Unread"], ["active", "Active"], ["Resolved", "Done"], ["archived", "Archived"]].map(([v, l]) => (
             <button key={v} onClick={() => setFilter(v)} style={{ padding: "4px 10px", borderRadius: 5, fontSize: 10, fontWeight: filter === v ? 600 : 450, background: filter === v ? (dark ? "rgba(196,125,142,0.1)" : "rgba(196,125,142,0.06)") : "transparent", color: filter === v ? t.accent : t.textMuted, border: "none", cursor: "pointer" }}>{l}</button>
           ))}
         </div>
@@ -157,8 +158,10 @@ export default function AdminTicketsPage({ dark, t }) {
               <button onClick={doResolve} style={{ padding: "9px 14px", borderRadius: 10, background: "none", border: `1px solid ${dark ? "rgba(110,231,183,0.15)" : "rgba(16,185,129,0.12)"}`, color: dark ? "#6ee7b7" : "#059669", fontSize: 12, fontWeight: 500, cursor: "pointer", whiteSpace: "nowrap" }}>Resolve</button>
             </div>
           ) : (
-            <div style={{ padding: "14px 18px", borderTop: `1px solid ${t.cardBorder}`, textAlign: "center", fontSize: 12, color: t.textMuted, flexShrink: 0 }}>
-              Ticket resolved · <button onClick={async () => { await fetch("/api/admin/tickets", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "reopen", ticketId: selected.id }) }); refreshTickets(); }} style={{ background: "none", border: "none", color: t.accent, fontSize: 12, cursor: "pointer", fontFamily: "inherit" }}>Reopen</button>
+            <div style={{ padding: "14px 18px", borderTop: `1px solid ${t.cardBorder}`, textAlign: "center", fontSize: 12, color: t.textMuted, flexShrink: 0, display: "flex", justifyContent: "center", gap: 12 }}>
+              <span>Ticket resolved</span>
+              <button onClick={async () => { await fetch("/api/admin/tickets", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "reopen", ticketId: selected.id }) }); refreshTickets(); }} style={{ background: "none", border: "none", color: t.accent, fontSize: 12, cursor: "pointer", fontFamily: "inherit" }}>Reopen</button>
+              <button onClick={async () => { await fetch("/api/admin/tickets", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "archive", ticketId: selected.id }) }); refreshTickets(); setSelected(null); }} style={{ background: "none", border: "none", color: t.textMuted, fontSize: 12, cursor: "pointer", fontFamily: "inherit" }}>Archive</button>
             </div>
           )}
         </> : (
