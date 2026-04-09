@@ -134,8 +134,11 @@ function OverviewPage({ user, orders, alerts, dark, t, setActive }) {
       </div>
 
       {/* Recent orders */}
-      <div className="dash-section-title" style={{ color: t.textMuted }}>Recent Activity</div>
-      <div className="dash-orders-card" style={{ background: dark ? "rgba(255,255,255,.06)" : "rgba(255,255,255,.95)", borderWidth: 1, borderStyle: "solid", borderColor: dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)", boxShadow: dark ? "0 4px 20px rgba(0,0,0,.25)" : "0 4px 20px rgba(0,0,0,.04)" }}>
+      <div className="dash-orders-card" style={{ background: dark ? "rgba(255,255,255,.03)" : "rgba(255,255,255,.85)", border: `0.5px solid ${dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)"}` }}>
+        <div style={{ padding: "16px 18px 0" }}>
+          <div className="dash-section-title" style={{ color: t.textMuted }}>Recent activity</div>
+        </div>
+        <div className="dash-section-divider" style={{ background: dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)" }} />
         {orders.length > 0 ? orders.slice(0, 5).map((o, i, arr) => (
           <div key={o.id} className="dash-order-row" style={{ borderBottom: i < arr.length - 1 ? `1px solid ${t.cardBorder}` : "none" }}>
             <div style={{ minWidth: 0, flex: 1 }}>
@@ -173,7 +176,7 @@ function OverviewPage({ user, orders, alerts, dark, t, setActive }) {
       </div>
 
       {/* Referral card — tablet/mobile only */}
-      <div className="dash-mobile-ref" style={{ background: t.cardBg, borderWidth: 1, borderStyle: "solid", borderColor: t.cardBorder }}>
+      <div className="dash-mobile-ref" style={{ background: dark ? "rgba(255,255,255,.03)" : "rgba(255,255,255,.85)", border: `0.5px solid ${t.cardBorder}` }}>
         <div className="dash-ref-label" style={{ color: t.textMuted }}>Your referral code</div>
         <div className="m dash-ref-code" style={{ color: t.accent }}>{user?.refCode || "—"}</div>
         <div className="dash-ref-stats" style={{ color: t.textMuted }}>{user?.refs || 0} referrals · {fN(user?.earnings || 0)} earned</div>
@@ -252,7 +255,7 @@ function RightSidebar({ orders, user, dark, t, setActive }) {
 
       {/* ── Referral Card — 15% ── */}
       <div className="dash-rs-section dash-rs-ref">
-        <div className="dash-rs-ref-card" style={{ background: t.cardBg, borderWidth: 1, borderStyle: "solid", borderColor: t.cardBorder }}>
+        <div className="dash-rs-ref-card" style={{ background: dark ? "rgba(255,255,255,.03)" : "rgba(255,255,255,.85)", border: `0.5px solid ${t.cardBorder}` }}>
           <div className="dash-ref-label" style={{ color: t.textMuted }}>Your referral code</div>
           <div className="m dash-ref-code" style={{ color: t.accent }}>{user?.refCode || "—"}</div>
           <div className="dash-ref-stats" style={{ color: t.textMuted }}>{user?.refs || 0} referrals · {fN(user?.earnings || 0)} earned</div>
@@ -637,7 +640,7 @@ function DashboardInner() {
             <div className={skBone} style={{ width: 200, height: 14, marginBottom: 24 }} />
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 12, marginBottom: 24 }}>
               {[1,2,3,4].map(i => (
-                <div key={i} style={{ padding: 20, borderRadius: 16, background: t.cardBg, borderWidth: 1, borderStyle: "solid", borderColor: t.cardBorder }}>
+                <div key={i} style={{ padding: 20, borderRadius: 16, background: dark ? "rgba(255,255,255,.03)" : "rgba(255,255,255,.85)", border: `0.5px solid ${t.cardBorder}` }}>
                   <div className={skBone} style={{ width: "60%", height: 10, marginBottom: 10 }} />
                   <div className={skBone} style={{ width: "45%", height: 24, marginBottom: 8 }} />
                   <div className={skBone} style={{ width: "70%", height: 9 }} />
@@ -693,7 +696,7 @@ function DashboardInner() {
         return <HowToPage dark={dark} t={t} />;
       default:
         return (
-          <div className="dash-placeholder" style={{ background: t.cardBg, borderWidth: 1, borderStyle: "solid", borderColor: t.cardBorder }}>
+          <div className="dash-placeholder" style={{ background: dark ? "rgba(255,255,255,.03)" : "rgba(255,255,255,.85)", border: `0.5px solid ${t.cardBorder}` }}>
             <div style={{ color: t.textMuted, fontSize: 15, fontWeight: 500 }}>{active.charAt(0).toUpperCase() + active.slice(1).replace("-", " ")}</div>
             <div style={{ color: t.textMuted, fontSize: 13, opacity: .5, marginTop: 4 }}>Coming soon</div>
           </div>

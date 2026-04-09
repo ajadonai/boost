@@ -98,7 +98,7 @@ export default function AddFundsPage({ user, dark, t, paymentStatus, setPaymentS
       <div className="fund-split fund-desktop-only">
         {/* LEFT — Balance + Amount */}
         <div className="fund-left">
-          <div className="fund-card-unified" style={{ background: t.cardBg, borderWidth: 1, borderStyle: "solid", borderColor: t.cardBorder, boxShadow: dark ? "0 4px 20px rgba(0,0,0,.25)" : "0 4px 20px rgba(0,0,0,.04)" }}>
+          <div className="fund-card-unified" style={{ background: dark ? "rgba(255,255,255,.03)" : "rgba(255,255,255,.85)", border: `0.5px solid ${t.cardBorder}` }}>
             <div className="fund-bal-row">
               <div>
                 <div className="fund-bal-label" style={{ color: t.textMuted }}>Current Balance</div>
@@ -140,7 +140,7 @@ export default function AddFundsPage({ user, dark, t, paymentStatus, setPaymentS
 
         {/* RIGHT — Invoice + Method + Pay */}
         <div className="fund-right">
-          <div className="fund-invoice" style={{ background: t.cardBg, borderWidth: 1, borderStyle: "solid", borderColor: t.cardBorder }}>
+          <div className="fund-invoice" style={{ background: dark ? "rgba(255,255,255,.03)" : "rgba(255,255,255,.85)", border: `0.5px solid ${t.cardBorder}` }}>
             <div className="fund-lines">
               <div className="fund-line"><span style={{ color: t.text, fontWeight: 500 }}>Deposit</span><span className="m" style={{ color: valid ? t.text : t.textMuted, fontWeight: 600 }}>{valid ? fN(numAmount) : "₦0"}</span></div>
               <div className="fund-line"><span style={{ color: t.textMuted }}>Fee</span><span className="m" style={{ color: t.green, fontWeight: 600 }}>Free</span></div>
@@ -174,7 +174,7 @@ export default function AddFundsPage({ user, dark, t, paymentStatus, setPaymentS
         {mobileStep === 1 && (
           <>
             {/* Balance card */}
-            <div className="fund-mob-balance" style={{ background: t.cardBg, borderWidth: 1, borderStyle: "solid", borderColor: t.cardBorder }}>
+            <div className="fund-mob-balance" style={{ background: dark ? "rgba(255,255,255,.03)" : "rgba(255,255,255,.85)", border: `0.5px solid ${t.cardBorder}` }}>
               <div>
                 <div className="fund-bal-label" style={{ color: t.textMuted }}>Current Balance</div>
                 <div className="m fund-bal-value" style={{ color: t.green }}>{fN(balance)}</div>
@@ -185,7 +185,7 @@ export default function AddFundsPage({ user, dark, t, paymentStatus, setPaymentS
             </div>
 
             {/* Amount card */}
-            <div className="fund-mob-amount" style={{ background: t.cardBg, borderWidth: 1, borderStyle: "solid", borderColor: t.cardBorder }}>
+            <div className="fund-mob-amount" style={{ background: dark ? "rgba(255,255,255,.03)" : "rgba(255,255,255,.85)", border: `0.5px solid ${t.cardBorder}` }}>
               <div className="fund-deposit-label" style={{ color: t.textMuted }}>How much?</div>
               <div className="fund-amount-wrap" style={{ background: dark ? "#0d1020" : "#fff", borderWidth: 1, borderStyle: "solid", borderColor: amount ? t.accent : t.cardBorder }}>
                 <span className="m fund-currency" style={{ color: dark ? "rgba(255,255,255,.55)" : "rgba(0,0,0,.4)" }}>₦</span>
@@ -228,7 +228,7 @@ export default function AddFundsPage({ user, dark, t, paymentStatus, setPaymentS
             </button>
 
             {/* Summary card */}
-            <div className="fund-mob-summary" style={{ background: t.cardBg, borderWidth: 1, borderStyle: "solid", borderColor: t.cardBorder }}>
+            <div className="fund-mob-summary" style={{ background: dark ? "rgba(255,255,255,.03)" : "rgba(255,255,255,.85)", border: `0.5px solid ${t.cardBorder}` }}>
               <div className="fund-line"><span style={{ color: t.textMuted }}>Deposit</span><span className="m" style={{ color: t.text, fontWeight: 600 }}>{fN(numAmount)}</span></div>
               <div className="fund-line"><span style={{ color: t.textMuted }}>Fee</span><span className="m" style={{ color: t.green, fontWeight: 600 }}>Free</span></div>
               <div style={{ height: 1, background: t.cardBorder, margin: "8px 0" }} />
@@ -239,7 +239,7 @@ export default function AddFundsPage({ user, dark, t, paymentStatus, setPaymentS
             </div>
 
             {/* Payment method card */}
-            <div className="fund-mob-method" style={{ background: t.cardBg, borderWidth: 1, borderStyle: "solid", borderColor: t.cardBorder }}>
+            <div className="fund-mob-method" style={{ background: dark ? "rgba(255,255,255,.03)" : "rgba(255,255,255,.85)", border: `0.5px solid ${t.cardBorder}` }}>
               <div className="fund-method-title" style={{ color: t.text }}>Choose payment method</div>
               {gateways.map(g => <Radio key={g.id} gw={g} />)}
               {payError && <div style={{ padding: "8px 12px", borderRadius: 8, marginTop: 8, fontSize: 12, background: dark ? "rgba(220,38,38,.08)" : "#fef2f2", border: `1px solid ${dark ? "rgba(220,38,38,.15)" : "#fecaca"}`, color: dark ? "#fca5a5" : "#dc2626" }}>⚠️ {payError}</div>}
@@ -269,7 +269,7 @@ export function AddFundsSidebar({ user, txs, dark, t }) {
   return (
     <>
       <div className="fund-rs-title" style={{ color: t.textMuted }}>Wallet</div>
-      <div className="fund-rs-wallet" style={{ background: t.cardBg, borderWidth: 1, borderStyle: "solid", borderColor: t.cardBorder }}>
+      <div className="fund-rs-wallet" style={{ background: dark ? "rgba(255,255,255,.03)" : "rgba(255,255,255,.85)", border: `0.5px solid ${t.cardBorder}` }}>
         <div className="fund-rs-bal-label" style={{ color: t.textMuted }}>Balance</div>
         <div className="m fund-rs-bal-val" style={{ color: t.green }}>{fN(balance)}</div>
       </div>

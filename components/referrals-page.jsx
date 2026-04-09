@@ -40,7 +40,7 @@ export default function ReferralsPage({ user, dark, t }) {
       </div>
 
       {/* Share card */}
-      <div className="ref-share-card" style={{ background: t.cardBg, borderWidth: 1, borderStyle: "solid", borderColor: t.cardBorder }}>
+      <div className="ref-share-card" style={{ background: dark ? "rgba(255,255,255,.03)" : "rgba(255,255,255,.85)", border: `0.5px solid ${t.cardBorder}` }}>
         <div className="ref-share-label" style={{ color: t.textMuted }}>Your Referral</div>
         <div className="ref-share-row">
           {/* Code */}
@@ -74,18 +74,19 @@ export default function ReferralsPage({ user, dark, t }) {
           ["Total Bonus", fN(totalEarnings), t.accent],
           ["Available", fN(totalEarnings), t.green],
         ].map(([label, val, color]) => (
-          <div key={label} className="ref-stat-card" style={{ background: t.cardBg, borderWidth: 1, borderStyle: "solid", borderColor: t.cardBorder }}>
+          <div key={label} className="ref-stat-card" style={{ background: dark ? "rgba(255,255,255,.03)" : "rgba(255,255,255,.85)", border: `0.5px solid ${t.cardBorder}` }}>
             <div className="ref-stat-label" style={{ color: t.textMuted }}>{label}</div>
             <div className="m ref-stat-val" style={{ color }}>{val}</div>
           </div>
         ))}
       </div>
 
-      {/* Section title */}
-      <div className="ref-section-title" style={{ color: t.textMuted }}>Your Referrals</div>
-
       {/* Referral list */}
-      <div className="ref-list" style={{ background: t.cardBg, borderWidth: 1, borderStyle: "solid", borderColor: t.cardBorder }}>
+      <div className="ref-list" style={{ background: dark ? "rgba(255,255,255,.03)" : "rgba(255,255,255,.85)", border: `0.5px solid ${t.cardBorder}` }}>
+        <div style={{ padding: "16px 18px 0" }}>
+          <div className="ref-section-title" style={{ color: t.textMuted }}>Your referrals</div>
+        </div>
+        <div className="ref-list-divider" style={{ background: t.cardBorder }} />
         {paged.length > 0 ? paged.map((r, i) => (
           <div key={r.id || i} className="ref-row" style={{ borderBottom: i < paged.length - 1 ? `1px solid ${t.cardBorder}` : "none" }}>
             <div className="ref-avatar" style={{ background: dark ? "rgba(196,125,142,.1)" : "rgba(196,125,142,.06)", color: t.accent }}>{(r.name || "?").charAt(0)}</div>
@@ -146,7 +147,7 @@ export default function ReferralsPage({ user, dark, t }) {
 
       {/* Mobile referral card (shows how-it-works on tablet/mobile since sidebar hidden) */}
       <div className="ref-mobile-how">
-        <div className="ref-section-title" style={{ color: t.textMuted }}>How It Works</div>
+        <div className="ref-section-title" style={{ color: t.textMuted }}>How it works</div>
         <div className="ref-how-steps">
           {[
             ["1", "Share your link", "Send your referral link to friends"],
@@ -198,7 +199,7 @@ export function ReferralsSidebar({ user, dark, t }) {
 
       {/* Current reward */}
       <div className="ref-rs-title" style={{ color: t.textMuted }}>Current Reward</div>
-      <div className="ref-rs-reward" style={{ background: t.cardBg, borderWidth: 1, borderStyle: "solid", borderColor: t.cardBorder }}>
+      <div className="ref-rs-reward" style={{ background: dark ? "rgba(255,255,255,.03)" : "rgba(255,255,255,.85)", border: `0.5px solid ${t.cardBorder}` }}>
         <div className="m ref-rs-reward-val" style={{ color: t.accent }}>₦500</div>
         <div className="ref-rs-reward-sub" style={{ color: t.textMuted }}>per successful referral</div>
       </div>

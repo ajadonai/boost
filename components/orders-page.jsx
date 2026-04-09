@@ -141,7 +141,7 @@ export default function OrdersPage({ orders: initialOrders, txs, dark, t }) {
         <input placeholder="Search by order ID or service..." value={search} onChange={e => { setSearch(e.target.value); setOPage(1); }} className="m ord-search" style={{ borderColor: t.cardBorder, background: dark ? "#0d1020" : "#fff", color: t.text }} />
 
         {/* Order list */}
-        <div className="ord-list" style={{ background: t.cardBg, borderWidth: 1, borderStyle: "solid", borderColor: t.cardBorder }}>
+        <div className="ord-list" style={{ background: dark ? "rgba(255,255,255,.03)" : "rgba(255,255,255,.85)", border: `0.5px solid ${t.cardBorder}` }}>
           {pagedOrders.length > 0 ? pagedOrders.map((o, i) => (
             <div key={o.id}>
               <div onClick={() => setExpanded(expanded === o.id ? null : o.id)} className="ord-row" style={{ borderBottom: (i < pagedOrders.length - 1 || expanded === o.id) ? `1px solid ${t.cardBorder}` : "none" }}>
@@ -229,7 +229,7 @@ export default function OrdersPage({ orders: initialOrders, txs, dark, t }) {
           ))}
         </div>
 
-        <div className="ord-list" style={{ background: t.cardBg, borderWidth: 1, borderStyle: "solid", borderColor: t.cardBorder }}>
+        <div className="ord-list" style={{ background: dark ? "rgba(255,255,255,.03)" : "rgba(255,255,255,.85)", border: `0.5px solid ${t.cardBorder}` }}>
           {pagedTxs.length > 0 ? pagedTxs.map((tx, i) => (
             <div key={tx.id} className="ord-tx-row" style={{ borderBottom: i < pagedTxs.length - 1 ? `1px solid ${t.cardBorder}` : "none" }}>
               <div className="ord-tx-icon" style={{ background: dark ? `${txClr(tx.type, dark)}15` : `${txClr(tx.type, dark)}10`, color: txClr(tx.type, dark) }}>{txIcon(tx.type)}</div>
