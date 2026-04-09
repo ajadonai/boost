@@ -187,30 +187,39 @@ function LandingInner(){
           <div className="hero-split">
             {/* LEFT */}
             <div className="hero-left">
-              <div className="fu hero-badge" style={{background:t.heroAccentBadge,border:`1px solid ${dark?"rgba(196,125,142,.15)":"rgba(255,255,255,.3)"}`,color:dark?t.accent:"#fff",backdropFilter:"blur(8px)"}}>🚀 Trusted by {siteStats.users} creators across Nigeria</div>
-              <h1 className="fu fd1 hero-h1" style={{color:t.heroText}}>Social Growth,<br/><span className="serif hero-refined" style={{color:dark?t.accent:"#fff",textShadow:dark?"none":"0 2px 20px rgba(196,125,142,.15)"}}>Refined.</span></h1>
-              <p className="fu fd2 hero-sub" style={{color:t.heroSoft}}>Real followers. Real engagement. Instant delivery. Nigeria's most trusted SMM platform.</p>
+              <div className="fu hero-eyebrow" style={{display:"inline-flex",alignItems:"center",gap:8,marginBottom:20}}>
+                <div className="hero-live-dot" style={{width:8,height:8,borderRadius:"50%",background:"#34d399",boxShadow:"0 0 12px rgba(52,211,153,.4)"}} />
+                <span className="m" style={{fontSize:12,fontWeight:500,letterSpacing:1.5,textTransform:"uppercase",color:dark?"#34d399":"rgba(255,255,255,.85)"}}>{(siteStats.orders||0).toLocaleString()} orders delivered today</span>
+              </div>
+              <h1 className="fu fd1 hero-h1" style={{color:t.heroText}}>Your audience,<br/><span className="serif hero-refined" style={{color:dark?t.accent:"#fff",textShadow:dark?"none":"0 2px 20px rgba(0,0,0,.15)"}}>amplified.</span></h1>
+              <div className="fu fd2 hero-value-line m" style={{fontSize:15,fontWeight:500,color:dark?"rgba(244,241,237,.5)":"rgba(255,255,255,.75)",marginBottom:20,display:"flex",alignItems:"center",gap:12,flexWrap:"wrap"}}>
+                <span style={{padding:"3px 10px",borderRadius:6,fontWeight:600,background:dark?"rgba(52,211,153,.08)":"rgba(255,255,255,.15)",color:dark?"#34d399":"#fff",border:`0.5px solid ${dark?"rgba(52,211,153,.15)":"rgba(255,255,255,.25)"}`}}>1,000 followers</span>
+                <span>from ₦850</span>
+                <span style={{opacity:.3}}>·</span>
+                <span>delivered in minutes</span>
+              </div>
+              <p className="fu fd2 hero-sub" style={{color:t.heroSoft}}>Real engagement from real accounts. Instant delivery across Instagram, TikTok, YouTube and 25+ platforms. Trusted by Nigeria's top creators.</p>
 
-              {/* Stats */}
-              <div className="fu fd3 hero-stats" style={{display:"grid",gap:16}}>
-                {[[siteStats.orders,"Orders",<svg key="o" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={dark?"#e0a458":"rgba(255,255,255,.75)"} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>],["₦500","Min Deposit",<svg key="d" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={dark?"#6ee7b7":"rgba(255,255,255,.75)"} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/><path d="M7 15h4"/></svg>],["24/7","Support",<svg key="s" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={dark?"#a5b4fc":"rgba(255,255,255,.75)"} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>]].map(([v,l,ic])=>(
-                  <div key={l} className="stat-card" style={{background:dark?"rgba(255,255,255,.03)":"rgba(255,255,255,.1)",border:`1px solid ${dark?"rgba(255,255,255,.05)":"rgba(255,255,255,.15)"}`,backdropFilter:"blur(8px)"}}>
-                    <div className="stat-icon">{ic}</div>
-                    <div className="m stat-value" style={{color:t.heroText}}>{v}</div>
-                    <div className="stat-label" style={{color:t.heroMuted}}>{l}</div>
-                  </div>
-                ))}
+              {/* Social proof strip */}
+              <div className="fu fd3 hero-proof" style={{display:"flex",alignItems:"center",gap:20,marginBottom:32,flexWrap:"wrap"}}>
+                {[[`${((siteStats.orders||0)/1000).toFixed(0)}K+`,"Orders\ndelivered"],[`${siteStats.users||"0"}+`,"Active\ncreators"],["98%","Delivery\nrate"]].map(([num,label],i)=><>{i>0&&<div style={{width:1,height:24,background:dark?"rgba(255,255,255,.08)":"rgba(255,255,255,.2)"}}/>}<div key={label} style={{display:"flex",alignItems:"center",gap:8}}><span className="m" style={{fontSize:20,fontWeight:600,color:t.heroText}}>{num}</span><span style={{fontSize:13,color:dark?"rgba(244,241,237,.35)":"rgba(255,255,255,.6)",lineHeight:1.3,whiteSpace:"pre-line"}}>{label}</span></div></>)}
               </div>
 
-              {/* Desktop: View Pricing text link */}
-              <div className="fu fd4 hero-view-pricing" style={{color:t.heroMuted}} onClick={()=>document.getElementById("pricing")?.scrollIntoView({behavior:"smooth"})}>
-                View Pricing
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={t.heroMuted} strokeWidth="2" strokeLinecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+              {/* CTAs */}
+              <div className="fu fd4 hero-ctas" style={{display:"flex",gap:12,alignItems:"center",flexWrap:"wrap"}}>
+                <button onClick={()=>setModal("signup")} className="hero-cta-btn" style={{padding:"14px 36px",borderRadius:12,background:"#fff",color:"#1a1a1a",fontSize:15,fontWeight:600,border:"none",boxShadow:"0 8px 32px rgba(0,0,0,.15)",cursor:"pointer"}}>Start growing now <span style={{fontSize:18}}>→</span></button>
+                <button onClick={()=>document.getElementById("pricing")?.scrollIntoView({behavior:"smooth"})} className="hero-secondary-btn" style={{padding:"14px 28px",borderRadius:12,fontSize:15,fontWeight:500,background:"none",border:`0.5px solid ${dark?"rgba(255,255,255,.12)":"rgba(255,255,255,.3)"}`,color:dark?"rgba(244,241,237,.7)":"#fff",cursor:"pointer"}}>View pricing</button>
               </div>
 
-              {/* Mobile/Tablet: Get Started Free */}
-              <div className="hero-mobile-cta fu fd4">
-                <button onClick={()=>setModal("signup")} className="hero-cta-btn">Get Started Free →</button>
+              {/* Guarantee */}
+              <div className="fu fd4" style={{display:"flex",alignItems:"center",gap:6,marginTop:16,fontSize:13,color:dark?"rgba(244,241,237,.3)":"rgba(255,255,255,.6)"}}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                Instant refund if we can't deliver
+              </div>
+
+              {/* Mobile CTA — hidden on desktop */}
+              <div className="hero-mobile-cta fu fd4" style={{display:"none"}}>
+                <button onClick={()=>setModal("signup")} className="hero-cta-btn" style={{padding:"14px 40px",borderRadius:14,background:"#fff",color:"#1a1a1a",fontSize:15,fontWeight:600,border:"none",boxShadow:"0 8px 32px rgba(0,0,0,.15)"}}>Start growing now →</button>
               </div>
             </div>
 
