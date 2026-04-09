@@ -38,7 +38,6 @@ function LandingInner(){
   const [heroRefCode,setHeroRefCode]=useState("");
   const [heroAgree,setHeroAgree]=useState(false);
   const [heroShowPw,setHeroShowPw]=useState(false);
-  const [faqOpen,setFaqOpen]=useState(null);
   const [activeStep,setActiveStep]=useState(0);
   const [scrolled,setScrolled]=useState(false);
   const [activeSection,setActiveSection]=useState(0);
@@ -94,7 +93,7 @@ function LandingInner(){
     try{const res=await fetch("/api/auth/forgot-password",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:heroEmail})});const data=await res.json();if(!res.ok){setHeroError(data.error||"Failed to send reset link");setHeroLoading(false);return;}setHeroError("");setHeroLoading(false);setHeroAuth("login");alert("Reset link sent! Check your email.");}catch{setHeroError("Something went wrong.");setHeroLoading(false);}
   };
 
-  const sectionIds=["hero","services","pricing","testimonials","faq","cta"];
+  const sectionIds=["hero","services","pricing","testimonials","cta"];
   const currentSec=useRef(0);
   useEffect(()=>{
     const handleKey=(e)=>{
@@ -133,7 +132,7 @@ function LandingInner(){
           </button>
           <div className="nav-right" style={{display:"flex",alignItems:"center",gap:10}}>
             <div className="nav-links" style={{gap:4,alignItems:"center",marginRight:6}}>
-              {["Services","Pricing","FAQ"].map(l=><button key={l} onClick={()=>document.getElementById(l.toLowerCase())?.scrollIntoView({behavior:"smooth"})} className="nav-link-pill" style={{padding:"6px 16px",borderRadius:8,background:"none",fontSize:14,color:dark?"rgba(255,255,255,.5)":"rgba(255,255,255,.6)",fontWeight:500,border:"none",cursor:"pointer"}}>{l}</button>)}
+              {["Services","Pricing","Testimonials"].map(l=><button key={l} onClick={()=>document.getElementById(l.toLowerCase())?.scrollIntoView({behavior:"smooth"})} className="nav-link-pill" style={{padding:"6px 16px",borderRadius:8,background:"none",fontSize:14,color:dark?"rgba(255,255,255,.5)":"rgba(255,255,255,.6)",fontWeight:500,border:"none",cursor:"pointer"}}>{l}</button>)}
             </div>
             <button onClick={toggleTheme} aria-label={dark?"Switch to light":"Switch to dark"} className="theme-toggle" style={{width:44,height:24,borderRadius:12,background:dark?"rgba(99,102,241,.2)":"rgba(255,255,255,.15)",position:"relative",transition:"background .8s ease",flexShrink:0,border:`0.5px solid ${dark?"rgba(99,102,241,.15)":"rgba(255,255,255,.2)"}`}}>
               <div style={{width:18,height:18,borderRadius:"50%",background:dark?"#1e1b4b":"#fff",position:"absolute",top:2.5,left:dark?22.5:2.5,transition:"left .8s cubic-bezier(.4,0,.2,1), background .8s ease",display:"flex",alignItems:"center",justifyContent:"center"}}>
@@ -415,32 +414,7 @@ function LandingInner(){
           </div>
         </section>
 
-        <div className="section-divider" style={{background:t.bgAlt}}><div className="section-divider-line" style={{background:`linear-gradient(90deg,transparent,${dark?"rgba(196,125,142,.2)":"rgba(196,125,142,.15)"},transparent)`}}/><div className="section-divider-dot" style={{background:t.accent}}/><div className="section-divider-line" style={{background:`linear-gradient(90deg,transparent,${dark?"rgba(196,125,142,.2)":"rgba(196,125,142,.15)"},transparent)`}}/></div>
 
-        {/* ━━━ SECTION 5: FAQ ━━━ */}
-        <section id="faq" className="s5 snap-section" style={{background:t.bg}}>
-          <div className="s5-header">
-            <div className="m s5-label" style={{color:t.accent}}>FAQ</div>
-            <h2 className="s5-heading" style={{color:t.text}}>Got <span className="serif s5-heading-accent" style={{color:t.accent}}>Questions</span>?</h2>
-            <p className="s5-desc" style={{color:t.textSoft}}>Everything you need to know about Nitro. Can't find your answer? Hit us up on WhatsApp.</p>
-          </div>
-          <div className="s5-list" style={{background:dark?"rgba(255,255,255,.03)":"rgba(255,255,255,.7)",borderTop:`1px solid ${dark?"rgba(255,255,255,.08)":"rgba(0,0,0,.08)"}`,borderRight:`1px solid ${dark?"rgba(255,255,255,.08)":"rgba(0,0,0,.08)"}`,borderBottom:`1px solid ${dark?"rgba(255,255,255,.08)":"rgba(0,0,0,.08)"}`,borderLeft:`3px solid ${t.accent}`}}>
-            {[["What is Nitro?","Nitro is Nigeria's fastest SMM panel. We help creators, businesses, and marketers grow their social media presence with real followers, likes, views, and engagement across all major platforms."],["Is Nitro safe to use?","Yes. We use secure payment gateways and deliver engagement from real accounts. Your social media accounts are never at risk — we only need your public profile link, never your password."],["How fast is delivery?","Most orders start processing within seconds of payment. Depending on the service, full delivery typically completes within minutes to a few hours."],["What's the minimum deposit?","You can start with as little as ₦500. There's no minimum per order — once your wallet is funded, you can place orders of any size."],["What payment methods do you accept?","We accept bank transfers, debit/credit cards, and cryptocurrency. All payments are processed instantly so you can start ordering right away."],["What happens if my order doesn't deliver?","If an order fails or partially delivers, we'll either refund your wallet or automatically refill the difference at no extra cost. Our support team is available 24/7."],["Do you offer refills?","Yes. Many of our services include automatic refills. If you lose followers or engagement within the refill period, we'll top them back up for free."],["Which platforms do you support?","We support Instagram, TikTok, YouTube, Twitter/X, Facebook, Telegram, Spotify, Snapchat, LinkedIn, Pinterest, Twitch, Discord, and more."]].map(([q,a],i)=>(
-              <div key={i} className="s5-item" style={{borderBottom:i<7?`1px solid ${dark?"rgba(255,255,255,.06)":"rgba(0,0,0,.06)"}`:undefined}}>
-                <button onClick={()=>setFaqOpen(faqOpen===i?null:i)} className="s5-question">
-                  <div className="s5-q-num m" style={{color:faqOpen===i?t.accent:t.textMuted}}>0{i+1}</div>
-                  <span className="s5-q-text" style={{color:faqOpen===i?t.accent:t.text}}>{q}</span>
-                  <div className="s5-chevron" style={{background:faqOpen===i?(dark?"rgba(196,125,142,.15)":"rgba(196,125,142,.08)"):(dark?"rgba(255,255,255,.04)":"rgba(0,0,0,.03)")}}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={faqOpen===i?t.accent:t.textMuted} strokeWidth="2" strokeLinecap="round" style={{transition:"transform .3s ease, stroke .3s",transform:faqOpen===i?"rotate(180deg)":"rotate(0)"}}><polyline points="6 9 12 15 18 9"/></svg>
-                  </div>
-                </button>
-                <div className="s5-answer" style={{maxHeight:faqOpen===i?200:0,opacity:faqOpen===i?1:0}}>
-                  <p className="s5-a-text" style={{color:dark?"#b0aca8":"#555250"}}>{a}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
 
         <div className="section-divider" style={{background:t.bg}}><div className="section-divider-line" style={{background:`linear-gradient(90deg,transparent,${dark?"rgba(196,125,142,.2)":"rgba(196,125,142,.15)"},transparent)`}}/><div className="section-divider-dot" style={{background:t.accent}}/><div className="section-divider-line" style={{background:`linear-gradient(90deg,transparent,${dark?"rgba(196,125,142,.2)":"rgba(196,125,142,.15)"},transparent)`}}/></div>
 
@@ -489,11 +463,11 @@ function LandingInner(){
             <div className="s6-footer-links">
               <div>
                 <div className="s6-footer-col-title" style={{color:t.accent}}>Product</div>
-                {[["Services","#services"],["Pricing","#pricing"],["FAQ","#faq"]].map(([l,href])=><div key={l} className="s6-footer-link" style={{color:dark?"#b0aca8":"#555"}} onClick={()=>document.getElementById(href.slice(1))?.scrollIntoView({behavior:"smooth"})}>{l}</div>)}
+                {[["Services","#services"],["Pricing","#pricing"],["Testimonials","#testimonials"]].map(([l,href])=><div key={l} className="s6-footer-link" style={{color:dark?"#b0aca8":"#555"}} onClick={()=>document.getElementById(href.slice(1))?.scrollIntoView({behavior:"smooth"})}>{l}</div>)}
               </div>
               <div>
                 <div className="s6-footer-col-title" style={{color:t.accent}}>Legal</div>
-                {[["Terms","/terms"],["Privacy","/privacy"],["Refund","/refund"],["Cookies","/cookie"]].map(([l,href])=><a key={l} href={href} className="s6-footer-link" style={{color:dark?"#b0aca8":"#555",display:"block"}}>{l}</a>)}
+                {[["Terms","/terms"],["Privacy","/privacy"],["Refund","/refund"],["Cookies","/cookie"],["FAQ","/faq"]].map(([l,href])=><a key={l} href={href} className="s6-footer-link" style={{color:dark?"#b0aca8":"#555",display:"block"}}>{l}</a>)}
               </div>
             </div>
           </div>
