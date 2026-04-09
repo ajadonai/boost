@@ -2,24 +2,34 @@ import prisma from '@/lib/prisma';
 import { log } from "@/lib/logger";
 import { requireAdmin, logActivity } from '@/lib/admin';
 
-export async function GET() {
+export async function GET(req) {
   const { admin, error } = await requireAdmin('orders');
   if (error) return error;
 
   try {
+    const url = new URL(req.url);
+    const cursor = url.searchParams.get('cursor');
+    const limit = Math.min(Number(url.searchParams.get('limit')) || 50, 200);
+
     const orders = await prisma.order.findMany({
       where: { deletedAt: null },
       orderBy: { createdAt: 'desc' },
-      take: 500,
+      take: limit + 1, // fetch one extra to detect if there are more
+      ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
       include: {
         user: { select: { name: true, email: true } },
         service: { select: { name: true, category: true } },
       },
     });
 
+    const hasMore = orders.length > limit;
+    const items = hasMore ? orders.slice(0, limit) : orders;
+    const nextCursor = hasMore ? items[items.length - 1].id : null;
+
     return Response.json({
-      orders: orders.map(o => ({
+      orders: items.map(o => ({
         id: o.orderId || o.id,
+        internalId: o.id,
         user: o.user?.name || 'Unknown',
         email: o.user?.email || '',
         service: o.service?.name || o.serviceId,
@@ -32,6 +42,8 @@ export async function GET() {
         apiOrderId: o.apiOrderId,
         created: o.createdAt.toISOString(),
       })),
+      nextCursor,
+      hasMore,
     });
   } catch (err) {
     log.error('Admin Orders', err.message);

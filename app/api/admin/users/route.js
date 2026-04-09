@@ -2,15 +2,19 @@ import prisma from '@/lib/prisma';
 import { log } from "@/lib/logger";
 import { requireAdmin, logActivity, canPerformAction } from '@/lib/admin';
 
-export async function GET() {
+export async function GET(req) {
   const { admin, error } = await requireAdmin('users');
   if (error) return error;
 
   try {
+    const url = new URL(req.url);
+    const cursor = url.searchParams.get('cursor');
+    const limit = Math.min(Number(url.searchParams.get('limit')) || 50, 200);
+
     const users = await prisma.user.findMany({
-      
       orderBy: { createdAt: 'desc' },
-      take: 500,
+      take: limit + 1,
+      ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
       select: {
         id: true, name: true, firstName: true, lastName: true, phone: true,
         email: true, balance: true, status: true,
@@ -19,8 +23,12 @@ export async function GET() {
       },
     });
 
+    const hasMore = users.length > limit;
+    const items = hasMore ? users.slice(0, limit) : users;
+    const nextCursor = hasMore ? items[items.length - 1].id : null;
+
     return Response.json({
-      users: users.map(u => ({
+      users: items.map(u => ({
         id: u.id,
         name: u.name,
         firstName: u.firstName,
@@ -34,6 +42,8 @@ export async function GET() {
         refCode: u.referralCode,
         joined: u.createdAt.toISOString(),
       })),
+      nextCursor,
+      hasMore,
     });
   } catch (err) {
     log.error('Admin Users', err.message);
