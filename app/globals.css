@@ -1329,7 +1329,7 @@ input { font-family: inherit; }
   /* Section 6 tablet */
   .s6-cta-wrapper { padding: 28px 40px 0; }
   .s6-cta { border-radius: 26px; padding: 60px 44px; }
-  .s6-cta-content { padding: 72px 40px 60px !important; }
+  .s6-cta-content { padding: 48px 40px 36px !important; }
   .s6-h2-bold { font-size: 42px !important; }
   .s6-h2-italic { font-size: 48px !important; margin-bottom: 16px !important; }
   .s6-ft-grid { grid-template-columns: 1fr 1fr 1fr !important; gap: 28px !important; }
@@ -1493,12 +1493,12 @@ input { font-family: inherit; }
   .s6-cta-wrapper { padding: 20px 16px 0; }
   .s6-cta { border-radius: 22px; padding: 48px 24px; }
   .s6-ring { top: -60px; right: -40px; width: 160px; height: 160px; }
-  .s6-cta-content { padding: 56px 24px 48px !important; }
+  .s6-cta-content { padding: 44px 24px 36px !important; }
   .s6-h2-bold { font-size: 34px !important; letter-spacing: -1.5px !important; margin-bottom: 4px; }
   .s6-h2-italic { font-size: 40px !important; margin-bottom: 14px !important; }
   .s6-btn-primary { padding: 16px 40px !important; font-size: 15px !important; }
   .s6-btn-ghost { display: none !important; }
-  .s6-footer { padding: 40px 20px 20px !important; }
+  .s6-footer { padding: 28px 20px 16px !important; }
   .s6-ft-grid { grid-template-columns: 1fr 1fr !important; gap: 24px 16px !important; }
   .s6-ft-brand { grid-column: 1 / -1; }
   .s6-footer-bottom { flex-direction: column !important; gap: 10px; text-align: center; }

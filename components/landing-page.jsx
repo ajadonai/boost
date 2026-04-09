@@ -432,18 +432,18 @@ function LandingInner(){
             {/* Noise */}
             <div style={{position:"absolute",inset:0,pointerEvents:"none",opacity:.03,backgroundImage:"url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",backgroundSize:"128px"}}/>
 
-            <div style={{position:"relative",zIndex:2,padding:"100px 60px 80px",maxWidth:640,margin:"0 auto"}} className="s6-cta-content">
+            <div style={{position:"relative",zIndex:2,padding:"64px 60px 48px",maxWidth:640,margin:"0 auto"}} className="s6-cta-content">
               {/* Eyebrow */}
-              <div style={{display:"inline-flex",alignItems:"center",gap:8,marginBottom:36}}>
+              <div style={{display:"inline-flex",alignItems:"center",gap:8,marginBottom:24}}>
                 <div className="hero-live-dot" style={{width:8,height:8,borderRadius:"50%",background:"#34d399",boxShadow:"0 0 12px rgba(52,211,153,.5)"}}/>
                 <span className="m" style={{fontSize:12,fontWeight:500,letterSpacing:1.5,textTransform:"uppercase",color:dark?"#34d399":"rgba(255,255,255,.85)"}}>{siteStats.orders||"0"} orders delivered today</span>
               </div>
 
               <h2 style={{fontSize:60,fontWeight:700,color:"#fff",lineHeight:1.02,letterSpacing:-2.5,marginBottom:4}} className="s6-h2-bold">Your Audience</h2>
-              <h2 className="serif s6-h2-italic" style={{fontStyle:"italic",fontWeight:400,fontSize:68,lineHeight:1.02,marginBottom:24,color:dark?"#c47d8e":"#fff",textShadow:dark?"none":"0 4px 32px rgba(0,0,0,.15)"}}>Won't Grow Itself.</h2>
-              <p style={{fontSize:17,lineHeight:1.7,marginBottom:44,color:dark?"rgba(255,255,255,.4)":"rgba(255,255,255,.8)",maxWidth:440,margin:"0 auto 44px"}}>Every minute you wait, your competitors are getting ahead. Join {siteStats.users||"0"} Nigerian creators already growing with Nitro.</p>
+              <h2 className="serif s6-h2-italic" style={{fontStyle:"italic",fontWeight:400,fontSize:68,lineHeight:1.02,marginBottom:16,color:dark?"#c47d8e":"#fff",textShadow:dark?"none":"0 4px 32px rgba(0,0,0,.15)"}}>Won't Grow Itself.</h2>
+              <p style={{fontSize:17,lineHeight:1.7,marginBottom:44,color:dark?"rgba(255,255,255,.4)":"rgba(255,255,255,.8)",maxWidth:440,margin:"0 auto 28px"}}>Every minute you wait, your competitors are getting ahead. Join {siteStats.users||"0"} Nigerian creators already growing with Nitro.</p>
 
-              <div className="s6-buttons" style={{display:"flex",gap:14,justifyContent:"center",flexWrap:"wrap",marginBottom:36}}>
+              <div className="s6-buttons" style={{display:"flex",gap:14,justifyContent:"center",flexWrap:"wrap",marginBottom:24}}>
                 <button className="s6-btn-primary" onClick={()=>setModal("signup")} style={{padding:"18px 56px",borderRadius:14,fontSize:16,fontWeight:600,border:"none",cursor:"pointer",background:"#fff",color:"#1a1a1a",boxShadow:"0 12px 48px rgba(255,255,255,.1)",position:"relative",overflow:"hidden"}}>Start Growing Now {"\u2192"}</button>
                 <button className="s6-btn-ghost" onClick={()=>document.getElementById("pricing")?.scrollIntoView({behavior:"smooth"})} style={{padding:"18px 44px",borderRadius:14,fontSize:16,fontWeight:500,cursor:"pointer",background:"none",color:"#fff",border:`1px solid ${dark?"rgba(255,255,255,.08)":"rgba(255,255,255,.25)"}`}}>View Pricing</button>
               </div>
@@ -461,12 +461,12 @@ function LandingInner(){
           </div>
 
           {/* ── FOOTER ── */}
-          <footer style={{padding:"56px 48px 28px",background:dark?"#030508":"#dedad4",position:"relative"}} className="s6-footer">
+          <footer style={{padding:"32px 48px 20px",background:dark?"#030508":"#dedad4",position:"relative"}} className="s6-footer">
             {/* Accent line */}
-            <div style={{height:1,marginBottom:48,background:`linear-gradient(90deg,transparent,${dark?"rgba(196,125,142,.15)":"rgba(196,125,142,.1)"},transparent)`}}/>
+            <div style={{height:1,marginBottom:24,background:`linear-gradient(90deg,transparent,${dark?"rgba(196,125,142,.15)":"rgba(196,125,142,.1)"},transparent)`}}/>
 
             {/* 4-column grid */}
-            <div className="s6-ft-grid" style={{display:"grid",gridTemplateColumns:"1.8fr 1fr 1fr 1fr",gap:40,marginBottom:48}}>
+            <div className="s6-ft-grid" style={{display:"grid",gridTemplateColumns:"1.8fr 1fr 1fr 1fr",gap:32,marginBottom:28}}>
               {/* Brand */}
               <div className="s6-ft-brand">
                 <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:14}}>
