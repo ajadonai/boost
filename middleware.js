@@ -13,8 +13,29 @@ async function verifyToken(token, secret) {
   }
 }
 
+const ALLOWED_ORIGINS = [
+  'https://nitro.ng', 'https://www.nitro.ng',
+  'https://thenitro.ng', 'https://www.thenitro.ng',
+  'http://localhost:3000', 'http://localhost:3001',
+];
+
 export async function middleware(request) {
   const { pathname } = request.nextUrl;
+
+  // ── CSRF: verify Origin on state-changing API requests ──
+  if (pathname.startsWith('/api/') && ['POST', 'PATCH', 'PUT', 'DELETE'].includes(request.method)) {
+    // Skip webhook endpoints (external services call these)
+    if (!pathname.includes('/webhook')) {
+      const origin = request.headers.get('origin');
+      if (origin) {
+        const appUrl = process.env.NEXT_PUBLIC_APP_URL || '';
+        const allowed = ALLOWED_ORIGINS.some(o => origin === o) || (appUrl && origin === appUrl);
+        if (!allowed) {
+          return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+        }
+      }
+    }
+  }
 
   // ── Redirect logged-in users away from landing page ──
   if (pathname === '/') {
@@ -84,5 +105,5 @@ export async function middleware(request) {
 }
 
 export const config = {
-  matcher: ['/', '/verify', '/dashboard/:path*', '/admin/:path*'],
+  matcher: ['/', '/verify', '/dashboard/:path*', '/admin/:path*', '/api/:path*'],
 };
