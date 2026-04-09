@@ -10,15 +10,16 @@ async function main() {
   // Delete existing user if present
   const existing = await prisma.user.findUnique({ where: { email } });
   if (existing) {
+    await prisma.ticketReply.deleteMany({ where: { ticket: { userId: existing.id } } });
+    await prisma.ticket.deleteMany({ where: { userId: existing.id } });
     await prisma.session.deleteMany({ where: { userId: existing.id } });
     await prisma.transaction.deleteMany({ where: { userId: existing.id } });
     await prisma.order.deleteMany({ where: { userId: existing.id } });
-    await prisma.ticket.deleteMany({ where: { userId: existing.id } });
     await prisma.user.delete({ where: { id: existing.id } });
     console.log('Deleted existing testuser');
   }
 
-  // Create user with 25k balance (stored in kobo)
+  // Create user — balance in kobo (₦25,000 = 2500000)
   const user = await prisma.user.create({
     data: {
       email,
@@ -27,7 +28,7 @@ async function main() {
       firstName: 'Test',
       lastName: 'User',
       phone: '+2348012345678',
-      balance: 2500000, // ₦25,000 in kobo
+      balance: 2500000,
       referralCode: 'NTR-TEST',
       emailVerified: true,
       notifOrders: true,
@@ -36,104 +37,103 @@ async function main() {
       status: 'Active',
     },
   });
-
   console.log(`Created user: ${user.id} (${user.email})`);
 
-  // Get some services for orders
+  // Get services for orders
   const services = await prisma.service.findMany({ take: 8 });
   if (services.length === 0) {
-    console.log('No services found — skipping orders');
+    console.log('No services found — skipping orders/transactions');
     await prisma.$disconnect();
     return;
   }
 
-  // Seed orders — mix of statuses
-  const orderData = [
-    { service: services[0], qty: 1000, charge: 350000, cost: 150000, status: 'Completed', daysAgo: 0 },
-    { service: services[1] || services[0], qty: 5000, charge: 850000, cost: 400000, status: 'Completed', daysAgo: 1 },
-    { service: services[2] || services[0], qty: 2000, charge: 420000, cost: 200000, status: 'Completed', daysAgo: 2 },
-    { service: services[3] || services[0], qty: 500, charge: 175000, cost: 80000, status: 'Completed', daysAgo: 3 },
-    { service: services[4] || services[0], qty: 10000, charge: 1500000, cost: 700000, status: 'Completed', daysAgo: 4 },
-    { service: services[5] || services[0], qty: 3000, charge: 650000, cost: 300000, status: 'Completed', daysAgo: 5 },
-    { service: services[6] || services[0], qty: 1500, charge: 280000, cost: 130000, status: 'Completed', daysAgo: 7 },
-    { service: services[0], qty: 2500, charge: 520000, cost: 250000, status: 'Completed', daysAgo: 10 },
-    { service: services[1] || services[0], qty: 800, charge: 190000, cost: 90000, status: 'Completed', daysAgo: 12 },
-    { service: services[2] || services[0], qty: 4000, charge: 720000, cost: 340000, status: 'Completed', daysAgo: 14 },
-    { service: services[3] || services[0], qty: 1000, charge: 350000, cost: 150000, status: 'Processing', daysAgo: 0 },
-    { service: services[4] || services[0], qty: 2000, charge: 480000, cost: 220000, status: 'Processing', daysAgo: 0 },
-    { service: services[5] || services[0], qty: 500, charge: 120000, cost: 55000, status: 'Pending', daysAgo: 0 },
-    { service: services[0], qty: 1000, charge: 350000, cost: 150000, status: 'Canceled', daysAgo: 6 },
-    { service: services[1] || services[0], qty: 3000, charge: 580000, cost: 270000, status: 'Partial', daysAgo: 8 },
+  // Helper — date N days ago
+  const ago = (days) => {
+    const d = new Date();
+    d.setDate(d.getDate() - days);
+    d.setHours(Math.floor(Math.random() * 12) + 8, Math.floor(Math.random() * 60));
+    return d;
+  };
+
+  const s = (i) => services[i % services.length];
+
+  // ── Orders ──
+  const orders = [
+    { svc: s(0), qty: 1000, charge: 350000, cost: 150000, status: 'Completed', d: 0 },
+    { svc: s(1), qty: 5000, charge: 850000, cost: 400000, status: 'Completed', d: 1 },
+    { svc: s(2), qty: 2000, charge: 420000, cost: 200000, status: 'Completed', d: 2 },
+    { svc: s(3), qty: 500,  charge: 175000, cost: 80000,  status: 'Completed', d: 3 },
+    { svc: s(4), qty: 10000,charge: 1500000,cost: 700000, status: 'Completed', d: 4 },
+    { svc: s(5), qty: 3000, charge: 650000, cost: 300000, status: 'Completed', d: 5 },
+    { svc: s(6), qty: 1500, charge: 280000, cost: 130000, status: 'Completed', d: 7 },
+    { svc: s(0), qty: 2500, charge: 520000, cost: 250000, status: 'Completed', d: 10 },
+    { svc: s(1), qty: 800,  charge: 190000, cost: 90000,  status: 'Completed', d: 12 },
+    { svc: s(2), qty: 4000, charge: 720000, cost: 340000, status: 'Completed', d: 14 },
+    { svc: s(3), qty: 1000, charge: 350000, cost: 150000, status: 'Processing', d: 0 },
+    { svc: s(4), qty: 2000, charge: 480000, cost: 220000, status: 'Processing', d: 0 },
+    { svc: s(5), qty: 500,  charge: 120000, cost: 55000,  status: 'Pending', d: 0 },
+    { svc: s(0), qty: 1000, charge: 350000, cost: 150000, status: 'Canceled', d: 6 },
+    { svc: s(1), qty: 3000, charge: 580000, cost: 270000, status: 'Partial', d: 8 },
   ];
 
-  let orderCount = 0;
-  for (const o of orderData) {
-    const d = new Date();
-    d.setDate(d.getDate() - o.daysAgo);
-    d.setHours(Math.floor(Math.random() * 12) + 8, Math.floor(Math.random() * 60));
-
+  for (let i = 0; i < orders.length; i++) {
+    const o = orders[i];
     await prisma.order.create({
       data: {
-        orderId: `NTR-${100000 + orderCount}`,
+        orderId: `NTR-${100000 + i}`,
         userId: user.id,
-        serviceId: o.service.id,
+        serviceId: o.svc.id,
         link: 'https://instagram.com/nitro.ng',
         quantity: o.qty,
         charge: o.charge,
         cost: o.cost,
         status: o.status,
-        createdAt: d,
+        createdAt: ago(o.d),
       },
     });
-    orderCount++;
   }
-  console.log(`Created ${orderCount} orders`);
+  console.log(`Created ${orders.length} orders`);
 
-  // Seed transactions
-  const txData = [
-    { type: 'deposit', amount: 5000000, method: 'Paystack', note: 'Card deposit', daysAgo: 0 },
-    { type: 'deposit', amount: 3000000, method: 'Paystack', note: 'Card deposit', daysAgo: 3 },
-    { type: 'deposit', amount: 10000000, method: 'Flutterwave', note: 'Bank transfer', daysAgo: 7 },
-    { type: 'deposit', amount: 2000000, method: 'Paystack', note: 'Card deposit', daysAgo: 12 },
-    { type: 'order', amount: -350000, method: null, note: 'Order NTR-100000', daysAgo: 0 },
-    { type: 'order', amount: -850000, method: null, note: 'Order NTR-100001', daysAgo: 1 },
-    { type: 'order', amount: -420000, method: null, note: 'Order NTR-100002', daysAgo: 2 },
-    { type: 'order', amount: -175000, method: null, note: 'Order NTR-100003', daysAgo: 3 },
-    { type: 'order', amount: -1500000, method: null, note: 'Order NTR-100004', daysAgo: 4 },
-    { type: 'order', amount: -650000, method: null, note: 'Order NTR-100005', daysAgo: 5 },
-    { type: 'referral', amount: 50000, method: null, note: 'Referral bonus — @david', daysAgo: 2 },
-    { type: 'referral', amount: 50000, method: null, note: 'Referral bonus — @chioma', daysAgo: 5 },
-    { type: 'referral', amount: 50000, method: null, note: 'Referral bonus — @emeka', daysAgo: 9 },
+  // ── Transactions ──
+  const txs = [
+    { type: 'deposit',  amount: 5000000,  method: 'Paystack',     note: 'Card deposit',              d: 0 },
+    { type: 'deposit',  amount: 3000000,  method: 'Paystack',     note: 'Card deposit',              d: 3 },
+    { type: 'deposit',  amount: 10000000, method: 'Flutterwave',  note: 'Bank transfer',             d: 7 },
+    { type: 'deposit',  amount: 2000000,  method: 'Paystack',     note: 'Card deposit',              d: 12 },
+    { type: 'order',    amount: -350000,  method: null,            note: 'Order NTR-100000',          d: 0 },
+    { type: 'order',    amount: -850000,  method: null,            note: 'Order NTR-100001',          d: 1 },
+    { type: 'order',    amount: -420000,  method: null,            note: 'Order NTR-100002',          d: 2 },
+    { type: 'order',    amount: -175000,  method: null,            note: 'Order NTR-100003',          d: 3 },
+    { type: 'order',    amount: -1500000, method: null,            note: 'Order NTR-100004',          d: 4 },
+    { type: 'order',    amount: -650000,  method: null,            note: 'Order NTR-100005',          d: 5 },
+    { type: 'referral', amount: 50000,    method: null,            note: 'Referral bonus — @david',   d: 2 },
+    { type: 'referral', amount: 50000,    method: null,            note: 'Referral bonus — @chioma',  d: 5 },
+    { type: 'referral', amount: 50000,    method: null,            note: 'Referral bonus — @emeka',   d: 9 },
   ];
 
-  let txCount = 0;
-  for (const tx of txData) {
-    const d = new Date();
-    d.setDate(d.getDate() - tx.daysAgo);
-    d.setHours(Math.floor(Math.random() * 12) + 8, Math.floor(Math.random() * 60));
-
+  for (let i = 0; i < txs.length; i++) {
+    const tx = txs[i];
     await prisma.transaction.create({
       data: {
         userId: user.id,
         type: tx.type,
         amount: tx.amount,
         method: tx.method,
-        reference: `ref_${Date.now()}_${txCount}`,
+        reference: `ref_test_${Date.now()}_${i}`,
         status: 'Completed',
         note: tx.note,
-        createdAt: d,
+        createdAt: ago(tx.d),
       },
     });
-    txCount++;
   }
-  console.log(`Created ${txCount} transactions`);
+  console.log(`Created ${txs.length} transactions`);
 
-  console.log('\n✅ Test user seeded successfully');
-  console.log(`   Email: testuser@gmail.com`);
-  console.log(`   Password: 12345678`);
-  console.log(`   Balance: ₦25,000`);
-  console.log(`   Orders: ${orderCount} (10 completed, 2 processing, 1 pending, 1 canceled, 1 partial)`);
-  console.log(`   Transactions: ${txCount}`);
+  console.log('\n✅ Test user seeded');
+  console.log('   Email: testuser@gmail.com');
+  console.log('   Password: 12345678');
+  console.log('   Balance: ₦25,000');
+  console.log(`   Orders: ${orders.length}`);
+  console.log(`   Transactions: ${txs.length}`);
 
   await prisma.$disconnect();
 }
