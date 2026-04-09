@@ -1,4 +1,5 @@
 import './globals.css';
+import SentryInit from '@/components/sentry-init';
 
 export const metadata = {
   title: 'Nitro — #1 SMM Panel in Nigeria',
@@ -31,6 +32,7 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body>
+        <SentryInit />
         {children}
       </body>
     </html>
