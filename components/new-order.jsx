@@ -72,7 +72,50 @@ export function OrderForm({ selSvc, selTier, platform, qty, setQty, link, setLin
   const s = selTier ? TS[selTier.tier] : null;
   const minQty = selTier?.min || 100;
   const maxQty = selTier?.max || 50000;
-  const isCommentService = selSvc?.type?.toLowerCase()?.includes("comment");
+
+  /* Detect service type from name + type field */
+  const svcName = (selSvc?.name || "").toLowerCase();
+  const svcType = (selSvc?.type || "").toLowerCase();
+  const isComment = svcType.includes("comment") || svcName.includes("comment");
+  const isMention = svcName.includes("mention");
+  const isPoll = svcName.includes("poll") || svcName.includes("vote");
+  const isReview = svcName.includes("review");
+  const needsComments = isComment || isReview;
+  const needsUsernames = isMention;
+  const needsAnswer = isPoll;
+
+  /* Smart link placeholder per platform */
+  const placeholders = {
+    instagram: "https://instagram.com/username or post URL",
+    tiktok: "https://tiktok.com/@username or video URL",
+    youtube: "https://youtube.com/watch?v=... or channel URL",
+    facebook: "https://facebook.com/page or post URL",
+    twitter: "https://x.com/username or tweet URL",
+    telegram: "https://t.me/channel or post URL",
+    threads: "https://threads.net/@username or post URL",
+    snapchat: "https://snapchat.com/add/username",
+    linkedin: "https://linkedin.com/in/username or post URL",
+    pinterest: "https://pinterest.com/pin/...",
+    reddit: "https://reddit.com/r/... or post URL",
+    discord: "https://discord.gg/invite-code",
+    whatsapp: "https://chat.whatsapp.com/group-link",
+    twitch: "https://twitch.tv/username",
+    kick: "https://kick.com/username",
+    spotify: "https://open.spotify.com/track/... or playlist URL",
+    audiomack: "https://audiomack.com/artist/song",
+    boomplay: "https://boomplay.com/songs/...",
+    applemusic: "https://music.apple.com/album/...",
+    soundcloud: "https://soundcloud.com/artist/track",
+    deezer: "https://deezer.com/track/...",
+    tidal: "https://tidal.com/browse/track/...",
+    google: "https://maps.google.com/... or business URL",
+    trustpilot: "https://trustpilot.com/review/...",
+    webtraffic: "https://yourwebsite.com",
+    appstore: "https://apps.apple.com/app/...",
+    playstore: "https://play.google.com/store/apps/details?id=...",
+  };
+  const linkPlaceholder = placeholders[platform] || `https://${platform}.com/...`;
+  const linkLabel = platform === "webtraffic" ? "Website URL" : isPoll ? "Post / Poll URL" : "Link";
 
   return (
     <div className="no-form-inner">
@@ -89,14 +132,32 @@ export function OrderForm({ selSvc, selTier, platform, qty, setQty, link, setLin
       </div>
       {selTier && <>
         <div className="no-form-field">
-          <label className="no-form-label" style={{ color: t.textMuted }}>Link</label>
-          <input type="text" placeholder={`https://${platform}.com/...`} value={link} onChange={e => setLink(e.target.value)} className="m no-form-input" style={{ borderColor: dark ? "rgba(255,255,255,.1)" : "rgba(0,0,0,.12)", background: dark ? "#0d1020" : "#fff", color: t.text }} />
+          <label className="no-form-label" style={{ color: t.textMuted }}>{linkLabel}</label>
+          <input type="text" placeholder={linkPlaceholder} value={link} onChange={e => setLink(e.target.value)} className="m no-form-input" style={{ borderColor: dark ? "rgba(255,255,255,.1)" : "rgba(0,0,0,.12)", background: dark ? "#0d1020" : "#fff", color: t.text }} />
         </div>
-        {isCommentService && (
+        {needsComments && (
           <div className="no-form-field">
-            <label className="no-form-label" style={{ color: t.textMuted }}>Comments <span style={{ fontWeight: 400, fontSize: 11 }}>(one per line)</span></label>
-            <textarea placeholder={"Great content! 🔥\nLove this post!\nAmazing work, keep it up 💯\nThis is fire 🙌"} value={comments || ""} onChange={e => setComments(e.target.value)} rows={4} className="m no-form-input" style={{ borderColor: dark ? "rgba(255,255,255,.1)" : "rgba(0,0,0,.12)", background: dark ? "#0d1020" : "#fff", color: t.text, resize: "vertical", fontFamily: "'JetBrains Mono', monospace", fontSize: 13, lineHeight: 1.5 }} />
-            <div style={{ fontSize: 11, color: t.textMuted, marginTop: 4 }}>{(comments || "").split("\n").filter(l => l.trim()).length} comments entered · we'll cycle through them</div>
+            <label className="no-form-label" style={{ color: t.textMuted }}>{isReview ? "Reviews" : "Comments"} <span style={{ fontWeight: 400, fontSize: 11 }}>(one per line)</span></label>
+            <textarea placeholder={isReview ? "Great service, highly recommend!\nFast delivery and excellent quality\nBest experience I've had, 5 stars" : "Great content! 🔥\nLove this post!\nAmazing work, keep it up 💯\nThis is fire 🙌"} value={comments || ""} onChange={e => setComments(e.target.value)} rows={4} className="m no-form-input" style={{ borderColor: dark ? "rgba(255,255,255,.1)" : "rgba(0,0,0,.12)", background: dark ? "#0d1020" : "#fff", color: t.text, resize: "vertical", fontFamily: "'JetBrains Mono', monospace", fontSize: 13, lineHeight: 1.5 }} />
+            <div style={{ fontSize: 11, color: t.textMuted, marginTop: 4 }}>{(comments || "").split("\n").filter(l => l.trim()).length} {isReview ? "reviews" : "comments"} entered · we'll cycle through them</div>
+          </div>
+        )}
+        {needsUsernames && (
+          <div className="no-form-field">
+            <label className="no-form-label" style={{ color: t.textMuted }}>Usernames to mention <span style={{ fontWeight: 400, fontSize: 11 }}>(one per line, without @)</span></label>
+            <textarea placeholder={"username1\nusername2\nusername3"} value={comments || ""} onChange={e => setComments(e.target.value)} rows={4} className="m no-form-input" style={{ borderColor: dark ? "rgba(255,255,255,.1)" : "rgba(0,0,0,.12)", background: dark ? "#0d1020" : "#fff", color: t.text, resize: "vertical", fontFamily: "'JetBrains Mono', monospace", fontSize: 13, lineHeight: 1.5 }} />
+            <div style={{ fontSize: 11, color: t.textMuted, marginTop: 4 }}>{(comments || "").split("\n").filter(l => l.trim()).length} usernames entered</div>
+          </div>
+        )}
+        {needsAnswer && (
+          <div className="no-form-field">
+            <label className="no-form-label" style={{ color: t.textMuted }}>Answer option number</label>
+            <div style={{ display: "flex", gap: 6 }}>
+              {[1, 2, 3, 4].map(n => (
+                <button key={n} type="button" onClick={() => setComments(String(n))} className="m" style={{ flex: 1, padding: "10px 0", borderRadius: 8, fontSize: 14, fontWeight: 600, border: `1px solid ${(comments || "") === String(n) ? t.accent : (dark ? "rgba(255,255,255,.1)" : "rgba(0,0,0,.1)")}`, background: (comments || "") === String(n) ? (dark ? "#2a1a22" : "#fdf2f4") : "transparent", color: (comments || "") === String(n) ? t.accent : t.textMuted, cursor: "pointer" }}>Option {n}</button>
+              ))}
+            </div>
+            <div style={{ fontSize: 11, color: t.textMuted, marginTop: 4 }}>Select which poll answer to vote for</div>
           </div>
         )}
         <div className="no-form-field">
@@ -120,7 +181,7 @@ export function OrderForm({ selSvc, selTier, platform, qty, setQty, link, setLin
           <span className="m no-form-tag" style={{ borderColor: t.cardBorder, color: t.textMuted }}>refill: {selTier.refill}</span>
           <span className="m no-form-tag" style={{ borderColor: t.cardBorder, color: t.textMuted }}>speed: {selTier.speed || "Instant"}</span>
         </div>
-        <button onClick={onSubmit} disabled={!link || (isCommentService && !(comments || "").trim()) || orderLoading} className="no-form-submit" style={{ opacity: link && (!isCommentService || (comments || "").trim()) && !orderLoading ? 1 : .5 }}>{orderLoading ? "Placing..." : "Place Order"}</button>
+        <button onClick={onSubmit} disabled={!link || ((needsComments || needsUsernames) && !(comments || "").trim()) || (needsAnswer && !(comments || "").trim()) || orderLoading} className="no-form-submit" style={{ opacity: link && (!(needsComments || needsUsernames || needsAnswer) || (comments || "").trim()) && !orderLoading ? 1 : .5 }}>{orderLoading ? "Placing..." : "Place Order"}</button>
       </>}
     </div>
   );
@@ -210,7 +271,7 @@ export default function NewOrderPage({ dark, t, user, onOrderSuccess, platform, 
       const res = await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tierId: selTier.id, link: link.trim(), quantity: qty, ...(comments?.trim() ? { comments: comments.trim() } : {}) }),
+        body: JSON.stringify({ tierId: selTier.id, link: link.trim(), quantity: qty, ...(comments?.trim() ? { comments: comments.trim() } : {}), serviceType: selSvc?.type || "" }),
         signal: AbortSignal.timeout(30000),
       });
       const data = await res.json();
