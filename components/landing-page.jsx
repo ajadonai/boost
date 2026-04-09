@@ -350,8 +350,6 @@ function LandingInner(){
                 ))}
               </div>
 
-              </div>
-
               <div className="s3-deposit" style={{display:"flex",alignItems:"center",gap:16,padding:"20px 24px",borderRadius:14,background:dark?"rgba(52,211,153,.04)":"rgba(5,150,105,.03)",border:`1px solid ${dark?"rgba(52,211,153,.15)":"rgba(5,150,105,.12)"}`}}>
                 <div style={{width:40,height:40,borderRadius:10,background:dark?"rgba(52,211,153,.08)":"rgba(5,150,105,.06)",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={dark?"#34d399":"#059669"} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
