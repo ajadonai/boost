@@ -395,7 +395,23 @@ export function AdminNotificationsPage({ dark, t }) {
     try {
       const res = await fetch("/api/admin/notifications", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ subject, message, target }) });
       const data = await res.json();
-      if (res.ok) { setMsg({ type: "success", text: data.message || "Sent" }); setSubject(""); setMessage(""); fetch("/api/admin/notifications").then(r => r.json()).then(d => setHistory(d.history || [])); }
+      if (res.ok) {
+        setMsg({ type: "success", text: data.message || "Sending..." });
+        setSubject(""); setMessage("");
+        // Poll history every 3s until status changes from "sending"
+        const pollDone = setInterval(() => {
+          fetch("/api/admin/notifications").then(r => r.json()).then(d => {
+            setHistory(d.history || []);
+            const latest = (d.history || [])[0];
+            if (latest && latest.status !== "sending") {
+              clearInterval(pollDone);
+              setMsg({ type: latest.status === "failed" ? "error" : "success", text: `${latest.sent}/${latest.recipients} delivered` });
+            }
+          });
+        }, 3000);
+        // Stop polling after 2 minutes max
+        setTimeout(() => clearInterval(pollDone), 120000);
+      }
       else setMsg({ type: "error", text: data.error || "Failed" });
     } catch { setMsg({ type: "error", text: "Request failed" }); }
     setSending(false);
@@ -446,7 +462,7 @@ export function AdminNotificationsPage({ dark, t }) {
               <div style={{ fontSize: 13, color: t.textSoft, marginTop: 2 }}>{n.message}</div>
               <div style={{ fontSize: 12, color: t.textMuted, marginTop: 4 }}>To: {n.target} · {n.recipients ? `${n.sent || 0}/${n.recipients} delivered` : ""} · By: {n.sentBy} · {n.sentAt ? fD(n.sentAt) : ""}</div>
             </div>
-            <span className="m" style={{ fontSize: 11, padding: "2px 7px", borderRadius: 4, fontWeight: 600, background: n.status === "sent" ? (dark ? "rgba(110,231,183,.1)" : "rgba(5,150,105,.06)") : (dark ? "rgba(252,211,77,.1)" : "rgba(217,119,6,.06)"), color: n.status === "sent" ? t.green : t.amber }}>{n.status}</span>
+            <span className="m" style={{ fontSize: 11, padding: "2px 7px", borderRadius: 4, fontWeight: 600, background: n.status === "sent" ? (dark ? "rgba(110,231,183,.1)" : "rgba(5,150,105,.06)") : n.status === "sending" ? (dark ? "rgba(96,165,250,.1)" : "rgba(59,130,246,.06)") : (dark ? "rgba(252,211,77,.1)" : "rgba(217,119,6,.06)"), color: n.status === "sent" ? t.green : n.status === "sending" ? (dark ? "#60a5fa" : "#2563eb") : t.amber }}>{n.status === "sending" ? "sending..." : n.status}</span>
           </div>
         )) : (
           <div className="adm-empty" style={{ color: t.textMuted }}>No notifications sent yet</div>

@@ -45,19 +45,20 @@ export async function POST(req) {
     // Get target users
     let whereClause = { status: 'Active' };
     if (target === 'new') {
-      // Users who signed up in last 7 days
       const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
       whereClause.createdAt = { gte: weekAgo };
     } else if (target === 'active') {
-      // Users who have at least 1 order
       whereClause.orders = { some: {} };
     }
-    // 'all' = all active users
 
     const users = await prisma.user.findMany({
       where: whereClause,
       select: { email: true, name: true },
     });
+
+    if (users.length === 0) {
+      return Response.json({ error: 'No users match the target' }, { status: 400 });
+    }
 
     // Build email HTML
     const html = `
@@ -73,46 +74,61 @@ export async function POST(req) {
       </div>
     `;
 
-    // Send emails (batch — fire all, count successes)
-    let sent = 0;
-    let failed = 0;
-    const batchSize = 10;
-
-    for (let i = 0; i < users.length; i += batchSize) {
-      const batch = users.slice(i, i + batchSize);
-      const results = await Promise.allSettled(
-        batch.map(u => sendEmail(u.email, subj, html))
-      );
-      results.forEach(r => {
-        if (r.status === 'fulfilled' && r.value?.success) sent++;
-        else failed++;
-      });
-    }
-
-    const totalStatus = failed === 0 ? 'sent' : sent === 0 ? 'failed' : 'partial';
-
-    // Store in history
+    // Save to history immediately as "sending"
+    const historyId = Date.now().toString();
     const history = await getHistory();
     history.unshift({
-      id: Date.now().toString(),
+      id: historyId,
       subject: subj,
       message: msg,
       target: target || 'all',
       sentBy: admin.name,
       sentAt: new Date().toISOString(),
-      status: totalStatus,
+      status: 'sending',
       recipients: users.length,
-      sent,
-      failed,
+      sent: 0,
+      failed: 0,
     });
     await saveHistory(history);
 
-    await logActivity(admin.name, `Sent notification "${subj}" to ${users.length} users (${sent} delivered)`, 'notification');
+    await logActivity(admin.name, `Queued notification "${subj}" to ${users.length} users`, 'notification');
+
+    // Send emails in background — don't block the response
+    const sendInBackground = async () => {
+      let sent = 0;
+      let failed = 0;
+      const batchSize = 10;
+
+      for (let i = 0; i < users.length; i += batchSize) {
+        const batch = users.slice(i, i + batchSize);
+        const results = await Promise.allSettled(
+          batch.map(u => sendEmail(u.email, subj, html))
+        );
+        results.forEach(r => {
+          if (r.status === 'fulfilled' && r.value?.success) sent++;
+          else failed++;
+        });
+      }
+
+      // Update history with final status
+      const finalStatus = failed === 0 ? 'sent' : sent === 0 ? 'failed' : 'partial';
+      try {
+        const h = await getHistory();
+        const entry = h.find(e => e.id === historyId);
+        if (entry) { entry.status = finalStatus; entry.sent = sent; entry.failed = failed; }
+        await saveHistory(h);
+      } catch {}
+    };
+
+    // Use globalThis.setTimeout as a fire-and-forget background task
+    // On Vercel, the function stays alive briefly after response — enough for small batches
+    // For large blasts, the history shows "sending" and updates once complete
+    sendInBackground().catch(err => console.error('[Email Blast Background]', err.message));
 
     return Response.json({
       success: true,
-      message: `Sent to ${sent}/${users.length} users${failed > 0 ? ` (${failed} failed)` : ''}`,
-      status: totalStatus,
+      message: `Sending to ${users.length} users in background...`,
+      status: 'sending',
     });
   } catch (err) {
     console.error('[Admin Notifications POST]', err.message);
