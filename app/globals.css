@@ -1420,9 +1420,8 @@ input { font-family: inherit; }
   .s3-card-service { font-size: 14px; }
   .s3-card-price { font-size: 13px; }
   .s3-card-row { padding: 5px 0; }
-  .s3-deposit { flex-direction: column; gap: 8px; padding: 14px 16px; border-radius: 12px; text-align: center; }
-  .s3-deposit-icon { display: none; }
-  .s3-deposit-title { font-size: 15px; }
+  .s3-deposit { flex-wrap: wrap !important; gap: 12px !important; padding: 16px !important; border-radius: 12px !important; }
+  .s3-deposit-btn { width: 100% !important; text-align: center !important; margin-left: 0 !important; }
   .s3-deposit-desc { font-size: 14px; }
   /* Section 4 mobile */
   .s4 { padding: 40px 0; min-height: auto; }
