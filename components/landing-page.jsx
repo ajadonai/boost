@@ -368,10 +368,19 @@ function LandingInner(){
 
         {/* ━━━ SECTION 4: TESTIMONIALS ━━━ */}
         <section id="testimonials" className="s4 snap-section" style={{background:t.bgAlt}}>
-          <div className="s4-header">
-            <div className="m s4-label" style={{color:t.accent}}>Testimonials</div>
-            <h2 className="s4-heading" style={{color:t.text}}>What Our <span className="serif s4-heading-accent" style={{color:t.accent}}>Users</span> Say</h2>
-            <p className="s4-desc" style={{color:t.textSoft}}>Real reviews from real Nigerian creators and businesses.</p>
+          <div className="s4-header-row">
+            <div className="s4-header-left">
+              <div className="m s4-label" style={{color:t.accent}}>Testimonials</div>
+              <h2 className="s4-heading" style={{color:t.text}}>Creators who <span className="serif s4-heading-accent" style={{color:t.accent}}>trust us.</span></h2>
+              <p className="s4-desc" style={{color:t.textSoft}}>Real reviews from Nigerian creators and businesses growing with Nitro.</p>
+            </div>
+            <div className="s4-rating-box" style={{background:dark?"rgba(255,255,255,.03)":"rgba(255,255,255,.7)",border:`1px solid ${dark?"rgba(255,255,255,.08)":"rgba(0,0,0,.08)"}`}}>
+              <span className="m s4-rating-big" style={{color:t.text}}>4.9</span>
+              <div>
+                <div style={{display:"flex",gap:2,marginBottom:2}}>{Array(5).fill(0).map((_,j)=><svg key={j} width="14" height="14" viewBox="0 0 24 24" fill="#fbbf24" stroke="#fbbf24" strokeWidth="1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>)}</div>
+                <span style={{fontSize:12,color:t.textMuted}}>from 850+ reviews</span>
+              </div>
+            </div>
           </div>
 
           {/* Desktop/Tablet grid */}
