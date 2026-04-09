@@ -1,8 +1,18 @@
 import { validateEnv } from '@/lib/env';
 import { log } from '@/lib/logger';
 
-export function register() {
+export async function register() {
   validateEnv();
+
+  // Initialize Sentry for server-side error tracking
+  if (process.env.NEXT_PUBLIC_SENTRY_DSN) {
+    if (process.env.NEXT_RUNTIME === "nodejs") {
+      await import("./sentry.server.config.js");
+    }
+    if (process.env.NEXT_RUNTIME === "edge") {
+      await import("./sentry.edge.config.js");
+    }
+  }
 
   // ── Graceful shutdown (for Railway, Docker, any long-running server) ──
   // Vercel serverless doesn't need this, but it doesn't hurt either.
