@@ -14,10 +14,8 @@ export async function register() {
     }
   }
 
-  // ── Graceful shutdown (for Railway, Docker, any long-running server) ──
-  // Vercel serverless doesn't need this, but it doesn't hurt either.
-  // On Railway/Docker: SIGTERM → stop accepting requests → finish in-flight → close DB → exit
-  if (typeof process !== 'undefined' && process.on) {
+  // ── Graceful shutdown (Node.js only — Edge runtime doesn't support process.exit/on) ──
+  if (process.env.NEXT_RUNTIME === "nodejs") {
     let shuttingDown = false;
 
     const shutdown = async (signal) => {
@@ -25,16 +23,13 @@ export async function register() {
       shuttingDown = true;
       log.info('Shutdown', `Received ${signal} — starting graceful shutdown`);
 
-      // Give in-flight requests time to finish (30s max)
       const forceExit = setTimeout(() => {
         log.warn('Shutdown', 'Forcing exit after 30s timeout');
         process.exit(1);
       }, 30000);
-      forceExit.unref(); // Don't keep process alive just for this timer
+      forceExit.unref();
 
       try {
-        // Close Prisma connection pool
-        const { PrismaClient } = await import('@prisma/client');
         const prisma = globalThis.prisma;
         if (prisma) {
           await prisma.$disconnect();
