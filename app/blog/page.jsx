@@ -7,41 +7,62 @@ const readTime = (text) => { const w = (text || "").replace(/<[^>]*>/g, "").repl
 /* Lightweight markdown → HTML */
 function md(src) {
   if (!src) return "";
-  let html = src
-    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
-    // Headings
-    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
-    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
-    .replace(/^# (.+)$/gm, '<h1>$1</h1>')
-    // Bold + italic
+  // Split into blocks by double newline
+  const blocks = src.split(/\n{2,}/);
+  const out = [];
+  let inList = null; // 'ul' or 'ol'
+  
+  for (const block of blocks) {
+    const trimmed = block.trim();
+    if (!trimmed) continue;
+    
+    // Heading
+    if (/^#{1,3} /.test(trimmed)) {
+      if (inList) { out.push(`</${inList}>`); inList = null; }
+      const level = trimmed.match(/^(#{1,3})/)[1].length;
+      const text = inline(trimmed.replace(/^#{1,3}\s+/, ''));
+      out.push(`<h${level}>${text}</h${level}>`);
+      continue;
+    }
+    
+    // Horizontal rule
+    if (/^---+$/.test(trimmed)) {
+      if (inList) { out.push(`</${inList}>`); inList = null; }
+      out.push('<hr/>');
+      continue;
+    }
+    
+    // Check if block is a list
+    const lines = trimmed.split('\n');
+    const isUL = lines.every(l => /^[-*] /.test(l.trim()));
+    const isOL = lines.every(l => /^\d+\. /.test(l.trim()));
+    
+    if (isUL) {
+      if (inList !== 'ul') { if (inList) out.push(`</${inList}>`); out.push('<ul>'); inList = 'ul'; }
+      lines.forEach(l => out.push(`<li>${inline(l.trim().replace(/^[-*] /, ''))}</li>`));
+      continue;
+    }
+    if (isOL) {
+      if (inList !== 'ol') { if (inList) out.push(`</${inList}>`); out.push('<ol>'); inList = 'ol'; }
+      lines.forEach(l => out.push(`<li>${inline(l.trim().replace(/^\d+\. /, ''))}</li>`));
+      continue;
+    }
+    
+    // Regular paragraph — join lines within same block
+    if (inList) { out.push(`</${inList}>`); inList = null; }
+    out.push(`<p>${inline(lines.join(' '))}</p>`);
+  }
+  if (inList) out.push(`</${inList}>`);
+  return out.join('\n');
+}
+
+function inline(text) {
+  return text
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
     .replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>')
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*(.+?)\*/g, '<em>$1</em>')
-    // Links
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
-    // Unordered lists
-    .replace(/^- (.+)$/gm, '<li>$1</li>')
-    // Ordered lists
-    .replace(/^\d+\. (.+)$/gm, '<oli>$1</oli>')
-    // Horizontal rule
-    .replace(/^---$/gm, '<hr/>')
-    // Line breaks → paragraphs
-    .replace(/\n\n+/g, '\n</p><p>\n')
-    .replace(/\n/g, '<br/>');
-  // Wrap in paragraph
-  html = '<p>' + html + '</p>';
-  // Fix list wrapping
-  html = html.replace(/(<li>.*?<\/li>)/gs, (m) => '<ul>' + m + '</ul>');
-  html = html.replace(/<\/ul><ul>/g, '');
-  html = html.replace(/(<oli>.*?<\/oli>)/gs, (m) => '<ol>' + m.replace(/<\/?oli>/g, (t) => t.replace('oli', 'li')) + '</ol>');
-  html = html.replace(/<\/ol><ol>/g, '');
-  // Clean up empty paragraphs and headings inside paragraphs
-  html = html.replace(/<p><(h[1-3])>/g, '<$1>').replace(/<\/(h[1-3])><\/p>/g, '</$1>');
-  html = html.replace(/<p><hr\/><\/p>/g, '<hr/>');
-  html = html.replace(/<p><ul>/g, '<ul>').replace(/<\/ul><\/p>/g, '</ul>');
-  html = html.replace(/<p><ol>/g, '<ol>').replace(/<\/ol><\/p>/g, '</ol>');
-  html = html.replace(/<p>\s*<\/p>/g, '');
-  return html;
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
 }
 
 export default function BlogPage() {

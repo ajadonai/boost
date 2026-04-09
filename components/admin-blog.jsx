@@ -122,25 +122,30 @@ export default function AdminBlogPage({ dark, t }) {
 
           {/* Content */}
           <div style={{ marginBottom: 14 }}>
-            <label style={{ fontSize: 13, color: t.textMuted, fontWeight: 600, display: "block", marginBottom: 4 }}>Content <span style={{ fontWeight: 400 }}>(supports HTML)</span></label>
-            <textarea value={content} onChange={e => setContent(e.target.value)} placeholder="Write your post content here... HTML tags supported." rows={12} style={{ ...inputStyle, resize: "vertical", fontFamily: "'JetBrains Mono', monospace", fontSize: 14, lineHeight: 1.6 }} />
+            <label style={{ fontSize: 13, color: t.textMuted, fontWeight: 600, display: "block", marginBottom: 4 }}>Content <span style={{ fontWeight: 400 }}>(Markdown)</span></label>
+            {/* Markdown toolbar */}
+            <div style={{ display: "flex", gap: 4, marginBottom: 6, flexWrap: "wrap" }}>
+              {[["H2","## ",""],["H3","### ",""],["B","**","**"],["I","*","*"],["Link","[","](url)"],["List","- ",""],["Num","1. ",""],["HR","\n---\n",""]].map(([label,before,after])=>(
+                <button key={label} type="button" onClick={()=>{const ta=document.getElementById("blog-editor");if(!ta)return;const s=ta.selectionStart,e=ta.selectionEnd,sel=content.substring(s,e);const ins=after?before+(sel||"text")+after:before+sel;const next=content.substring(0,s)+ins+content.substring(e);setContent(next);setTimeout(()=>{ta.focus();ta.selectionStart=ta.selectionEnd=s+ins.length;},0);}} style={{ padding: "4px 10px", borderRadius: 6, fontSize: 12, fontWeight: 600, fontFamily: "'JetBrains Mono',monospace", background: dark ? "rgba(255,255,255,.04)" : "rgba(0,0,0,.03)", border: `1px solid ${dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)"}`, color: t.textMuted, cursor: "pointer" }}>{label}</button>
+              ))}
+            </div>
+            <textarea id="blog-editor" value={content} onChange={e => setContent(e.target.value)} placeholder={"## Your heading here\n\nWrite your paragraph. Leave a blank line between paragraphs.\n\n### Subheading\n\nUse **bold** and *italic* for emphasis.\n\n- Bullet point\n- Another point\n\n1. Numbered item\n2. Another item"} rows={16} style={{ ...inputStyle, resize: "vertical", fontFamily: "'JetBrains Mono', monospace", fontSize: 14, lineHeight: 1.6 }} />
             <details style={{ marginTop: 8 }}>
-              <summary style={{ fontSize: 13, color: t.accent, cursor: "pointer", fontWeight: 500 }}>Styling guide — how to format your posts</summary>
+              <summary style={{ fontSize: 13, color: t.accent, cursor: "pointer", fontWeight: 500 }}>Markdown guide</summary>
               <div style={{ marginTop: 8, padding: 14, borderRadius: 10, background: dark ? "rgba(255,255,255,.03)" : "rgba(0,0,0,.02)", fontSize: 13, color: t.textMuted, lineHeight: 1.8, fontFamily: "'JetBrains Mono', monospace" }}>
-                <div style={{ fontFamily: "inherit", fontWeight: 600, color: t.text, marginBottom: 8, fontSize: 13 }}>Available HTML tags:</div>
-                <div><span style={{ color: t.accent }}>&lt;h2&gt;</span>Section heading<span style={{ color: t.accent }}>&lt;/h2&gt;</span> — main sections</div>
-                <div><span style={{ color: t.accent }}>&lt;h3&gt;</span>Sub-heading<span style={{ color: t.accent }}>&lt;/h3&gt;</span> — subsections</div>
-                <div><span style={{ color: t.accent }}>&lt;p&gt;</span>Paragraph text here<span style={{ color: t.accent }}>&lt;/p&gt;</span> — regular text</div>
-                <div><span style={{ color: t.accent }}>&lt;strong&gt;</span>bold text<span style={{ color: t.accent }}>&lt;/strong&gt;</span> — emphasis</div>
-                <div><span style={{ color: t.accent }}>&lt;a href="..."&gt;</span>link<span style={{ color: t.accent }}>&lt;/a&gt;</span> — clickable link</div>
-                <div><span style={{ color: t.accent }}>&lt;ul&gt;&lt;li&gt;</span>item<span style={{ color: t.accent }}>&lt;/li&gt;&lt;/ul&gt;</span> — bullet list</div>
-                <div><span style={{ color: t.accent }}>&lt;ol&gt;&lt;li&gt;</span>item<span style={{ color: t.accent }}>&lt;/li&gt;&lt;/ol&gt;</span> — numbered list</div>
-                <div><span style={{ color: t.accent }}>&lt;img src="..." /&gt;</span> — image (full width, rounded)</div>
-                <div style={{ marginTop: 10, fontFamily: "inherit", fontWeight: 600, color: t.text, fontSize: 13 }}>Pro tip callout box:</div>
-                <div style={{ whiteSpace: "pre-wrap", marginTop: 4, padding: 8, borderRadius: 6, background: dark ? "rgba(255,255,255,.03)" : "rgba(0,0,0,.02)" }}>{`<div style="background:${dark ? "rgba(196,125,142,.06)" : "#fff"};border-left:3px solid #c47d8e;padding:14px 18px;border-radius:0 8px 8px 0;margin:0 0 16px">
-  <div style="font-size:13px;font-weight:500;color:#c47d8e;margin-bottom:4px">Pro tip</div>
-  <div style="font-size:13px;color:${dark ? "#999" : "#555"};line-height:1.6">Your tip text here</div>
-</div>`}</div>
+                <div style={{ fontWeight: 600, color: t.text, marginBottom: 8 }}>Formatting:</div>
+                <div><span style={{ color: t.accent }}>## </span>Heading — main sections</div>
+                <div><span style={{ color: t.accent }}>### </span>Subheading — subsections</div>
+                <div><span style={{ color: t.accent }}>**</span>bold<span style={{ color: t.accent }}>**</span> — strong emphasis</div>
+                <div><span style={{ color: t.accent }}>*</span>italic<span style={{ color: t.accent }}>*</span> — subtle emphasis</div>
+                <div><span style={{ color: t.accent }}>[</span>text<span style={{ color: t.accent }}>](</span>url<span style={{ color: t.accent }}>)</span> — link</div>
+                <div><span style={{ color: t.accent }}>- </span>item — bullet list</div>
+                <div><span style={{ color: t.accent }}>1. </span>item — numbered list</div>
+                <div><span style={{ color: t.accent }}>---</span> — divider line</div>
+                <div style={{ marginTop: 8, fontWeight: 600, color: t.text }}>Tips:</div>
+                <div>• Blank line between paragraphs</div>
+                <div>• No blank lines needed between list items</div>
+                <div>• Start each section with ## heading</div>
               </div>
             </details>
           </div>
