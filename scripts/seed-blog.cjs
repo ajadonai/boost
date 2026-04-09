@@ -45,6 +45,7 @@ Welcome to the fastest SMM panel in Nigeria. Your audience is waiting.`,
     showInHowTo: true,
     sortOrder: 1,
     authorName: "Nitro Team",
+    thumbnail: "/blog/getting-started.svg",
   },
   {
     title: "How to Grow Your Instagram in Nigeria: 2026 Guide",
@@ -88,6 +89,7 @@ Don't choose between organic and paid growth. The smartest creators use both. Ni
     showInHowTo: false,
     sortOrder: 2,
     authorName: "Nitro Team",
+    thumbnail: "/blog/grow-instagram-nigeria.svg",
   },
   {
     title: "Understanding Nitro's Service Tiers: Budget vs Standard vs Premium",
@@ -144,6 +146,7 @@ Start with Standard. Move to Premium for anything that matters. Use Budget for v
     showInHowTo: true,
     sortOrder: 3,
     authorName: "Nitro Team",
+    thumbnail: "/blog/service-tiers.svg",
   },
   {
     title: "Is SMM Safe? What You Need to Know",
@@ -194,6 +197,7 @@ Millions of creators, businesses, and marketers worldwide use SMM services daily
     showInHowTo: false,
     sortOrder: 4,
     authorName: "Nitro Team",
+    thumbnail: "/blog/is-smm-safe.svg",
   },
 ];
 
