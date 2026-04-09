@@ -416,74 +416,106 @@ function LandingInner(){
 
 
 
-        <div className="section-divider" style={{background:t.bg}}><div className="section-divider-line" style={{background:`linear-gradient(90deg,transparent,${dark?"rgba(196,125,142,.2)":"rgba(196,125,142,.15)"},transparent)`}}/><div className="section-divider-dot" style={{background:t.accent}}/><div className="section-divider-line" style={{background:`linear-gradient(90deg,transparent,${dark?"rgba(196,125,142,.2)":"rgba(196,125,142,.15)"},transparent)`}}/></div>
 
-        <div id="cta" className="s6-wrapper snap-section" style={{background:t.bgAlt}}>
         {/* ━━━ SECTION 6: CTA + FOOTER ━━━ */}
-        <div className="s6-cta-wrapper">
-          <div className="s6-cta" style={{background:dark?"linear-gradient(145deg,#1a0e14 0%,#2d1520 30%,#1e0f18 60%,#0f0a12 100%)":"linear-gradient(145deg,#c47d8e 0%,#a3586b 35%,#8b4a5e 65%,#6b3a4a 100%)",border:dark?"1px solid rgba(196,125,142,.12)":"none"}}>
-            {/* Spinning ring */}
-            <div className="s6-ring" style={{border:`1px solid ${dark?"rgba(196,125,142,.1)":"rgba(255,255,255,.12)"}`}}><div className="s6-ring-inner" style={{border:`1px solid ${dark?"rgba(196,125,142,.06)":"rgba(255,255,255,.08)"}`}}/></div>
-            {/* Orbs */}
-            <div className="s6-orb1" style={{background:dark?"rgba(196,125,142,.08)":"rgba(255,255,255,.06)"}}/>
-            <div className="s6-orb2" style={{background:dark?"rgba(165,180,252,.05)":"rgba(255,255,255,.05)"}}/>
-            {/* Particles */}
-            {[["15%","18%",4,0],["25%","75%",3,1],["70%","15%",3,.5],["60%","82%",5,1.5],["40%","90%",3,2],["80%","45%",4,.8]].map(([top,left,s,d],i)=><div key={i} className="s6-particle" style={{top,left,width:s,height:s,background:dark?"rgba(196,125,142,.25)":"rgba(255,255,255,.25)",animationDelay:`${d}s`,animationDuration:`${3+i}s`}}/>)}
+        <div id="cta" className="s6-wrapper snap-section">
+          {/* ── CTA — FULL BLEED ── */}
+          <div className="s6-cta-bleed" style={{background:dark?"#080510":"linear-gradient(180deg,"+t.bgAlt+" 0%,#c47d8e 25%,#8b4a5e 65%,#5a2d3d 100%)",position:"relative",overflow:"hidden",textAlign:"center"}}>
+            {/* Ambient orbs */}
+            <div style={{position:"absolute",width:500,height:500,borderRadius:"50%",top:"-20%",left:"15%",background:dark?"rgba(196,125,142,.12)":"rgba(255,255,255,.1)",filter:"blur(100px)",pointerEvents:"none"}}/>
+            <div style={{position:"absolute",width:350,height:350,borderRadius:"50%",bottom:"-10%",right:"10%",background:dark?"rgba(120,80,180,.08)":"rgba(255,255,255,.08)",filter:"blur(100px)",pointerEvents:"none"}}/>
+            {dark&&<div style={{position:"absolute",width:200,height:200,borderRadius:"50%",top:"40%",right:"30%",background:"rgba(52,211,153,.04)",filter:"blur(80px)",pointerEvents:"none"}}/>}
+            {/* Concentric rings */}
+            <div style={{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",pointerEvents:"none"}}>
+              {[600,400,200].map((s,i)=><div key={i} style={{width:s,height:s,borderRadius:"50%",border:`0.5px solid ${dark?`rgba(196,125,142,${.06-.015*i})`:`rgba(255,255,255,${.1-.02*i})`}`,position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)"}}/>)}
+            </div>
+            {/* Noise */}
+            <div style={{position:"absolute",inset:0,pointerEvents:"none",opacity:.03,backgroundImage:"url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",backgroundSize:"128px"}}/>
 
-            <div className="s6-cta-content">
-              {/* Live badge */}
-              <div className="s6-badge" style={{background:dark?"rgba(196,125,142,.12)":"rgba(255,255,255,.12)",border:`1px solid ${dark?"rgba(196,125,142,.18)":"rgba(255,255,255,.2)"}`}}>
-                <div className="s6-pulse"/>
-                <span className="m s6-badge-count" style={{color:dark?"#c47d8e":"#fff"}}>{siteStats.users}</span>
-                <span className="s6-badge-text" style={{color:dark?"rgba(196,125,142,.7)":"rgba(255,255,255,.7)"}}>creators growing right now</span>
+            <div style={{position:"relative",zIndex:2,padding:"100px 60px 80px",maxWidth:640,margin:"0 auto"}} className="s6-cta-content">
+              {/* Eyebrow */}
+              <div style={{display:"inline-flex",alignItems:"center",gap:8,marginBottom:36}}>
+                <div className="hero-live-dot" style={{width:8,height:8,borderRadius:"50%",background:"#34d399",boxShadow:"0 0 12px rgba(52,211,153,.5)"}}/>
+                <span className="m" style={{fontSize:12,fontWeight:500,letterSpacing:1.5,textTransform:"uppercase",color:dark?"#34d399":"rgba(255,255,255,.85)"}}>{siteStats.orders||"0"} orders delivered today</span>
               </div>
-              <h2 className="s6-h2-bold">Your Audience</h2>
-              <h2 className="serif s6-h2-italic" style={{color:dark?"#c47d8e":"#fff"}}>Won't Grow Itself.</h2>
-              <p className="s6-sub" style={{color:dark?"rgba(255,255,255,.55)":"rgba(255,255,255,.75)"}}>Every minute you wait, your competitors are getting ahead. Start with ₦500 and see results in seconds.</p>
-              <div className="s6-buttons">
-                <button className="s6-btn-primary" onClick={()=>setModal("signup")}>Get Started Free →</button>
-                <button className="s6-btn-ghost" style={{border:`1.5px solid ${dark?"rgba(255,255,255,.12)":"rgba(255,255,255,.25)"}`}} onClick={()=>document.getElementById("pricing")?.scrollIntoView({behavior:"smooth"})}>View Pricing</button>
+
+              <h2 style={{fontSize:60,fontWeight:700,color:"#fff",lineHeight:1.02,letterSpacing:-2.5,marginBottom:4}} className="s6-h2-bold">Your Audience</h2>
+              <h2 className="serif s6-h2-italic" style={{fontStyle:"italic",fontWeight:400,fontSize:68,lineHeight:1.02,marginBottom:24,color:dark?"#c47d8e":"#fff",textShadow:dark?"none":"0 4px 32px rgba(0,0,0,.15)"}}>Won't Grow Itself.</h2>
+              <p style={{fontSize:17,lineHeight:1.7,marginBottom:44,color:dark?"rgba(255,255,255,.4)":"rgba(255,255,255,.8)",maxWidth:440,margin:"0 auto 44px"}}>Every minute you wait, your competitors are getting ahead. Join {siteStats.users||"0"} Nigerian creators already growing with Nitro.</p>
+
+              <div className="s6-buttons" style={{display:"flex",gap:14,justifyContent:"center",flexWrap:"wrap",marginBottom:36}}>
+                <button className="s6-btn-primary" onClick={()=>setModal("signup")} style={{padding:"18px 56px",borderRadius:14,fontSize:16,fontWeight:600,border:"none",cursor:"pointer",background:"#fff",color:"#1a1a1a",boxShadow:"0 12px 48px rgba(255,255,255,.1)",position:"relative",overflow:"hidden"}}>Start Growing Now {"\u2192"}</button>
+                <button className="s6-btn-ghost" onClick={()=>document.getElementById("pricing")?.scrollIntoView({behavior:"smooth"})} style={{padding:"18px 44px",borderRadius:14,fontSize:16,fontWeight:500,cursor:"pointer",background:"none",color:"#fff",border:`1px solid ${dark?"rgba(255,255,255,.08)":"rgba(255,255,255,.25)"}`}}>View Pricing</button>
+              </div>
+
+              {/* Trust strip */}
+              <div style={{display:"flex",justifyContent:"center",gap:28,flexWrap:"wrap"}}>
+                {[["M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z","Refund guarantee"],["M12 12m-10 0a10 10 0 1020 0 10 10 0 10-20 0M12 6v6l4 2","Delivery in seconds"],["M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z","24/7 support"]].map(([path,label])=>(
+                  <div key={label} style={{display:"flex",alignItems:"center",gap:6,fontSize:13,fontWeight:450,color:dark?"rgba(255,255,255,.25)":"rgba(255,255,255,.6)"}}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d={path}/></svg>
+                    {label}
+                  </div>
+                ))}
               </div>
             </div>
           </div>
-        </div>
 
-        <div style={{flex:1}} />
+          {/* ── FOOTER ── */}
+          <footer style={{padding:"56px 48px 28px",background:dark?"#030508":"#dedad4",position:"relative"}} className="s6-footer">
+            {/* Accent line */}
+            <div style={{height:1,marginBottom:48,background:`linear-gradient(90deg,transparent,${dark?"rgba(196,125,142,.15)":"rgba(196,125,142,.1)"},transparent)`}}/>
 
-        <footer className="s6-footer" style={{background:dark?"#050710":"#e6e2dc"}}>
-          {/* Top row: [brand] [product] [legal] */}
-          <div className="s6-footer-top">
-            <div className="s6-footer-brand">
-              <div className="s6-footer-logo">
-                <div style={{width:24,height:24,borderRadius:6,background:"linear-gradient(135deg,#c47d8e,#8b5e6b)",display:"flex",alignItems:"center",justifyContent:"center"}}><svg width="10" height="10" viewBox="0 0 20 20" fill="none"><path d="M4,16 L4,4 L16,16 L16,4" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
-                <span className="s6-footer-brand-name" style={{color:t.text}}>NITRO</span>
+            {/* 4-column grid */}
+            <div className="s6-ft-grid" style={{display:"grid",gridTemplateColumns:"1.8fr 1fr 1fr 1fr",gap:40,marginBottom:48}}>
+              {/* Brand */}
+              <div className="s6-ft-brand">
+                <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:14}}>
+                  <div style={{width:28,height:28,borderRadius:7,background:"linear-gradient(135deg,#c47d8e,#8b5e6b)",display:"flex",alignItems:"center",justifyContent:"center",boxShadow:"0 2px 8px rgba(196,125,142,.25)"}}><svg width="12" height="12" viewBox="0 0 20 20" fill="none"><path d="M4,16 L4,4 L16,16 L16,4" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
+                  <span style={{fontSize:16,fontWeight:700,letterSpacing:2,color:t.text}}>NITRO</span>
+                </div>
+                <p style={{fontSize:14,lineHeight:1.65,maxWidth:260,marginBottom:20,color:dark?"rgba(244,241,237,.3)":"rgba(28,27,25,.4)"}}>Nigeria's fastest SMM panel. Real followers, real engagement, instant delivery across 25+ platforms.</p>
+                <div style={{display:"flex",gap:8}}>
+                  {[[`https://x.com/${socialLinks.social_twitter||"TheNitroNG"}`,<svg key="x" width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>],[`https://instagram.com/${socialLinks.social_instagram||"Nitro.ng"}`,<svg key="ig" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>]].map(([href,icon],i)=>(
+                    <a key={i} href={href} target="_blank" rel="noopener" style={{width:34,height:34,borderRadius:9,background:dark?"rgba(255,255,255,.04)":"rgba(0,0,0,.04)",border:`0.5px solid ${dark?"rgba(255,255,255,.06)":"rgba(0,0,0,.06)"}`,display:"flex",alignItems:"center",justifyContent:"center",textDecoration:"none",color:dark?"rgba(244,241,237,.4)":"rgba(28,27,25,.4)"}} className="s6-sico">{icon}</a>
+                  ))}
+                  {socialLinks.social_whatsapp&&<a href={socialLinks.social_whatsapp} target="_blank" rel="noopener" style={{width:34,height:34,borderRadius:9,background:dark?"rgba(37,211,102,.04)":"rgba(37,211,102,.03)",border:`0.5px solid ${dark?"rgba(37,211,102,.1)":"rgba(37,211,102,.08)"}`,display:"flex",alignItems:"center",justifyContent:"center",textDecoration:"none"}} className="s6-sico"><svg width="14" height="14" viewBox="0 0 24 24" fill="#25d366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></a>}
+                  {socialLinks.social_telegram&&<a href={socialLinks.social_telegram} target="_blank" rel="noopener" style={{width:34,height:34,borderRadius:9,background:dark?"rgba(0,136,204,.04)":"rgba(0,136,204,.03)",border:`0.5px solid ${dark?"rgba(0,136,204,.1)":"rgba(0,136,204,.08)"}`,display:"flex",alignItems:"center",justifyContent:"center",textDecoration:"none"}} className="s6-sico"><svg width="14" height="14" viewBox="0 0 24 24" fill="#0088cc"><path d="M11.944 0A12 12 0 000 12a12 12 0 0012 12 12 12 0 0012-12A12 12 0 0012 0a12 12 0 00-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 01.171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg></a>}
+                </div>
               </div>
-              <p className="s6-footer-tagline" style={{color:dark?"#8a8680":"#777"}}>Nigeria's fastest SMM panel. Real growth, instant delivery.</p>
-            </div>
-            <div className="s6-footer-links">
+              {/* Product */}
               <div>
-                <div className="s6-footer-col-title" style={{color:t.accent}}>Product</div>
-                {[["Services","#services"],["Pricing","#pricing"],["Testimonials","#testimonials"]].map(([l,href])=><div key={l} className="s6-footer-link" style={{color:dark?"#b0aca8":"#555"}} onClick={()=>document.getElementById(href.slice(1))?.scrollIntoView({behavior:"smooth"})}>{l}</div>)}
+                <div className="m" style={{fontSize:11,fontWeight:600,letterSpacing:1.5,textTransform:"uppercase",marginBottom:16,color:dark?"rgba(244,241,237,.2)":"rgba(28,27,25,.25)"}}>Product</div>
+                {[["Services","#services"],["Pricing","#pricing"],["Testimonials","#testimonials"],["Blog","/blog"]].map(([l,h])=>h.startsWith("#")?<div key={l} className="s6-footer-link" style={{display:"block",fontSize:14,fontWeight:450,padding:"5px 0",cursor:"pointer",color:dark?"rgba(244,241,237,.45)":"rgba(28,27,25,.5)"}} onClick={()=>document.getElementById(h.slice(1))?.scrollIntoView({behavior:"smooth"})}>{l}</div>:<a key={l} href={h} className="s6-footer-link" style={{display:"block",fontSize:14,fontWeight:450,padding:"5px 0",textDecoration:"none",color:dark?"rgba(244,241,237,.45)":"rgba(28,27,25,.5)"}}>{l}</a>)}
               </div>
+              {/* Company */}
               <div>
-                <div className="s6-footer-col-title" style={{color:t.accent}}>Legal</div>
-                {[["Terms","/terms"],["Privacy","/privacy"],["Refund","/refund"],["Cookies","/cookie"],["FAQ","/faq"]].map(([l,href])=><a key={l} href={href} className="s6-footer-link" style={{color:dark?"#b0aca8":"#555",display:"block"}}>{l}</a>)}
+                <div className="m" style={{fontSize:11,fontWeight:600,letterSpacing:1.5,textTransform:"uppercase",marginBottom:16,color:dark?"rgba(244,241,237,.2)":"rgba(28,27,25,.25)"}}>Company</div>
+                {[["FAQ","/faq"],["Terms","/terms"],["Privacy","/privacy"],["Refund","/refund"],["Cookies","/cookie"]].map(([l,h])=><a key={l} href={h} className="s6-footer-link" style={{display:"block",fontSize:14,fontWeight:450,padding:"5px 0",textDecoration:"none",color:dark?"rgba(244,241,237,.45)":"rgba(28,27,25,.5)"}}>{l}</a>)}
+              </div>
+              {/* Get in touch */}
+              <div>
+                <div className="m" style={{fontSize:11,fontWeight:600,letterSpacing:1.5,textTransform:"uppercase",marginBottom:16,color:dark?"rgba(244,241,237,.2)":"rgba(28,27,25,.25)"}}>Get in touch</div>
+                <a href="mailto:TheNitroNG@gmail.com" className="s6-footer-link" style={{display:"block",fontSize:13,fontWeight:450,padding:"5px 0",textDecoration:"none",color:dark?"rgba(244,241,237,.45)":"rgba(28,27,25,.5)"}}>TheNitroNG@gmail.com</a>
+                <div className="s6-footer-link" style={{display:"block",fontSize:14,fontWeight:450,padding:"5px 0",cursor:"pointer",color:dark?"rgba(244,241,237,.45)":"rgba(28,27,25,.5)"}} onClick={()=>window.open(socialLinks.social_whatsapp_support?`https://wa.me/${socialLinks.social_whatsapp_support}`:"#","_blank")}>WhatsApp Support</div>
+                <a href="https://stats.uptimerobot.com/PvHE3u4psX" target="_blank" rel="noopener" className="s6-footer-link" style={{display:"flex",alignItems:"center",gap:6,fontSize:14,fontWeight:450,padding:"5px 0",textDecoration:"none",color:dark?"rgba(244,241,237,.45)":"rgba(28,27,25,.5)"}}><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Status Page</a>
               </div>
             </div>
-          </div>
-          {/* Divider */}
-          <div className="s6-footer-divider" style={{background:dark?"rgba(255,255,255,.08)":"rgba(0,0,0,.08)"}}/>
-          {/* Bottom row: [copyright] [socials] */}
-          <div className="s6-footer-bottom">
-            <span className="s6-copyright" style={{color:dark?"#8a8680":"#777"}}>© {new Date().getFullYear() > 2026 ? `2026–${new Date().getFullYear()}` : "2026"} Nitro. All rights reserved.</span>
-            <div className="s6-social-icons">
-              {(socialLinks.social_instagram||"Nitro.ng")&&<a href={`https://instagram.com/${socialLinks.social_instagram||"Nitro.ng"}`} target="_blank" rel="noopener" className="s6-sico" style={{color:dark?"#b0aca8":"#555"}}><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>}
-              {(socialLinks.social_twitter||"TheNitroNG")&&<a href={`https://x.com/${socialLinks.social_twitter||"TheNitroNG"}`} target="_blank" rel="noopener" className="s6-sico" style={{color:dark?"#b0aca8":"#555"}}><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>}
-              <a href="mailto:TheNitroNG@gmail.com" className="s6-sico" style={{color:dark?"#b0aca8":"#555"}}><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="22,6 12,13 2,6"/></svg></a>
+
+            {/* Divider */}
+            <div style={{height:.5,marginBottom:22,background:dark?"rgba(255,255,255,.05)":"rgba(0,0,0,.05)"}}/>
+
+            {/* Bottom bar */}
+            <div className="s6-footer-bottom" style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+              <span style={{fontSize:13,color:dark?"rgba(244,241,237,.2)":"rgba(28,27,25,.25)"}}>{"©"} {new Date().getFullYear()>2026?`2026–${new Date().getFullYear()}`:"2026"} Nitro. All rights reserved.</span>
+              <div style={{display:"flex",alignItems:"center",gap:16}}>
+                <a href="/terms" style={{fontSize:12,textDecoration:"none",color:dark?"rgba(244,241,237,.2)":"rgba(28,27,25,.25)"}}>Terms</a>
+                <a href="/privacy" style={{fontSize:12,textDecoration:"none",color:dark?"rgba(244,241,237,.2)":"rgba(28,27,25,.25)"}}>Privacy</a>
+                <span style={{fontSize:12,color:dark?"rgba(244,241,237,.15)":"rgba(28,27,25,.2)"}}>Built in Lagos 🇳🇬</span>
+              </div>
             </div>
-          </div>
-        </footer>
+          </footer>
         </div>{/* end s6-wrapper */}
+
 
       </div>
 
