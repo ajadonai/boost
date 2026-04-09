@@ -1371,7 +1371,7 @@ input { font-family: inherit; }
   .s2-feat-row { padding: 14px 16px !important; }
   .s2-how { padding: 0 20px 48px !important; }
   .s2-timeline { grid-template-columns: 1fr 1fr !important; gap: 10px !important; }
-  .s2-step-item { padding: 16px !important; border-radius: 12px; }
+  .s2-step-item { padding: 16px !important; border-radius: 12px; background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.05); padding-right: 16px !important; }
   .s2-step-connector { display: none !important; }
   .s2-step-desc { padding-left: 0 !important; font-size: 13px !important; }
   /* Section 3 mobile */
