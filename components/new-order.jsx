@@ -76,10 +76,13 @@ export function OrderForm({ selSvc, selTier, platform, qty, setQty, link, setLin
   /* Detect service type from name + type field */
   const svcName = (selSvc?.name || "").toLowerCase();
   const svcType = (selSvc?.type || "").toLowerCase();
-  const isComment = svcType.includes("comment") || svcName.includes("comment");
+  // "Custom Comments" or "Comments" but NOT "Comment Likes"
+  const isComment = (svcType.includes("comment") || svcName.includes("comment")) && !svcName.includes("comment like");
   const isMention = svcName.includes("mention");
-  const isPoll = svcName.includes("poll") || svcName.includes("vote");
-  const isReview = svcName.includes("review");
+  // "Poll Votes" but NOT "Upvotes"
+  const isPoll = svcName.includes("poll vote") || svcName.includes("poll") && !svcName.includes("upvote");
+  // "Reviews (5 Stars)" but NOT "Review Likes"
+  const isReview = svcName.includes("review") && !svcName.includes("review like");
   const needsComments = isComment || isReview;
   const needsUsernames = isMention;
   const needsAnswer = isPoll;
