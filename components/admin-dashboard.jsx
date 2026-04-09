@@ -240,7 +240,7 @@ function AdminDashboardInner() {
         }
         if (res.ok) {
           const d = await res.json();
-          setAdmin({ name: d.admin?.name || "Admin", role: d.admin?.role || "superadmin", email: d.admin?.email || "" });
+          setAdmin({ name: d.admin?.name || "Admin", role: d.admin?.role || "superadmin", email: d.admin?.email || "", pages: d.admin?.pages || "*" });
           setData({
             stats: d || {},
             recentOrders: d.recentOrders || [],
@@ -276,7 +276,7 @@ function AdminDashboardInner() {
         if (res.status === 401) { try { await fetch("/api/auth/admin/logout", { method: "POST" }); } catch {} window.location.replace("/admin/login"); return; }
         if (res.ok) {
           const d = await res.json();
-          setAdmin(prev => ({ ...prev, name: d.admin?.name || prev.name, role: d.admin?.role || prev.role }));
+          setAdmin(prev => ({ ...prev, name: d.admin?.name || prev.name, role: d.admin?.role || prev.role, pages: d.admin?.pages || prev.pages }));
           setData({
             stats: d || {},
             recentOrders: d.recentOrders || [],
@@ -344,6 +344,11 @@ function AdminDashboardInner() {
 
   /* Render page */
   const renderPage = () => {
+    const ap = admin?.pages;
+    // Guard: if page not in allowed list, fall back to overview
+    if (active !== "overview" && ap !== "*" && Array.isArray(ap) && !ap.includes(active)) {
+      return <AdminOverview data={data} dark={dark} t={t} setActive={setActive} />;
+    }
     switch (active) {
       case "overview": return <AdminOverview data={data} dark={dark} t={t} setActive={setActive} />;
       case "orders": return <AdminOrdersPage dark={dark} t={t} />;
@@ -409,10 +414,14 @@ function AdminDashboardInner() {
       {/* ═══ BODY ═══ */}
       <div className="dash-body">
         <aside className="dash-left admin-sidebar" style={{ background: t.sidebarBg, borderRight: `1px solid ${t.sidebarBorder}`, left: leftOpen ? 0 : undefined }}>
-          {ADMIN_NAV.map(section => (
+          {ADMIN_NAV.map(section => {
+            const ap = admin?.pages;
+            const visibleItems = ap === "*" ? section.items : section.items.filter(item => ap?.includes(item.id));
+            if (visibleItems.length === 0) return null;
+            return (
             <div key={section.section}>
               <div className="adm-nav-section" style={{ color: t.textMuted }}>{section.section}</div>
-              {section.items.map(item => (
+              {visibleItems.map(item => (
                 <button key={item.id} onClick={() => { setActive(item.id); setLeftOpen(false); }} className="dash-nav-item" style={{ background: active === item.id ? t.navActive : "transparent", color: active === item.id ? t.accent : t.textSoft, fontWeight: active === item.id ? 600 : 450 }}>
                   <span style={{ opacity: active === item.id ? 1 : .6, flexShrink: 0 }}>{item.icon}</span>
                   {item.label}
@@ -420,7 +429,8 @@ function AdminDashboardInner() {
                 </button>
               ))}
             </div>
-          ))}
+            );
+          })}
           <div style={{ flex: 1 }} />
           <div className="dash-sidebar-divider" style={{ background: t.sidebarBorder }} />
           <div style={{ padding: "6px 14px" }}>

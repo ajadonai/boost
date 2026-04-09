@@ -1,6 +1,6 @@
 import prisma from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
-import { requireAdmin, logActivity } from '@/lib/admin';
+import { requireAdmin, logActivity, canPerformAction } from '@/lib/admin';
 
 export async function GET() {
   const { admin, error } = await requireAdmin('team');
@@ -22,6 +22,7 @@ export async function GET() {
         joined: a.createdAt.toISOString(),
         customPages: a.customPages ? JSON.parse(a.customPages) : null,
       })),
+      currentRole: admin.role,
     });
   } catch (err) {
     console.error('[Admin Team]', err.message);
@@ -33,10 +34,6 @@ export async function POST(req) {
   const { admin, error } = await requireAdmin('team', true);
   if (error) return error;
 
-  if (admin.role !== 'superadmin' && admin.role !== 'owner') {
-    return Response.json({ error: 'Only owner or superadmin can manage team' }, { status: 403 });
-  }
-
   try {
     const { action, adminId, name, email, password, role, status, pages, newPassword } = await req.json();
 
@@ -44,6 +41,7 @@ export async function POST(req) {
     const ASSIGNABLE = ['admin', 'support', 'finance'];
 
     if (action === 'create') {
+      if (!canPerformAction(admin, 'team.create')) return Response.json({ error: 'Not authorized to create admins' }, { status: 403 });
       if (!name || !email || !password) return Response.json({ error: 'Name, email, password required' }, { status: 400 });
       const safeRole = ASSIGNABLE.includes(role) ? role : 'admin';
       const exists = await prisma.admin.findUnique({ where: { email: email.toLowerCase() } });
@@ -58,6 +56,7 @@ export async function POST(req) {
     }
 
     if (action === 'updateRole') {
+      if (!canPerformAction(admin, 'team.changeRole')) return Response.json({ error: 'Only owner can change roles' }, { status: 403 });
       if (!adminId || !role) return Response.json({ error: 'Admin ID and role required' }, { status: 400 });
       const target = await prisma.admin.findUnique({ where: { id: adminId } });
       if (!target) return Response.json({ error: 'Admin not found' }, { status: 404 });
@@ -110,6 +109,7 @@ export async function POST(req) {
     }
 
     if (action === 'delete') {
+      if (!canPerformAction(admin, 'team.delete')) return Response.json({ error: 'Only owner can delete admins' }, { status: 403 });
       if (!adminId) return Response.json({ error: 'Admin ID required' }, { status: 400 });
       const target = await prisma.admin.findUnique({ where: { id: adminId } });
       if (!target) return Response.json({ error: 'Admin not found' }, { status: 404 });

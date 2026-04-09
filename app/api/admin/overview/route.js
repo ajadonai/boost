@@ -1,5 +1,5 @@
 import prisma from '@/lib/prisma';
-import { requireAdmin } from '@/lib/admin';
+import { requireAdmin, getAdminPages } from '@/lib/admin';
 
 export async function GET() {
   const { admin, error } = await requireAdmin('overview');
@@ -72,7 +72,7 @@ export async function GET() {
     };
 
     return Response.json({
-      admin: { name: admin.name, role: admin.role, email: admin.email, themePreference: admin.themePreference || 'auto' },
+      admin: { name: admin.name, role: admin.role, email: admin.email, themePreference: admin.themePreference || 'auto', pages: getAdminPages(admin) },
       revenue: todayRevenue,
       users: userCount,
       orders: orderCount,

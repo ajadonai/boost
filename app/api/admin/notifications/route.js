@@ -1,5 +1,5 @@
 import prisma from '@/lib/prisma';
-import { requireAdmin, logActivity } from '@/lib/admin';
+import { requireAdmin, logActivity, canPerformAction } from '@/lib/admin';
 import { sendEmail } from '@/lib/email';
 
 async function getHistory() {
@@ -33,6 +33,7 @@ export async function GET() {
 export async function POST(req) {
   const { admin, error } = await requireAdmin('notifications', true);
   if (error) return error;
+  if (!canPerformAction(admin, 'notifications.send')) return Response.json({ error: 'Not authorized to send notifications' }, { status: 403 });
 
   try {
     const { subject, message, target } = await req.json();

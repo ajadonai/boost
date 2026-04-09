@@ -1,5 +1,5 @@
 import prisma from '@/lib/prisma';
-import { requireAdmin, logActivity } from '@/lib/admin';
+import { requireAdmin, logActivity, canPerformAction } from '@/lib/admin';
 
 export async function GET() {
   const { admin, error } = await requireAdmin('settings');
@@ -21,8 +21,8 @@ export async function POST(req) {
   const { admin, error } = await requireAdmin('settings', true);
   if (error) return error;
 
-  if (admin.role !== 'superadmin' && admin.role !== 'owner') {
-    return Response.json({ error: 'Only owner or superadmin can change settings' }, { status: 403 });
+  if (!canPerformAction(admin, 'settings.save')) {
+    return Response.json({ error: 'Not authorized to change settings' }, { status: 403 });
   }
 
   try {

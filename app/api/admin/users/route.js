@@ -1,5 +1,5 @@
 import prisma from '@/lib/prisma';
-import { requireAdmin, logActivity } from '@/lib/admin';
+import { requireAdmin, logActivity, canPerformAction } from '@/lib/admin';
 
 export async function GET() {
   const { admin, error } = await requireAdmin('users');
@@ -53,6 +53,7 @@ export async function POST(req) {
     if (!user) return Response.json({ error: 'User not found' }, { status: 404 });
 
     if (action === 'credit') {
+      if (!canPerformAction(admin, 'users.adjustBalance')) return Response.json({ error: 'Not authorized to adjust balances' }, { status: 403 });
       const amountKobo = Math.round(Number(amount) * 100);
       if (!amountKobo || amountKobo <= 0) return Response.json({ error: 'Invalid amount' }, { status: 400 });
 
@@ -78,6 +79,7 @@ export async function POST(req) {
     }
 
     if (action === 'suspend') {
+      if (!canPerformAction(admin, 'users.ban')) return Response.json({ error: 'Not authorized to suspend users' }, { status: 403 });
       await prisma.user.update({ where: { id: userId }, data: { status: 'Suspended' } });
       await logActivity(admin.name, `Suspended user ${user.name}`, 'user');
       return Response.json({ success: true, message: `${user.name} suspended` });

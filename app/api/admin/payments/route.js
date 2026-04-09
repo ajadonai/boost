@@ -1,5 +1,5 @@
 import prisma from '@/lib/prisma';
-import { requireAdmin, logActivity } from '@/lib/admin';
+import { requireAdmin, logActivity, canPerformAction } from '@/lib/admin';
 
 const DEFAULT_GATEWAYS = [
   { id: 'paystack', name: 'Paystack', desc: 'Cards, Bank Transfer, USSD', enabled: false, priority: 1, fields: { secretKey: '', publicKey: '' } },
@@ -48,8 +48,8 @@ async function getGateways() {
 
 export async function GET() {
   try {
-    const admin = await requireAdmin();
-    if (!admin) return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    const { admin, error } = await requireAdmin('payments');
+    if (error) return error;
 
     const gateways = await getGateways();
 
@@ -71,8 +71,11 @@ export async function GET() {
 
 export async function POST(req) {
   try {
-    const admin = await requireAdmin();
-    if (!admin) return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    const { admin, error } = await requireAdmin('payments', true);
+    if (error) return error;
+    if (!canPerformAction(admin, 'payments.configure')) {
+      return Response.json({ error: 'Only owner/superadmin can configure payments' }, { status: 403 });
+    }
 
     const { action, gatewayId, enabled, priority, fields, name, desc } = await req.json();
 

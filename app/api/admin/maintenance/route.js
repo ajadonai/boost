@@ -1,5 +1,5 @@
 import prisma from '@/lib/prisma';
-import { requireAdmin, logActivity } from '@/lib/admin';
+import { requireAdmin, logActivity, canPerformAction } from '@/lib/admin';
 
 export async function GET() {
   const { admin, error } = await requireAdmin('maintenance');
@@ -28,7 +28,7 @@ export async function POST(req) {
   const { admin, error } = await requireAdmin('maintenance', true);
   if (error) return error;
 
-  if (admin.role !== 'superadmin' && admin.role !== 'owner') {
+  if (!canPerformAction(admin, 'maintenance.toggle')) {
     return Response.json({ error: 'Only owner/superadmin can toggle maintenance' }, { status: 403 });
   }
 
