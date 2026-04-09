@@ -455,6 +455,7 @@ function DashboardInner() {
   const [noSelTier, setNoSelTier] = useState(null);
   const [noQty, setNoQty] = useState(1000);
   const [noLink, setNoLink] = useState("");
+  const [noComments, setNoComments] = useState("");
   const [noCatModal, setNoCatModal] = useState(false);
   const isServices = active === "services";
   const isOrders = active === "orders";
@@ -607,7 +608,7 @@ function DashboardInner() {
   const handleLogout = async () => { try { await fetch("/api/auth/logout", { method: "POST" }); } catch {} window.location.replace("/?logout=1"); };
 
   /* Reset services state when leaving */
-  useEffect(() => { if (!isServices) { setNoSelSvc(null); setNoSelTier(null); setNoLink(""); setNoCatModal(false); } }, [active]);
+  useEffect(() => { if (!isServices) { setNoSelSvc(null); setNoSelTier(null); setNoLink(""); setNoComments(""); setNoCatModal(false); } }, [active]);
 
   const t = useMemo(() => ({
     ...baseT,
@@ -690,7 +691,7 @@ function DashboardInner() {
       case "overview":
         return <OverviewPage user={user} orders={orders} alerts={alerts} dark={dark} t={t} setActive={setActive} />;
       case "services":
-        return <NewOrderPage dark={dark} t={t} user={user} onOrderSuccess={refreshDashboard} platform={noPlatform} setPlatform={setNoPlatform} selSvc={noSelSvc} setSelSvc={setNoSelSvc} selTier={noSelTier} setSelTier={setNoSelTier} qty={noQty} setQty={setNoQty} link={noLink} setLink={setNoLink} catModal={noCatModal} setCatModal={setNoCatModal} />;
+        return <NewOrderPage dark={dark} t={t} user={user} onOrderSuccess={refreshDashboard} platform={noPlatform} setPlatform={setNoPlatform} selSvc={noSelSvc} setSelSvc={setNoSelSvc} selTier={noSelTier} setSelTier={setNoSelTier} qty={noQty} setQty={setNoQty} link={noLink} setLink={setNoLink} comments={noComments} setComments={setNoComments} catModal={noCatModal} setCatModal={setNoCatModal} />;
       case "orders":
         return <OrdersPage orders={orders} txs={txs} dark={dark} t={t} />;
       case "referrals":
@@ -865,7 +866,7 @@ function DashboardInner() {
         <aside className="dash-right" style={{ background: t.sidebarBg, borderLeft: `0.5px solid ${t.sidebarBorder}` }}>
           {isServices ? (
             noHasOrder ? (
-              <OrderForm selSvc={noSelSvc} selTier={noSelTier} platform={noPlatform} qty={noQty} setQty={setNoQty} link={noLink} setLink={setNoLink} dark={dark} t={t} compact />
+              <OrderForm selSvc={noSelSvc} selTier={noSelTier} platform={noPlatform} qty={noQty} setQty={setNoQty} link={noLink} setLink={setNoLink} comments={noComments} setComments={setNoComments} dark={dark} t={t} compact />
             ) : (
               <>
               <ServicesSidebar dark={dark} t={t} />

@@ -67,11 +67,12 @@ const TS = {
 /* ═══════════════════════════════════════════ */
 /* ═══ ORDER FORM                          ═══ */
 /* ═══════════════════════════════════════════ */
-export function OrderForm({ selSvc, selTier, platform, qty, setQty, link, setLink, dark, t, onClose, compact, onSubmit, orderLoading }) {
+export function OrderForm({ selSvc, selTier, platform, qty, setQty, link, setLink, dark, t, onClose, compact, onSubmit, orderLoading, comments, setComments }) {
   const price = selTier ? Math.round((qty / 1000) * selTier.price) : 0;
   const s = selTier ? TS[selTier.tier] : null;
   const minQty = selTier?.min || 100;
   const maxQty = selTier?.max || 50000;
+  const isCommentService = selSvc?.type?.toLowerCase()?.includes("comment");
 
   return (
     <div className="no-form-inner">
@@ -91,6 +92,13 @@ export function OrderForm({ selSvc, selTier, platform, qty, setQty, link, setLin
           <label className="no-form-label" style={{ color: t.textMuted }}>Link</label>
           <input type="text" placeholder={`https://${platform}.com/...`} value={link} onChange={e => setLink(e.target.value)} className="m no-form-input" style={{ borderColor: dark ? "rgba(255,255,255,.1)" : "rgba(0,0,0,.12)", background: dark ? "#0d1020" : "#fff", color: t.text }} />
         </div>
+        {isCommentService && (
+          <div className="no-form-field">
+            <label className="no-form-label" style={{ color: t.textMuted }}>Comments <span style={{ fontWeight: 400, fontSize: 11 }}>(one per line)</span></label>
+            <textarea placeholder={"Great content! 🔥\nLove this post!\nAmazing work, keep it up 💯\nThis is fire 🙌"} value={comments || ""} onChange={e => setComments(e.target.value)} rows={4} className="m no-form-input" style={{ borderColor: dark ? "rgba(255,255,255,.1)" : "rgba(0,0,0,.12)", background: dark ? "#0d1020" : "#fff", color: t.text, resize: "vertical", fontFamily: "'JetBrains Mono', monospace", fontSize: 13, lineHeight: 1.5 }} />
+            <div style={{ fontSize: 11, color: t.textMuted, marginTop: 4 }}>{(comments || "").split("\n").filter(l => l.trim()).length} comments entered · we'll cycle through them</div>
+          </div>
+        )}
         <div className="no-form-field">
           <label className="no-form-label" style={{ color: t.textMuted }}>Quantity</label>
           <input type="number" value={qty} onChange={e => setQty(Math.max(minQty, Math.min(maxQty, Number(e.target.value))))} className="m no-form-input" style={{ borderColor: dark ? "rgba(255,255,255,.1)" : "rgba(0,0,0,.12)", background: dark ? "#0d1020" : "#fff", color: t.text }} />
@@ -112,7 +120,7 @@ export function OrderForm({ selSvc, selTier, platform, qty, setQty, link, setLin
           <span className="m no-form-tag" style={{ borderColor: t.cardBorder, color: t.textMuted }}>refill: {selTier.refill}</span>
           <span className="m no-form-tag" style={{ borderColor: t.cardBorder, color: t.textMuted }}>speed: {selTier.speed || "Instant"}</span>
         </div>
-        <button onClick={onSubmit} disabled={!link || orderLoading} className="no-form-submit" style={{ opacity: link && !orderLoading ? 1 : .5 }}>{orderLoading ? "Placing..." : "Place Order"}</button>
+        <button onClick={onSubmit} disabled={!link || (isCommentService && !(comments || "").trim()) || orderLoading} className="no-form-submit" style={{ opacity: link && (!isCommentService || (comments || "").trim()) && !orderLoading ? 1 : .5 }}>{orderLoading ? "Placing..." : "Place Order"}</button>
       </>}
     </div>
   );
@@ -121,7 +129,7 @@ export function OrderForm({ selSvc, selTier, platform, qty, setQty, link, setLin
 /* ═══════════════════════════════════════════ */
 /* ═══ NEW ORDER PAGE                      ═══ */
 /* ═══════════════════════════════════════════ */
-export default function NewOrderPage({ dark, t, user, onOrderSuccess, platform, setPlatform, selSvc, setSelSvc, selTier, setSelTier, qty, setQty, link, setLink, catModal, setCatModal }) {
+export default function NewOrderPage({ dark, t, user, onOrderSuccess, platform, setPlatform, selSvc, setSelSvc, selTier, setSelTier, qty, setQty, link, setLink, comments, setComments, catModal, setCatModal }) {
   const [filterType, setFilterType] = useState("all");
   const [search, setSearch] = useState("");
   const [orderModal, setOrderModal] = useState(false);
@@ -202,7 +210,7 @@ export default function NewOrderPage({ dark, t, user, onOrderSuccess, platform, 
       const res = await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tierId: selTier.id, link: link.trim(), quantity: qty }),
+        body: JSON.stringify({ tierId: selTier.id, link: link.trim(), quantity: qty, ...(comments?.trim() ? { comments: comments.trim() } : {}) }),
         signal: AbortSignal.timeout(30000),
       });
       const data = await res.json();
@@ -361,7 +369,7 @@ export default function NewOrderPage({ dark, t, user, onOrderSuccess, platform, 
       {orderModal && hasOrder && (
         <div className="no-modal-overlay" onClick={() => setOrderModal(false)}>
           <div className="no-modal" onClick={e => e.stopPropagation()} style={{ background: dark ? "#0e1120" : "#ffffff", borderWidth: 1, borderStyle: "solid", borderColor: t.cardBorder }}>
-            <OrderForm selSvc={selSvc} selTier={selTier} platform={platform} qty={qty} setQty={setQty} link={link} setLink={setLink} dark={dark} t={t} onClose={() => setOrderModal(false)} onSubmit={submitOrder} orderLoading={orderLoading} />
+            <OrderForm selSvc={selSvc} selTier={selTier} platform={platform} qty={qty} setQty={setQty} link={link} setLink={setLink} comments={comments} setComments={setComments} dark={dark} t={t} onClose={() => setOrderModal(false)} onSubmit={submitOrder} orderLoading={orderLoading} />
           </div>
         </div>
       )}

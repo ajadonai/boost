@@ -145,7 +145,7 @@ export async function POST(req) {
     const session = await getCurrentUser();
     if (!session) return Response.json({ error: 'Not authenticated' }, { status: 401 });
 
-    const { tierId, serviceId, link, quantity } = await req.json();
+    const { tierId, serviceId, link, quantity, comments } = await req.json();
 
     if (!link || !quantity) {
       return Response.json({ error: 'Link and quantity required' }, { status: 400 });
@@ -213,7 +213,7 @@ export async function POST(req) {
     let apiOrderId = null;
     if (service.apiId && process.env.MTP_API_KEY) {
       try {
-        const mtpResult = await placeOrder(service.apiId, trimmedLink, qty);
+        const mtpResult = await placeOrder(service.apiId, trimmedLink, qty, comments || undefined);
         apiOrderId = mtpResult.order ? String(mtpResult.order) : null;
       } catch (err) {
         log.error('Order MTP', err.message);
