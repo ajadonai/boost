@@ -317,10 +317,10 @@ input { font-family: inherit; }
 .skel-bone { border-radius: 6px; background-size: 200% 100%; animation: skeletonShimmer 1.8s ease-in-out infinite; }
 .skel-dark { background-color: rgba(255,255,255,.06); background-image: linear-gradient(90deg, transparent 0%, rgba(255,255,255,.04) 40%, transparent 80%); }
 .skel-light { background-color: rgba(0,0,0,.05); background-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.03) 40%, transparent 80%); }
-.dash-page-enter { animation: fadeInUp .3s ease; }
+.dash-page-enter { animation: fadeInUp .3s ease; padding-bottom: 8px; }
 
 /* Page header divider — stretches edge to edge across sidebars */
-.page-divider { height: 2px; margin-top: 12px; margin-left: -28px; margin-right: -28px; }
+.page-divider { height: 1px; margin-top: 12px; margin-left: -28px; margin-right: -28px; }
 
 /* Nav */
 .dash-nav { display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; z-index: 20; height: 56px; padding: 0 24px; }
