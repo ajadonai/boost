@@ -1,0 +1,41 @@
+import prisma from '@/lib/prisma';
+
+const GATEWAY_INFO = {
+  paystack: { name: 'Paystack', desc: 'Cards, Bank Transfer, USSD' },
+  flutterwave: { name: 'Flutterwave', desc: 'Cards, Bank Transfer, Mobile Money' },
+  alatpay: { name: 'ALATPay (Wema)', desc: 'Direct bank debit' },
+  monnify: { name: 'Monnify', desc: 'Auto-confirmed bank transfer' },
+  korapay: { name: 'KoraPay', desc: 'Cards, Bank Transfer' },
+};
+
+export async function GET() {
+  try {
+    const settings = await prisma.setting.findMany({
+      where: { key: { startsWith: 'gateway_' } },
+    });
+
+    const gateways = [];
+    settings.forEach(s => {
+      try {
+        const id = s.key.replace('gateway_', '');
+        const data = JSON.parse(s.value);
+        if (data.enabled) {
+          const info = GATEWAY_INFO[id] || { name: id, desc: '' };
+          gateways.push({
+            id,
+            name: info.name,
+            desc: info.desc,
+            priority: data.priority || 99,
+          });
+        }
+      } catch {}
+    });
+
+    gateways.sort((a, b) => a.priority - b.priority);
+
+    return Response.json({ gateways });
+  } catch (err) {
+    console.error('[Gateways GET]', err.message);
+    return Response.json({ gateways: [] });
+  }
+}

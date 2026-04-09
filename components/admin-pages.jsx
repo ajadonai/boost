@@ -8,17 +8,50 @@ import { fN, fD } from "../lib/format";
 /* ═══ PAYMENTS PAGE                       ═══ */
 /* ═══════════════════════════════════════════ */
 export function AdminPaymentsPage({ dark, t }) {
-  const [gateways, setGateways] = useState([
-    { id: "paystack", name: "Paystack", desc: "Cards, Bank Transfer, USSD", enabled: true, priority: 1 },
-    { id: "flutterwave", name: "Flutterwave", desc: "Cards, Bank Transfer, Mobile Money", enabled: true, priority: 2 },
-    { id: "alatpay", name: "ALATPay (Wema)", desc: "Direct bank debit, web payment", enabled: true, priority: 3 },
-    { id: "crypto", name: "Crypto", desc: "USDT, BTC, ETH", enabled: false, priority: 4 },
-    { id: "monnify", name: "Monnify", desc: "Auto-confirmed bank transfer", enabled: false, priority: 5 },
-  ]);
+  const [gateways, setGateways] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [configuring, setConfiguring] = useState(null); // gateway object being configured
+  const [configFields, setConfigFields] = useState({});
+  const [saving, setSaving] = useState(false);
+  const [msg, setMsg] = useState(null);
 
-  const toggleGateway = (id) => {
-    setGateways(prev => prev.map(g => g.id === id ? { ...g, enabled: !g.enabled } : g));
+  const refresh = () => {
+    fetch("/api/admin/payments").then(r => r.json()).then(d => {
+      if (d.gateways) setGateways(d.gateways);
+      setLoading(false);
+    }).catch(() => setLoading(false));
   };
+  useEffect(() => { refresh(); }, []);
+
+  const toggle = async (id, enabled) => {
+    setMsg(null);
+    const res = await fetch("/api/admin/payments", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "toggle", gatewayId: id, enabled }) });
+    if (res.ok) { refresh(); setMsg({ type: "success", text: `${id} ${enabled ? "enabled" : "disabled"}` }); }
+    else { const d = await res.json(); setMsg({ type: "error", text: d.error || "Failed" }); }
+  };
+
+  const openConfig = (g) => {
+    // Pre-fill with empty strings for each field (masked values aren't editable)
+    const fields = {};
+    const defaultFields = { paystack: ["secretKey", "publicKey"], flutterwave: ["secretKey", "publicKey"], alatpay: ["secretKey", "publicKey"], monnify: ["apiKey", "secretKey", "contractCode"], korapay: ["secretKey", "publicKey"] };
+    (defaultFields[g.id] || ["secretKey", "publicKey"]).forEach(k => { fields[k] = ""; });
+    setConfigFields(fields);
+    setConfiguring(g);
+  };
+
+  const saveConfig = async () => {
+    if (!configuring) return;
+    // Only send non-empty fields
+    const nonEmpty = Object.fromEntries(Object.entries(configFields).filter(([, v]) => v.trim()));
+    if (Object.keys(nonEmpty).length === 0) { setMsg({ type: "error", text: "Enter at least one key" }); return; }
+    setSaving(true);
+    const res = await fetch("/api/admin/payments", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "configure", gatewayId: configuring.id, fields: nonEmpty }) });
+    if (res.ok) { setMsg({ type: "success", text: `${configuring.name} keys saved` }); setConfiguring(null); refresh(); }
+    else { const d = await res.json(); setMsg({ type: "error", text: d.error || "Save failed" }); }
+    setSaving(false);
+  };
+
+  const FIELD_LABELS = { secretKey: "Secret Key", publicKey: "Public Key", apiKey: "API Key", contractCode: "Contract Code" };
 
   return (
     <>
@@ -26,32 +59,67 @@ export function AdminPaymentsPage({ dark, t }) {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
           <div>
             <div className="adm-title" style={{ color: t.text }}>Payments</div>
-            <div className="adm-subtitle" style={{ color: t.textMuted }}>Manage payment gateways</div>
+            <div className="adm-subtitle" style={{ color: t.textMuted }}>Configure payment gateways. Enable and add API keys to accept payments.</div>
           </div>
-          <button className="adm-btn-primary">+ Add Gateway</button>
         </div>
         <div className="page-divider" style={{ background: t.cardBorder }} />
       </div>
 
-      <div className="adm-section-title" style={{ color: t.textMuted, marginTop: 16, marginBottom: 10 }}>Payment Gateways</div>
-      <div className="adm-card" style={{ background: dark ? "rgba(255,255,255,.06)" : "rgba(255,255,255,.95)", borderWidth: 1, borderStyle: "solid", borderColor: dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)", boxShadow: dark ? "0 4px 20px rgba(0,0,0,.25)" : "0 4px 20px rgba(0,0,0,.04)" }}>
-        {gateways.map((g, i) => (
-          <div key={g.id} className="adm-list-row" style={{ borderBottom: i < gateways.length - 1 ? `1px solid ${t.cardBorder}` : "none", flexWrap: "wrap", gap: 10 }}>
-            <div style={{ flex: 1, minWidth: 160 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <span style={{ fontSize: 14, fontWeight: 500, color: t.text }}>{g.name}</span>
-                <span className="m" style={{ fontSize: 11, padding: "1px 6px", borderRadius: 4, fontWeight: 600, background: g.enabled ? (dark ? "rgba(110,231,183,.1)" : "rgba(5,150,105,.06)") : (dark ? "rgba(252,165,165,.1)" : "rgba(220,38,38,.06)"), color: g.enabled ? t.green : t.red }}>{g.enabled ? "Active" : "Disabled"}</span>
+      {msg && <div style={{ padding: "10px 14px", borderRadius: 8, marginBottom: 12, background: msg.type === "success" ? (dark ? "rgba(110,231,183,.08)" : "#ecfdf5") : (dark ? "rgba(220,38,38,.08)" : "#fef2f2"), color: msg.type === "success" ? (dark ? "#6ee7b7" : "#059669") : (dark ? "#fca5a5" : "#dc2626"), fontSize: 13, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <span>{msg.text}</span>
+        <button onClick={() => setMsg(null)} style={{ background: "none", border: "none", color: "inherit", cursor: "pointer", fontSize: 14 }}>✕</button>
+      </div>}
+
+      {loading ? <div style={{ padding: 40, textAlign: "center", color: t.textMuted }}>Loading gateways...</div> : (
+        <div className="adm-card" style={{ background: dark ? "rgba(255,255,255,.06)" : "rgba(255,255,255,.95)", borderWidth: 1, borderStyle: "solid", borderColor: dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)", boxShadow: dark ? "0 4px 20px rgba(0,0,0,.25)" : "0 4px 20px rgba(0,0,0,.04)" }}>
+          {gateways.map((g, i) => (
+            <div key={g.id} className="adm-list-row" style={{ borderBottom: i < gateways.length - 1 ? `1px solid ${t.cardBorder}` : "none", flexWrap: "wrap", gap: 10 }}>
+              <div style={{ flex: 1, minWidth: 160 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 2 }}>
+                  <span style={{ fontSize: 14, fontWeight: 550, color: t.text }}>{g.name}</span>
+                  <span className="m" style={{ fontSize: 10, padding: "2px 6px", borderRadius: 4, fontWeight: 600, background: g.enabled ? (dark ? "rgba(110,231,183,.1)" : "rgba(5,150,105,.06)") : (dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.04)"), color: g.enabled ? (dark ? "#6ee7b7" : "#059669") : t.textMuted }}>{g.enabled ? "Active" : "Disabled"}</span>
+                  {g.hasKeys && <span className="m" style={{ fontSize: 10, padding: "2px 6px", borderRadius: 4, fontWeight: 600, background: dark ? "rgba(96,165,250,.08)" : "rgba(59,130,246,.06)", color: dark ? "#60a5fa" : "#2563eb" }}>Keys set</span>}
+                </div>
+                <div style={{ fontSize: 12, color: t.textMuted }}>{g.desc}</div>
               </div>
-              <div style={{ fontSize: 13, color: t.textMuted, marginTop: 2 }}>{g.desc}</div>
+              <div style={{ display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap" }}>
+                <button onClick={() => toggle(g.id, !g.enabled)} className="adm-btn-sm" style={{ borderColor: t.cardBorder, color: g.enabled ? (dark ? "#fca5a5" : "#dc2626") : (dark ? "#6ee7b7" : "#059669") }}>{g.enabled ? "Disable" : "Enable"}</button>
+                <button onClick={() => openConfig(g)} className="adm-btn-sm" style={{ borderColor: t.cardBorder, color: t.accent }}>Configure</button>
+              </div>
             </div>
-            <div style={{ display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap" }}>
-              <span className="m" style={{ fontSize: 12, color: t.textMuted }}>Priority: {g.priority}</span>
-              <button onClick={() => toggleGateway(g.id)} className="adm-btn-sm" style={{ borderColor: t.cardBorder, color: g.enabled ? t.red : t.green }}>{g.enabled ? "Disable" : "Enable"}</button>
-              <button className="adm-btn-sm" style={{ borderColor: t.cardBorder, color: t.accent }}>Configure</button>
+          ))}
+        </div>
+      )}
+
+      {/* Configure modal */}
+      {configuring && (
+        <div onClick={() => setConfiguring(null)} style={{ position: "fixed", inset: 0, zIndex: 100, background: "rgba(0,0,0,.5)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
+          <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 440, background: dark ? "#111728" : "#fff", borderRadius: 16, padding: 24, border: `1px solid ${t.cardBorder}`, boxShadow: "0 20px 60px rgba(0,0,0,.3)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+              <div style={{ fontSize: 16, fontWeight: 600, color: t.text }}>Configure {configuring.name}</div>
+              <button onClick={() => setConfiguring(null)} style={{ background: "none", border: "none", color: t.textMuted, fontSize: 18, cursor: "pointer" }}>✕</button>
+            </div>
+            <div style={{ fontSize: 12, color: t.textMuted, marginBottom: 16, lineHeight: 1.5 }}>Enter your API keys. Leave blank to keep existing keys. Current keys are masked for security.</div>
+            {Object.entries(configFields).map(([key]) => (
+              <div key={key} style={{ marginBottom: 14 }}>
+                <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: t.textMuted, marginBottom: 4, textTransform: "uppercase", letterSpacing: 0.8 }}>{FIELD_LABELS[key] || key}</label>
+                <div style={{ fontSize: 11, color: t.textMuted, marginBottom: 4 }}>Current: {configuring.fields?.[key] || "Not set"}</div>
+                <input
+                  type="password"
+                  value={configFields[key]}
+                  onChange={e => setConfigFields(prev => ({ ...prev, [key]: e.target.value }))}
+                  placeholder={`Enter new ${FIELD_LABELS[key] || key}`}
+                  style={{ width: "100%", padding: "10px 12px", borderRadius: 8, border: `1px solid ${t.cardBorder}`, background: dark ? "rgba(255,255,255,.04)" : "rgba(0,0,0,.03)", color: t.text, fontSize: 13, outline: "none", fontFamily: "'JetBrains Mono', monospace", boxSizing: "border-box" }}
+                />
+              </div>
+            ))}
+            <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
+              <button onClick={saveConfig} disabled={saving} style={{ flex: 1, padding: "11px 0", borderRadius: 8, background: "linear-gradient(135deg,#c47d8e,#8b5e6b)", color: "#fff", fontSize: 13, fontWeight: 600, border: "none", cursor: "pointer" }}>{saving ? "Saving..." : "Save Keys"}</button>
+              <button onClick={() => setConfiguring(null)} style={{ padding: "11px 20px", borderRadius: 8, background: "none", border: `1px solid ${t.cardBorder}`, color: t.textMuted, fontSize: 13, cursor: "pointer" }}>Cancel</button>
             </div>
           </div>
-        ))}
-      </div>
+        </div>
+      )}
     </>
   );
 }

@@ -1,8 +1,15 @@
-import { fetchWithRetry } from '@/lib/fetch';
 import prisma from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/auth';
 
-const PAYSTACK_SECRET = process.env.PAYSTACK_SECRET_KEY;
+async function getGatewayKeys(gatewayId) {
+  const setting = await prisma.setting.findUnique({ where: { key: `gateway_${gatewayId}` } });
+  if (setting) {
+    try { const data = JSON.parse(setting.value); if (data.fields) return data.fields; } catch {}
+  }
+  if (gatewayId === 'paystack') return { secretKey: process.env.PAYSTACK_SECRET_KEY || '' };
+  if (gatewayId === 'flutterwave') return { secretKey: process.env.FLUTTERWAVE_SECRET_KEY || '' };
+  return {};
+}
 
 export async function POST(req) {
   try {
@@ -12,7 +19,6 @@ export async function POST(req) {
     const { reference } = await req.json();
     if (!reference) return Response.json({ error: 'Reference required' }, { status: 400 });
 
-    // Check if already processed
     const existing = await prisma.transaction.findFirst({
       where: { reference, userId: session.id },
     });
@@ -22,33 +28,50 @@ export async function POST(req) {
       return Response.json({ success: true, message: 'Already credited', amount: existing.amount / 100 });
     }
 
-    if (!PAYSTACK_SECRET) {
-      return Response.json({ error: 'Payment not configured' }, { status: 503 });
+    const gateway = existing.method || 'paystack';
+    const keys = await getGatewayKeys(gateway);
+
+    if (!keys.secretKey) {
+      return Response.json({ error: 'Payment gateway not configured' }, { status: 503 });
     }
 
-    // Verify with Paystack
-    const res = await fetch(`https://api.paystack.co/transaction/verify/${encodeURIComponent(reference)}`, {
-      headers: { 'Authorization': `Bearer ${PAYSTACK_SECRET}` },
-    });
+    let verified = false;
+    let paidAmount = existing.amount; // fallback
 
-    const data = await res.json();
+    // ═══ PAYSTACK VERIFY ═══
+    if (gateway === 'paystack') {
+      const res = await fetch(`https://api.paystack.co/transaction/verify/${encodeURIComponent(reference)}`, {
+        headers: { 'Authorization': `Bearer ${keys.secretKey}` },
+      });
+      const data = await res.json();
+      if (data.status && data.data.status === 'success') {
+        verified = true;
+        paidAmount = data.data.amount; // kobo
+      }
+    }
 
-    if (!data.status || data.data.status !== 'success') {
-      // Update transaction as failed
+    // ═══ FLUTTERWAVE VERIFY ═══
+    if (gateway === 'flutterwave') {
+      // Flutterwave verifies by tx_ref
+      const res = await fetch(`https://api.flutterwave.com/v3/transactions/verify_by_reference?tx_ref=${encodeURIComponent(reference)}`, {
+        headers: { 'Authorization': `Bearer ${keys.secretKey}` },
+      });
+      const data = await res.json();
+      if (data.status === 'success' && data.data.status === 'successful') {
+        verified = true;
+        paidAmount = Math.round(data.data.amount * 100); // convert to kobo
+      }
+    }
+
+    if (!verified) {
       await prisma.transaction.update({
         where: { id: existing.id },
-        data: { status: 'Failed', note: `Payment ${data.data?.status || 'failed'}` },
+        data: { status: 'Failed', note: `Payment verification failed via ${gateway}` },
       });
       return Response.json({ error: 'Payment not successful' }, { status: 400 });
     }
 
-    // Verify amount matches
-    const paidAmount = data.data.amount; // in kobo
-    if (paidAmount !== existing.amount) {
-      console.warn(`[Paystack Verify] Amount mismatch: expected ${existing.amount}, got ${paidAmount} for ${reference}`);
-    }
-
-    // Credit user wallet + mark transaction complete
+    // Credit user wallet + mark complete
     await prisma.$transaction([
       prisma.user.update({
         where: { id: session.id },
@@ -60,7 +83,7 @@ export async function POST(req) {
       }),
     ]);
 
-    console.log(`[Paystack] ₦${paidAmount / 100} credited to user ${session.id} (ref: ${reference})`);
+    console.log(`[${gateway}] ₦${paidAmount / 100} credited to user ${session.id} (ref: ${reference})`);
 
     return Response.json({
       success: true,

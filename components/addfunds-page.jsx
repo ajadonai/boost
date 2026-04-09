@@ -4,14 +4,6 @@ import { fN, fD } from "../lib/format";
 
 const PRESETS = [1000, 2000, 5000, 10000, 20000, 50000];
 
-const GATEWAYS = [
-  { id: "paystack", label: "Paystack", enabled: true },
-  { id: "flutterwave", label: "Flutterwave", enabled: true },
-  { id: "alatpay", label: "ALATPay (Wema)", enabled: true },
-  { id: "crypto", label: "Crypto (USDT/BTC)", enabled: false },
-  { id: "monnify", label: "Monnify", enabled: false },
-];
-
 const ACCEPTED_TYPES = ["Cards", "Bank Transfer", "USSD", "Mobile Money"];
 
 /* ═══════════════════════════════════════════ */
@@ -19,9 +11,21 @@ const ACCEPTED_TYPES = ["Cards", "Bank Transfer", "USSD", "Mobile Money"];
 /* ═══════════════════════════════════════════ */
 export default function AddFundsPage({ user, dark, t, paymentStatus, setPaymentStatus }) {
   const [amount, setAmount] = useState("");
-  const [method, setMethod] = useState("paystack");
+  const [method, setMethod] = useState("");
   const [loading, setLoading] = useState(false);
-  const [mobileStep, setMobileStep] = useState(1); // 1 = amount, 2 = payment
+  const [mobileStep, setMobileStep] = useState(1);
+  const [gateways, setGateways] = useState([]);
+  const [gatewaysLoading, setGatewaysLoading] = useState(true);
+
+  // Fetch enabled gateways from API
+  useEffect(() => {
+    fetch("/api/payments/gateways").then(r => r.json()).then(d => {
+      const gws = d.gateways || [];
+      setGateways(gws);
+      if (gws.length > 0 && !method) setMethod(gws[0].id);
+      setGatewaysLoading(false);
+    }).catch(() => setGatewaysLoading(false));
+  }, []); // 1 = amount, 2 = payment
 
   const numAmount = Number(amount) || 0;
   const valid = numAmount >= 500;
@@ -34,7 +38,7 @@ export default function AddFundsPage({ user, dark, t, paymentStatus, setPaymentS
       const res = await fetch("/api/payments/initialize", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount: numAmount }),
+        body: JSON.stringify({ amount: numAmount, method }),
       });
       const data = await res.json();
       if (data.authorization_url) {
@@ -50,13 +54,12 @@ export default function AddFundsPage({ user, dark, t, paymentStatus, setPaymentS
   };
 
   const Radio = ({ gw }) => (
-    <div onClick={() => gw.enabled && setMethod(gw.id)} className="fund-method-row" style={{ borderBottom: `1px solid ${t.cardBorder}`, opacity: gw.enabled ? 1 : .35, cursor: gw.enabled ? "pointer" : "default" }}>
-      <div className="fund-radio" style={{ borderWidth: 2, borderStyle: "solid", borderColor: method === gw.id && gw.enabled ? t.accent : (dark ? "rgba(255,255,255,.15)" : "rgba(0,0,0,.15)") }}>
-        {method === gw.id && gw.enabled && <div className="fund-radio-dot" style={{ background: t.accent }} />}
+    <div onClick={() => setMethod(gw.id)} className="fund-method-row" style={{ borderBottom: `1px solid ${t.cardBorder}`, cursor: "pointer" }}>
+      <div className="fund-radio" style={{ borderWidth: 2, borderStyle: "solid", borderColor: method === gw.id ? t.accent : (dark ? "rgba(255,255,255,.15)" : "rgba(0,0,0,.15)") }}>
+        {method === gw.id && <div className="fund-radio-dot" style={{ background: t.accent }} />}
       </div>
-      <span style={{ fontSize: 14, fontWeight: method === gw.id && gw.enabled ? 600 : 450, color: method === gw.id && gw.enabled ? t.text : (dark ? "rgba(255,255,255,.55)" : "rgba(0,0,0,.55)"), display: "flex", alignItems: "center", gap: 8 }}>
-        {gw.label}
-        {!gw.enabled && <span className="m" style={{ fontSize: 11, padding: "2px 6px", borderRadius: 4, background: dark ? "#1c1608" : "#fffbeb", color: dark ? "#fcd34d" : "#d97706", fontWeight: 700 }}>SOON</span>}
+      <span style={{ fontSize: 14, fontWeight: method === gw.id ? 600 : 450, color: method === gw.id ? t.text : (dark ? "rgba(255,255,255,.55)" : "rgba(0,0,0,.55)") }}>
+        {gw.name}
       </span>
     </div>
   );
@@ -147,7 +150,7 @@ export default function AddFundsPage({ user, dark, t, paymentStatus, setPaymentS
             <div className="fund-div" style={{ background: t.cardBorder }} />
             <div className="fund-method-section">
               <div className="fund-method-title" style={{ color: t.text }}>Payment method</div>
-              {GATEWAYS.map(g => <Radio key={g.id} gw={g} />)}
+              {gatewaysLoading ? <div style={{ fontSize: 12, color: t.textMuted, padding: "8px 0" }}>Loading...</div> : gateways.length === 0 ? <div style={{ fontSize: 12, color: t.textMuted, padding: "8px 0" }}>No payment methods available</div> : gateways.map(g => <Radio key={g.id} gw={g} />)}
             </div>
             <div className="fund-btn-wrap">
               <button onClick={handlePay} disabled={!valid || loading} className="fund-pay-btn" style={{ background: valid ? `linear-gradient(135deg,#c47d8e,#8b5e6b)` : (dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)"), color: valid ? "#fff" : t.textMuted }}>
@@ -234,7 +237,7 @@ export default function AddFundsPage({ user, dark, t, paymentStatus, setPaymentS
             {/* Payment method card */}
             <div className="fund-mob-method" style={{ background: t.cardBg, borderWidth: 1, borderStyle: "solid", borderColor: t.cardBorder }}>
               <div className="fund-method-title" style={{ color: t.text }}>Choose payment method</div>
-              {GATEWAYS.map(g => <Radio key={g.id} gw={g} />)}
+              {gateways.map(g => <Radio key={g.id} gw={g} />)}
               <button onClick={handlePay} disabled={loading} className="fund-pay-btn" style={{ background: `linear-gradient(135deg,#c47d8e,#8b5e6b)`, color: "#fff", marginTop: 12 }}>
                 {loading ? "Processing..." : `Pay ${fN(numAmount)} Now`}
               </button>
