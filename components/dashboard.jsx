@@ -619,10 +619,10 @@ function DashboardInner() {
     return (
       <div className="dash-root" style={{ background: t.bg }}>
         <style>{`@keyframes spin{to{transform:rotate(360deg)}}@keyframes skeletonShimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}`}</style>
-        <nav className="dash-nav" style={{ background: t.sidebarBg, borderBottom: `1px solid ${t.sidebarBorder}` }}>
+        <nav className="dash-nav" style={{ background: t.sidebarBg, borderBottom: `0.5px solid ${t.sidebarBorder}` }}>
           <div className="dash-nav-left">
             <div className="dash-logo-static">
-              <div className="dash-logo-box"><svg width="11" height="11" viewBox="0 0 20 20" fill="none"><path d="M4,16 L4,4 L16,16 L16,4" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
+              <div className="dash-logo-box"><svg width="11" height="11" viewBox="0 0 20 20" fill="none"><path d="M4,16 L4,4 L16,16 L16,4" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
               <span className="dash-logo-text" style={{ color: t.text }}>NITRO</span>
             </div>
           </div>
@@ -632,7 +632,7 @@ function DashboardInner() {
           </div>
         </nav>
         <div className="dash-body">
-          <aside className="dash-left" style={{ background: t.sidebarBg, borderRight: `1px solid ${t.sidebarBorder}` }}>
+          <aside className="dash-left" style={{ background: t.sidebarBg, borderRight: `0.5px solid ${t.sidebarBorder}` }}>
             {[1,2,3,4,5,6,7,8].map(i => <div key={i} className={skBone} style={{ height: 36, borderRadius: 12, margin: "0 0 4px" }} />)}
           </aside>
           <main className="dash-main" style={{ background: t.bg }}>
@@ -663,7 +663,7 @@ function DashboardInner() {
               ))}
             </div>
           </main>
-          <div className="dash-right" style={{ background: t.sidebarBg, borderLeft: `1px solid ${t.sidebarBorder}` }}>
+          <div className="dash-right" style={{ background: t.sidebarBg, borderLeft: `0.5px solid ${t.sidebarBorder}` }}>
             <div className={skBone} style={{ width: 100, height: 8, marginBottom: 14 }} />
             {[1,2,3].map(i => <div key={i} className={skBone} style={{ height: 50, borderRadius: 10, marginBottom: 6 }} />)}
             <div style={{ height: 2, background: t.sidebarBorder, margin: "12px 0" }} />
@@ -710,7 +710,7 @@ function DashboardInner() {
     <div className="dash-root" style={{ background: t.bg }}>
 
       {/* ═══ TOP NAV ═══ */}
-      <nav className="dash-nav" style={{ background: t.sidebarBg, borderBottom: `1px solid ${t.sidebarBorder}` }}>
+      <nav className="dash-nav" style={{ background: t.sidebarBg, borderBottom: `0.5px solid ${t.sidebarBorder}` }}>
         <div className="dash-nav-left">
           {/* Mobile/tablet: hamburger + logo as one button to toggle sidebar */}
           <button className="dash-menu-btn" onClick={() => setLeftOpen(!leftOpen)}>
@@ -723,21 +723,21 @@ function DashboardInner() {
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={t.accent} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             )}
             <div className="dash-logo-box">
-              <svg width="11" height="11" viewBox="0 0 20 20" fill="none"><path d="M4,16 L4,4 L16,16 L16,4" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              <svg width="11" height="11" viewBox="0 0 20 20" fill="none"><path d="M4,16 L4,4 L16,16 L16,4" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
             </div>
             <span className="dash-logo-text" style={{ color: t.text }}>NITRO</span>
           </button>
           {/* Desktop: static logo, no click action */}
           <div className="dash-logo-static">
             <div className="dash-logo-box">
-              <svg width="11" height="11" viewBox="0 0 20 20" fill="none"><path d="M4,16 L4,4 L16,16 L16,4" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              <svg width="11" height="11" viewBox="0 0 20 20" fill="none"><path d="M4,16 L4,4 L16,16 L16,4" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
             </div>
             <span className="dash-logo-text" style={{ color: t.text }}>NITRO</span>
           </div>
         </div>
         <div className="dash-nav-right">
           {/* Theme toggle */}
-          <button onClick={toggleTheme} className="dash-theme-toggle" style={{ background: dark ? "rgba(99,102,241,.25)" : "rgba(0,0,0,.06)", borderWidth: 1, borderStyle: "solid", borderColor: dark ? "rgba(99,102,241,.2)" : "rgba(0,0,0,.08)" }}>
+          <button onClick={toggleTheme} className="dash-theme-toggle" style={{ background: dark ? "rgba(99,102,241,.2)" : "rgba(0,0,0,.06)", border: `0.5px solid ${dark ? "rgba(99,102,241,.15)" : "rgba(0,0,0,.08)"}` }}>
             <div className="dash-theme-thumb" style={{ background: dark ? "#1e1b4b" : "#fff", left: dark ? 23 : 3, boxShadow: dark ? "0 0 6px rgba(99,102,241,.3)" : "0 1px 4px rgba(0,0,0,.15)" }}>
               {dark
                 ? <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#a5b4fc" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
@@ -765,7 +765,7 @@ function DashboardInner() {
       <div className="dash-body">
 
         {/* ── LEFT SIDEBAR ── */}
-        <aside className="dash-left" style={{ background: t.sidebarBg, borderRight: `1px solid ${t.sidebarBorder}`, left: leftOpen ? 0 : undefined }}>
+        <aside className="dash-left" style={{ background: t.sidebarBg, borderRight: `0.5px solid ${t.sidebarBorder}`, left: leftOpen ? 0 : undefined }}>
 
             {/* ── Regular nav items — always shown ── */}
             <>
@@ -853,7 +853,7 @@ function DashboardInner() {
         </main>
 
         {/* ── RIGHT SIDEBAR ── */}
-        <aside className="dash-right" style={{ background: t.sidebarBg, borderLeft: `1px solid ${t.sidebarBorder}` }}>
+        <aside className="dash-right" style={{ background: t.sidebarBg, borderLeft: `0.5px solid ${t.sidebarBorder}` }}>
           {isServices ? (
             noHasOrder ? (
               <OrderForm selSvc={noSelSvc} selTier={noSelTier} platform={noPlatform} qty={noQty} setQty={setNoQty} link={noLink} setLink={setNoLink} dark={dark} t={t} compact />

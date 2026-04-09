@@ -325,12 +325,12 @@ function AdminDashboardInner() {
     const skBone = `skel-bone ${dark ? "skel-dark" : "skel-light"}`;
     return (
       <div className="dash-root" style={{ background: t.bg }}>
-        <nav className="dash-nav" style={{ background: t.sidebarBg, borderBottom: `1px solid ${t.sidebarBorder}` }}>
-          <div className="dash-nav-left"><div className="dash-logo-static"><div className="dash-logo-box"><svg width="11" height="11" viewBox="0 0 20 20" fill="none"><path d="M4,16 L4,4 L16,16 L16,4" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/></svg></div><span className="dash-logo-text" style={{ color: t.text }}>NITRO</span></div></div>
+        <nav className="dash-nav" style={{ background: t.sidebarBg, borderBottom: `0.5px solid ${t.sidebarBorder}` }}>
+          <div className="dash-nav-left"><div className="dash-logo-static"><div className="dash-logo-box"><svg width="11" height="11" viewBox="0 0 20 20" fill="none"><path d="M4,16 L4,4 L16,16 L16,4" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg></div><span className="dash-logo-text" style={{ color: t.text }}>NITRO</span></div></div>
           <div className="dash-nav-right"><div className={skBone} style={{ width: 30, height: 30, borderRadius: 10 }} /></div>
         </nav>
         <div className="dash-body">
-          <aside className="dash-left" style={{ background: t.sidebarBg, borderRight: `1px solid ${t.sidebarBorder}` }}>
+          <aside className="dash-left" style={{ background: t.sidebarBg, borderRight: `0.5px solid ${t.sidebarBorder}` }}>
             {[1,2,3,4,5,6,7,8,9].map(i => <div key={i} className={skBone} style={{ height: 36, borderRadius: 12, margin: "0 0 4px" }} />)}
           </aside>
           <main className="dash-main" style={{ background: t.bg }}>
@@ -383,7 +383,7 @@ function AdminDashboardInner() {
     <div className="dash-root" style={{ background: t.bg }}>
 
       {/* ═══ TOP NAV ═══ */}
-      <nav className="dash-nav" style={{ background: t.sidebarBg, borderBottom: `1px solid ${t.sidebarBorder}` }}>
+      <nav className="dash-nav" style={{ background: t.sidebarBg, borderBottom: `0.5px solid ${t.sidebarBorder}` }}>
         <div className="dash-nav-left">
           <button className="dash-menu-btn" onClick={() => setLeftOpen(!leftOpen)}>
             <div className="dash-hamburger-bars" style={{ opacity: leftOpen ? 0 : 1, position: leftOpen ? "absolute" : "relative" }}>
@@ -392,11 +392,11 @@ function AdminDashboardInner() {
               <div style={{ height: 2, borderRadius: 1, background: t.accent, width: 16 }} />
             </div>
             {leftOpen && <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={t.accent} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>}
-            <div className="dash-logo-box"><svg width="11" height="11" viewBox="0 0 20 20" fill="none"><path d="M4,16 L4,4 L16,16 L16,4" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
+            <div className="dash-logo-box"><svg width="11" height="11" viewBox="0 0 20 20" fill="none"><path d="M4,16 L4,4 L16,16 L16,4" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
             <span className="dash-logo-text" style={{ color: t.text }}>NITRO</span>
           </button>
           <div className="dash-logo-static">
-            <div className="dash-logo-box"><svg width="11" height="11" viewBox="0 0 20 20" fill="none"><path d="M4,16 L4,4 L16,16 L16,4" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
+            <div className="dash-logo-box"><svg width="11" height="11" viewBox="0 0 20 20" fill="none"><path d="M4,16 L4,4 L16,16 L16,4" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
             <span className="dash-logo-text" style={{ color: t.text }}>NITRO</span>
             <span className="m" style={{ fontSize: 11, padding: "2px 6px", borderRadius: 4, background: dark ? "rgba(196,125,142,.15)" : "rgba(196,125,142,.08)", color: t.accent, fontWeight: 700 }}>ADMIN</span>
           </div>
@@ -416,7 +416,7 @@ function AdminDashboardInner() {
 
       {/* ═══ BODY ═══ */}
       <div className="dash-body">
-        <aside className="dash-left admin-sidebar" style={{ background: t.sidebarBg, borderRight: `1px solid ${t.sidebarBorder}`, left: leftOpen ? 0 : undefined }}>
+        <aside className="dash-left admin-sidebar" style={{ background: t.sidebarBg, borderRight: `0.5px solid ${t.sidebarBorder}`, left: leftOpen ? 0 : undefined }}>
           {ADMIN_NAV.map(section => {
             const ap = admin?.pages;
             const visibleItems = ap === "*" ? section.items : section.items.filter(item => ap?.includes(item.id));
@@ -457,7 +457,7 @@ function AdminDashboardInner() {
           </div>
         </main>
 
-        <div className="dash-right" style={{ background: t.sidebarBg, borderLeft: `1px solid ${t.sidebarBorder}` }}>
+        <div className="dash-right" style={{ background: t.sidebarBg, borderLeft: `0.5px solid ${t.sidebarBorder}` }}>
           <AdminRightSidebar data={data} dark={dark} t={t} />
         </div>
       </div>

@@ -349,7 +349,7 @@ input { font-family: inherit; }
 /* Static logo — desktop only */
 .dash-logo-static { display: flex; align-items: center; gap: 10px; }
 
-.dash-logo-box { width: 26px; height: 26px; border-radius: 7px; background: linear-gradient(135deg, #c47d8e, #8b5e6b); display: flex; align-items: center; justify-content: center; }
+.dash-logo-box { width: 26px; height: 26px; border-radius: 7px; background: linear-gradient(135deg, #c47d8e, #8b5e6b); display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(196,125,142,.25); }
 .dash-logo-text { font-size: 15px; font-weight: 700; letter-spacing: 1.5px; }
 .dash-nav-name { font-size: 14px; font-weight: 550; }
 
@@ -377,7 +377,7 @@ input { font-family: inherit; }
 .dash-left { width: 220px; display: flex; flex-direction: column; padding: 16px 12px; flex-shrink: 0; overflow: auto; }
 .dash-sidebar-close { display: none; }
 .dash-nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 12px; font-size: 14px; margin-bottom: 2px; text-align: left; width: 100%; background: none; }
-.dash-sidebar-divider { height: 2px; margin: 8px -12px; }
+.dash-sidebar-divider { height: 0.5px; margin: 8px -12px; }
 .dash-sidebar-balance { padding: 10px 14px; margin-bottom: 4px; }
 .dash-bal-label { font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 4px; }
 .dash-bal-value { font-size: 18px; font-weight: 700; }
