@@ -18,6 +18,10 @@ const M = [
 {n:"Instagram Auto Views (Reels)",p:"Instagram",y:"views",t:[{t:"Standard",a:6228,s:3500,sp:"100-200K/day",r:0}]},
 {n:"Instagram Auto Saves",p:"Instagram",y:"engagement",t:[{t:"Standard",a:6231,s:3500,sp:"100-500/day",r:0}]},
 {n:"Instagram Auto Reach + Profile Visit",p:"Instagram",y:"engagement",t:[{t:"Standard",a:6230,s:6500,sp:"50-100K/day",r:0}]},
+
+{n:"Instagram Custom Comments",p:"Instagram",y:"comments",t:[{t:"Standard",a:2953,s:85000,sp:"500-2K/day",r:0},{t:"Premium",a:2517,s:180000,sp:"100-500/day",r:0}]},
+{n:"Instagram Random Comments",p:"Instagram",y:"comments",t:[{t:"Budget",a:5709,s:30000,sp:"1-5K/day",r:0},{t:"Standard",a:2951,s:60000,sp:"500-2K/day",r:0}]},
+{n:"Instagram Emoji Comments",p:"Instagram",y:"comments",t:[{t:"Budget",a:5710,s:18000,sp:"1-5K/day",r:0}]},
 // ─── TIKTOK (9) ───
 {n:"TikTok Video Views",p:"TikTok",y:"views",t:[{t:"Budget",a:2026,s:200,sp:"5-50K/day",r:0},{t:"Standard",a:9349,s:1000,sp:"500-1M/day",r:1},{t:"Premium",a:1130,s:2200,sp:"50-500K/day",r:1}]},
 {n:"TikTok Likes",p:"TikTok",y:"likes",t:[{t:"Budget",a:1128,s:3000,sp:"5-50K/day",r:0},{t:"Standard",a:1126,s:4000,sp:"5-50K/day",r:1},{t:"Premium",a:1106,s:5000,sp:"5-50K/day",r:1}]},
@@ -28,6 +32,9 @@ const M = [
 {n:"TikTok Live Stream Likes",p:"TikTok",y:"likes",t:[{t:"Budget",a:8894,s:2000,sp:"Natural",r:0},{t:"Standard",a:8893,s:4500,sp:"Fast",r:0}]},
 {n:"TikTok Likes + Views",p:"TikTok",y:"likes",t:[{t:"Standard",a:8118,s:14000,sp:"5-10K/day",r:1},{t:"Premium",a:8849,s:15000,sp:"10-20K/day",r:1}]},
 {n:"TikTok PK Battle Points",p:"TikTok",y:"engagement",t:[{t:"Standard",a:5159,s:14000,sp:"50-100K/day",r:0}]},
+
+{n:"TikTok Custom Comments",p:"TikTok",y:"comments",t:[{t:"Standard",a:5160,s:90000,sp:"500-2K/day",r:0},{t:"Premium",a:5161,s:200000,sp:"100-500/day",r:0}]},
+{n:"TikTok Random Comments",p:"TikTok",y:"comments",t:[{t:"Budget",a:5162,s:35000,sp:"1-5K/day",r:0}]},
 // ─── YOUTUBE (8) ───
 {n:"YouTube Views",p:"YouTube",y:"views",t:[{t:"Standard",a:1573,s:15000,sp:"100-500/day",r:1}]},
 {n:"YouTube Likes",p:"YouTube",y:"likes",t:[{t:"Budget",a:935,s:3000,sp:"10-100K/day",r:0},{t:"Standard",a:918,s:12000,sp:"5-10K/day",r:1},{t:"Premium",a:6233,s:18000,sp:"10-20K/day",r:1}]},
@@ -49,6 +56,9 @@ const M = [
 {n:"X/Twitter Bookmarks",p:"Twitter/X",y:"engagement",t:[{t:"Standard",a:7484,s:35000,sp:"5-10K/day",r:0},{t:"Premium",a:7483,s:90000,sp:"5-10K/day",r:1}]},
 {n:"X/Twitter Poll Votes",p:"Twitter/X",y:"engagement",t:[{t:"Budget",a:2994,s:12000,sp:"20K/day",r:1},{t:"Standard",a:1606,s:20000,sp:"200K/day",r:1}]},
 {n:"X/Twitter Impressions",p:"Twitter/X",y:"engagement",t:[{t:"Standard",a:4033,s:7000,sp:"5-10K/day",r:0}]},
+
+{n:"YouTube Custom Comments",p:"YouTube",y:"comments",t:[{t:"Standard",a:911,s:120000,sp:"100-500/day",r:0},{t:"Premium",a:2080,s:250000,sp:"50-200/day",r:0}]},
+{n:"YouTube Random Comments",p:"YouTube",y:"comments",t:[{t:"Budget",a:913,s:50000,sp:"500-2K/day",r:0}]},
 // ─── FACEBOOK (11) ───
 {n:"Facebook Video Views",p:"Facebook",y:"views",t:[{t:"Budget",a:680,s:3000,sp:"20-30K/day",r:1},{t:"Standard",a:7654,s:4500,sp:"5-15K/day",r:1},{t:"Premium",a:6336,s:6000,sp:"50-100K/day",r:1}]},
 {n:"Facebook Reel Views",p:"Facebook",y:"views",t:[{t:"Standard",a:6337,s:4500,sp:"20-30K/day",r:1},{t:"Premium",a:6339,s:6000,sp:"50-100K/day",r:1}]},
@@ -61,6 +71,9 @@ const M = [
 {n:"Facebook Post Reactions (Haha 😂)",p:"Facebook",y:"engagement",t:[{t:"Standard",a:5989,s:14000,sp:"50-200/day",r:0}]},
 {n:"Facebook Live Stream Views",p:"Facebook",y:"views",t:[{t:"Budget",a:618,s:12000,sp:"15 min",r:0},{t:"Standard",a:619,s:25000,sp:"30 min",r:0}]},
 {n:"Facebook Comment Likes",p:"Facebook",y:"likes",t:[{t:"Budget",a:595,s:35000,sp:"1-5K/day",r:0},{t:"Standard",a:587,s:38000,sp:"1-5K/day",r:1}]},
+
+{n:"Facebook Custom Comments",p:"Facebook",y:"comments",t:[{t:"Standard",a:583,s:80000,sp:"500-2K/day",r:0}]},
+{n:"Facebook Random Comments",p:"Facebook",y:"comments",t:[{t:"Budget",a:584,s:30000,sp:"1-5K/day",r:0}]},
 // ─── TELEGRAM (8) ───
 {n:"Telegram Post Views",p:"Telegram",y:"views",t:[{t:"Budget",a:4880,s:800,sp:"100-200K/day",r:0},{t:"Standard",a:2949,s:1500,sp:"100-200K/day",r:0}]},
 {n:"Telegram Post Views — Future Posts",p:"Telegram",y:"views",t:[{t:"Standard",a:8500,s:1000,sp:"100-200K/day",r:0}]},
