@@ -1,16 +1,25 @@
 'use client';
 import { useState, useEffect, useMemo, useRef } from "react";
+import dynamic from "next/dynamic";
 import { ThemeProvider, useTheme } from "./shared-nav";
 import NewOrderPage, { PLATFORMS, PLATFORM_GROUPS, OrderForm, ServicesSidebar } from "./new-order";
-import OrdersPage, { OrdersSidebar } from "./orders-page";
-import ReferralsPage, { ReferralsSidebar } from "./referrals-page";
-import SettingsPage, { SettingsSidebar } from "./settings-page";
-import SupportPage, { SupportSidebar } from "./support-page";
-import AddFundsPage, { AddFundsSidebar } from "./addfunds-page";
-import HowToPage, { HowToSidebar } from "./howto-page";
 import { ToastProvider } from "./toast";
 import { ConfirmProvider } from "./confirm-dialog";
 import { fN, fD } from "../lib/format";
+
+/* Dynamic imports — only load when user navigates to that page */
+const OrdersPage = dynamic(() => import("./orders-page").then(m => m.default), { ssr: false });
+const OrdersSidebar = dynamic(() => import("./orders-page").then(m => m.OrdersSidebar), { ssr: false });
+const ReferralsPage = dynamic(() => import("./referrals-page").then(m => m.default), { ssr: false });
+const ReferralsSidebar = dynamic(() => import("./referrals-page").then(m => m.ReferralsSidebar), { ssr: false });
+const SettingsPage = dynamic(() => import("./settings-page").then(m => m.default), { ssr: false });
+const SettingsSidebar = dynamic(() => import("./settings-page").then(m => m.SettingsSidebar), { ssr: false });
+const SupportPage = dynamic(() => import("./support-page").then(m => m.default), { ssr: false });
+const SupportSidebar = dynamic(() => import("./support-page").then(m => m.SupportSidebar), { ssr: false });
+const AddFundsPage = dynamic(() => import("./addfunds-page").then(m => m.default), { ssr: false });
+const AddFundsSidebar = dynamic(() => import("./addfunds-page").then(m => m.AddFundsSidebar), { ssr: false });
+const HowToPage = dynamic(() => import("./howto-page").then(m => m.default), { ssr: false });
+const HowToSidebar = dynamic(() => import("./howto-page").then(m => m.HowToSidebar), { ssr: false });
 
 /* ═══════════════════════════════════════════ */
 /* ═══ SVG ICONS                          ═══ */
