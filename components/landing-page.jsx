@@ -131,7 +131,7 @@ function LandingInner(){
             <span className="nav-brand-text" style={{fontSize:16,fontWeight:700,color:"#fff",letterSpacing:1.5}}>NITRO</span>
           </button>
           <div className="nav-right" style={{display:"flex",alignItems:"center",gap:10}}>
-            <div className="nav-links" style={{display:"flex",gap:4,alignItems:"center",marginRight:6}}>
+            <div className="nav-links" style={{gap:4,alignItems:"center",marginRight:6}}>
               {["Services","Pricing","FAQ"].map(l=><button key={l} onClick={()=>document.getElementById(l.toLowerCase())?.scrollIntoView({behavior:"smooth"})} className="nav-link-pill" style={{padding:"6px 16px",borderRadius:8,background:"none",fontSize:13,color:dark?"rgba(255,255,255,.5)":"rgba(255,255,255,.6)",fontWeight:500,border:"none",cursor:"pointer"}}>{l}</button>)}
             </div>
             <button onClick={toggleTheme} aria-label={dark?"Switch to light":"Switch to dark"} className="theme-toggle" style={{width:44,height:24,borderRadius:12,background:dark?"rgba(99,102,241,.2)":"rgba(255,255,255,.15)",position:"relative",transition:"background .8s ease",flexShrink:0,border:`0.5px solid ${dark?"rgba(99,102,241,.15)":"rgba(255,255,255,.2)"}`}}>
