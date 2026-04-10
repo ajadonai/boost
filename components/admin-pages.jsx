@@ -310,13 +310,16 @@ export function AdminAlertsPage({ dark, t }) {
     } catch {}
   };
 
+  const typeColors = { info: t.accent, warning: dark ? "#fbbf24" : "#d97706", success: dark ? "#6ee7b7" : "#059669", urgent: dark ? "#fca5a5" : "#dc2626" };
+  const typeIcons = { info: "📢", warning: "⚠️", success: "✅", urgent: "🚨" };
+
   return (
     <>
       <div className="adm-header">
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
           <div>
             <div className="adm-title" style={{ color: t.text }}>Announcements</div>
-            <div className="adm-subtitle" style={{ color: t.textMuted }}>User-facing announcements and banners</div>
+            <div className="adm-subtitle" style={{ color: t.textMuted }}>Site-wide banners shown to visitors and users</div>
           </div>
           <button onClick={() => setShowNew(!showNew)} className="adm-btn-primary">{showNew ? "Cancel" : "+ New Alert"}</button>
         </div>
@@ -324,53 +327,92 @@ export function AdminAlertsPage({ dark, t }) {
       </div>
 
       {showNew && (
-        <div className="adm-card" style={{ background: dark ? "rgba(255,255,255,.03)" : "rgba(255,255,255,.85)", border: `0.5px solid ${dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)"}`, padding: 18, marginTop: 16, marginBottom: 16, boxShadow: dark ? "0 4px 20px rgba(0,0,0,.25)" : "0 4px 20px rgba(0,0,0,.04)", borderRadius: 14 }}>
-          <div style={{ marginBottom: 12 }}>
-            <label style={{ fontSize: 14, color: t.textMuted, display: "block", marginBottom: 4 }}>Message</label>
-            <textarea value={newMsg} onChange={e => setNewMsg(e.target.value)} placeholder="Alert message..." rows={2} style={{ width: "100%", padding: "10px 14px", borderRadius: 8, borderWidth: 1, borderStyle: "solid", borderColor: t.cardBorder, background: dark ? "#0d1020" : "#fff", color: t.text, fontSize: 15, outline: "none", resize: "vertical", fontFamily: "inherit", boxSizing: "border-box" }} />
-          </div>
-          <div style={{ display: "flex", gap: 12, marginBottom: 12, flexWrap: "wrap" }}>
-            <div>
-              <label style={{ fontSize: 14, color: t.textMuted, display: "block", marginBottom: 4 }}>Type</label>
-              <div style={{ display: "flex", gap: 4 }}>
-                {["info", "warning"].map(ty => (
-                  <button key={ty} onClick={() => setNewType(ty)} className="adm-filter-pill" style={{ borderWidth: 1, borderStyle: "solid", borderColor: newType === ty ? t.accent : t.cardBorder, background: newType === ty ? (dark ? "#2a1a22" : "#fdf2f4") : "transparent", color: newType === ty ? t.accent : t.textMuted }}>{ty}</button>
-                ))}
+        <div className="set-section" style={{ marginTop: 16 }}>
+          <div className="set-card" style={{ background: dark ? "rgba(255,255,255,.03)" : "rgba(255,255,255,.85)", border: `0.5px solid ${t.cardBorder}` }}>
+            <div className="set-card-title" style={{ color: t.textMuted }}>New announcement</div>
+            <div className="set-card-divider" style={{ background: t.cardBorder }} />
+
+            <div style={{ marginBottom: 14 }}>
+              <label style={{ fontSize: 13, color: t.textMuted, display: "block", marginBottom: 4 }}>Message</label>
+              <textarea value={newMsg} onChange={e => setNewMsg(e.target.value)} placeholder="What do you want users to know?" rows={2} style={{ width: "100%", padding: "10px 14px", borderRadius: 8, borderWidth: 1, borderStyle: "solid", borderColor: t.cardBorder, background: dark ? "#0d1020" : "#fff", color: t.text, fontSize: 15, outline: "none", resize: "vertical", fontFamily: "inherit", boxSizing: "border-box" }} />
+            </div>
+
+            <div style={{ display: "flex", gap: 20, marginBottom: 16, flexWrap: "wrap" }}>
+              <div>
+                <label style={{ fontSize: 13, color: t.textMuted, display: "block", marginBottom: 6 }}>Type</label>
+                <div style={{ display: "flex", gap: 4 }}>
+                  {[
+                    ["info", "Info", "General announcements"],
+                    ["success", "Success", "Promos, milestones"],
+                    ["warning", "Warning", "Maintenance, delays"],
+                    ["urgent", "Urgent", "Disruptions, critical"],
+                  ].map(([ty, label]) => (
+                    <button key={ty} onClick={() => setNewType(ty)} style={{
+                      padding: "7px 14px", borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: "pointer",
+                      borderWidth: 1, borderStyle: "solid", fontFamily: "inherit",
+                      borderColor: newType === ty ? typeColors[ty] : t.cardBorder,
+                      background: newType === ty ? (dark ? "rgba(255,255,255,.04)" : "rgba(0,0,0,.02)") : "transparent",
+                      color: newType === ty ? typeColors[ty] : t.textMuted,
+                    }}>{label}</button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <label style={{ fontSize: 13, color: t.textMuted, display: "block", marginBottom: 6 }}>Show on</label>
+                <div style={{ display: "flex", gap: 4 }}>
+                  {[
+                    ["both", "Both"],
+                    ["dashboard", "Dashboard"],
+                    ["landing", "Landing page"],
+                  ].map(([tg, label]) => (
+                    <button key={tg} onClick={() => setNewTarget(tg)} style={{
+                      padding: "7px 14px", borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: "pointer",
+                      borderWidth: 1, borderStyle: "solid", fontFamily: "inherit",
+                      borderColor: newTarget === tg ? t.accent : t.cardBorder,
+                      background: newTarget === tg ? (dark ? "#2a1a22" : "#fdf2f4") : "transparent",
+                      color: newTarget === tg ? t.accent : t.textMuted,
+                    }}>{label}</button>
+                  ))}
+                </div>
               </div>
             </div>
-            <div>
-              <label style={{ fontSize: 14, color: t.textMuted, display: "block", marginBottom: 4 }}>Show on</label>
-              <div style={{ display: "flex", gap: 4 }}>
-                {["both", "dashboard", "login"].map(tg => (
-                  <button key={tg} onClick={() => setNewTarget(tg)} className="adm-filter-pill" style={{ borderWidth: 1, borderStyle: "solid", borderColor: newTarget === tg ? t.accent : t.cardBorder, background: newTarget === tg ? (dark ? "#2a1a22" : "#fdf2f4") : "transparent", color: newTarget === tg ? t.accent : t.textMuted }}>{tg}</button>
-                ))}
-              </div>
+
+            <div style={{ fontSize: 12, color: t.textMuted, marginBottom: 14, lineHeight: 1.5 }}>
+              <strong style={{ color: t.textSoft }}>Dismiss behavior:</strong> Info & success alerts are permanently dismissed per user. Warning & urgent alerts come back each new session.
             </div>
+
+            <button onClick={createAlert} className="adm-btn-primary" style={{ opacity: newMsg.trim() ? 1 : .4 }}>Create Alert</button>
           </div>
-          <button onClick={createAlert} className="adm-btn-primary" style={{ opacity: newMsg.trim() ? 1 : .4 }}>Create Alert</button>
         </div>
       )}
 
-      <div className="adm-card" style={{ background: dark ? "rgba(255,255,255,.03)" : "rgba(255,255,255,.85)", border: `0.5px solid ${dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)"}`, marginTop: showNew ? 0 : 16 }}>
-        {loading ? (
-          <div className="adm-empty" style={{ color: t.textMuted }}>Loading alerts...</div>
-        ) : alerts.length > 0 ? alerts.map((a, i) => (
-          <div key={`${a.id}-${i}`} className="adm-list-row" style={{ borderBottom: i < alerts.length - 1 ? `1px solid ${t.cardBorder}` : "none" }}>
-            <div style={{ flex: 1 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <span style={{ fontSize: 15 }}>{a.type === "warning" ? "⚠️" : "📢"}</span>
-                <span style={{ fontSize: 15, fontWeight: 500, color: t.text, opacity: a.active ? 1 : .5 }}>{a.message}</span>
+      <div className="set-section" style={{ marginTop: showNew ? 0 : 16 }}>
+        <div className="set-card" style={{ background: dark ? "rgba(255,255,255,.03)" : "rgba(255,255,255,.85)", border: `0.5px solid ${t.cardBorder}`, padding: 0 }}>
+          {loading ? (
+            <div style={{ padding: 20, fontSize: 14, color: t.textMuted, textAlign: "center" }}>Loading alerts...</div>
+          ) : alerts.length > 0 ? alerts.map((a, i) => (
+            <div key={`${a.id}-${i}`} style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 16px", borderBottom: i < alerts.length - 1 ? `1px solid ${t.cardBorder}` : "none" }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <span style={{ fontSize: 14, flexShrink: 0 }}>{typeIcons[a.type] || "📢"}</span>
+                  <span style={{ fontSize: 14, fontWeight: 500, color: t.text, opacity: a.active ? 1 : .45, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{a.message}</span>
+                </div>
+                <div style={{ fontSize: 12, color: t.textMuted, marginTop: 3, paddingLeft: 26 }}>
+                  <span style={{ color: typeColors[a.type] || t.textMuted, fontWeight: 600 }}>{a.type}</span>
+                  {" · "}{a.target === "both" ? "everywhere" : a.target}
+                  {" · "}{a.active ? "Active" : "Paused"}
+                  {a.created ? ` · ${fD(a.created)}` : ""}
+                </div>
               </div>
-              <div style={{ fontSize: 13, color: t.textMuted, marginTop: 3, paddingLeft: 26 }}>Target: {a.target} · {a.active ? "Active" : "Inactive"} · {a.created ? fD(a.created) : ""}</div>
+              <div style={{ display: "flex", gap: 4, flexShrink: 0 }}>
+                <button onClick={() => toggleAlert(a.id, a.active)} className="adm-btn-sm" style={{ borderColor: t.cardBorder, color: a.active ? (dark ? "#fbbf24" : "#d97706") : (dark ? "#6ee7b7" : "#059669") }}>{a.active ? "Pause" : "Activate"}</button>
+                <button onClick={async () => { const ok = await confirm({ title: "Delete Announcement", message: `Delete this alert? "${a.message?.slice(0, 50)}..."`, confirmLabel: "Delete", danger: true }); if (ok) deleteAlert(a.id); }} className="adm-btn-sm" style={{ borderColor: dark ? "rgba(252,165,165,.2)" : "rgba(220,38,38,.15)", color: dark ? "#fca5a5" : "#dc2626" }}>Delete</button>
+              </div>
             </div>
-            <div style={{ display: "flex", gap: 4 }}>
-              <button onClick={() => toggleAlert(a.id, a.active)} className="adm-btn-sm" style={{ borderColor: t.cardBorder, color: a.active ? t.amber : t.green }}>{a.active ? "Pause" : "Activate"}</button>
-              <button onClick={async () => { const ok = await confirm({ title: "Delete Announcement", message: `Delete this alert? "${a.message?.slice(0, 50)}..."`, confirmLabel: "Delete", danger: true }); if (ok) deleteAlert(a.id); }} className="adm-btn-sm" style={{ borderColor: dark ? "rgba(252,165,165,.2)" : "rgba(220,38,38,.15)", color: t.red }}>Delete</button>
-            </div>
-          </div>
-        )) : (
-          <div className="adm-empty" style={{ color: t.textMuted }}>No alerts</div>
-        )}
+          )) : (
+            <div style={{ padding: 20, fontSize: 14, color: t.textMuted, textAlign: "center" }}>No announcements yet</div>
+          )}
+        </div>
       </div>
     </>
   );

@@ -23,12 +23,12 @@ export async function GET() {
         where: {
           active: true,
           deletedAt: null,
-          target: { in: ['both', 'login'] },
+          target: { in: ['both', 'landing'] },
           OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
         },
         orderBy: { createdAt: 'desc' },
         take: 3,
-      })).map(a => ({ message: a.message, type: a.type }));
+      })).map(a => ({ id: a.id, message: a.message, type: a.type }));
     } catch {}
 
     return ok({
