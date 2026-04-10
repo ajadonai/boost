@@ -31,6 +31,9 @@ export async function POST(req) {
     if (user.status === 'Suspended') {
       return Response.json({ error: 'Account suspended', banned: true }, { status: 403 });
     }
+    if (user.status === 'Deleted') {
+      return error('Invalid email or password', 401);
+    }
 
     const valid = await bcrypt.compare(password, user.password);
     if (!valid) {
