@@ -47,6 +47,26 @@ function NumInput({ value, onChange, min = 0, max = 999999, fallback, width = 64
   />;
 }
 
+function Tip({ children, green, dark }) {
+  return (
+    <div style={{ padding: "10px 14px", borderRadius: 8, background: green ? (dark ? "rgba(74,222,128,.05)" : "rgba(22,163,74,.03)") : (dark ? "rgba(196,125,142,.05)" : "rgba(196,125,142,.03)"), borderLeft: `3px solid ${green ? (dark ? "#4ade80" : "#16a34a") : "#c47d8e"}`, fontSize: 13, color: dark ? "#888" : "#666", lineHeight: 1.6, marginBottom: 16 }}>
+      {children}
+    </div>
+  );
+}
+
+function Row({ label, hint, children, dark }) {
+  return (
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 0", borderBottom: `1px solid ${dark ? "rgba(255,255,255,.04)" : "rgba(0,0,0,.04)"}` }}>
+      <div style={{ flex: 1 }}>
+        <div style={{ fontSize: 14, fontWeight: 500, color: dark ? "#e5e5e5" : "#1a1a1a" }}>{label}</div>
+        {hint && <div style={{ fontSize: 12, color: dark ? "#555" : "#999", marginTop: 2 }}>{hint}</div>}
+      </div>
+      <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>{children}</div>
+    </div>
+  );
+}
+
 export default function AdminPricingPage({ dark, t }) {
   const confirm = useConfirm();
   const [brackets, setBrackets] = useState(DEF_BRACKETS);
@@ -100,24 +120,6 @@ export default function AdminPricingPage({ dark, t }) {
   const cardS = { background: dark ? "rgba(255,255,255,.03)" : "rgba(255,255,255,.85)", border: `0.5px solid ${dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)"}` };
   const divS = { background: dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)" };
 
-  // Tip component
-  const Tip = ({ children, green }) => (
-    <div style={{ padding: "10px 14px", borderRadius: 8, background: green ? (dark ? "rgba(74,222,128,.05)" : "rgba(22,163,74,.03)") : (dark ? "rgba(196,125,142,.05)" : "rgba(196,125,142,.03)"), borderLeft: `3px solid ${green ? (dark ? "#4ade80" : "#16a34a") : "#c47d8e"}`, fontSize: 13, color: t.textMuted, lineHeight: 1.6, marginBottom: 16 }}>
-      {children}
-    </div>
-  );
-
-  // Field row
-  const Row = ({ label, hint, children }) => (
-    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 0", borderBottom: `1px solid ${dark ? "rgba(255,255,255,.04)" : "rgba(0,0,0,.04)"}` }}>
-      <div style={{ flex: 1 }}>
-        <div style={{ fontSize: 14, fontWeight: 500, color: t.text }}>{label}</div>
-        {hint && <div style={{ fontSize: 12, color: t.textSoft, marginTop: 2 }}>{hint}</div>}
-      </div>
-      <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>{children}</div>
-    </div>
-  );
-
   return (
     <div style={{ padding: "0 0 40px" }}>
       {/* Header */}
@@ -134,7 +136,7 @@ export default function AdminPricingPage({ dark, t }) {
         <div className="set-card-title" style={{ color: t.textMuted }}>Price brackets</div>
         <div className="set-card-desc" style={{ color: t.textMuted }}>Services are assigned to a bracket based on MTP cost. Cost × multiplier = sell price.</div>
         <div className="set-card-divider" style={divS} />
-        <Tip>Cheap services (₦0–200) get 2.5–3× markup because customers don't notice small price differences. Expensive services (₦5K+) get 1.35–1.5× to stay competitive at higher price points.</Tip>
+        <Tip dark={dark}>Cheap services (₦0–200) get 2.5–3× markup because customers don't notice small price differences. Expensive services (₦5K+) get 1.35–1.5× to stay competitive at higher price points.</Tip>
 
         {brackets.map((b, i) => {
           const exCost = b.min === 0 ? 10 : b.min;
@@ -157,13 +159,13 @@ export default function AdminPricingPage({ dark, t }) {
         <div className="set-card-title" style={{ color: t.textMuted }}>Margin floor</div>
         <div className="set-card-desc" style={{ color: t.textMuted }}>Safety net — ensures cheap services never sell at razor-thin margins.</div>
         <div className="set-card-divider" style={divS} />
-        <Tip>If a bracket calculates a margin below {floorPct}%, the sell price is raised automatically. Only applies to services costing less than ₦{floorCeiling.toLocaleString()} — expensive services use the bracket multiplier alone.</Tip>
+        <Tip dark={dark}>If a bracket calculates a margin below {floorPct}%, the sell price is raised automatically. Only applies to services costing less than ₦{floorCeiling.toLocaleString()} — expensive services use the bracket multiplier alone.</Tip>
 
-        <Row label="Minimum margin" hint={`You keep at least ${floorPct}% of every sale`}>
+        <Row dark={dark} label="Minimum margin" hint={`You keep at least ${floorPct}% of every sale`}>
           <NumInput dark={dark} value={floorPct} onChange={setFloorPct} min={0} max={90} fallback={50} width={64} />
           <span style={{ fontSize: 14, color: t.textMuted }}>%</span>
         </Row>
-        <Row label="Cost ceiling" hint="Floor only applies below this cost per 1K">
+        <Row dark={dark} label="Cost ceiling" hint="Floor only applies below this cost per 1K">
           <span style={{ fontSize: 14, color: t.textMuted }}>₦</span>
           <NumInput dark={dark} value={floorCeiling} onChange={setFloorCeiling} min={0} max={999999} fallback={5000} width={80} />
         </Row>
@@ -175,8 +177,8 @@ export default function AdminPricingPage({ dark, t }) {
           <div className="set-card-title" style={{ color: t.textMuted }}>🇳🇬 Nigerian bonus</div>
           <div className="set-card-desc" style={{ color: t.textMuted }}>Extra markup on Nigerian-targeted services.</div>
           <div className="set-card-divider" style={divS} />
-          <Tip green>Nigerian engagement is premium — local followers look authentic and perform better with geo-targeted algorithms.</Tip>
-          <Row label="Bonus markup" hint="Added on top of the bracket sell price">
+          <Tip dark={dark} green>Nigerian engagement is premium — local followers look authentic and perform better with geo-targeted algorithms.</Tip>
+          <Row dark={dark} label="Bonus markup" hint="Added on top of the bracket sell price">
             <NumInput dark={dark} value={ngBonus} onChange={setNgBonus} min={0} max={200} fallback={25} width={64} />
             <span style={{ fontSize: 14, color: t.textMuted }}>%</span>
           </Row>
@@ -186,7 +188,7 @@ export default function AdminPricingPage({ dark, t }) {
           <div className="set-card-title" style={{ color: t.textMuted }}>Exchange rate</div>
           <div className="set-card-desc" style={{ color: t.textMuted }}>MTP costs are in USD — this converts to Naira.</div>
           <div className="set-card-divider" style={divS} />
-          <Row label="USD → NGN" hint={`$1 = ₦${usdRate.toLocaleString()}`}>
+          <Row dark={dark} label="USD → NGN" hint={`$1 = ₦${usdRate.toLocaleString()}`}>
             <span style={{ fontSize: 14, color: t.textMuted }}>₦</span>
             <NumInput dark={dark} value={usdRate} onChange={setUsdRate} min={1} max={999999} fallback={1600} width={80} />
           </Row>
@@ -199,7 +201,7 @@ export default function AdminPricingPage({ dark, t }) {
         <div className="set-card-desc" style={{ color: t.textMuted }}>Test any MTP cost to see the calculated sell price, profit, and margin.</div>
         <div className="set-card-divider" style={divS} />
 
-        <Row label="MTP cost per 1K" hint="Enter any value to preview">
+        <Row dark={dark} label="MTP cost per 1K" hint="Enter any value to preview">
           <span style={{ fontSize: 14, color: t.textMuted }}>₦</span>
           <NumInput dark={dark} value={simCost} onChange={setSimCost} min={0} max={999999} fallback={500} width={90} />
         </Row>
