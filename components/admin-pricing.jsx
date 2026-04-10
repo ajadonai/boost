@@ -13,9 +13,11 @@ const DEF_BRACKETS = [
 const COLORS = ["#34d399","#6ee7b7","#60a5fa","#a78bfa","#e0a458","#c47d8e"];
 
 function calcSell(cost, brackets, floorPct, floorCeiling) {
+  if (!brackets || !brackets.length) return 0;
   const b = brackets.find(b => cost >= b.min && cost < (b.max)) || brackets[brackets.length - 1];
   let sell = Math.round(cost * b.multiplier);
-  if (cost < floorCeiling) { const min = Math.round(cost / (1 - floorPct / 100)); if (sell < min) sell = min; }
+  const clamped = Math.min(floorPct, 99);
+  if (cost < floorCeiling && clamped > 0) { const min = Math.round(cost / (1 - clamped / 100)); if (sell < min) sell = min; }
   return sell;
 }
 
