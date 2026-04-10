@@ -15,6 +15,7 @@ export default function AdminUsersPage({ dark, t }) {
   const [txUser, setTxUser] = useState(null); // user whose transactions are shown
   const [txList, setTxList] = useState([]);
   const [txLoading, setTxLoading] = useState(false);
+  const [txPage, setTxPage] = useState(1);
   const [page, setPage] = useState(1);
   const perPage = 15;
 
@@ -56,8 +57,8 @@ export default function AdminUsersPage({ dark, t }) {
   };
 
   const viewTransactions = async (user) => {
-    if (txUser?.id === user.id) { setTxUser(null); setTxList([]); return; }
-    setTxUser(user); setTxLoading(true); setTxList([]);
+    if (txUser?.id === user.id) { setTxUser(null); setTxList([]); setTxPage(1); return; }
+    setTxUser(user); setTxLoading(true); setTxList([]); setTxPage(1);
     try {
       const r = await fetch("/api/admin/users", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "transactions", userId: user.id }) });
       const d = await r.json();
@@ -158,18 +159,35 @@ export default function AdminUsersPage({ dark, t }) {
                 </div>
                 {txLoading ? (
                   <div style={{ padding: 16, fontSize: 13, color: t.textMuted }}>Loading...</div>
-                ) : txList.length > 0 ? txList.slice(0, 50).map((tx, j) => (
-                  <div key={tx.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 16px", borderBottom: j < Math.min(txList.length, 50) - 1 ? `1px solid ${dark ? "rgba(255,255,255,.03)" : "rgba(0,0,0,.03)"}` : "none", fontSize: 13, flexWrap: "wrap" }}>
-                    <span style={{ width: 70, color: t.textSoft, fontSize: 12, flexShrink: 0 }}>{new Date(tx.createdAt).toLocaleDateString("en-NG", { month: "short", day: "numeric" })}</span>
-                    <span className="m" style={{ width: 60, fontSize: 11, padding: "1px 6px", borderRadius: 4, textAlign: "center", flexShrink: 0, background: tx.type === "deposit" ? (dark ? "rgba(110,231,183,.08)" : "rgba(5,150,105,.04)") : tx.type === "order" ? (dark ? "rgba(196,125,142,.08)" : "rgba(196,125,142,.04)") : tx.type === "referral" || tx.type === "bonus" ? (dark ? "rgba(96,165,250,.08)" : "rgba(96,165,250,.04)") : (dark ? "rgba(255,255,255,.04)" : "rgba(0,0,0,.02)"), color: tx.type === "deposit" ? t.green : tx.type === "order" ? t.accent : tx.type === "referral" || tx.type === "bonus" ? "#60a5fa" : t.textMuted }}>{tx.type}</span>
-                    <span className="m" style={{ width: 80, textAlign: "right", fontWeight: 600, flexShrink: 0, color: tx.type === "deposit" || tx.type === "referral" || tx.type === "bonus" || tx.type === "refund" ? t.green : t.text }}>{tx.type === "order" ? "-" : "+"}{fN(tx.amount / 100)}</span>
-                    <span style={{ fontSize: 12, color: tx.status === "Completed" ? t.textMuted : tx.status === "Pending" ? "#e0a458" : t.red }}>{tx.status}</span>
-                    <span style={{ flex: 1, fontSize: 12, color: t.textSoft, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{tx.note || tx.reference || ""}</span>
-                  </div>
-                )) : (
+                ) : txList.length > 0 ? (() => {
+                  const txPerPg = 15;
+                  const txTotalPages = Math.ceil(txList.length / txPerPg);
+                  const txPaged = txList.slice((txPage - 1) * txPerPg, txPage * txPerPg);
+                  return (
+                    <>
+                      {txPaged.map((tx, j) => (
+                        <div key={tx.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 16px", borderBottom: j < txPaged.length - 1 ? `1px solid ${dark ? "rgba(255,255,255,.03)" : "rgba(0,0,0,.03)"}` : "none", fontSize: 13, flexWrap: "wrap" }}>
+                          <span style={{ width: 70, color: t.textSoft, fontSize: 12, flexShrink: 0 }}>{new Date(tx.createdAt).toLocaleDateString("en-NG", { month: "short", day: "numeric" })}</span>
+                          <span className="m" style={{ width: 60, fontSize: 11, padding: "1px 6px", borderRadius: 4, textAlign: "center", flexShrink: 0, background: tx.type === "deposit" ? (dark ? "rgba(110,231,183,.08)" : "rgba(5,150,105,.04)") : tx.type === "order" ? (dark ? "rgba(196,125,142,.08)" : "rgba(196,125,142,.04)") : tx.type === "referral" || tx.type === "bonus" ? (dark ? "rgba(96,165,250,.08)" : "rgba(96,165,250,.04)") : (dark ? "rgba(255,255,255,.04)" : "rgba(0,0,0,.02)"), color: tx.type === "deposit" ? t.green : tx.type === "order" ? t.accent : tx.type === "referral" || tx.type === "bonus" ? "#60a5fa" : t.textMuted }}>{tx.type}</span>
+                          <span className="m" style={{ width: 80, textAlign: "right", fontWeight: 600, flexShrink: 0, color: tx.type === "deposit" || tx.type === "referral" || tx.type === "bonus" || tx.type === "refund" ? t.green : t.text }}>{tx.type === "order" ? "-" : "+"}{fN(tx.amount / 100)}</span>
+                          <span style={{ fontSize: 12, color: tx.status === "Completed" ? t.textMuted : tx.status === "Pending" ? "#e0a458" : t.red }}>{tx.status}</span>
+                          <span style={{ flex: 1, fontSize: 12, color: t.textSoft, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{tx.note || tx.reference || ""}</span>
+                        </div>
+                      ))}
+                      {txTotalPages > 1 && (
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 16px", borderTop: `1px solid ${dark ? "rgba(255,255,255,.04)" : "rgba(0,0,0,.04)"}` }}>
+                          <span style={{ fontSize: 12, color: t.textMuted }}>{txList.length} transactions · Page {txPage}/{txTotalPages}</span>
+                          <div style={{ display: "flex", gap: 4 }}>
+                            <button onClick={() => setTxPage(p => Math.max(1, p - 1))} disabled={txPage === 1} className="adm-btn-sm" style={{ borderColor: t.cardBorder, color: t.textSoft, fontSize: 12, padding: "4px 10px", opacity: txPage === 1 ? .4 : 1 }}>←</button>
+                            <button onClick={() => setTxPage(p => Math.min(txTotalPages, p + 1))} disabled={txPage >= txTotalPages} className="adm-btn-sm" style={{ borderColor: t.cardBorder, color: t.textSoft, fontSize: 12, padding: "4px 10px", opacity: txPage >= txTotalPages ? .4 : 1 }}>→</button>
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  );
+                })() : (
                   <div style={{ padding: 16, fontSize: 13, color: t.textMuted }}>No transactions</div>
                 )}
-                {txList.length > 50 && <div style={{ padding: "8px 16px", fontSize: 12, color: t.textMuted }}>Showing first 50 of {txList.length}. Download CSV for full history.</div>}
               </div>
             )}
           </div>
