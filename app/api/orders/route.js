@@ -182,6 +182,9 @@ export async function POST(req) {
       }
       tierName = `${tier.group.name} (${tier.tier})`;
       const qty = Number(quantity);
+      if (!qty || isNaN(qty) || qty <= 0 || !Number.isFinite(qty)) {
+        return Response.json({ error: 'Invalid quantity' }, { status: 400 });
+      }
       if (qty < service.min || qty > service.max) {
         return Response.json({ error: `Quantity must be between ${service.min.toLocaleString()} and ${service.max.toLocaleString()}` }, { status: 400 });
       }
@@ -194,12 +197,20 @@ export async function POST(req) {
         return Response.json({ error: 'Service not available' }, { status: 400 });
       }
       const qty = Number(quantity);
+      if (!qty || isNaN(qty) || qty <= 0 || !Number.isFinite(qty)) {
+        return Response.json({ error: 'Invalid quantity' }, { status: 400 });
+      }
       if (qty < service.min || qty > service.max) {
         return Response.json({ error: `Quantity must be between ${service.min.toLocaleString()} and ${service.max.toLocaleString()}` }, { status: 400 });
       }
       charge = Math.round((service.sellPer1k / 1000) * qty);
       cost = Math.round((service.costPer1k / 1000) * qty);
       tierName = service.name;
+    }
+
+    // Reject zero/negative charges (misconfigured service)
+    if (!charge || charge <= 0) {
+      return Response.json({ error: 'Service pricing not configured' }, { status: 400 });
     }
 
     const qty = Number(quantity);

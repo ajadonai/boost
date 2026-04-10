@@ -3,9 +3,13 @@ import { log } from "@/lib/logger";
 import crypto from 'crypto';
 import { ok, error } from '@/lib/utils';
 import { sendPasswordResetEmail } from '@/lib/email';
+import { rateLimit, tooManyRequests } from '@/lib/rate-limit';
 
 export async function POST(req) {
   try {
+    const { limited } = rateLimit(req, { maxAttempts: 5, windowMs: 15 * 60 * 1000 });
+    if (limited) return tooManyRequests('Too many requests. Try again in 15 minutes.');
+
     const { email } = await req.json();
     if (!email) return error('Email is required');
 

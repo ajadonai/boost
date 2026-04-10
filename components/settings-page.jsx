@@ -39,6 +39,8 @@ export default function SettingsPage({ user, dark, t, themeMode, setThemeMode, s
   const [apiKey, setApiKey] = useState(null);
   const [apiLoading, setApiLoading] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
+  const [deletePassword, setDeletePassword] = useState("");
+  const [deleteError, setDeleteError] = useState("");
   const [copied, setCopied] = useState(false);
 
   // Change password state
@@ -316,15 +318,30 @@ export default function SettingsPage({ user, dark, t, themeMode, setThemeMode, s
           <div className="set-danger-card" style={{ background: dark ? "rgba(220,38,38,.04)" : "rgba(220,38,38,.02)", border: `0.5px solid ${dark ? "rgba(252,165,165,.08)" : "rgba(220,38,38,.08)"}` }}>
             <div className="set-danger-title" style={{ color: dark ? "#fca5a5" : "#dc2626" }}>Delete account</div>
             <div className="set-danger-desc" style={{ color: t.textMuted }}>Permanently delete your account. Orders and transactions preserved, personal data removed.</div>
-            <button onClick={async () => {
-              const ok = await confirm({ title: "Delete Your Account", message: "This will permanently delete your account. Your orders and transaction history will be kept for records but your personal info will be removed. This cannot be undone.", confirmLabel: "Delete Account", danger: true, requireType: "DELETE" });
-              if (ok) {
-                try {
-                  const res = await fetch("/api/auth/delete-account", { method: "POST" });
-                  if (res.ok) { window.location.replace("/?deleted=1"); }
-                } catch {}
-              }
-            }} className="set-btn-danger" style={{ borderColor: dark ? "rgba(252,165,165,.2)" : "rgba(220,38,38,.18)", color: dark ? "#fca5a5" : "#dc2626" }}>Delete my account</button>
+            {showDelete ? (
+              <div style={{ marginTop: 12 }}>
+                <div style={{ fontSize: 13, color: t.textMuted, marginBottom: 6 }}>Enter your password to confirm</div>
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                  <input type="password" value={deletePassword} onChange={e => setDeletePassword(e.target.value)} placeholder="Your password" style={{ flex: 1, minWidth: 160, padding: "10px 14px", borderRadius: 8, background: dark ? "#0d1020" : "#fff", border: `1px solid ${dark ? "rgba(252,165,165,.15)" : "rgba(220,38,38,.12)"}`, color: t.text, fontSize: 14, outline: "none" }} />
+                  <button onClick={async () => {
+                    if (!deletePassword) return;
+                    const ok = await confirm({ title: "Delete Your Account", message: "This will permanently delete your account. Your orders and transaction history will be kept for records but your personal info will be removed. This cannot be undone.", confirmLabel: "Delete Account", danger: true, requireType: "DELETE" });
+                    if (ok) {
+                      try {
+                        const res = await fetch("/api/auth/delete-account", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password: deletePassword }) });
+                        const data = await res.json();
+                        if (res.ok) { window.location.replace("/?deleted=1"); }
+                        else { setDeleteError(data.error || "Failed to delete account"); }
+                      } catch { setDeleteError("Request failed"); }
+                    }
+                  }} className="set-btn-danger" style={{ borderColor: dark ? "rgba(252,165,165,.2)" : "rgba(220,38,38,.18)", color: dark ? "#fca5a5" : "#dc2626", opacity: deletePassword ? 1 : .4 }}>Delete my account</button>
+                  <button onClick={() => { setShowDelete(false); setDeletePassword(""); setDeleteError(""); }} style={{ padding: "10px 14px", borderRadius: 8, background: "none", border: `1px solid ${t.cardBorder}`, color: t.textMuted, fontSize: 14, cursor: "pointer" }}>Cancel</button>
+                </div>
+                {deleteError && <div style={{ fontSize: 13, color: dark ? "#fca5a5" : "#dc2626", marginTop: 8 }}>⚠️ {deleteError}</div>}
+              </div>
+            ) : (
+              <button onClick={() => setShowDelete(true)} className="set-btn-danger" style={{ borderColor: dark ? "rgba(252,165,165,.2)" : "rgba(220,38,38,.18)", color: dark ? "#fca5a5" : "#dc2626" }}>Delete my account</button>
+            )}
           </div>
         </div>
       </div>

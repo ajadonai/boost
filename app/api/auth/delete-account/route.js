@@ -2,14 +2,22 @@ import prisma from '@/lib/prisma';
 import { log } from "@/lib/logger";
 import { getCurrentUser, clearUserCookie } from '@/lib/auth';
 import { cancelOrder } from '@/lib/mtp';
+import bcrypt from 'bcryptjs';
 
-export async function POST() {
+export async function POST(req) {
   try {
     const payload = await getCurrentUser();
     if (!payload) return Response.json({ error: 'Not authenticated' }, { status: 401 });
 
+    const { password } = await req.json().catch(() => ({}));
+
     const user = await prisma.user.findUnique({ where: { id: payload.id } });
     if (!user) return Response.json({ error: 'User not found' }, { status: 404 });
+
+    // Require password confirmation
+    if (!password) return Response.json({ error: 'Password required to delete account' }, { status: 400 });
+    const valid = await bcrypt.compare(password, user.password);
+    if (!valid) return Response.json({ error: 'Incorrect password' }, { status: 400 });
 
     // Cancel active orders and refund
     const activeOrders = await prisma.order.findMany({
