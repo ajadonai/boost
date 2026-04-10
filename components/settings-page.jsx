@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useConfirm } from "./confirm-dialog";
 import { fN } from "../lib/format";
+import { SITE } from "../lib/site";
 
 
 function Toggle({ on, onToggle, accent }) {
@@ -286,7 +287,7 @@ export default function SettingsPage({ user, dark, t, themeMode, setThemeMode, s
           <div className="set-card" style={{ background: dark ? "rgba(255,255,255,.03)" : "rgba(255,255,255,.85)", border: `0.5px solid ${t.cardBorder}` }}>
             <div className="set-card-title" style={{ color: t.textMuted }}>System status</div>
             <div className="set-card-divider" style={{ background: t.cardBorder }} />
-            <a href="https://stats.uptimerobot.com/PvHE3u4psX" target="_blank" rel="noopener" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", textDecoration: "none", padding: "2px 0" }}>
+            <a href={SITE.status} target="_blank" rel="noopener" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", textDecoration: "none", padding: "2px 0" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                 <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#34d399", flexShrink: 0 }} />
                 <span style={{ fontSize: 14, fontWeight: 500, color: t.text }}>All systems operational</span>

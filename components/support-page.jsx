@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect, useRef, useCallback } from "react";
 import { fD } from "../lib/format";
+import { SITE } from "../lib/site";
 
 const BOT_RESPONSES = {
   check_order: { text: "To check your order status, go to **History** in your dashboard. Each order shows its current status. You can also tap **Check** on any order to refresh from the provider.", followUp: "What do the statuses mean?" },
@@ -462,7 +463,7 @@ export function SupportSidebar({ dark, t }) {
       <div className="sup-rs-divider" style={{ background: t.sidebarBorder }} />
       <div className="sup-rs-title" style={{ color: t.textMuted }}>Contact Us</div>
       <div className="sup-rs-contact" style={{ background: t.cardBg }}>
-        {[["Email","info@nitro.ng"],["Instagram","@Nitro.ng"],["Twitter/X","@TheNitroNG"]].map(([label,val])=>
+        {[["Email",SITE.email.general],["Instagram","@Nitro.ng"],["Twitter/X","@TheNitroNG"]].map(([label,val])=>
           <div key={label} className="sup-rs-contact-row"><span style={{ color: t.textMuted }}>{label}</span><span style={{ color: t.accent, fontWeight: 500 }}>{val}</span></div>
         )}
       </div>

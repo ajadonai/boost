@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import dynamic from "next/dynamic";
 import { ThemeProvider, useTheme } from "./shared-nav";
+import { SITE } from "../lib/site";
 
 const AuthModal = dynamic(() => import("./auth-modal"), { ssr: false });
 
@@ -478,9 +479,9 @@ function LandingInner(){
               {/* Get in touch */}
               <div>
                 <div className="m" style={{fontSize:11,fontWeight:600,letterSpacing:1.5,textTransform:"uppercase",marginBottom:16,color:dark?"rgba(244,241,237,.2)":"rgba(28,27,25,.25)"}}>Get in touch</div>
-                <a href="mailto:info@nitro.ng" className="s6-footer-link" style={{display:"block",fontSize:13,fontWeight:450,padding:"5px 0",textDecoration:"none",color:dark?"rgba(244,241,237,.45)":"rgba(28,27,25,.5)"}}>info@nitro.ng</a>
+                <a href={`mailto:${SITE.email.general}`} className="s6-footer-link" style={{display:"block",fontSize:13,fontWeight:450,padding:"5px 0",textDecoration:"none",color:dark?"rgba(244,241,237,.45)":"rgba(28,27,25,.5)"}}>{SITE.email.general}</a>
                 <div className="s6-footer-link" style={{display:"block",fontSize:14,fontWeight:450,padding:"5px 0",cursor:"pointer",color:dark?"rgba(244,241,237,.45)":"rgba(28,27,25,.5)"}} onClick={()=>window.open(socialLinks.social_whatsapp_support?`https://wa.me/${socialLinks.social_whatsapp_support}`:"#","_blank")}>WhatsApp Support</div>
-                <a href="https://stats.uptimerobot.com/PvHE3u4psX" target="_blank" rel="noopener" className="s6-footer-link" style={{display:"flex",alignItems:"center",gap:6,fontSize:14,fontWeight:450,padding:"5px 0",textDecoration:"none",color:dark?"rgba(244,241,237,.45)":"rgba(28,27,25,.5)"}}><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Status Page</a>
+                <a href={SITE.status} target="_blank" rel="noopener" className="s6-footer-link" style={{display:"flex",alignItems:"center",gap:6,fontSize:14,fontWeight:450,padding:"5px 0",textDecoration:"none",color:dark?"rgba(244,241,237,.45)":"rgba(28,27,25,.5)"}}><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Status Page</a>
               </div>
             </div>
 
