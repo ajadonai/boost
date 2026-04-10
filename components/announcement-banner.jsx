@@ -10,23 +10,23 @@ const ICONS = {
 
 const STYLES = {
   info: {
-    bgD: "rgba(14,17,32,.92)", bgL: "rgba(255,255,255,.92)",
-    brdD: "rgba(196,125,142,.12)", brdL: "rgba(196,125,142,.1)",
+    bgD: "rgba(196,125,142,.12)", bgL: "rgba(196,125,142,.06)",
+    brdD: "rgba(196,125,142,.3)", brdL: "rgba(196,125,142,.25)",
     colD: "#c47d8e", colL: "#8b5e6b",
   },
   warning: {
-    bgD: "rgba(20,18,12,.92)", bgL: "rgba(255,253,245,.92)",
-    brdD: "rgba(251,191,36,.12)", brdL: "rgba(217,119,6,.1)",
+    bgD: "rgba(251,191,36,.12)", bgL: "rgba(217,119,6,.06)",
+    brdD: "rgba(251,191,36,.35)", brdL: "rgba(217,119,6,.3)",
     colD: "#fbbf24", colL: "#d97706",
   },
   success: {
-    bgD: "rgba(12,20,16,.92)", bgL: "rgba(245,255,250,.92)",
-    brdD: "rgba(110,231,183,.12)", brdL: "rgba(5,150,105,.1)",
+    bgD: "rgba(110,231,183,.1)", bgL: "rgba(5,150,105,.05)",
+    brdD: "rgba(110,231,183,.3)", brdL: "rgba(5,150,105,.25)",
     colD: "#6ee7b7", colL: "#059669",
   },
   urgent: {
-    bgD: "rgba(24,12,12,.92)", bgL: "rgba(255,245,245,.92)",
-    brdD: "rgba(252,165,165,.15)", brdL: "rgba(220,38,38,.1)",
+    bgD: "rgba(252,165,165,.12)", bgL: "rgba(220,38,38,.06)",
+    brdD: "rgba(252,165,165,.35)", brdL: "rgba(220,38,38,.3)",
     colD: "#fca5a5", colL: "#dc2626",
   },
 };
@@ -96,18 +96,18 @@ export default function AnnouncementBanner({ alerts, dark, mode = "dashboard", o
       style={{
         ...posStyle,
         background: dark ? s.bgD : s.bgL,
-        borderBottom: mode === "landing" ? `1px solid ${dark ? s.brdD : s.brdL}` : "none",
-        border: mode !== "landing" ? `1px solid ${dark ? s.brdD : s.brdL}` : undefined,
+        borderTop: `1px solid ${dark ? s.brdD : s.brdL}`,
+        borderRight: `1px solid ${dark ? s.brdD : s.brdL}`,
+        borderBottom: `1px solid ${dark ? s.brdD : s.brdL}`,
+        borderLeft: `3px solid ${dark ? s.colD : s.colL}`,
         borderRadius: mode !== "landing" ? 12 : 0,
-        backdropFilter: "blur(16px)",
-        WebkitBackdropFilter: "blur(16px)",
       }}
     >
       <div className="nitro-announce-inner">
         <div className="nitro-announce-icon" style={{ color: dark ? s.colD : s.colL }}>
           {icon(dark ? s.colD : s.colL)}
         </div>
-        <div className="nitro-announce-text" style={{ color: dark ? "rgba(255,255,255,.85)" : "rgba(0,0,0,.75)" }}>
+        <div className="nitro-announce-text" style={{ color: dark ? "#f5f3f0" : "#1a1917" }}>
           {alert.message}
           {alert.action && (
             <a href={alert.action.href || "#"} className="nitro-announce-action" style={{ color: dark ? s.colD : s.colL }}>
