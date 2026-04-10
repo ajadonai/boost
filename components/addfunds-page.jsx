@@ -80,16 +80,6 @@ export default function AddFundsPage({ user, dark, t, paymentStatus, setPaymentS
     }
   };
 
-  const Radio = ({ gw }) => (
-    <div onClick={() => setMethod(gw.id)} className="fund-method-row" style={{ borderBottom: `1px solid ${t.cardBorder}`, cursor: "pointer" }}>
-      <div className="fund-radio" style={{ borderWidth: 2, borderStyle: "solid", borderColor: method === gw.id ? t.accent : (dark ? "rgba(255,255,255,.15)" : "rgba(0,0,0,.15)") }}>
-        {method === gw.id && <div className="fund-radio-dot" style={{ background: t.accent }} />}
-      </div>
-      <span style={{ fontSize: 15, fontWeight: method === gw.id ? 600 : 450, color: method === gw.id ? t.text : (dark ? "rgba(255,255,255,.55)" : "rgba(0,0,0,.55)") }}>
-        {gw.name}
-      </span>
-    </div>
-  );
 
   return (
     <>
@@ -119,70 +109,50 @@ export default function AddFundsPage({ user, dark, t, paymentStatus, setPaymentS
       </div>
 
       {/* ═══ DESKTOP + TABLET: side by side ═══ */}
-      <div className="fund-split fund-desktop-only">
-        {/* LEFT — Balance + Amount */}
-        <div className="fund-left">
-          <div className="fund-card-unified" style={{ background: dark ? "rgba(255,255,255,.03)" : "rgba(255,255,255,.85)", border: `0.5px solid ${t.cardBorder}` }}>
-            <div className="fund-bal-row">
-              <div>
-                <div className="fund-bal-label" style={{ color: t.textMuted }}>Current Balance</div>
-                <div className="m fund-bal-value" style={{ color: t.green }}>{fN(balance)}</div>
-              </div>
-              <div className="fund-bal-icon" style={{ background: dark ? "rgba(110,231,183,.08)" : "rgba(5,150,105,.04)" }}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={t.green} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-              </div>
-            </div>
-            <div className="fund-card-divider" style={{ background: t.cardBorder }} />
-            <div className="fund-deposit-label" style={{ color: t.textMuted }}>Amount to deposit</div>
-            <div className="fund-amount-wrap" style={{ background: dark ? "#0d1020" : "#fff", borderWidth: 1, borderStyle: "solid", borderColor: amount ? t.accent : t.cardBorder }}>
-              <span className="m fund-currency" style={{ color: dark ? "rgba(255,255,255,.55)" : "rgba(0,0,0,.4)" }}>₦</span>
-              <input type="number" value={amount} onChange={e => setAmount(e.target.value)} placeholder="0" className="m fund-amount-input" style={{ color: t.text }} />
-            </div>
-            <div className="fund-presets">
-              {PRESETS.map(p => (
-                <button key={p} onClick={() => setAmount(String(p))} className="m fund-preset" style={{ borderWidth: 1, borderStyle: "solid", borderColor: numAmount === p ? t.accent : t.cardBorder, background: numAmount === p ? (dark ? "rgba(196,125,142,.1)" : "rgba(196,125,142,.06)") : "transparent", color: numAmount === p ? t.accent : (dark ? "rgba(255,255,255,.55)" : "rgba(0,0,0,.45)") }}>
-                  ₦{p >= 1000 ? `${p / 1000}K` : p}
-                </button>
-              ))}
-            </div>
-            <div className="fund-warn-space">
-              {numAmount > 0 && numAmount < 500 && (
-                <div className="fund-warn" style={{ color: dark ? "#fcd34d" : "#d97706" }}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                  Minimum deposit is ₦500
-                </div>
-              )}
-            </div>
-            <div className="fund-accepted" style={{ marginTop: 8 }}>
-              <span className="fund-accepted-label" style={{ color: t.textMuted }}>We accept:</span>
-              {ACCEPTED_TYPES.map(type => (
-                <span key={type} className="fund-accepted-pill" style={{ background: dark ? "rgba(255,255,255,.04)" : "rgba(255,255,255,.8)", borderWidth: 1, borderStyle: "solid", borderColor: t.cardBorder, color: dark ? "rgba(255,255,255,.55)" : "rgba(0,0,0,.45)" }}>{type}</span>
-              ))}
-            </div>
+      <div className="fund-desktop-only" style={{ flexDirection: "column", flex: 1 }}>
+        {/* Balance bar — compact, full width */}
+        <div className="fund-bal-bar" style={{ background: dark ? "rgba(255,255,255,.03)" : "rgba(255,255,255,.85)", border: `0.5px solid ${t.cardBorder}`, borderRadius: 14, padding: "14px 20px", display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+          <div>
+            <div style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 1.5, color: t.textMuted, marginBottom: 2 }}>Current Balance</div>
+            <div className="m" style={{ fontSize: 24, fontWeight: 700, color: t.green }}>{fN(balance)}</div>
+          </div>
+          <div style={{ width: 38, height: 38, borderRadius: 10, background: dark ? "rgba(110,231,183,.06)" : "rgba(5,150,105,.04)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke={t.green} strokeWidth="1.5" strokeLinecap="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
           </div>
         </div>
 
-        {/* RIGHT — Invoice + Method + Pay */}
-        <div className="fund-right">
-          <div className="fund-invoice" style={{ background: dark ? "rgba(255,255,255,.03)" : "rgba(255,255,255,.85)", border: `0.5px solid ${t.cardBorder}` }}>
-            <div className="fund-lines">
-              <div className="fund-line"><span style={{ color: t.text, fontWeight: 500 }}>Deposit</span><span className="m" style={{ color: valid ? t.text : t.textMuted, fontWeight: 600 }}>{valid ? fN(numAmount) : "₦0"}</span></div>
-              <div className="fund-line"><span style={{ color: t.textMuted }}>Fee</span><span className="m" style={{ color: t.green, fontWeight: 600 }}>Free</span></div>
-            </div>
-            <div className="fund-double-div" style={{ borderColor: t.cardBorder }} />
-            <div className="fund-total-section">
-              <div className="fund-total-label" style={{ color: t.textMuted }}>Total Due</div>
-              <div className={`m fund-total-val${valid ? "" : " fund-total-empty"}`} style={{ color: valid ? t.accent : t.textMuted }}>{valid ? fN(numAmount) : "—"}</div>
-            </div>
-            <div className="fund-div" style={{ background: t.cardBorder }} />
-            <div className="fund-method-section">
-              <div className="fund-method-title" style={{ color: t.text }}>Payment method</div>
-              {gatewaysLoading ? <div style={{ fontSize: 13, color: t.textMuted, padding: "8px 0" }}>Loading...</div> : gateways.length === 0 ? <div style={{ fontSize: 13, color: t.textMuted, padding: "8px 0" }}>No payment methods available</div> : gateways.map(g => <Radio key={g.id} gw={g} />)}
-            </div>
-            <div className="fund-btn-wrap">
+        {/* Two columns — matched height */}
+        <div style={{ display: "flex", gap: 16, flex: 1, alignItems: "stretch" }}>
+          {/* LEFT — Amount + Presets + Coupon */}
+          <div style={{ flex: 1, minWidth: 0, display: "flex" }}>
+            <div style={{ flex: 1, display: "flex", flexDirection: "column", background: dark ? "rgba(255,255,255,.03)" : "rgba(255,255,255,.85)", border: `0.5px solid ${t.cardBorder}`, borderRadius: 14, padding: 22 }}>
+              <div className="fund-deposit-label" style={{ color: t.textMuted }}>Amount to deposit</div>
+              <div className="fund-amount-wrap" style={{ background: dark ? "#0d1020" : "#fff", borderWidth: 1, borderStyle: "solid", borderColor: amount ? t.accent : t.cardBorder }}>
+                <span className="m fund-currency" style={{ color: dark ? "rgba(255,255,255,.55)" : "rgba(0,0,0,.4)" }}>₦</span>
+                <input type="number" value={amount} onChange={e => setAmount(e.target.value)} placeholder="0" className="m fund-amount-input" style={{ color: t.text }} />
+              </div>
+              <div className="fund-presets">
+                {PRESETS.map(p => (
+                  <button key={p} onClick={() => setAmount(String(p))} className="m fund-preset" style={{ borderWidth: 1, borderStyle: "solid", borderColor: numAmount === p ? t.accent : t.cardBorder, background: numAmount === p ? (dark ? "rgba(196,125,142,.1)" : "rgba(196,125,142,.06)") : "transparent", color: numAmount === p ? t.accent : (dark ? "rgba(255,255,255,.55)" : "rgba(0,0,0,.45)") }}>
+                    ₦{p >= 1000 ? `${p / 1000}K` : p}
+                  </button>
+                ))}
+              </div>
+              <div className="fund-warn-space">
+                {numAmount > 0 && numAmount < 500 && (
+                  <div className="fund-warn" style={{ color: dark ? "#fcd34d" : "#d97706" }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    Minimum deposit is ₦500
+                  </div>
+                )}
+              </div>
+
+              {/* Spacer pushes coupon + accepted to bottom */}
+              <div style={{ flex: 1 }} />
+
               {/* Coupon */}
               {!couponApplied ? (
-                <div style={{ marginBottom: 10 }}>
+                <div style={{ marginTop: 8 }}>
                   {!showCoupon ? (
                     <button onClick={() => setShowCoupon(true)} style={{ background: "none", border: "none", color: t.accent, fontSize: 13, fontWeight: 500, cursor: "pointer", padding: 0, display: "flex", alignItems: "center", gap: 6 }}>
                       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>
@@ -199,33 +169,59 @@ export default function AddFundsPage({ user, dark, t, paymentStatus, setPaymentS
                   )}
                 </div>
               ) : (
-                <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 12px", borderRadius: 8, background: dark ? "rgba(110,231,183,.06)" : "rgba(5,150,105,.04)", border: `1px solid ${dark ? "rgba(110,231,183,.12)" : "rgba(5,150,105,.08)"}`, fontSize: 13, color: dark ? "#6ee7b7" : "#059669", marginBottom: 10 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 8, padding: "8px 12px", borderRadius: 8, background: dark ? "rgba(110,231,183,.06)" : "rgba(5,150,105,.04)", border: `1px solid ${dark ? "rgba(110,231,183,.12)" : "rgba(5,150,105,.08)"}`, fontSize: 13, color: dark ? "#6ee7b7" : "#059669" }}>
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
                   <span><strong className="m">{couponApplied.code}</strong> — {couponApplied.type === "percent" ? `${couponApplied.value}% bonus` : `₦${couponApplied.value.toLocaleString()} bonus`}</span>
                   <button onClick={removeCoupon} style={{ background: "none", border: "none", color: dark ? "#fca5a5" : "#dc2626", fontSize: 12, cursor: "pointer", marginLeft: "auto" }}>Remove</button>
                 </div>
               )}
+
+              <div className="fund-accepted" style={{ marginTop: 12 }}>
+                <span className="fund-accepted-label" style={{ color: t.textMuted }}>We accept:</span>
+                {ACCEPTED_TYPES.map(type => (
+                  <span key={type} className="fund-accepted-pill" style={{ background: dark ? "rgba(255,255,255,.04)" : "rgba(255,255,255,.8)", borderWidth: 1, borderStyle: "solid", borderColor: t.cardBorder, color: dark ? "rgba(255,255,255,.55)" : "rgba(0,0,0,.45)" }}>{type}</span>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* RIGHT — Summary + Method dropdown + Pay */}
+          <div style={{ width: 280, flexShrink: 0, display: "flex" }}>
+            <div style={{ flex: 1, display: "flex", flexDirection: "column", background: dark ? "rgba(255,255,255,.03)" : "rgba(255,255,255,.85)", border: `0.5px solid ${t.cardBorder}`, borderRadius: 14, padding: 22 }}>
+              <div className="fund-line"><span style={{ color: t.textMuted }}>Deposit</span><span className="m" style={{ color: valid ? t.text : t.textMuted, fontWeight: 600 }}>{valid ? fN(numAmount) : "₦0"}</span></div>
+              <div className="fund-line"><span style={{ color: t.textMuted }}>Fee</span><span className="m" style={{ color: t.green, fontWeight: 600 }}>Free</span></div>
               {couponApplied && discount > 0 && (
-                <div style={{ display: "flex", justifyContent: "space-between", padding: "8px 12px", borderRadius: 8, background: dark ? "rgba(255,255,255,.02)" : "rgba(0,0,0,.015)", marginBottom: 10, fontSize: 14 }}>
-                  <span style={{ color: t.textMuted }}>Coupon bonus</span>
-                  <span className="m" style={{ color: dark ? "#6ee7b7" : "#059669", fontWeight: 600 }}>+{fN(discount / 100)}</span>
-                </div>
+                <div className="fund-line"><span style={{ color: t.textMuted }}>Coupon bonus</span><span className="m" style={{ color: dark ? "#6ee7b7" : "#059669", fontWeight: 600 }}>+{fN(discount / 100)}</span></div>
               )}
-              {couponApplied && discount > 0 && (
-                <div style={{ display: "flex", justifyContent: "space-between", padding: "8px 12px", borderRadius: 8, background: dark ? "rgba(110,231,183,.04)" : "rgba(5,150,105,.03)", marginBottom: 10, fontSize: 14 }}>
-                  <span style={{ color: t.textMuted }}>You get</span>
-                  <strong className="m" style={{ color: dark ? "#6ee7b7" : "#059669" }}>{fN(numAmount + discount / 100)}</strong>
-                </div>
+              <div style={{ height: 1, background: t.cardBorder, margin: "4px 0 14px" }} />
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 20 }}>
+                <span style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: 1.5, color: t.textMuted }}>{couponApplied && discount > 0 ? "You get" : "Total"}</span>
+                <span className="m" style={{ fontSize: 28, fontWeight: 700, color: valid ? t.accent : t.textMuted }}>{valid ? fN(numAmount + (discount > 0 ? discount / 100 : 0)) : "—"}</span>
+              </div>
+
+              <div style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: 1, color: t.textMuted, marginBottom: 6 }}>Payment method</div>
+              {gatewaysLoading ? (
+                <div style={{ fontSize: 13, color: t.textMuted, padding: "8px 0" }}>Loading...</div>
+              ) : gateways.length === 0 ? (
+                <div style={{ fontSize: 13, color: t.textMuted, padding: "8px 0" }}>No payment methods available</div>
+              ) : (
+                <select value={method} onChange={e => setMethod(e.target.value)} style={{ width: "100%", padding: "10px 14px", borderRadius: 10, background: dark ? "rgba(255,255,255,.04)" : "#fff", border: `1px solid ${dark ? "rgba(255,255,255,.08)" : "rgba(0,0,0,.1)"}`, color: t.text, fontSize: 14, fontWeight: 500, fontFamily: "'Outfit',sans-serif", outline: "none", appearance: "none", cursor: "pointer", backgroundImage: `url("data:image/svg+xml,%3Csvg width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='${dark ? "%23666" : "%23999"}' stroke-width='2' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: "no-repeat", backgroundPosition: "right 12px center", paddingRight: 32 }}>
+                  {gateways.map(g => <option key={g.id} value={g.id}>{g.name}</option>)}
+                </select>
               )}
+
+              {/* Spacer pushes button to bottom */}
+              <div style={{ flex: 1, minHeight: 16 }} />
+
               {payError && <div style={{ padding: "8px 12px", borderRadius: 8, marginBottom: 8, fontSize: 13, background: dark ? "rgba(220,38,38,.08)" : "#fef2f2", border: `1px solid ${dark ? "rgba(220,38,38,.15)" : "#fecaca"}`, color: dark ? "#fca5a5" : "#dc2626", display: "flex", justifyContent: "space-between", alignItems: "center" }}><span>⚠️ {payError}</span><button onClick={() => setPayError(null)} style={{ background: "none", border: "none", color: "inherit", cursor: "pointer", fontSize: 14 }}>✕</button></div>}
               <button onClick={handlePay} disabled={!valid || loading} className="fund-pay-btn" style={{ background: valid ? `linear-gradient(135deg,#c47d8e,#8b5e6b)` : (dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)"), color: valid ? "#fff" : t.textMuted }}>
                 {loading ? "Processing..." : valid ? `Pay ${fN(numAmount)} Now` : "How much?"}
               </button>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, marginTop: 10, fontSize: 12, color: t.textMuted }}>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                Encrypted & secure
+              </div>
             </div>
-          </div>
-          <div className="fund-security">
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: t.textMuted }}><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-            <span style={{ color: t.textMuted }}>Payments are encrypted and processed securely</span>
           </div>
         </div>
       </div>
@@ -331,8 +327,14 @@ export default function AddFundsPage({ user, dark, t, paymentStatus, setPaymentS
 
             {/* Payment method card */}
             <div className="fund-mob-method" style={{ background: dark ? "rgba(255,255,255,.03)" : "rgba(255,255,255,.85)", border: `0.5px solid ${t.cardBorder}` }}>
-              <div className="fund-method-title" style={{ color: t.text }}>Choose payment method</div>
-              {gateways.map(g => <Radio key={g.id} gw={g} />)}
+              <div style={{ fontSize: 12, fontWeight: 600, textTransform: "uppercase", letterSpacing: 1, color: t.textMuted, marginBottom: 6 }}>Payment method</div>
+              {gateways.length > 0 ? (
+                <select value={method} onChange={e => setMethod(e.target.value)} style={{ width: "100%", padding: "10px 14px", borderRadius: 10, background: dark ? "rgba(255,255,255,.04)" : "#fff", border: `1px solid ${dark ? "rgba(255,255,255,.08)" : "rgba(0,0,0,.1)"}`, color: t.text, fontSize: 14, fontWeight: 500, fontFamily: "'Outfit',sans-serif", outline: "none", appearance: "none", cursor: "pointer", backgroundImage: `url("data:image/svg+xml,%3Csvg width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='${dark ? "%23666" : "%23999"}' stroke-width='2' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: "no-repeat", backgroundPosition: "right 12px center", paddingRight: 32 }}>
+                  {gateways.map(g => <option key={g.id} value={g.id}>{g.name}</option>)}
+                </select>
+              ) : (
+                <div style={{ fontSize: 13, color: t.textMuted, padding: "8px 0" }}>No payment methods available</div>
+              )}
               {payError && <div style={{ padding: "8px 12px", borderRadius: 8, marginTop: 8, fontSize: 13, background: dark ? "rgba(220,38,38,.08)" : "#fef2f2", border: `1px solid ${dark ? "rgba(220,38,38,.15)" : "#fecaca"}`, color: dark ? "#fca5a5" : "#dc2626" }}>⚠️ {payError}</div>}
               <button onClick={handlePay} disabled={loading} className="fund-pay-btn" style={{ background: `linear-gradient(135deg,#c47d8e,#8b5e6b)`, color: "#fff", marginTop: 12 }}>
                 {loading ? "Processing..." : `Pay ${fN(numAmount)} Now`}
