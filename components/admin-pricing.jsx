@@ -82,7 +82,13 @@ export default function AdminPricingPage({ dark, t }) {
   useEffect(() => {
     fetch("/api/admin/settings").then(r => r.json()).then(d => {
       if (!d.settings) return; const s = d.settings;
-      try { if (s.markup_brackets) setBrackets(JSON.parse(s.markup_brackets)); } catch {}
+      try {
+        if (s.markup_brackets) {
+          const parsed = JSON.parse(s.markup_brackets);
+          // Fix null max from JSON.stringify(Infinity) → null
+          setBrackets(parsed.map(b => ({ ...b, max: b.max == null ? 999999999 : b.max })));
+        }
+      } catch {}
       if (s.markup_margin_floor) setFloorPct(Number(s.markup_margin_floor));
       if (s.markup_floor_ceiling) setFloorCeiling(Number(s.markup_floor_ceiling));
       if (s.markup_ng_bonus) setNgBonus(Number(s.markup_ng_bonus));
@@ -144,7 +150,7 @@ export default function AdminPricingPage({ dark, t }) {
             <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 0", borderBottom: i < brackets.length - 1 ? `1px solid ${dark ? "rgba(255,255,255,.04)" : "rgba(0,0,0,.04)"}` : "none" }}>
               <div style={{ width: 8, height: 8, borderRadius: 2, background: COLORS[i], flexShrink: 0 }} />
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 14, fontWeight: 500, color: t.text }}>₦{b.min.toLocaleString()} – {b.max >= 999999999 ? "∞" : `₦${b.max.toLocaleString()}`}</div>
+                <div style={{ fontSize: 14, fontWeight: 500, color: t.text }}>₦{b.min.toLocaleString()} – {!b.max || b.max >= 999999999 ? "∞" : `₦${b.max.toLocaleString()}`}</div>
                 <div style={{ fontSize: 12, color: t.textSoft }}>{b.label} · ₦{exCost} → ₦{Math.round(exCost * b.multiplier)}</div>
               </div>
               <NumInput dark={dark} value={b.multiplier} decimal min={1} max={10} fallback={1} width={64} onChange={v => { const n = [...brackets]; n[i] = { ...b, multiplier: v }; setBrackets(n); }} />
