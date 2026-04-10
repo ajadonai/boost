@@ -109,7 +109,7 @@ export default function AddFundsPage({ user, dark, t, paymentStatus, setPaymentS
       </div>
 
       {/* ═══ DESKTOP + TABLET: side by side ═══ */}
-      <div className="fund-desktop-only" style={{ flexDirection: "column", flex: 1 }}>
+      <div className="fund-desktop-only" style={{ display: "flex", flexDirection: "column", flex: 1 }}>
         {/* Balance bar — compact, full width */}
         <div className="fund-bal-bar" style={{ background: dark ? "rgba(255,255,255,.03)" : "rgba(255,255,255,.85)", border: `0.5px solid ${t.cardBorder}`, borderRadius: 14, padding: "14px 20px", display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
           <div>
