@@ -23,7 +23,7 @@ export async function GET() {
         where: {
           active: true,
           deletedAt: null,
-          target: { in: ['both', 'landing'] },
+          target: { in: ['everyone', 'landing'] },
           OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
         },
         orderBy: { createdAt: 'desc' },

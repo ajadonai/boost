@@ -281,7 +281,7 @@ export function AdminAlertsPage({ dark, t }) {
   const [showNew, setShowNew] = useState(false);
   const [newMsg, setNewMsg] = useState("");
   const [newType, setNewType] = useState("info");
-  const [newTarget, setNewTarget] = useState("both");
+  const [newTarget, setNewTarget] = useState("everyone");
 
   useEffect(() => {
     fetch("/api/admin/alerts").then(r => r.json()).then(d => { setAlerts(d.alerts || []); setLoading(false); }).catch(() => setLoading(false));
@@ -361,9 +361,10 @@ export function AdminAlertsPage({ dark, t }) {
                 <label style={{ fontSize: 13, color: t.textMuted, display: "block", marginBottom: 6 }}>Show on</label>
                 <div style={{ display: "flex", gap: 4 }}>
                   {[
-                    ["both", "Both"],
-                    ["dashboard", "Dashboard"],
+                    ["everyone", "Everyone"],
                     ["landing", "Landing page"],
+                    ["users", "Users only"],
+                    ["admin", "Admin only"],
                   ].map(([tg, label]) => (
                     <button key={tg} onClick={() => setNewTarget(tg)} style={{
                       padding: "7px 14px", borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: "pointer",
@@ -399,7 +400,7 @@ export function AdminAlertsPage({ dark, t }) {
                 </div>
                 <div style={{ fontSize: 12, color: t.textMuted, marginTop: 3, paddingLeft: 26 }}>
                   <span style={{ color: typeColors[a.type] || t.textMuted, fontWeight: 600 }}>{a.type}</span>
-                  {" · "}{a.target === "both" ? "everywhere" : a.target}
+                  {" · "}{a.target === "everyone" ? "everywhere" : a.target === "users" ? "users only" : a.target === "admin" ? "admin only" : a.target}
                   {" · "}{a.active ? "Active" : "Paused"}
                   {a.created ? ` · ${fD(a.created)}` : ""}
                 </div>

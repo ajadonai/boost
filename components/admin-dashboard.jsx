@@ -3,6 +3,7 @@ import { useState, useEffect, useMemo, useRef } from "react";
 import { ThemeProvider, useTheme } from "./shared-nav";
 import { ToastProvider } from "./toast";
 import { ConfirmProvider } from "./confirm-dialog";
+import AnnouncementBanner from "./announcement-banner";
 import AdminOrdersPage from "./admin-orders";
 import AdminUsersPage from "./admin-users";
 import AdminTicketsPage from "./admin-tickets";
@@ -232,8 +233,11 @@ function AdminDashboardInner() {
 
   /* Data fetch */
   const [redirecting, setRedirecting] = useState(false);
+  const [adminAlerts, setAdminAlerts] = useState([]);
   useEffect(() => {
     if (redirecting) return;
+    // Fetch admin-targeted alerts
+    fetch("/api/admin/alerts/active").then(r => r.ok ? r.json() : { alerts: [] }).then(d => setAdminAlerts(d.alerts || [])).catch(() => {});
     async function load() {
       try {
         const res = await fetch("/api/admin/overview");
@@ -449,6 +453,7 @@ function AdminDashboardInner() {
         {leftOpen && <div className="dash-overlay" onClick={() => setLeftOpen(false)} />}
 
         <main className="dash-main" style={{ background: t.bg, ...(active === "tickets" ? { overflow: "hidden" } : {}) }}>
+          <AnnouncementBanner alerts={adminAlerts} dark={dark} mode="dashboard" />
           <div key={active} className="dash-page-enter" style={active === "tickets" ? { flex: 1, display: "flex", flexDirection: "column", minHeight: 0, overflow: "hidden" } : undefined}>
             {renderPage()}
           </div>
