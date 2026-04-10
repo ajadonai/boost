@@ -4,6 +4,7 @@ import prisma from '@/lib/prisma';
 const PUBLIC_KEYS = [
   'social_whatsapp', 'social_telegram', 'social_instagram',
   'social_twitter', 'social_whatsapp_support',
+  'site_email_general', 'site_email_support',
   'ref_referrer_bonus', 'ref_invitee_bonus',
 ];
 

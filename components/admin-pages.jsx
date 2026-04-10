@@ -411,10 +411,13 @@ function CleanupButton({ dark, t }) {
 export function AdminSettingsPage({ admin, dark, t, themeMode, setThemeMode, setDark }) {
   const confirm = useConfirm();
   const [social, setSocial] = useState({ social_whatsapp: "", social_telegram: "", social_instagram: "", social_twitter: "", social_whatsapp_support: "" });
+  const [emails, setEmails] = useState({ site_email_general: "", site_email_support: "" });
   const [refSettings, setRefSettings] = useState({ ref_referrer_bonus: "50000", ref_invitee_bonus: "50000" });
   const [socialLoading, setSocialLoading] = useState(true);
   const [socialSaving, setSocialSaving] = useState(false);
   const [socialMsg, setSocialMsg] = useState(null);
+  const [emailSaving, setEmailSaving] = useState(false);
+  const [emailMsg, setEmailMsg] = useState(null);
   const [refSaving, setRefSaving] = useState(false);
   const [refMsg, setRefMsg] = useState(null);
 
@@ -422,6 +425,7 @@ export function AdminSettingsPage({ admin, dark, t, themeMode, setThemeMode, set
     fetch("/api/admin/settings").then(r => r.json()).then(d => {
       if (d.settings) {
         setSocial(prev => ({ ...prev, ...Object.fromEntries(Object.entries(d.settings).filter(([k]) => k.startsWith("social_"))) }));
+        setEmails(prev => ({ ...prev, ...Object.fromEntries(Object.entries(d.settings).filter(([k]) => k.startsWith("site_email_"))) }));
         setRefSettings(prev => ({ ...prev, ...Object.fromEntries(Object.entries(d.settings).filter(([k]) => k.startsWith("ref_"))) }));
       }
     }).finally(() => setSocialLoading(false));
@@ -435,6 +439,16 @@ export function AdminSettingsPage({ admin, dark, t, themeMode, setThemeMode, set
       setSocialMsg(res.ok ? { type: "success", text: "Social links saved" } : { type: "error", text: data.error || "Failed" });
     } catch { setSocialMsg({ type: "error", text: "Request failed" }); }
     setSocialSaving(false);
+  };
+
+  const saveEmails = async () => {
+    setEmailSaving(true); setEmailMsg(null);
+    try {
+      const res = await fetch("/api/admin/settings", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ settings: emails }) });
+      const data = await res.json();
+      setEmailMsg(res.ok ? { type: "success", text: "Contact emails saved" } : { type: "error", text: data.error || "Failed" });
+    } catch { setEmailMsg({ type: "error", text: "Request failed" }); }
+    setEmailSaving(false);
   };
 
   const applyTheme = (mode) => {
@@ -559,6 +573,29 @@ export function AdminSettingsPage({ admin, dark, t, themeMode, setThemeMode, set
               <input type="password" value={admConfPw} onChange={e => setAdmConfPw(e.target.value)} style={{ width: "100%", padding: "10px 14px", borderRadius: 8, borderWidth: 1, borderStyle: "solid", borderColor: t.cardBorder, background: dark ? "#0d1020" : "#fff", color: t.text, fontSize: 15, outline: "none", boxSizing: "border-box" }} />
             </div>
             <button onClick={changeAdmPw} disabled={pwSaving} className="adm-btn-primary" style={{ opacity: admCurPw && admNewPw && admConfPw && !pwSaving ? 1 : .4 }}>{pwSaving ? "Updating..." : "Update Password"}</button>
+          </div>
+        </div>
+
+        {/* Contact Emails */}
+        <div style={{ marginBottom: 20 }}>
+          <div style={{ fontSize: 16, fontWeight: 600, color: t.text, marginBottom: 10 }}>Contact Emails</div>
+          <div className="adm-card" style={{ background: dark ? "rgba(255,255,255,.03)" : "rgba(255,255,255,.85)", border: `0.5px solid ${dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)"}`, padding: 18, borderRadius: 14, boxShadow: dark ? "0 4px 20px rgba(0,0,0,.25)" : "0 4px 20px rgba(0,0,0,.04)" }}>
+            <div style={{ fontSize: 13, color: t.textMuted, marginBottom: 14, lineHeight: 1.5 }}>These appear across the site — landing page, support page, legal pages, banned page. Leave blank to use defaults from site config.</div>
+
+            {emailMsg && <div style={{ padding: "8px 12px", borderRadius: 8, marginBottom: 12, fontSize: 14, background: emailMsg.type === "success" ? (dark ? "rgba(110,231,183,.08)" : "#ecfdf5") : (dark ? "rgba(220,38,38,.08)" : "#fef2f2"), color: emailMsg.type === "success" ? (dark ? "#6ee7b7" : "#059669") : (dark ? "#fca5a5" : "#dc2626") }}>{emailMsg.type === "success" ? "✓" : "⚠️"} {emailMsg.text}</div>}
+
+            {[
+              ["site_email_general", "General Email", "info@nitro.ng", "Main contact email shown on landing page, legal pages, banned page"],
+              ["site_email_support", "Support Email", "support@nitro.ng", "Support-specific email shown on support page and ticket responses"],
+            ].map(([key, label, placeholder, hint]) => (
+              <div key={key} style={{ marginBottom: 12 }}>
+                <label style={{ fontSize: 14, color: t.textMuted, display: "block", marginBottom: 3 }}>{label}</label>
+                <input value={emails[key] || ""} onChange={e => setEmails(prev => ({ ...prev, [key]: e.target.value.trim() }))} placeholder={placeholder} type="email" style={{ width: "100%", padding: "10px 14px", borderRadius: 8, borderWidth: 1, borderStyle: "solid", borderColor: t.cardBorder, background: dark ? "#0d1020" : "#fff", color: t.text, fontSize: 15, outline: "none", boxSizing: "border-box", fontFamily: "inherit" }} />
+                <div style={{ fontSize: 12, color: t.textMuted, marginTop: 2, opacity: .7 }}>{hint}</div>
+              </div>
+            ))}
+
+            <button onClick={saveEmails} disabled={emailSaving} className="adm-btn-primary" style={{ opacity: emailSaving ? .5 : 1 }}>{emailSaving ? "Saving..." : "Save Emails"}</button>
           </div>
         </div>
 
