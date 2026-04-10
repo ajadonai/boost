@@ -88,7 +88,7 @@ export default function AnnouncementBanner({ alerts, dark, mode = "dashboard", o
 
   const posStyle = mode === "landing"
     ? { position: "fixed", top: 57, left: 0, right: 0, zIndex: 90 }
-    : { position: "absolute", top: 0, left: 0, right: 0, zIndex: 10 };
+    : { marginBottom: 16 };
 
   return (
     <div
@@ -96,7 +96,9 @@ export default function AnnouncementBanner({ alerts, dark, mode = "dashboard", o
       style={{
         ...posStyle,
         background: dark ? s.bgD : s.bgL,
-        borderBottom: `1px solid ${dark ? s.brdD : s.brdL}`,
+        borderBottom: mode === "landing" ? `1px solid ${dark ? s.brdD : s.brdL}` : "none",
+        border: mode !== "landing" ? `1px solid ${dark ? s.brdD : s.brdL}` : undefined,
+        borderRadius: mode !== "landing" ? 12 : 0,
         backdropFilter: "blur(16px)",
         WebkitBackdropFilter: "blur(16px)",
       }}

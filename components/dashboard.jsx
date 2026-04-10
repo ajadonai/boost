@@ -820,7 +820,7 @@ function DashboardInner() {
         {leftOpen && <div className="dash-overlay" onClick={() => setLeftOpen(false)} />}
 
         {/* ── MAIN ── */}
-        <main className="dash-main" style={{ background: t.bg, ...(isSupport ? { overflow: "hidden" } : {}), position: "relative" }}>
+        <main className="dash-main" style={{ background: t.bg, ...(isSupport ? { overflow: "hidden" } : {}) }}>
           <AnnouncementBanner alerts={alerts} dark={dark} mode="dashboard" />
           {!isServices && !isOrders && !isReferrals && !isSettings && !isSupport && !isAddFunds && !isHowTo && <>
             <div className="dash-welcome" style={{ color: t.text }}>What's good, {firstName}</div>
