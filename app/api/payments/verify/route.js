@@ -83,6 +83,7 @@ export async function POST(req) {
     // Check for coupon bonus
     let couponBonus = 0;
     let couponLabel = '';
+    let couponUpdateData = null; // defer usage increment until after credit succeeds
     const couponMatch = (existing.note || '').match(/\[coupon:([^\]]+)\]/);
     if (couponMatch) {
       try {
@@ -102,9 +103,8 @@ export async function POST(req) {
                 couponBonus = coupon.value * 100; // fixed naira to kobo
               }
               couponLabel = `Coupon ${coupon.code}: ${coupon.type === 'percent' ? `${coupon.value}%` : `₦${coupon.value}`} bonus`;
-              // Increment usage
-              const updated = coupons.map(c => c.id === couponId ? { ...c, used: (c.used || 0) + 1 } : c);
-              await prisma.setting.update({ where: { key: 'coupons' }, data: { value: JSON.stringify(updated) } });
+              // Prepare update but don't execute yet
+              couponUpdateData = JSON.stringify(coupons.map(c => c.id === couponId ? { ...c, used: (c.used || 0) + 1 } : c));
             }
           }
         }
@@ -133,6 +133,14 @@ export async function POST(req) {
     }
 
     await prisma.$transaction(ops);
+
+    // Increment coupon usage AFTER credit succeeds — if credit failed,
+    // the coupon use isn't burned
+    if (couponUpdateData) {
+      try {
+        await prisma.setting.update({ where: { key: 'coupons' }, data: { value: couponUpdateData } });
+      } catch {}
+    }
 
     console.log(`[${gateway}] ₦${paidAmount / 100} + ₦${couponBonus / 100} bonus credited to user ${session.id} (ref: ${reference})`);
 

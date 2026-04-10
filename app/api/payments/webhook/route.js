@@ -37,6 +37,7 @@ export async function POST(req) {
 
       // Check for coupon bonus
       let couponBonus = 0;
+      let couponUpdateData = null;
       const couponMatch = (tx.note || '').match(/\[coupon:([^\]]+)\]/);
       if (couponMatch) {
         try {
@@ -50,8 +51,7 @@ export async function POST(req) {
               const notMaxed = !coupon.maxUses || coupon.maxUses === 0 || (coupon.used || 0) < coupon.maxUses;
               if (notExpired && notMaxed) {
                 couponBonus = coupon.type === 'percent' ? Math.round(amount * (coupon.value / 100)) : coupon.value * 100;
-                const updated = coupons.map(c => c.id === couponId ? { ...c, used: (c.used || 0) + 1 } : c);
-                await prisma.setting.update({ where: { key: 'coupons' }, data: { value: JSON.stringify(updated) } });
+                couponUpdateData = JSON.stringify(coupons.map(c => c.id === couponId ? { ...c, used: (c.used || 0) + 1 } : c));
               }
             }
           }
@@ -77,6 +77,13 @@ export async function POST(req) {
         }));
       }
       await prisma.$transaction(ops);
+
+      // Increment coupon usage AFTER credit succeeds
+      if (couponUpdateData) {
+        try {
+          await prisma.setting.update({ where: { key: 'coupons' }, data: { value: couponUpdateData } });
+        } catch {}
+      }
 
       console.log(`[Webhook] ₦${amount / 100} + ₦${couponBonus / 100} bonus credited to user ${tx.userId} (ref: ${reference})`);
     }
