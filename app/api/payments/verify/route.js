@@ -88,23 +88,29 @@ export async function POST(req) {
     if (couponMatch) {
       try {
         const couponId = couponMatch[1];
-        const row = await prisma.setting.findUnique({ where: { key: 'coupons' } });
-        if (row) {
-          const coupons = JSON.parse(row.value);
-          const coupon = coupons.find(c => c.id === couponId && c.enabled !== false);
-          if (coupon) {
-            // Check still valid
-            const notExpired = !coupon.expires || new Date(coupon.expires) >= new Date();
-            const notMaxed = !coupon.maxUses || coupon.maxUses === 0 || (coupon.used || 0) < coupon.maxUses;
-            if (notExpired && notMaxed) {
-              if (coupon.type === 'percent') {
-                couponBonus = Math.round(paidAmount * (coupon.value / 100));
-              } else {
-                couponBonus = coupon.value * 100; // fixed naira to kobo
+        // Check if this user already used this coupon
+        const alreadyUsed = await prisma.transaction.findFirst({
+          where: { userId: session.id, type: 'bonus', note: { contains: `[cid:${couponId}]` } },
+        });
+        if (!alreadyUsed) {
+          const row = await prisma.setting.findUnique({ where: { key: 'coupons' } });
+          if (row) {
+            const coupons = JSON.parse(row.value);
+            const coupon = coupons.find(c => c.id === couponId && c.enabled !== false);
+            if (coupon) {
+              // Check still valid
+              const notExpired = !coupon.expires || new Date(coupon.expires) >= new Date();
+              const notMaxed = !coupon.maxUses || coupon.maxUses === 0 || (coupon.used || 0) < coupon.maxUses;
+              if (notExpired && notMaxed) {
+                if (coupon.type === 'percent') {
+                  couponBonus = Math.round(paidAmount * (coupon.value / 100));
+                } else {
+                  couponBonus = coupon.value * 100; // fixed naira to kobo
+                }
+                couponLabel = `Coupon ${coupon.code}: ${coupon.type === 'percent' ? `${coupon.value}%` : `₦${coupon.value}`} bonus [cid:${couponId}]`;
+                // Prepare update but don't execute yet
+                couponUpdateData = JSON.stringify(coupons.map(c => c.id === couponId ? { ...c, used: (c.used || 0) + 1 } : c));
               }
-              couponLabel = `Coupon ${coupon.code}: ${coupon.type === 'percent' ? `${coupon.value}%` : `₦${coupon.value}`} bonus`;
-              // Prepare update but don't execute yet
-              couponUpdateData = JSON.stringify(coupons.map(c => c.id === couponId ? { ...c, used: (c.used || 0) + 1 } : c));
             }
           }
         }

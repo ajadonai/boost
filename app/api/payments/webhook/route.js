@@ -37,21 +37,29 @@ export async function POST(req) {
 
       // Check for coupon bonus
       let couponBonus = 0;
+      let couponLabel = '';
       let couponUpdateData = null;
       const couponMatch = (tx.note || '').match(/\[coupon:([^\]]+)\]/);
       if (couponMatch) {
         try {
           const couponId = couponMatch[1];
-          const row = await prisma.setting.findUnique({ where: { key: 'coupons' } });
-          if (row) {
-            const coupons = JSON.parse(row.value);
-            const coupon = coupons.find(c => c.id === couponId && c.enabled !== false);
-            if (coupon) {
-              const notExpired = !coupon.expires || new Date(coupon.expires) >= new Date();
-              const notMaxed = !coupon.maxUses || coupon.maxUses === 0 || (coupon.used || 0) < coupon.maxUses;
-              if (notExpired && notMaxed) {
-                couponBonus = coupon.type === 'percent' ? Math.round(amount * (coupon.value / 100)) : coupon.value * 100;
-                couponUpdateData = JSON.stringify(coupons.map(c => c.id === couponId ? { ...c, used: (c.used || 0) + 1 } : c));
+          // Check if this user already used this coupon
+          const alreadyUsed = await prisma.transaction.findFirst({
+            where: { userId: tx.userId, type: 'bonus', note: { contains: `[cid:${couponId}]` } },
+          });
+          if (!alreadyUsed) {
+            const row = await prisma.setting.findUnique({ where: { key: 'coupons' } });
+            if (row) {
+              const coupons = JSON.parse(row.value);
+              const coupon = coupons.find(c => c.id === couponId && c.enabled !== false);
+              if (coupon) {
+                const notExpired = !coupon.expires || new Date(coupon.expires) >= new Date();
+                const notMaxed = !coupon.maxUses || coupon.maxUses === 0 || (coupon.used || 0) < coupon.maxUses;
+                if (notExpired && notMaxed) {
+                  couponBonus = coupon.type === 'percent' ? Math.round(amount * (coupon.value / 100)) : coupon.value * 100;
+                  couponLabel = `Coupon ${coupon.code}: bonus [cid:${couponId}]`;
+                  couponUpdateData = JSON.stringify(coupons.map(c => c.id === couponId ? { ...c, used: (c.used || 0) + 1 } : c));
+                }
               }
             }
           }
@@ -73,7 +81,7 @@ export async function POST(req) {
       ];
       if (couponBonus > 0) {
         ops.push(prisma.transaction.create({
-          data: { userId: tx.userId, type: 'bonus', amount: couponBonus, status: 'Completed', note: `Coupon bonus on deposit ₦${amount / 100}` },
+          data: { userId: tx.userId, type: 'bonus', amount: couponBonus, status: 'Completed', note: couponLabel || `Coupon bonus on deposit ₦${amount / 100}` },
         }));
       }
       await prisma.$transaction(ops);
