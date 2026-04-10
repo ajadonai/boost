@@ -56,13 +56,28 @@ export async function GET(req) {
 }
 
 export async function POST(req) {
-  const { admin, error } = await requireAdmin('users', true);
-  if (error) return error;
-
   try {
-    const { action, userId, amount } = await req.json();
+    const body = await req.json();
+    const { action, userId, amount } = body;
 
     if (!userId) return Response.json({ error: 'User ID required' }, { status: 400 });
+
+    // Transactions is read-only — doesn't need write permission
+    if (action === 'transactions') {
+      const { admin, error } = await requireAdmin('users');
+      if (error) return error;
+      const transactions = await prisma.transaction.findMany({
+        where: { userId },
+        orderBy: { createdAt: 'desc' },
+        take: 200,
+        select: { id: true, type: true, amount: true, status: true, method: true, reference: true, note: true, createdAt: true },
+      });
+      return Response.json({ transactions });
+    }
+
+    // All other actions require write permission
+    const { admin, error } = await requireAdmin('users', true);
+    if (error) return error;
 
     const user = await prisma.user.findUnique({ where: { id: userId } });
     if (!user) return Response.json({ error: 'User not found' }, { status: 404 });
@@ -104,16 +119,6 @@ export async function POST(req) {
       await prisma.user.update({ where: { id: userId }, data: { status: 'Active' } });
       await logActivity(admin.name, `Activated user ${user.name}`, 'user');
       return Response.json({ success: true, message: `${user.name} activated` });
-    }
-
-    if (action === 'transactions') {
-      const transactions = await prisma.transaction.findMany({
-        where: { userId },
-        orderBy: { createdAt: 'desc' },
-        take: 200,
-        select: { id: true, type: true, amount: true, status: true, method: true, reference: true, note: true, createdAt: true },
-      });
-      return Response.json({ transactions });
     }
 
     return Response.json({ error: 'Unknown action' }, { status: 400 });
