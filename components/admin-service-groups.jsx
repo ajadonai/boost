@@ -204,15 +204,15 @@ export default function AdminServiceGroupsPage({ dark, t }) {
       {filtered.length === 0 && <div style={{ padding: 40, textAlign: "center", color: t.textMuted, fontSize: 14 }}>No service groups yet. Create one to get started.</div>}
 
       {filtered.map(g => (
-        <div key={g.id} style={{ ...cardStyle, opacity: g.enabled ? 1 : .5, borderLeft: g.nigerian ? `3px solid ${dark ? "#4ade80" : "#16a34a"}` : undefined }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8, flexWrap: "wrap", gap: 8 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        <div key={g.id} className="sg-card" style={{ ...cardStyle, opacity: g.enabled ? 1 : .5, borderLeft: g.nigerian ? `3px solid ${dark ? "#4ade80" : "#16a34a"}` : undefined }}>
+          <div className="sg-header-row" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8, flexWrap: "wrap", gap: 8 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
               <span style={{ fontSize: 16, fontWeight: 600, color: t.text }}>{g.name}</span>
               <span style={{ fontSize: 12, padding: "2px 8px", borderRadius: 4, background: dark ? "rgba(196,125,142,.1)" : "rgba(196,125,142,.06)", color: "#c47d8e", fontWeight: 500 }}>{g.platform}</span>
               {g.nigerian && <span style={{ fontSize: 12, padding: "2px 8px", borderRadius: 4, background: dark ? "rgba(74,222,128,.1)" : "rgba(22,163,74,.06)", color: dark ? "#4ade80" : "#16a34a", fontWeight: 500 }}>🇳🇬 Nigerian</span>}
               {!g.enabled && <span style={{ fontSize: 12, color: t.textMuted }}>(disabled)</span>}
             </div>
-            <div style={{ display: "flex", gap: 6 }}>
+            <div className="sg-actions" style={{ display: "flex", gap: 6 }}>
               <button onClick={() => act({ action: "update-group", groupId: g.id, enabled: !g.enabled })} style={ghostBtn}>{g.enabled ? "Disable" : "Enable"}</button>
               <button onClick={() => setAddTierGroup(addTierGroup === g.id ? null : g.id)} style={ghostBtn}>{addTierGroup === g.id ? "Cancel" : "+ Tier"}</button>
               <button onClick={async () => { if (await confirm({ title: "Delete Group", message: `Delete "${g.name}" and all its tiers?`, confirmLabel: "Delete", danger: true })) act({ action: "delete-group", groupId: g.id }); }} style={{ ...ghostBtn, color: dark ? "#fca5a5" : "#dc2626" }}>Delete</button>
