@@ -493,7 +493,7 @@ function CleanupButton({ dark, t }) {
   );
 }
 
-export function AdminSettingsPage({ admin, dark, t, themeMode, setThemeMode, setDark }) {
+export function AdminSettingsPage({ admin, dark, t, themeMode, setThemeMode, setDark, onLogout }) {
   const confirm = useConfirm();
   const [social, setSocial] = useState({ social_whatsapp: "", social_telegram: "", social_instagram: "", social_twitter: "", social_whatsapp_support: "" });
   const [emails, setEmails] = useState({ site_email_general: "", site_email_support: "" });
@@ -756,6 +756,14 @@ export function AdminSettingsPage({ admin, dark, t, themeMode, setThemeMode, set
             <div style={{ fontSize: 14, color: t.textMuted, marginBottom: 12, lineHeight: 1.5 }}>Remove unverified accounts older than 7 days that have no orders or transactions.</div>
             <CleanupButton dark={dark} t={t} />
           </div>
+        </div>
+
+        {/* Logout */}
+        <div style={{ marginBottom: 20 }}>
+          <button onClick={onLogout} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, width: "100%", padding: "12px 20px", borderRadius: 10, background: "none", border: `1px solid ${dark ? "rgba(252,165,165,.2)" : "rgba(220,38,38,.15)"}`, cursor: "pointer", fontSize: 15, fontWeight: 600, color: dark ? "#fca5a5" : "#dc2626", fontFamily: "inherit" }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Log out
+          </button>
         </div>
       </div>
     </>
