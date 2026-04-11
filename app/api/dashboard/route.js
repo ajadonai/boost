@@ -24,7 +24,7 @@ export async function GET() {
         where: { userId: user.id },
         orderBy: { createdAt: 'desc' },
         take: 50,
-        include: { service: { select: { name: true, category: true } } },
+        include: { service: { select: { name: true, category: true } }, tier: { select: { tier: true, group: { select: { name: true, platform: true } } } } },
       });
     } catch (e) { log.error('Dashboard', 'Orders query failed', { error: e.message }); }
 
@@ -117,8 +117,9 @@ export async function GET() {
       },
       orders: orders.map(o => ({
         id: o.orderId || o.id,
-        service: o.service?.name || o.serviceId,
-        platform: o.service?.category || 'unknown',
+        service: o.tier?.group?.name || o.service?.name || o.serviceId,
+        platform: o.tier?.group?.platform || o.service?.category || 'unknown',
+        tier: o.tier?.tier || null,
         link: o.link, quantity: o.quantity,
         charge: o.charge / 100,
         status: o.status,

@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from "react";
 import { useConfirm } from "./confirm-dialog";
+import { PlatformIcon } from "./platform-icon";
 import { fN, fD } from "../lib/format";
 
 
@@ -145,29 +146,37 @@ export default function OrdersPage({ orders: initialOrders, txs, dark, t }) {
           {pagedOrders.length > 0 ? pagedOrders.map((o, i) => (
             <div key={o.id}>
               <div onClick={() => setExpanded(expanded === o.id ? null : o.id)} className="ord-row" style={{ borderBottom: (i < pagedOrders.length - 1 || expanded === o.id) ? `1px solid ${t.cardBorder}` : "none" }}>
+                <PlatformIcon platform={o.platform} dark={dark} />
                 <div className="ord-row-left">
-                  <div className="ord-row-top">
-                    <span className="m ord-row-id" style={{ color: t.accent }}>{o.id}</span>
-                    <Badge status={o.status} dark={dark} />
-                  </div>
-                  <div className="ord-row-service" style={{ color: t.text }}>{o.service}</div>
-                  <div className="ord-row-meta" style={{ color: t.textMuted }}>
-                    <span>{o.platform || "—"}</span>
+                  <div className="ord-row-service" style={{ color: t.text }}>{o.service}{o.tier ? ` · ${o.tier}` : ""}</div>
+                  <div className="ord-row-meta ord-row-meta-wide" style={{ color: t.textMuted }}>
+                    <span className="m">{o.id}</span>
+                    <span className="ord-meta-sep" />
                     <span>{o.quantity?.toLocaleString() || 0} qty</span>
+                    <span className="ord-meta-sep" />
                     <span>{o.created ? fD(o.created) : ""}</span>
+                  </div>
+                  <div className="ord-row-meta ord-row-meta-narrow" style={{ color: t.textMuted }}>
+                    <div className="m">{o.id}</div>
+                    <div className="ord-row-meta-sub">
+                      <span>{o.quantity?.toLocaleString() || 0} qty</span>
+                      <span className="ord-meta-sep" />
+                      <span>{o.created ? fD(o.created, true) : ""}</span>
+                    </div>
                   </div>
                 </div>
                 <div className="ord-row-right">
                   <div className="m ord-row-charge" style={{ color: t.green }}>{fN(o.charge)}</div>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={t.textMuted} strokeWidth="2" strokeLinecap="round" style={{ marginTop: 4, transform: expanded === o.id ? "rotate(180deg)" : "rotate(0)", transition: "transform .2s" }}><polyline points="6 9 12 15 18 9"/></svg>
+                  <Badge status={o.status} dark={dark} />
                 </div>
+                <svg className="ord-row-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={t.textMuted} strokeWidth="2" strokeLinecap="round" style={{ transform: expanded === o.id ? "rotate(180deg)" : "rotate(0)", transition: "transform .2s" }}><polyline points="6 9 12 15 18 9"/></svg>
               </div>
 
               {/* Expanded details */}
               {expanded === o.id && (
                 <div className="ord-expanded" style={{ background: dark ? "rgba(255,255,255,.015)" : "rgba(0,0,0,.015)", borderBottom: i < pagedOrders.length - 1 ? `1px solid ${t.cardBorder}` : "none" }}>
                   <div className="ord-detail-grid">
-                    <div>
+                    <div className="ord-detail-link">
                       <div className="ord-detail-label" style={{ color: t.textMuted }}>Link</div>
                       <div className="m ord-detail-val" style={{ color: t.accent, wordBreak: "break-all" }}>{o.link || "—"}</div>
                     </div>
@@ -178,10 +187,6 @@ export default function OrdersPage({ orders: initialOrders, txs, dark, t }) {
                     <div>
                       <div className="ord-detail-label" style={{ color: t.textMuted }}>Charge</div>
                       <div className="m ord-detail-val" style={{ color: t.green }}>{fN(o.charge)}</div>
-                    </div>
-                    <div>
-                      <div className="ord-detail-label" style={{ color: t.textMuted }}>Date</div>
-                      <div className="ord-detail-val" style={{ color: t.text }}>{o.created ? fD(o.created) : "—"}</div>
                     </div>
                   </div>
                   {(o.status === "Processing" || o.status === "Pending") && (
@@ -295,10 +300,15 @@ export function OrdersSidebar({ orders, dark, t }) {
       <div className="ord-rs-title" style={{ color: t.textMuted }}>Recent Activity</div>
       {orders.slice(0, 5).map(o => (
         <div key={o.id} className="ord-rs-item" style={{ background: t.cardBg }}>
-          <div className="ord-rs-item-name" style={{ color: t.text }}>{o.service}</div>
-          <div className="ord-rs-item-row">
-            <span style={{ fontWeight: 600, color: sClr(o.status, dark) }}>{o.status}</span>
-            <span style={{ color: t.textMuted }}>{o.created ? fD(o.created).split(",")[0] : ""}</span>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <PlatformIcon platform={o.platform} dark={dark} size={28} />
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div className="ord-rs-item-name" style={{ color: t.text }}>{o.service}{o.tier ? ` · ${o.tier}` : ""}</div>
+              <div className="ord-rs-item-row">
+                <span style={{ fontWeight: 600, color: sClr(o.status, dark) }}>{o.status}</span>
+                <span style={{ color: t.textMuted }}>{o.created ? fD(o.created, true) : ""}</span>
+              </div>
+            </div>
           </div>
         </div>
       ))}

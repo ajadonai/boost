@@ -6,6 +6,7 @@ import NewOrderPage, { PLATFORMS, PLATFORM_GROUPS, OrderForm, ServicesSidebar } 
 import { ToastProvider } from "./toast";
 import { ConfirmProvider } from "./confirm-dialog";
 import AnnouncementBanner from "./announcement-banner";
+import { PlatformIcon } from "./platform-icon";
 import { fN, fD } from "../lib/format";
 
 /* Dynamic imports — only load when user navigates to that page */
@@ -134,11 +135,12 @@ function OverviewPage({ user, orders, alerts, dark, t, setActive }) {
         <div className="dash-section-divider" style={{ background: dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)" }} />
         {orders.length > 0 ? orders.slice(0, 5).map((o, i, arr) => (
           <div key={o.id} className="dash-order-row" style={{ borderBottom: i < arr.length - 1 ? `1px solid ${t.cardBorder}` : "none" }}>
+            <PlatformIcon platform={o.platform} dark={dark} />
             <div style={{ minWidth: 0, flex: 1 }}>
-              <div className="dash-order-service" style={{ color: t.text }}>{o.service}</div>
+              <div className="dash-order-service" style={{ color: t.text }}>{o.service}{o.tier ? ` · ${o.tier}` : ""}</div>
               <div className="dash-order-meta">
-                <span className="m" style={{ color: t.textMuted }}>{o.id}</span>
                 <span style={{ color: t.textMuted }}>{o.quantity?.toLocaleString() || 0} qty</span>
+                <span className="dash-order-sep" />
                 <span style={{ color: t.textMuted }}>{o.created ? fD(o.created) : ""}</span>
               </div>
             </div>
@@ -206,10 +208,15 @@ function RightSidebar({ orders, user, dark, t, setActive }) {
         <div className="dash-rs-list">
           {activeOrders.slice(0, 3).map(o => (
             <div key={o.id} className="dash-rs-item" style={{ background: t.cardBg }}>
-              <div className="dash-rs-item-name" style={{ color: t.text }}>{o.service}</div>
-              <div className="dash-rs-item-row">
-                <span style={{ fontWeight: 600, color: sClr(o.status, dark) }}>{o.status}</span>
-                <span style={{ color: t.textMuted }}>{o.quantity?.toLocaleString() || 0} qty</span>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <PlatformIcon platform={o.platform} dark={dark} size={28} />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div className="dash-rs-item-name" style={{ color: t.text }}>{o.service}{o.tier ? ` · ${o.tier}` : ""}</div>
+                  <div className="dash-rs-item-row">
+                    <span style={{ fontWeight: 600, color: sClr(o.status, dark) }}>{o.status}</span>
+                    <span style={{ color: t.textMuted }}>{o.quantity?.toLocaleString() || 0} qty</span>
+                  </div>
+                </div>
               </div>
             </div>
           ))}
