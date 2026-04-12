@@ -836,7 +836,7 @@ function DashboardInner() {
         {/* ── MAIN ── */}
         <main className="dash-main" style={{ background: t.bg, ...(isSupport ? { overflow: "hidden" } : {}) }}>
           <AnnouncementBanner alerts={alerts} dark={dark} mode="dashboard" />
-          {!isServices && !isOrders && !isReferrals && !isSettings && !isSupport && !isAddFunds && !isHowTo && <>
+          {!isServices && !isOrders && !isReferrals && !isSettings && !isSupport && !isAddFunds && !isHowTo && !isLeaderboard && <>
             <div className="dash-welcome" style={{ color: t.text }}>What's good, {firstName}</div>
             <div className="dash-welcome-sub" style={{ color: t.textMuted }}>Here's your empire at a glance</div>
           </>}
