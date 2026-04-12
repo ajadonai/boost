@@ -107,7 +107,7 @@ export default function AdminUsersPage({ dark, t }) {
 
       <div className="adm-card" style={{ background: dark ? "rgba(255,255,255,.03)" : "rgba(255,255,255,.85)", border: `0.5px solid ${dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)"}` }}>
         {loading ? (
-          <div className="adm-empty" style={{ color: t.textMuted }}>Loading users...</div>
+          <div className="adm-empty">{[1,2,3,4,5].map(i => <div key={i} className={`skel-bone ${dark ? "skel-dark" : "skel-light"}`} style={{ height: 48, borderRadius: 6, marginBottom: 6 }} />)}</div>
         ) : paged.length > 0 ? paged.map((u, i) => (
           <div key={u.id}>
             <div className="adm-list-row adm-user-row" style={{ borderBottom: (i < paged.length - 1 && creditId !== u.id && txUser?.id !== u.id) ? `1px solid ${t.cardBorder}` : "none", flexWrap: "wrap" }}>

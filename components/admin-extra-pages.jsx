@@ -47,7 +47,7 @@ export function AdminActivityPage({ dark, t }) {
 
       <div className="adm-card" style={{ background: dark ? "rgba(255,255,255,.03)" : "rgba(255,255,255,.85)", border: `0.5px solid ${dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)"}` }}>
         {loading ? (
-          <div className="adm-empty" style={{ color: t.textMuted }}>Loading activity...</div>
+          <div className="adm-empty">{[1,2,3,4,5].map(i => <div key={i} className={`skel-bone ${dark ? "skel-dark" : "skel-light"}`} style={{ height: 40, borderRadius: 6, marginBottom: 6 }} />)}</div>
         ) : filtered.length > 0 ? filtered.map((l, i) => (
           <div key={l.id || i} className="adm-list-row" style={{ borderBottom: i < filtered.length - 1 ? `1px solid ${t.cardBorder}` : "none" }}>
             <div style={{ width: 8, height: 8, borderRadius: 4, background: typeColor(l.type), flexShrink: 0, marginTop: 6 }} />
@@ -185,7 +185,7 @@ export function AdminTeamPage({ admin: currentAdmin, dark, t }) {
       )}
 
       <div className="adm-card" style={{ background: dark ? "rgba(255,255,255,.03)" : "rgba(255,255,255,.85)", border: `0.5px solid ${dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)"}`, marginTop: showAdd || showGuide ? 0 : 16 }}>
-        {loading ? <div className="adm-empty" style={{ color: t.textMuted }}>Loading team...</div> : admins.map((a, i) => {
+        {loading ? <div className="adm-empty">{[1,2,3].map(i => <div key={i} className={`skel-bone ${dark ? "skel-dark" : "skel-light"}`} style={{ height: 52, borderRadius: 8, marginBottom: 6 }} />)}</div> : admins.map((a, i) => {
           const owner = a.role === "owner";
           const ri = ROLE_INFO[a.role] || { color: "#888" };
           const expanded = expandedId === a.id && !owner && canManage;

@@ -130,7 +130,7 @@ export default function AdminServiceGroupsPage({ dark, t }) {
   const accentBtn = { ...btnStyle, background: "linear-gradient(135deg,#c47d8e,#a3586b)", color: "#fff" };
   const ghostBtn = { ...btnStyle, background: dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.04)", color: dark ? "#a09b95" : "#555250" };
 
-  if (loading) return <div style={{ padding: 24, color: t.textMuted }}>Loading menu builder...</div>;
+  if (loading) return <div style={{ padding: 24 }}>{[1,2,3,4].map(i => <div key={i} className={`skel-bone ${dark ? "skel-dark" : "skel-light"}`} style={{ height: 56, borderRadius: 10, marginBottom: 8 }} />)}</div>;
 
   return (
     <div style={{ padding: "0 0 40px" }}>
