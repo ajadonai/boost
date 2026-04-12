@@ -35,7 +35,7 @@ export function AdminPaymentsPage({ dark, t }) {
   const openConfig = (g) => {
     // Pre-fill with empty strings for each field (masked values aren't editable)
     const fields = {};
-    const defaultFields = { paystack: ["secretKey", "publicKey"], flutterwave: ["secretKey", "publicKey"], alatpay: ["secretKey", "publicKey"], monnify: ["apiKey", "secretKey", "contractCode"], korapay: ["secretKey", "publicKey"] };
+    const defaultFields = { flutterwave: ["secretKey", "publicKey"], alatpay: ["secretKey", "publicKey"], monnify: ["apiKey", "secretKey", "contractCode"], korapay: ["secretKey", "publicKey"], crypto: ["apiKey"], manual: ["bankName", "accountNumber", "accountName"] };
     (defaultFields[g.id] || ["secretKey", "publicKey"]).forEach(k => { fields[k] = ""; });
     setConfigFields(fields);
     setConfiguring(g);
@@ -53,7 +53,7 @@ export function AdminPaymentsPage({ dark, t }) {
     setSaving(false);
   };
 
-  const FIELD_LABELS = { secretKey: "Secret Key", publicKey: "Public Key", apiKey: "API Key", contractCode: "Contract Code" };
+  const FIELD_LABELS = { secretKey: "Secret Key", publicKey: "Public Key", apiKey: "API Key", contractCode: "Contract Code", bankName: "Bank Name", accountNumber: "Account Number", accountName: "Account Name" };
 
   return (
     <>
@@ -102,20 +102,23 @@ export function AdminPaymentsPage({ dark, t }) {
               <div style={{ fontSize: 16, fontWeight: 600, color: t.text }}>Configure {configuring.name}</div>
               <button onClick={() => setConfiguring(null)} style={{ background: "none", border: "none", color: t.textMuted, fontSize: 18, cursor: "pointer" }}>✕</button>
             </div>
-            <div style={{ fontSize: 13, color: t.textMuted, marginBottom: 16, lineHeight: 1.5 }}>Enter your API keys. Leave blank to keep existing keys. Current keys are masked for security.</div>
-            {Object.entries(configFields).map(([key]) => (
+            <div style={{ fontSize: 13, color: t.textMuted, marginBottom: 16, lineHeight: 1.5 }}>{configuring.id === "manual" ? "Enter your bank details. Users will see these when selecting bank transfer." : configuring.id === "crypto" ? "API key is set via environment variable. You can leave this blank." : "Enter your API keys. Leave blank to keep existing keys. Current keys are masked for security."}</div>
+            {Object.entries(configFields).map(([key]) => {
+              const isSecret = !["bankName", "accountNumber", "accountName"].includes(key);
+              return (
               <div key={key} style={{ marginBottom: 14 }}>
                 <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: t.textMuted, marginBottom: 4, textTransform: "uppercase", letterSpacing: 0.8 }}>{FIELD_LABELS[key] || key}</label>
                 <div style={{ fontSize: 12, color: t.textMuted, marginBottom: 4 }}>Current: {configuring.fields?.[key] || "Not set"}</div>
                 <input
-                  type="password"
+                  type={isSecret ? "password" : "text"}
                   value={configFields[key]}
                   onChange={e => setConfigFields(prev => ({ ...prev, [key]: e.target.value }))}
-                  placeholder={`Enter new ${FIELD_LABELS[key] || key}`}
-                  style={{ width: "100%", padding: "10px 12px", borderRadius: 8, border: `1px solid ${t.cardBorder}`, background: dark ? "rgba(255,255,255,.04)" : "rgba(0,0,0,.03)", color: t.text, fontSize: 14, outline: "none", fontFamily: "'JetBrains Mono', monospace", boxSizing: "border-box" }}
+                  placeholder={`Enter ${FIELD_LABELS[key] || key}`}
+                  style={{ width: "100%", padding: "10px 12px", borderRadius: 8, border: `1px solid ${t.cardBorder}`, background: dark ? "rgba(255,255,255,.04)" : "rgba(0,0,0,.03)", color: t.text, fontSize: 14, outline: "none", fontFamily: isSecret ? "'JetBrains Mono', monospace" : "'Outfit', sans-serif", boxSizing: "border-box" }}
                 />
               </div>
-            ))}
+              );
+            })}
             <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
               <button onClick={saveConfig} disabled={saving} style={{ flex: 1, padding: "11px 0", borderRadius: 8, background: "linear-gradient(135deg,#c47d8e,#8b5e6b)", color: "#fff", fontSize: 14, fontWeight: 600, border: "none", cursor: "pointer" }}>{saving ? "Saving..." : "Save Keys"}</button>
               <button onClick={() => setConfiguring(null)} style={{ padding: "11px 20px", borderRadius: 8, background: "none", border: `1px solid ${t.cardBorder}`, color: t.textMuted, fontSize: 14, cursor: "pointer" }}>Cancel</button>
