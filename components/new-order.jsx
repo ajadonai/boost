@@ -290,14 +290,10 @@ export default function NewOrderPage({ dark, t, user, onOrderSuccess, platform, 
   };
 
   const [platGroup, setPlatGroup] = useState("Social Platforms");
-  const [platPage, setPlatPage] = useState(0);
 
   /* Platforms in the selected group with services */
   const groupPlatforms = PLATFORM_GROUPS.find(g => g.label === platGroup)?.platforms || [];
   const visiblePlatforms = groupPlatforms.filter(p => (platformCounts[p.id] || 0) > 0);
-  const MAX_GRID = 5;
-  const totalPlatPages = Math.ceil(visiblePlatforms.length / MAX_GRID);
-  const gridPlatforms = visiblePlatforms.slice(platPage * MAX_GRID, (platPage + 1) * MAX_GRID);
 
   const TierChips = ({ svc }) => (
     <div className="no-tier-chips">
@@ -398,37 +394,22 @@ export default function NewOrderPage({ dark, t, user, onOrderSuccess, platform, 
       {/* ═══ GROUP TABS ═══ */}
       <div className="no-group-tabs" style={{ borderBottomColor: t.cardBorder }}>
         {PLATFORM_GROUPS.map(g => (
-          <button key={g.label} onClick={() => { setPlatGroup(g.label); setPlatPage(0); const first = g.platforms.find(p => (platformCounts[p.id] || 0) > 0); if (first) setPlatform(first.id); }} className={`no-group-tab${platGroup === g.label ? " no-group-tab-on" : ""}`} style={{ color: platGroup === g.label ? t.accent : t.textMuted, borderBottomColor: platGroup === g.label ? t.accent : "transparent" }}>
+          <button key={g.label} onClick={() => { setPlatGroup(g.label); const first = g.platforms.find(p => (platformCounts[p.id] || 0) > 0); if (first) setPlatform(first.id); }} className={`no-group-tab${platGroup === g.label ? " no-group-tab-on" : ""}`} style={{ color: platGroup === g.label ? t.accent : t.textMuted, borderBottomColor: platGroup === g.label ? t.accent : "transparent" }}>
             {g.label.replace(" Platforms", "").replace("SEO & ", "")}
           </button>
         ))}
       </div>
 
-      {/* ═══ PLATFORM GRID — desktop only (paginated, max 5 per page) ═══ */}
-      <div className="no-plat-grid-wrap">
-        {platPage > 0 && (
-          <button onClick={() => setPlatPage(platPage - 1)} className="no-plat-nav no-plat-nav-prev" style={{ color: t.textMuted, borderColor: t.cardBorder }}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="15 18 9 12 15 6"/></svg>
-          </button>
-        )}
-        <div className="no-plat-grid">
-          {gridPlatforms.map(p => {
-            const isActive = platform === p.id;
-            const count = platformCounts[p.id] || 0;
-            return (
-              <button key={p.id} onClick={() => setPlatform(p.id)} className={`no-plat-card${isActive ? " no-plat-card-on" : ""}`} style={{ borderColor: isActive ? t.accent : t.cardBorder, background: isActive ? (dark ? "rgba(196,125,142,.06)" : "rgba(196,125,142,.04)") : (dark ? "rgba(255,255,255,.02)" : "rgba(255,255,255,.7)") }}>
-                <div className="no-plat-card-icon">{p.icon}</div>
-                <div className="no-plat-card-name" style={{ color: isActive ? t.accent : t.textSoft }}>{p.label}</div>
-                {count > 0 && <div className="no-plat-card-count" style={{ color: isActive ? t.accent : t.textMuted }}>{count}</div>}
-              </button>
-            );
-          })}
-        </div>
-        {platPage < totalPlatPages - 1 && (
-          <button onClick={() => setPlatPage(platPage + 1)} className="no-plat-nav no-plat-nav-next" style={{ color: t.textMuted, borderColor: t.cardBorder }}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="9 18 15 12 9 6"/></svg>
-          </button>
-        )}
+      {/* ═══ PLATFORM ICONS — desktop only (compact row) ═══ */}
+      <div className="no-plat-icon-row">
+        {visiblePlatforms.map(p => {
+          const isActive = platform === p.id;
+          return (
+            <button key={p.id} onClick={() => setPlatform(p.id)} className={`no-plat-icon-btn${isActive ? " no-plat-icon-on" : ""}`} style={{ borderColor: isActive ? t.accent : t.cardBorder, background: isActive ? (dark ? "rgba(196,125,142,.08)" : "rgba(196,125,142,.05)") : (dark ? "rgba(255,255,255,.03)" : "rgba(255,255,255,.8)") }} title={p.label}>
+              <span className="no-plat-icon-svg">{p.icon}</span>
+            </button>
+          );
+        })}
       </div>
 
       {/* ═══ PLATFORM DROPDOWN — mobile/tablet only ═══ */}
