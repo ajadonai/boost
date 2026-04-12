@@ -289,39 +289,61 @@ export default function NewOrderPage({ dark, t, user, onOrderSuccess, platform, 
     setOrderLoading(false);
   };
 
-  const TierCards = ({ svc }) => (
-    <div className="no-tier-grid">
+  const [platGroup, setPlatGroup] = useState("Social Platforms");
+
+  /* Platforms in the selected group with services */
+  const groupPlatforms = PLATFORM_GROUPS.find(g => g.label === platGroup)?.platforms || [];
+  const visiblePlatforms = groupPlatforms.filter(p => (platformCounts[p.id] || 0) > 0);
+  const remainingCount = groupPlatforms.length - visiblePlatforms.length;
+
+  const TierChips = ({ svc }) => (
+    <div className="no-tier-chips">
       {svc.tiers.map(tier => {
-        const s = TS[tier.tier]; const isSel = selTier?.tier === tier.tier && selSvc?.id === svc.id;
+        const s = TS[tier.tier];
+        const isSel = selTier?.tier === tier.tier && selSvc?.id === svc.id;
         return (
-          <div key={tier.tier} onClick={e => pickTier(tier, e)} className="no-tier-card" style={{ borderWidth: 1, borderStyle: "solid", borderColor: isSel ? s.text : (dark ? s.borderD : s.border), background: isSel ? (dark ? s.bgD : s.bg) : (dark ? "#0e1120" : "#ffffff") }}>
-            <div className="no-tier-header">
-              <span style={{ fontSize: 14, fontWeight: 600, color: s.text }}>{s.label} {tier.tier}</span>
-              <span style={{ fontSize: 14, fontWeight: 600, color: s.text }}>₦{tier.price.toLocaleString()}<span style={{ fontSize: 12, fontWeight: 400 }}>/{tier.per}</span></span>
-            </div>
-            <div className="no-tier-meta" style={{ color: t.textMuted }}>Refill: <strong style={{ color: t.textSoft }}>{tier.refill}</strong> · {tier.speed}</div>
-          </div>
+          <button key={tier.tier} onClick={e => pickTier(tier, e)} className={`no-tier-chip${isSel ? " no-tier-chip-sel" : ""}`} style={{ background: dark ? s.bgD : s.bg, color: s.text, borderColor: isSel ? s.text : (dark ? s.borderD : s.border) }}>
+            {s.label} {tier.tier} · ₦{tier.price.toLocaleString()}
+          </button>
         );
       })}
     </div>
   );
 
-  const ServiceRow = ({ svc }) => {
+  const ServiceCard = ({ svc }) => {
     const isSel = selSvc?.id === svc.id;
+    const lowestPrice = Math.min(...svc.tiers.map(ti => ti.price));
+    const lowestPer = svc.tiers.find(ti => ti.price === lowestPrice)?.per || "1K";
+    const activeTier = isSel && selTier ? selTier : null;
     return (
-      <div onClick={() => pickService(svc)} className={`no-svc-row${isSel ? " no-svc-expanded" : ""}`} style={{ borderWidth: 1, borderStyle: "solid", borderColor: isSel ? t.accent : t.cardBorder, background: isSel ? (dark ? "#1e1420" : "#fefbfc") : svc.ng ? (dark ? "rgba(30,80,60,.15)" : "#e8f5ee") : t.cardBg, ...(isSel ? { boxShadow: dark ? "0 4px 20px rgba(196,125,142,.15)" : "0 4px 20px rgba(196,125,142,.1)", marginTop: 4, marginBottom: 4, borderLeftWidth: 3, borderLeftColor: t.accent } : {}), opacity: selSvc && !isSel ? (dark ? .45 : .5) : 1 }}>
-        <div className="no-svc-header">
-          <span className="no-svc-name" style={{ color: svc.ng ? (dark ? "#5dcaa5" : "#0F6E56") : t.text }}>{svc.name}</span>
-          <div className="no-svc-badges">
-            {svc.tiers.map(tier => (
-              <span key={tier.tier} className="m no-tier-badge" style={{ background: dark ? TS[tier.tier].bgD : TS[tier.tier].bg, color: TS[tier.tier].text, borderWidth: 1, borderStyle: "solid", borderColor: dark ? TS[tier.tier].borderD : TS[tier.tier].border }}>{tier.tier}</span>
-            ))}
+      <div onClick={() => pickService(svc)} className={`no-svc-card${isSel ? " no-svc-card-sel" : ""}${svc.ng ? " no-svc-ng" : ""}`} style={{ borderColor: isSel ? t.accent : t.cardBorder, background: isSel ? (dark ? "rgba(196,125,142,.04)" : "rgba(196,125,142,.02)") : svc.ng ? (dark ? "rgba(30,80,60,.15)" : "#e8f5ee") : t.cardBg, opacity: selSvc && !isSel ? (dark ? .4 : .45) : 1 }}>
+        <div className="no-svc-card-top">
+          <div className="no-svc-card-info">
+            <div className="no-svc-card-name" style={{ color: svc.ng ? (dark ? "#5dcaa5" : "#0F6E56") : t.text }}>{svc.name}</div>
+            <div className="no-svc-card-badges">
+              {svc.tiers.map(tier => (
+                <span key={tier.tier} className="m no-tier-badge" style={{ background: dark ? TS[tier.tier].bgD : TS[tier.tier].bg, color: TS[tier.tier].text, borderWidth: 1, borderStyle: "solid", borderColor: dark ? TS[tier.tier].borderD : TS[tier.tier].border }}>{tier.tier}</span>
+              ))}
+            </div>
+          </div>
+          <div className="no-svc-card-price">
+            <div className="no-svc-card-price-label" style={{ color: t.textMuted }}>{activeTier ? activeTier.tier : "from"}</div>
+            <div className="m no-svc-card-price-val" style={{ color: t.accent }}>₦{(activeTier ? activeTier.price : lowestPrice).toLocaleString()}<span className="no-svc-card-price-per" style={{ color: t.textMuted }}>/{activeTier ? activeTier.per : lowestPer}</span></div>
           </div>
         </div>
-        {isSel && svc.tiers.length > 1 && <TierCards svc={svc} />}
+        {isSel && svc.tiers.length > 1 && <TierChips svc={svc} />}
+        {isSel && activeTier && (
+          <div className="no-tier-detail" style={{ background: dark ? `${TS[activeTier.tier].text}08` : `${TS[activeTier.tier].text}06`, borderColor: dark ? `${TS[activeTier.tier].text}18` : `${TS[activeTier.tier].text}12` }}>
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: TS[activeTier.tier].text }}>{TS[activeTier.tier].label} {activeTier.tier}</div>
+              <div style={{ fontSize: 12, color: t.textMuted, marginTop: 2 }}>Refill: {activeTier.refill} · {activeTier.speed} · Min {(activeTier.min || 100).toLocaleString()}</div>
+            </div>
+            <div className="m" style={{ fontSize: 15, fontWeight: 700, color: TS[activeTier.tier].text }}>₦{activeTier.price.toLocaleString()}<span style={{ fontSize: 11, fontWeight: 400, color: t.textMuted }}>/{activeTier.per}</span></div>
+          </div>
+        )}
         {isSel && svc.tiers.length === 1 && (
-          <div className="no-svc-single" style={{ color: t.textMuted }}>
-            <span style={{ fontWeight: 600, color: TS[svc.tiers[0].tier].text }}>₦{svc.tiers[0].price.toLocaleString()}/{svc.tiers[0].per}</span> · Refill: {svc.tiers[0].refill} · {svc.tiers[0].speed}
+          <div className="no-tier-detail" style={{ background: dark ? `${TS[svc.tiers[0].tier].text}08` : `${TS[svc.tiers[0].tier].text}06`, borderColor: dark ? `${TS[svc.tiers[0].tier].text}18` : `${TS[svc.tiers[0].tier].text}12` }}>
+            <div style={{ fontSize: 12, color: t.textMuted }}>Refill: {svc.tiers[0].refill} · {svc.tiers[0].speed} · Min {(svc.tiers[0].min || 100).toLocaleString()}</div>
           </div>
         )}
       </div>
@@ -344,30 +366,20 @@ export default function NewOrderPage({ dark, t, user, onOrderSuccess, platform, 
         </div>
       )}
 
-      {/* Mobile/tablet guide — hidden on desktop where right sidebar shows it */}
+      {/* Mobile/tablet guide */}
       <div className="no-mobile-guide">
         <MobileGuide dark={dark} t={t} />
       </div>
 
       {menuLoading && (
         <div style={{ padding: "0" }}>
-          {/* Skeleton platform button — mobile/tablet */}
-          <div className="no-plat-btn-wrap">
-            <div className={`skel-bone ${dark ? "skel-dark" : "skel-light"}`} style={{ height: 42, borderRadius: 10, marginBottom: 10 }} />
-          </div>
-          {/* Skeleton search bar */}
           <div className={`skel-bone ${dark ? "skel-dark" : "skel-light"}`} style={{ height: 38, borderRadius: 8, marginBottom: 14 }} />
-          {/* Skeleton service cards */}
           {[1, 2, 3, 4, 5].map(i => (
-            <div key={i} style={{ padding: "14px 16px", borderRadius: 10, border: `1px solid ${dark ? "rgba(255,255,255,.05)" : "rgba(0,0,0,.05)"}`, marginBottom: 8, background: dark ? "rgba(255,255,255,.02)" : "rgba(255,255,255,.6)" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+            <div key={i} style={{ padding: "14px 16px", borderRadius: 12, border: `1px solid ${dark ? "rgba(255,255,255,.05)" : "rgba(0,0,0,.05)"}`, marginBottom: 8, background: dark ? "rgba(255,255,255,.02)" : "rgba(255,255,255,.6)" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <div className={`skel-bone ${dark ? "skel-dark" : "skel-light"}`} style={{ height: 16, width: `${45 + i * 8}%`, borderRadius: 4 }} />
-                <div style={{ display: "flex", gap: 6 }}>
-                  <div className={`skel-bone ${dark ? "skel-dark" : "skel-light"}`} style={{ height: 22, width: 58, borderRadius: 4 }} />
-                  {i % 2 === 0 && <div className={`skel-bone ${dark ? "skel-dark" : "skel-light"}`} style={{ height: 22, width: 50, borderRadius: 4 }} />}
-                </div>
+                <div className={`skel-bone ${dark ? "skel-dark" : "skel-light"}`} style={{ height: 20, width: 70, borderRadius: 4 }} />
               </div>
-              <div className={`skel-bone ${dark ? "skel-dark" : "skel-light"}`} style={{ height: 12, width: "30%", borderRadius: 3 }} />
             </div>
           ))}
         </div>
@@ -375,63 +387,51 @@ export default function NewOrderPage({ dark, t, user, onOrderSuccess, platform, 
       {menuError && <div style={{ padding: 40, textAlign: "center", color: dark ? "#fca5a5" : "#dc2626" }}>{menuError}</div>}
 
       {!menuLoading && !menuError && <>
-      {/* ═══ CONTENT WITH INLINE PLATFORM PICKER ═══ */}
-      <div className="no-content-split">
 
-        {/* ── Inline platform sidebar (desktop only) ── */}
-        <div className="no-plat-sidebar" style={{ borderRight: `1px solid ${t.cardBorder}` }}>
-          {PLATFORM_GROUPS.map(group => (
-            <div key={group.label} className="no-plat-group">
-              <div className="no-plat-group-label" style={{ color: t.accent }}>{group.label}</div>
-              {group.platforms.map(p => {
-                const active = platform === p.id;
-                const count = platformCounts[p.id] || 0;
-                return (
-                  <button key={p.id} onClick={() => setPlatform(p.id)} className="no-plat-item" style={{ background: active ? t.navActive : "transparent", color: active ? t.accent : t.textSoft, fontWeight: active ? 600 : 430 }}>
-                    <span className="no-plat-item-icon" style={{ opacity: active ? 1 : .5 }}>{p.icon}</span>
-                    {p.label}
-                    {count > 0 && <span style={{ marginLeft: "auto", fontSize: 11, fontWeight: 600, color: active ? t.accent : t.textMuted, background: active ? (dark ? "rgba(196,125,142,.15)" : "rgba(196,125,142,.1)") : (dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.04)"), padding: "1px 6px", borderRadius: 8, minWidth: 18, textAlign: "center" }}>{count}</span>}
-                  </button>
-                );
-              })}
-            </div>
-          ))}
-        </div>
+      {/* ═══ GROUP TABS ═══ */}
+      <div className="no-group-tabs" style={{ borderBottomColor: t.cardBorder }}>
+        {PLATFORM_GROUPS.map(g => (
+          <button key={g.label} onClick={() => { setPlatGroup(g.label); const first = g.platforms.find(p => (platformCounts[p.id] || 0) > 0); if (first) setPlatform(first.id); }} className={`no-group-tab${platGroup === g.label ? " no-group-tab-on" : ""}`} style={{ color: platGroup === g.label ? t.accent : t.textMuted, borderBottomColor: platGroup === g.label ? t.accent : "transparent" }}>
+            {g.label.replace(" Platforms", "")}
+          </button>
+        ))}
+      </div>
 
-        {/* ── Service list ── */}
-        <div className="no-svc-area">
-
-          {/* Platform selector — tablet/mobile only */}
-          <div className="no-plat-btn-wrap">
-            <button onClick={() => setCatModal(true)} className="no-plat-btn" style={{ borderWidth: 1, borderStyle: "solid", borderColor: t.accent, background: dark ? "#2a1a22" : "#fdf2f4", color: t.accent }}>
-              <span style={{ display: "flex", alignItems: "center" }}>{activePlat?.icon}</span>
-              {activePlat?.label}
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" style={{ marginLeft: "auto" }}><polyline points="6 9 12 15 18 9" /></svg>
+      {/* ═══ PLATFORM ICON GRID ═══ */}
+      <div className="no-plat-grid">
+        {visiblePlatforms.map(p => {
+          const isActive = platform === p.id;
+          const count = platformCounts[p.id] || 0;
+          return (
+            <button key={p.id} onClick={() => setPlatform(p.id)} className={`no-plat-card${isActive ? " no-plat-card-on" : ""}`} style={{ borderColor: isActive ? t.accent : t.cardBorder, background: isActive ? (dark ? "rgba(196,125,142,.06)" : "rgba(196,125,142,.04)") : (dark ? "rgba(255,255,255,.02)" : "rgba(255,255,255,.7)") }}>
+              <div className="no-plat-card-icon">{p.icon}</div>
+              <div className="no-plat-card-name" style={{ color: isActive ? t.accent : t.textSoft }}>{p.label}</div>
+              {count > 0 && <div className="no-plat-card-count" style={{ color: isActive ? t.accent : t.textMuted }}>{count}</div>}
             </button>
+          );
+        })}
+        {remainingCount > 0 && groupPlatforms.length > visiblePlatforms.length && (
+          <div className="no-plat-card no-plat-card-more" style={{ borderColor: t.cardBorder, color: t.textMuted }}>
+            <div className="no-plat-card-icon" style={{ fontSize: 14, color: t.textMuted }}>+{remainingCount}</div>
+            <div className="no-plat-card-name" style={{ color: t.textMuted }}>More</div>
           </div>
+        )}
+      </div>
 
-          {types.length > 1 && (
-            <div className="no-filters">
-              {["all", ...types].map(ty => (
-                <button key={ty} onClick={() => setFilterType(ty)} className="no-filter-pill" style={{ borderWidth: 1, borderStyle: "solid", borderColor: filterType === ty ? t.accent : t.cardBorder, background: filterType === ty ? (dark ? "#2a1a22" : "#fdf2f4") : "transparent", color: filterType === ty ? t.accent : t.textMuted }}>{ty}</button>
-              ))}
-            </div>
-          )}
+      {/* ═══ SEARCH ═══ */}
+      <input placeholder={`Search ${activePlat?.label || ""} services...`} value={search} onChange={e => setSearch(e.target.value)} className="no-svc-search" style={{ borderColor: t.cardBorder, background: dark ? "rgba(255,255,255,.03)" : "#fff", color: t.text }} />
 
-          {/* Search */}
-          <input placeholder="Search services..." value={search} onChange={e => setSearch(e.target.value)} style={{ width: "100%", boxSizing: "border-box", padding: "9px 12px", borderRadius: 8, borderWidth: 1, borderStyle: "solid", borderColor: t.cardBorder, background: dark ? "#0d1020" : "#fff", color: t.text, fontSize: 13, outline: "none", marginBottom: 10, fontFamily: "'JetBrains Mono', monospace" }} />
+      {/* ═══ SECTION HEADER ═══ */}
+      <div className="no-sec-hdr" style={{ borderBottomColor: t.cardBorder }}>
+        <div className="no-sec-icon">{activePlat?.icon}</div>
+        <span style={{ fontSize: 17, fontWeight: 600, color: t.text }}>{activePlat?.label}</span>
+        <span style={{ fontSize: 13, color: t.textMuted, marginLeft: "auto" }}>{filtered.length} service{filtered.length !== 1 ? "s" : ""}</span>
+      </div>
 
-          {/* Platform name + count */}
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-            <span style={{ fontSize: 16, fontWeight: 600, color: t.text }}>{activePlat?.label}</span>
-            <span style={{ fontSize: 13, color: t.textMuted }}>({filtered.length} services)</span>
-          </div>
-
-          <div className="no-svc-list">
-            {filtered.map(svc => <ServiceRow key={svc.id} svc={svc} />)}
-            {filtered.length === 0 && <div className="no-empty" style={{ color: t.textMuted }}>Coming soon.</div>}
-          </div>
-        </div>
+      {/* ═══ SERVICE CARDS ═══ */}
+      <div className="no-svc-list">
+        {filtered.map(svc => <ServiceCard key={svc.id} svc={svc} />)}
+        {filtered.length === 0 && <div className="no-empty" style={{ color: t.textMuted }}>Coming soon.</div>}
       </div>
 
       {/* Fixed bottom bar — mobile/tablet */}
@@ -451,43 +451,11 @@ export default function NewOrderPage({ dark, t, user, onOrderSuccess, platform, 
         </div>
       )}
 
-      {/* Order modal — mobile/tablet (fixed, no scroll, no zoom) */}
+      {/* Order modal — mobile/tablet */}
       {orderModal && hasOrder && (
         <div className="no-modal-overlay" onClick={() => setOrderModal(false)}>
           <div className="no-modal" onClick={e => e.stopPropagation()} style={{ background: dark ? "#0e1120" : "#ffffff", borderWidth: 1, borderStyle: "solid", borderColor: t.cardBorder }}>
             <OrderForm selSvc={selSvc} selTier={selTier} platform={platform} qty={qty} setQty={setQty} link={link} setLink={setLink} comments={comments} setComments={setComments} dark={dark} t={t} onClose={() => setOrderModal(false)} onSubmit={submitOrder} orderLoading={orderLoading} />
-          </div>
-        </div>
-      )}
-
-      {/* Category modal — mobile/tablet */}
-      {catModal && (
-        <div className="no-cat-overlay" onClick={() => setCatModal(false)}>
-          <div className="no-cat-modal" onClick={e => e.stopPropagation()} style={{ background: dark ? "#0e1120" : "#ffffff" }}>
-            <div className="no-cat-header">
-              <div className="no-cat-title" style={{ color: t.text }}>Select Platform</div>
-              <button onClick={() => setCatModal(false)} className="no-cat-close" style={{ borderColor: t.cardBorder, color: t.textSoft }}>✕</button>
-            </div>
-            <div className="no-cat-scroll">
-              {PLATFORM_GROUPS.map(group => (
-                <div key={group.label} className="no-cat-group">
-                  <div className="no-cat-group-label" style={{ color: t.textMuted }}>{group.label}</div>
-                  <div className="no-cat-grid">
-                    {group.platforms.map(p => {
-                      const act = platform === p.id;
-                      const count = platformCounts[p.id] || 0;
-                      return (
-                        <button key={p.id} onClick={() => { setPlatform(p.id); setCatModal(false); }} className="no-cat-item" style={{ borderWidth: 1, borderStyle: "solid", borderColor: act ? t.accent : t.cardBorder, background: act ? (dark ? "#2a1a22" : "#fdf2f4") : "transparent", color: act ? t.accent : t.text, position: "relative" }}>
-                          <span className="no-cat-icon">{p.icon}</span>
-                          <span className="no-cat-label">{p.label}</span>
-                          {count > 0 && <span style={{ fontSize: 10, fontWeight: 600, color: act ? t.accent : t.textMuted, position: "absolute", top: 4, right: 6 }}>{count}</span>}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              ))}
-            </div>
           </div>
         </div>
       )}
