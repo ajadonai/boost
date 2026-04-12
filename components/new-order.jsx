@@ -282,7 +282,7 @@ export default function NewOrderPage({ dark, t, user, onOrderSuccess, platform, 
     }
     else { setSelSvc(svc); setSelTier(null); }
   };
-  const pickTier = (tier, e) => { e.stopPropagation(); e.preventDefault(); setSelTier(tier); setQty(tier.min || 100); };
+  const pickTier = (tier, e) => { e.stopPropagation(); e.preventDefault(); setSelTier(tier); setQty(tier.min || 100); setOrderModal(true); };
 
   /* Place order */
   const submitOrder = async () => {
