@@ -158,7 +158,7 @@ export default function AdminUsersPage({ dark, t }) {
                   </div>
                 </div>
                 {txLoading ? (
-                  <div style={{ padding: 16, fontSize: 13, color: t.textMuted }}>Loading...</div>
+                  <div style={{ padding: 16 }}>{[1,2,3,4].map(i => <div key={i} className={`skel-bone ${dark ? "skel-dark" : "skel-light"}`} style={{ height: 36, borderRadius: 6, marginBottom: 6 }} />)}</div>
                 ) : txList.length > 0 ? (() => {
                   const txPerPg = 15;
                   const txTotalPages = Math.ceil(txList.length / txPerPg);
