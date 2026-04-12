@@ -1,12 +1,28 @@
 import prisma from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/auth';
 
-function getBadge(orderCount) {
-  if (orderCount >= 1000) return { title: 'Legend', emoji: '👑' };
-  if (orderCount >= 201) return { title: 'Elite', emoji: '💎' };
-  if (orderCount >= 51) return { title: 'Power User', emoji: '⚡' };
-  if (orderCount >= 11) return { title: 'Regular', emoji: '🔥' };
-  return { title: 'Starter', emoji: '🌱' };
+const DEFAULT_TIERS = [
+  { name: "Starter", threshold: 0, discount: 0, color: "#6B7280" },
+  { name: "Regular", threshold: 5000000, discount: 3, color: "#F59E0B" },
+  { name: "Power User", threshold: 25000000, discount: 5, color: "#3B82F6" },
+  { name: "Elite", threshold: 100000000, discount: 8, color: "#8B5CF6" },
+  { name: "Legend", threshold: 500000000, discount: 12, color: "#EF4444" },
+];
+
+async function getLoyaltyTiers() {
+  try {
+    const row = await prisma.setting.findUnique({ where: { key: 'loyalty_tiers' } });
+    if (row) return JSON.parse(row.value);
+  } catch {}
+  return DEFAULT_TIERS;
+}
+
+function getBadge(totalSpend, tiers) {
+  let badge = tiers[0];
+  for (const t of tiers) {
+    if (totalSpend >= t.threshold) badge = t;
+  }
+  return badge;
 }
 
 export async function GET(req) {
@@ -20,6 +36,7 @@ export async function GET(req) {
     const now = new Date();
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
     const dateFilter = period === 'month' ? { createdAt: { gte: monthStart } } : {};
+    const tiers = await getLoyaltyTiers();
 
     // Top spenders — ranked by order count (no amount exposed)
     const spenders = await prisma.order.groupBy({
@@ -37,23 +54,23 @@ export async function GET(req) {
     });
     const spenderMap = Object.fromEntries(spenderUsers.map(u => [u.id, u]));
 
-    // Get all-time order counts for badges
-    const allTimeCounts = await prisma.order.groupBy({
+    // Get all-time spend for badges (sum of charge on all orders)
+    const allTimeSpend = await prisma.order.groupBy({
       by: ['userId'],
       where: { userId: { in: spenderIds }, deletedAt: null },
-      _count: { id: true },
+      _sum: { charge: true },
     });
-    const allTimeMap = Object.fromEntries(allTimeCounts.map(a => [a.userId, a._count.id]));
+    const spendMap = Object.fromEntries(allTimeSpend.map(a => [a.userId, a._sum.charge || 0]));
 
     const topSpenders = spenders.map((s, i) => {
       const u = spenderMap[s.userId] || {};
-      const badge = getBadge(allTimeMap[s.userId] || s._count.id);
+      const badge = getBadge(spendMap[s.userId] || 0, tiers);
       return {
         rank: i + 1,
         name: formatName(u),
         orders: s._count.id,
-        badge: badge.title,
-        badgeEmoji: badge.emoji,
+        badge: badge.name,
+        badgeColor: badge.color,
         isYou: s.userId === session.id,
       };
     });
@@ -99,30 +116,36 @@ export async function GET(req) {
     });
     const activeMap = Object.fromEntries(activeUsers.map(u => [u.id, u]));
 
-    // All-time counts for active badges
-    const activeAllTime = await prisma.order.groupBy({
+    // All-time spend for active badges
+    const activeAllTimeSpend = await prisma.order.groupBy({
       by: ['userId'],
       where: { userId: { in: activeIds }, deletedAt: null },
-      _count: { id: true },
+      _sum: { charge: true },
     });
-    const activeAllTimeMap = Object.fromEntries(activeAllTime.map(a => [a.userId, a._count.id]));
+    const activeSpendMap = Object.fromEntries(activeAllTimeSpend.map(a => [a.userId, a._sum.charge || 0]));
 
     const mostActive = active.map((a, i) => {
       const u = activeMap[a.userId] || {};
-      const badge = getBadge(activeAllTimeMap[a.userId] || a._count.id);
+      const badge = getBadge(activeSpendMap[a.userId] || 0, tiers);
       return {
         rank: i + 1,
         name: formatName(u),
         orders: a._count.id,
-        badge: badge.title,
-        badgeEmoji: badge.emoji,
+        badge: badge.name,
+        badgeColor: badge.color,
         isYou: a.userId === session.id,
       };
     });
 
-    // Your all-time badge
-    const yourAllTime = await prisma.order.count({ where: { userId: session.id, deletedAt: null } });
-    const yourBadge = getBadge(yourAllTime);
+    // Your all-time badge (by spend)
+    const yourSpendAgg = await prisma.order.aggregate({ where: { userId: session.id, deletedAt: null }, _sum: { charge: true }, _count: { id: true } });
+    const yourTotalSpend = yourSpendAgg._sum.charge || 0;
+    const yourTotalOrders = yourSpendAgg._count.id || 0;
+    const yourBadge = getBadge(yourTotalSpend, tiers);
+
+    // Next tier info
+    const currentIdx = tiers.findIndex(t2 => t2.name === yourBadge.name);
+    const nextTier = currentIdx < tiers.length - 1 ? tiers[currentIdx + 1] : null;
 
     // Your ranks
     const yourSpenderRank = topSpenders.findIndex(s => s.isYou) + 1 || null;
@@ -142,7 +165,8 @@ export async function GET(req) {
       referrers: topReferrers,
       active: mostActive,
       yourRank: { spenders: yourSpenderRank, referrers: yourRefRank, active: yourActiveRank },
-      yourBadge: { title: yourBadge.title, emoji: yourBadge.emoji, totalOrders: yourAllTime },
+      yourBadge: { name: yourBadge.name, color: yourBadge.color, discount: yourBadge.discount, perks: yourBadge.perks, totalOrders: yourTotalOrders, nextTier: nextTier ? { name: nextTier.name, color: nextTier.color, threshold: nextTier.threshold, remaining: Math.max(0, nextTier.threshold - yourTotalSpend) } : null },
+      tiers,
       rewardAnnouncement,
       period,
     });

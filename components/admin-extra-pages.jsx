@@ -342,6 +342,21 @@ export function AdminCouponsPage({ dark, t }) {
   const [refSaving, setRefSaving] = useState(false);
   const [refMsg, setRefMsg] = useState(null);
 
+  const [rewardsTab, setRewardsTab] = useState("referrals");
+
+  // Loyalty tier settings
+  const DEFAULT_TIERS = [
+    { name: "Starter", threshold: 0, discount: 0, perks: "Welcome to Nitro", color: "#6B7280" },
+    { name: "Regular", threshold: 5000000, discount: 3, perks: "3% discount on all orders", color: "#F59E0B" },
+    { name: "Power User", threshold: 25000000, discount: 5, perks: "5% discount + priority support", color: "#3B82F6" },
+    { name: "Elite", threshold: 100000000, discount: 8, perks: "8% discount + priority support", color: "#8B5CF6" },
+    { name: "Legend", threshold: 500000000, discount: 12, perks: "12% discount + priority support + early access", color: "#EF4444" },
+  ];
+  const [loyaltyTiers, setLoyaltyTiers] = useState(DEFAULT_TIERS);
+  const [loyaltyEnabled, setLoyaltyEnabled] = useState(true);
+  const [loyaltySaving, setLoyaltySaving] = useState(false);
+  const [loyaltyMsg, setLoyaltyMsg] = useState(null);
+
   useEffect(() => {
     fetch("/api/admin/coupons").then(r => r.json()).then(d => { setCoupons(d.coupons || []); setLoading(false); }).catch(() => setLoading(false));
     fetch("/api/admin/settings").then(r => r.json()).then(d => {
@@ -351,6 +366,10 @@ export function AdminCouponsPage({ dark, t }) {
       if (s.ref_referrer_bonus) setRefReferrer(String(Math.round(Number(s.ref_referrer_bonus) / 100)));
       if (s.ref_invitee_bonus) setRefInvitee(String(Math.round(Number(s.ref_invitee_bonus) / 100)));
       if (s.ref_min_deposit) setRefMinDeposit(String(Math.round(Number(s.ref_min_deposit) / 100)));
+      if (s.loyalty_enabled !== undefined) setLoyaltyEnabled(s.loyalty_enabled === "true" || s.loyalty_enabled === true);
+      if (s.loyalty_tiers) {
+        try { setLoyaltyTiers(JSON.parse(s.loyalty_tiers)); } catch {}
+      }
     });
   }, []);
 
@@ -366,6 +385,22 @@ export function AdminCouponsPage({ dark, t }) {
       setRefMsg(r.ok ? { ok: true, text: "Referral settings saved" } : { text: "Failed to save" });
     } catch { setRefMsg({ text: "Request failed" }); }
     setRefSaving(false);
+  };
+
+  const saveLoyalty = async () => {
+    setLoyaltySaving(true); setLoyaltyMsg(null);
+    try {
+      const r = await fetch("/api/admin/settings", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ settings: {
+        loyalty_enabled: String(loyaltyEnabled),
+        loyalty_tiers: JSON.stringify(loyaltyTiers),
+      }}) });
+      setLoyaltyMsg(r.ok ? { ok: true, text: "Loyalty settings saved" } : { text: "Failed to save" });
+    } catch { setLoyaltyMsg({ text: "Request failed" }); }
+    setLoyaltySaving(false);
+  };
+
+  const updateTier = (idx, field, value) => {
+    setLoyaltyTiers(prev => prev.map((t2, i) => i === idx ? { ...t2, [field]: value } : t2));
   };
 
   const createCoupon = async () => {
@@ -393,11 +428,19 @@ export function AdminCouponsPage({ dark, t }) {
     <>
       <div className="adm-header">
         <div className="adm-title" style={{ color: t.text }}>Rewards</div>
-        <div className="adm-subtitle" style={{ color: t.textMuted }}>Manage referral bonuses and coupon codes</div>
+        <div className="adm-subtitle" style={{ color: t.textMuted }}>Manage referrals, coupons, and loyalty program</div>
         <div className="page-divider" style={{ background: t.cardBorder }} />
       </div>
 
-      {/* ═══ REFERRAL SETTINGS ═══ */}
+      {/* ═══ TABS ═══ */}
+      <div style={{ display: "flex", gap: 0, marginBottom: 20, borderBottom: `1px solid ${dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)"}` }}>
+        {[["referrals", "Referrals"], ["coupons", "Coupons"], ["loyalty", "Loyalty"]].map(([id, label]) => (
+          <button key={id} onClick={() => setRewardsTab(id)} style={{ padding: "10px 20px", fontSize: 14, fontWeight: rewardsTab === id ? 600 : 450, color: rewardsTab === id ? t.accent : t.textMuted, borderBottom: `2px solid ${rewardsTab === id ? t.accent : "transparent"}`, background: "none", cursor: "pointer", fontFamily: "inherit" }}>{label}</button>
+        ))}
+      </div>
+
+      {/* ═══ REFERRAL TAB ═══ */}
+      {rewardsTab === "referrals" && (
       <div className="adm-card" style={{ background: cardBg, border: cardBd, padding: 20, marginBottom: 20 }}>
         <div className="set-card-title" style={{ color: t.textMuted }}>Referral program</div>
         <div className="set-card-divider" style={{ background: divBg }} />
@@ -443,8 +486,10 @@ export function AdminCouponsPage({ dark, t }) {
           <button onClick={saveReferral} disabled={refSaving} className="adm-btn-primary" style={{ opacity: refSaving ? .5 : 1 }}>{refSaving ? "Saving..." : "Save Referral Settings"}</button>
         </div>
       </div>
+      )}
 
-      {/* ═══ COUPONS ═══ */}
+      {/* ═══ COUPONS TAB ═══ */}
+      {rewardsTab === "coupons" && (
       <div className="adm-card" style={{ background: cardBg, border: cardBd, marginBottom: 20 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px 16px 0" }}>
           <div>
@@ -495,6 +540,63 @@ export function AdminCouponsPage({ dark, t }) {
           <div className="adm-empty" style={{ color: t.textMuted }}>No coupons created yet</div>
         )}
       </div>
+      )}
+
+      {/* ═══ LOYALTY TAB ═══ */}
+      {rewardsTab === "loyalty" && (
+      <div className="adm-card" style={{ background: cardBg, border: cardBd, padding: 20, marginBottom: 20 }}>
+        <div className="set-card-title" style={{ color: t.textMuted }}>Loyalty program</div>
+        <div className="set-card-divider" style={{ background: divBg }} />
+
+        <div style={{ padding: "10px 14px", borderRadius: 8, background: dark ? "rgba(196,125,142,.05)" : "rgba(196,125,142,.03)", borderLeft: "3px solid #c47d8e", fontSize: 13, color: t.textMuted, lineHeight: 1.6, marginBottom: 16 }}>
+          Users earn tiers based on total lifetime spend. Each tier grants an automatic discount on future orders.
+        </div>
+
+        {loyaltyMsg && <div style={{ padding: "8px 14px", borderRadius: 8, marginBottom: 12, fontSize: 13, background: loyaltyMsg.ok ? (dark ? "rgba(110,231,183,.08)" : "#ecfdf5") : (dark ? "rgba(220,38,38,.08)" : "#fef2f2"), color: loyaltyMsg.ok ? (dark ? "#6ee7b7" : "#059669") : (dark ? "#fca5a5" : "#dc2626") }}>{loyaltyMsg.ok ? "✓" : "⚠️"} {loyaltyMsg.text}</div>}
+
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 0", borderBottom: `1px solid ${dark ? "rgba(255,255,255,.04)" : "rgba(0,0,0,.04)"}`, marginBottom: 16 }}>
+          <div><div style={{ fontSize: 14, fontWeight: 500, color: t.text }}>Loyalty program</div><div style={{ fontSize: 12, color: t.textSoft, marginTop: 2 }}>Enable automatic tier-based discounts</div></div>
+          <div onClick={() => setLoyaltyEnabled(!loyaltyEnabled)} style={{ width: 44, height: 24, borderRadius: 12, background: loyaltyEnabled ? "#c47d8e" : (dark ? "rgba(255,255,255,.08)" : "rgba(0,0,0,.08)"), position: "relative", cursor: "pointer", flexShrink: 0 }}>
+            <div style={{ width: 18, height: 18, borderRadius: "50%", background: "#fff", position: "absolute", top: 3, left: loyaltyEnabled ? 23 : 3, transition: "left .2s" }} />
+          </div>
+        </div>
+
+        {loyaltyTiers.map((tier, idx) => (
+          <div key={idx} style={{ padding: 16, borderRadius: 10, border: `1px solid ${dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)"}`, marginBottom: 12, background: dark ? "rgba(255,255,255,.02)" : "rgba(0,0,0,.01)" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
+              <div style={{ width: 8, height: 8, borderRadius: "50%", background: tier.color, flexShrink: 0 }} />
+              <input value={tier.name} onChange={e => updateTier(idx, "name", e.target.value.slice(0, 20))} style={{ ...inputStyle, fontWeight: 600, fontSize: 16, padding: "6px 10px" }} />
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
+              <div>
+                <label style={{ fontSize: 12, color: t.textMuted, display: "block", marginBottom: 4 }}>Min. spend (₦)</label>
+                <input type="number" value={Math.round(tier.threshold / 100)} onChange={e => updateTier(idx, "threshold", Number(e.target.value || 0) * 100)} style={inputStyle} disabled={idx === 0} />
+              </div>
+              <div>
+                <label style={{ fontSize: 12, color: t.textMuted, display: "block", marginBottom: 4 }}>Discount (%)</label>
+                <input type="number" value={tier.discount} onChange={e => updateTier(idx, "discount", Math.min(50, Math.max(0, Number(e.target.value || 0))))} style={inputStyle} min={0} max={50} />
+              </div>
+            </div>
+            <div>
+              <label style={{ fontSize: 12, color: t.textMuted, display: "block", marginBottom: 4 }}>Perks description</label>
+              <input value={tier.perks} onChange={e => updateTier(idx, "perks", e.target.value.slice(0, 200))} placeholder="Describe the perks for this tier" style={inputStyle} />
+            </div>
+            <div style={{ marginTop: 10 }}>
+              <label style={{ fontSize: 12, color: t.textMuted, display: "block", marginBottom: 4 }}>Badge color</label>
+              <div style={{ display: "flex", gap: 6 }}>
+                {["#6B7280", "#F59E0B", "#3B82F6", "#8B5CF6", "#EF4444", "#059669", "#EC4899", "#c47d8e"].map(c => (
+                  <div key={c} onClick={() => updateTier(idx, "color", c)} style={{ width: 24, height: 24, borderRadius: 6, background: c, cursor: "pointer", border: tier.color === c ? "2px solid #fff" : "2px solid transparent", boxShadow: tier.color === c ? `0 0 0 2px ${c}` : "none" }} />
+                ))}
+              </div>
+            </div>
+          </div>
+        ))}
+
+        <div style={{ marginTop: 16 }}>
+          <button onClick={saveLoyalty} disabled={loyaltySaving} className="adm-btn-primary" style={{ opacity: loyaltySaving ? .5 : 1 }}>{loyaltySaving ? "Saving..." : "Save Loyalty Settings"}</button>
+        </div>
+      </div>
+      )}
     </>
   );
 }

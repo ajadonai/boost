@@ -41,7 +41,7 @@ function PodiumCard({ entry, rank, dark, tab }) {
       <div className="lb-pod-name" style={{ fontSize: isFirst ? 15 : 13 }}>
         {entry.name}{entry.isYou ? " (You)" : ""}
       </div>
-      {entry.badge && <div style={{ fontSize: 11, color: dark ? "rgba(255,255,255,.5)" : "rgba(0,0,0,.4)", marginTop: 2 }}>{entry.badgeEmoji} {entry.badge}</div>}
+      {entry.badge && <div style={{ fontSize: 11, color: dark ? "rgba(255,255,255,.5)" : "rgba(0,0,0,.4)", marginTop: 2 }}><span style={{ display: "inline-block", width: 8, height: 8, borderRadius: "50%", background: entry.badgeColor || "#6B7280", marginRight: 4 }} />{entry.badge}</div>}
       <div className="m lb-pod-val" style={{ color: dark ? p.valDk : p.valLt, fontSize: isFirst ? 16 : 14 }}>{val}</div>
     </div>
   );
@@ -55,7 +55,7 @@ function ListRow({ entry, dark, t, tab, isLast }) {
       <div className="lb-avatar" style={{ background: dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.04)", color: dark ? "rgba(255,255,255,.5)" : "rgba(0,0,0,.45)" }}><UserIcon size={14} /></div>
       <div className="lb-info">
         <div className="lb-name" style={{ color: t.text }}>{entry.name}{entry.isYou ? " (You)" : ""}</div>
-        {entry.badge && <div style={{ fontSize: 11, color: t.textMuted }}>{entry.badgeEmoji} {entry.badge}</div>}
+        {entry.badge && <div style={{ fontSize: 11, color: t.textMuted }}><span style={{ display: "inline-block", width: 8, height: 8, borderRadius: "50%", background: entry.badgeColor || "#6B7280", marginRight: 4 }} />{entry.badge}</div>}
       </div>
       <div style={{ marginLeft: "auto", textAlign: "right" }}>
         <div className="m lb-val" style={{ color: dark ? "#6ee7b7" : "#059669" }}>{val}</div>
@@ -133,7 +133,7 @@ export default function LeaderboardPage({ dark, t }) {
           <div className="lb-you" style={{ background: dark ? "rgba(196,125,142,.04)" : "rgba(196,125,142,.04)", borderColor: dark ? "rgba(196,125,142,.12)" : "rgba(196,125,142,.1)" }}>
             <div className="m lb-you-rank" style={{ color: t.accent }}>#{yourRank}</div>
             <div>
-              <div style={{ fontSize: 14, fontWeight: 600, color: t.text }}>Your Rank {yourBadge ? `· ${yourBadge.emoji} ${yourBadge.title}` : ""}</div>
+              <div style={{ fontSize: 14, fontWeight: 600, color: t.text, display: "flex", alignItems: "center", gap: 6 }}>Your Rank {yourBadge && <><span style={{ display: "inline-block", width: 8, height: 8, borderRadius: "50%", background: yourBadge.color || "#6B7280" }} /><span style={{ color: yourBadge.color }}>{yourBadge.name}</span></>}</div>
               <div style={{ fontSize: 12, color: t.textMuted }}>
                 {tab === "spenders" && `${list.find(e => e.isYou)?.orders || 0} orders`}
                 {tab === "referrers" && `${list.find(e => e.isYou)?.referrals || 0} referrals`}

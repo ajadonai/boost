@@ -97,14 +97,32 @@ export async function GET() {
       } catch {}
     }
 
-    // User badge based on all-time order count
+    // User badge based on total lifetime spend
+    const DEFAULT_TIERS = [
+      { name: "Starter", threshold: 0, discount: 0, color: "#6B7280", perks: "Welcome to Nitro" },
+      { name: "Regular", threshold: 5000000, discount: 3, color: "#F59E0B", perks: "3% discount on all orders" },
+      { name: "Power User", threshold: 25000000, discount: 5, color: "#3B82F6", perks: "5% discount + priority support" },
+      { name: "Elite", threshold: 100000000, discount: 8, color: "#8B5CF6", perks: "8% discount + priority support" },
+      { name: "Legend", threshold: 500000000, discount: 12, color: "#EF4444", perks: "12% discount + priority support + early access" },
+    ];
+    let loyaltyTiers = DEFAULT_TIERS;
+    try {
+      const ltRow = await prisma.setting.findUnique({ where: { key: 'loyalty_tiers' } });
+      if (ltRow) loyaltyTiers = JSON.parse(ltRow.value);
+    } catch {}
+
     let totalOrders = 0;
-    try { totalOrders = await prisma.order.count({ where: { userId: user.id, deletedAt: null } }); } catch {}
-    const badge = totalOrders >= 1000 ? { title: 'Legend', emoji: '👑' }
-      : totalOrders >= 201 ? { title: 'Elite', emoji: '💎' }
-      : totalOrders >= 51 ? { title: 'Power User', emoji: '⚡' }
-      : totalOrders >= 11 ? { title: 'Regular', emoji: '🔥' }
-      : { title: 'Starter', emoji: '🌱' };
+    let totalSpend = 0;
+    try {
+      const agg = await prisma.order.aggregate({ where: { userId: user.id, deletedAt: null }, _sum: { charge: true }, _count: { id: true } });
+      totalOrders = agg._count.id || 0;
+      totalSpend = agg._sum.charge || 0;
+    } catch {}
+
+    let badge = loyaltyTiers[0];
+    for (const t2 of loyaltyTiers) { if (totalSpend >= t2.threshold) badge = t2; }
+    const currentIdx = loyaltyTiers.findIndex(t2 => t2.name === badge.name);
+    const nextTier = currentIdx < loyaltyTiers.length - 1 ? loyaltyTiers[currentIdx + 1] : null;
 
     return ok({
       user: {
@@ -123,9 +141,12 @@ export async function GET() {
         refMinDeposit: refMinDepositDisplay,
         themePreference: user.themePreference || 'auto',
         perPagePreference: user.perPagePreference || 10,
-        badge: badge.title,
-        badgeEmoji: badge.emoji,
+        badge: badge.name,
+        badgeColor: badge.color,
+        badgeDiscount: badge.discount,
+        badgePerks: badge.perks,
         totalOrders,
+        nextTier: nextTier ? { name: nextTier.name, color: nextTier.color, remaining: Math.max(0, nextTier.threshold - totalSpend) } : null,
       },
       orders: orders.map(o => ({
         id: o.orderId || o.id,
