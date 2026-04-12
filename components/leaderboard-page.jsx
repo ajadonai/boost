@@ -156,7 +156,7 @@ export default function LeaderboardPage({ dark, t }) {
                 <div>
                   <div style={{ fontSize: 13, fontWeight: 600, color: t.text }}>Your Rank</div>
                   <div style={{ fontSize: 11, color: t.textMuted }}>
-                    {yourBadge.nextTier ? `₦${(yourBadge.nextTier.remaining / 100).toLocaleString()} to ${yourBadge.nextTier.name}` : "Max tier reached"}
+                    {yourBadge.nextTier ? `Keep ordering to reach ${yourBadge.nextTier.name}` : "Max tier reached"}
                   </div>
                 </div>
               </div>
@@ -289,7 +289,7 @@ export function TierPerksCard({ dark, t }) {
           </div>
           {yourBadge.nextTier && (
             <div style={{ fontSize: 11, color: t.textMuted }}>
-              ₦{(yourBadge.nextTier.remaining / 100).toLocaleString()} to {yourBadge.nextTier.name}
+              Keep ordering to reach {yourBadge.nextTier.name}
             </div>
           )}
         </div>
