@@ -28,8 +28,8 @@ export default function CookieBanner() {
     <div className="cookie-banner">
       <div className="cookie-inner">
         <div className="cookie-text">
-          <span className="cookie-icon">🍪</span>
-          <p>We use cookies to improve your experience. By continuing, you agree to our <a href="/cookie">Cookie Policy</a>.</p>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c47d8e" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, opacity: 0.7 }}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <p>We use cookies to keep you signed in and improve your experience. <a href="/cookie">Cookie policy</a></p>
         </div>
         <div className="cookie-actions">
           <button onClick={decline} className="cookie-decline">Decline</button>
