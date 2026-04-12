@@ -212,7 +212,7 @@ export default function AddFundsPage({ user, dark, t, paymentStatus, setPaymentS
                   ) : (
                     <div>
                       <div style={{ display: "flex", gap: 8 }}>
-                        <input value={couponCode} onChange={e => setCouponCode(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ""))} placeholder="Enter code" className="m" style={{ flex: 1, padding: "9px 12px", borderRadius: 8, background: dark ? "rgba(255,255,255,.04)" : "#fff", border: `1px solid ${dark ? "rgba(255,255,255,.08)" : "rgba(0,0,0,.1)"}`, color: t.text, fontSize: 14, fontFamily: "'JetBrains Mono',monospace", letterSpacing: 1, outline: "none" }} />
+                        <input value={couponCode} onChange={e => setCouponCode(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ""))} placeholder="Enter code" className="m" style={{ flex: 1, maxWidth: 200, padding: "9px 12px", borderRadius: 8, background: dark ? "rgba(255,255,255,.04)" : "#fff", border: `1px solid ${dark ? "rgba(255,255,255,.08)" : "rgba(0,0,0,.1)"}`, color: t.text, fontSize: 14, fontFamily: "'JetBrains Mono',monospace", letterSpacing: 1, outline: "none" }} />
                         <button onClick={applyCoupon} disabled={couponLoading || !couponCode.trim()} style={{ padding: "9px 16px", borderRadius: 8, background: dark ? "rgba(196,125,142,.12)" : "rgba(196,125,142,.08)", color: t.accent, fontSize: 14, fontWeight: 600, cursor: "pointer", border: "none", opacity: couponLoading || !couponCode.trim() ? .5 : 1 }}>{couponLoading ? "..." : "Apply"}</button>
                       </div>
                       {couponError && <div style={{ fontSize: 12, color: dark ? "#fca5a5" : "#dc2626", marginTop: 6 }}>⚠️ {couponError}</div>}
@@ -324,7 +324,7 @@ export default function AddFundsPage({ user, dark, t, paymentStatus, setPaymentS
                   ) : (
                     <>
                       <div style={{ display: "flex", gap: 8 }}>
-                        <input value={couponCode} onChange={e => setCouponCode(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ""))} placeholder="Enter code" className="m" style={{ flex: 1, padding: "9px 12px", borderRadius: 8, background: dark ? "rgba(255,255,255,.04)" : "#fff", border: `1px solid ${dark ? "rgba(255,255,255,.08)" : "rgba(0,0,0,.1)"}`, color: t.text, fontSize: 14, fontFamily: "'JetBrains Mono',monospace", letterSpacing: 1, outline: "none" }} />
+                        <input value={couponCode} onChange={e => setCouponCode(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ""))} placeholder="Enter code" className="m" style={{ flex: 1, maxWidth: 200, padding: "9px 12px", borderRadius: 8, background: dark ? "rgba(255,255,255,.04)" : "#fff", border: `1px solid ${dark ? "rgba(255,255,255,.08)" : "rgba(0,0,0,.1)"}`, color: t.text, fontSize: 14, fontFamily: "'JetBrains Mono',monospace", letterSpacing: 1, outline: "none" }} />
                         <button onClick={applyCoupon} disabled={couponLoading || !couponCode.trim()} style={{ padding: "9px 16px", borderRadius: 8, background: dark ? "rgba(196,125,142,.12)" : "rgba(196,125,142,.08)", color: t.accent, fontSize: 14, fontWeight: 600, cursor: "pointer", border: "none", opacity: couponLoading || !couponCode.trim() ? .5 : 1 }}>{couponLoading ? "..." : "Apply"}</button>
                       </div>
                       {couponError && <div style={{ fontSize: 12, color: dark ? "#fca5a5" : "#dc2626", marginTop: 6 }}>⚠️ {couponError}</div>}
