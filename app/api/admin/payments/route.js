@@ -3,11 +3,12 @@ import { log } from "@/lib/logger";
 import { requireAdmin, logActivity, canPerformAction } from '@/lib/admin';
 
 const DEFAULT_GATEWAYS = [
-  { id: 'paystack', name: 'Paystack', desc: 'Cards, Bank Transfer, USSD', enabled: false, priority: 1, fields: { secretKey: '', publicKey: '' } },
-  { id: 'flutterwave', name: 'Flutterwave', desc: 'Cards, Bank Transfer, Mobile Money', enabled: false, priority: 2, fields: { secretKey: '', publicKey: '' } },
-  { id: 'alatpay', name: 'ALATPay (Wema)', desc: 'Direct bank debit', enabled: false, priority: 3, fields: { secretKey: '', publicKey: '' } },
-  { id: 'monnify', name: 'Monnify', desc: 'Auto-confirmed bank transfer', enabled: false, priority: 4, fields: { apiKey: '', secretKey: '', contractCode: '' } },
-  { id: 'korapay', name: 'KoraPay', desc: 'Cards, Bank Transfer', enabled: false, priority: 5, fields: { secretKey: '', publicKey: '' } },
+  { id: 'flutterwave', name: 'Flutterwave', desc: 'Cards, Bank Transfer, Mobile Money', enabled: false, priority: 1, fields: { secretKey: '', publicKey: '' } },
+  { id: 'alatpay', name: 'ALATPay (Wema)', desc: 'Direct bank debit', enabled: false, priority: 2, fields: { secretKey: '', publicKey: '' } },
+  { id: 'monnify', name: 'Monnify', desc: 'Auto-confirmed bank transfer', enabled: false, priority: 3, fields: { apiKey: '', secretKey: '', contractCode: '' } },
+  { id: 'korapay', name: 'KoraPay', desc: 'Cards, Bank Transfer', enabled: false, priority: 4, fields: { secretKey: '', publicKey: '' } },
+  { id: 'crypto', name: 'Crypto', desc: 'BTC, ETH, USDT, USDC', enabled: false, priority: 5, fields: { apiKey: '' } },
+  { id: 'manual', name: 'Bank Transfer (Manual)', desc: 'User transfers to your bank, you confirm', enabled: false, priority: 6, fields: { bankName: '', accountNumber: '', accountName: '' } },
 ];
 
 async function getGateways() {

@@ -2,11 +2,12 @@ import prisma from '@/lib/prisma';
 import { log } from "@/lib/logger";
 
 const GATEWAY_INFO = {
-  paystack: { name: 'Paystack', desc: 'Cards, Bank Transfer, USSD' },
   flutterwave: { name: 'Flutterwave', desc: 'Cards, Bank Transfer, Mobile Money' },
   alatpay: { name: 'ALATPay (Wema)', desc: 'Direct bank debit' },
   monnify: { name: 'Monnify', desc: 'Auto-confirmed bank transfer' },
   korapay: { name: 'KoraPay', desc: 'Cards, Bank Transfer' },
+  crypto: { name: 'Crypto', desc: 'BTC, ETH, USDT, USDC' },
+  manual: { name: 'Bank Transfer', desc: 'Manual bank transfer' },
 };
 
 export async function GET() {
