@@ -457,12 +457,12 @@ input { font-family: inherit; }
 .no-group-tab { padding: 8px 16px; font-size: 14px; font-weight: 500; cursor: pointer; border: none; border-bottom: 2px solid transparent; margin-bottom: -1px; background: none; font-family: inherit; }
 .no-group-tab-on { font-weight: 600; }
 
-/* Platform icon row — desktop only (compact) */
-.no-plat-icon-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
-.no-plat-icon-btn { width: 44px; height: 44px; border-radius: 12px; border-width: 1.5px; border-style: solid; display: flex; align-items: center; justify-content: center; cursor: pointer; font-family: inherit; transition: all .15s; }
+/* Platform icon row — desktop only */
+.no-plat-icon-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; max-width: 100%; }
+.no-plat-icon-btn { width: 52px; height: 52px; border-radius: 14px; border-width: 1.5px; border-style: solid; display: flex; align-items: center; justify-content: center; cursor: pointer; font-family: inherit; transition: all .15s; }
 .no-plat-icon-btn:hover { border-color: rgba(196,125,142,.3) !important; }
-.no-plat-icon-on { border-width: 2px; }
-.no-plat-icon-svg { display: flex; align-items: center; justify-content: center; width: 20px; height: 20px; }
+.no-plat-icon-on { border-width: 2.5px; }
+.no-plat-icon-svg { display: flex; align-items: center; justify-content: center; width: 22px; height: 22px; color: inherit; }
 
 /* Platform dropdown — mobile/tablet only */
 .no-plat-btn-wrap { display: none; margin-bottom: 12px; }

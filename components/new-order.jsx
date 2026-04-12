@@ -400,16 +400,21 @@ export default function NewOrderPage({ dark, t, user, onOrderSuccess, platform, 
         ))}
       </div>
 
-      {/* ═══ PLATFORM ICONS — desktop only (compact row) ═══ */}
+      {/* ═══ PLATFORM ICONS — desktop only (max 10 + overflow) ═══ */}
       <div className="no-plat-icon-row">
-        {visiblePlatforms.map(p => {
+        {visiblePlatforms.slice(0, 10).map(p => {
           const isActive = platform === p.id;
           return (
-            <button key={p.id} onClick={() => setPlatform(p.id)} className={`no-plat-icon-btn${isActive ? " no-plat-icon-on" : ""}`} style={{ borderColor: isActive ? t.accent : t.cardBorder, background: isActive ? (dark ? "rgba(196,125,142,.08)" : "rgba(196,125,142,.05)") : (dark ? "rgba(255,255,255,.03)" : "rgba(255,255,255,.8)") }} title={p.label}>
+            <button key={p.id} onClick={() => setPlatform(p.id)} className={`no-plat-icon-btn${isActive ? " no-plat-icon-on" : ""}`} style={{ borderColor: isActive ? t.accent : t.cardBorder, background: isActive ? (dark ? "rgba(196,125,142,.1)" : "rgba(196,125,142,.06)") : (dark ? "rgba(255,255,255,.04)" : "rgba(255,255,255,.8)"), color: isActive ? t.accent : (dark ? "rgba(255,255,255,.6)" : "rgba(0,0,0,.55)") }} title={p.label}>
               <span className="no-plat-icon-svg">{p.icon}</span>
             </button>
           );
         })}
+        {visiblePlatforms.length > 10 && (
+          <button onClick={() => setCatModal(true)} className="no-plat-icon-btn" style={{ borderColor: t.cardBorder, borderStyle: "dashed", background: dark ? "rgba(255,255,255,.03)" : "rgba(255,255,255,.7)", color: t.textMuted, fontSize: 13, fontWeight: 600 }} title="More platforms">
+            +{visiblePlatforms.length - 10}
+          </button>
+        )}
       </div>
 
       {/* ═══ PLATFORM DROPDOWN — mobile/tablet only ═══ */}
