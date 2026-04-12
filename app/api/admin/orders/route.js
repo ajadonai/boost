@@ -1,6 +1,7 @@
 import prisma from '@/lib/prisma';
 import { log } from "@/lib/logger";
 import { requireAdmin, logActivity } from '@/lib/admin';
+import { checkOrder, cancelOrder, refillOrder, isProviderConfigured, getProviderName } from '@/lib/smm';
 
 export async function GET(req) {
   const { admin, error } = await requireAdmin('orders');
@@ -18,7 +19,7 @@ export async function GET(req) {
       ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
       include: {
         user: { select: { name: true, email: true } },
-        service: { select: { name: true, category: true } },
+        service: { select: { name: true, category: true, provider: true } },
         tier: { select: { tier: true, group: { select: { name: true, platform: true } } } },
       },
     });
@@ -37,6 +38,7 @@ export async function GET(req) {
         tier: o.tier?.tier || null,
         platform: o.tier?.group?.platform || o.service?.category || 'unknown',
         category: o.service?.category || 'unknown',
+        provider: o.service?.provider || 'mtp',
         link: o.link,
         quantity: o.quantity,
         charge: o.charge / 100,
@@ -65,50 +67,50 @@ export async function POST(req) {
 
     const order = await prisma.order.findFirst({
       where: { OR: [{ orderId }, { id: orderId }], deletedAt: null },
+      include: { service: { select: { provider: true } } },
     });
     if (!order) return Response.json({ error: 'Order not found' }, { status: 404 });
 
+    const provider = order.service?.provider || 'mtp';
+    const providerLabel = getProviderName(provider);
+
     if (action === 'cancel') {
-      // Cancel on MTP if possible
-      if (order.apiOrderId && process.env.MTP_API_KEY) {
+      if (order.apiOrderId && isProviderConfigured(provider)) {
         try {
-          const { cancelOrder } = await import('@/lib/mtp');
-          await cancelOrder(order.apiOrderId);
-        } catch (e) { log.warn('Admin Cancel MTP', e.message); }
+          await cancelOrder(provider, order.apiOrderId);
+        } catch (e) { log.warn(`Admin Cancel ${providerLabel}`, e.message); }
       }
       await prisma.order.update({ where: { id: order.id }, data: { status: 'Cancelled' } });
-      await logActivity(admin.name, `Cancelled order ${orderId}`, 'order');
+      await logActivity(admin.name, `Cancelled order ${orderId} (${providerLabel})`, 'order');
       return Response.json({ success: true, message: 'Order cancelled' });
     }
 
     if (action === 'refill') {
-      if (order.apiOrderId && process.env.MTP_API_KEY) {
+      if (order.apiOrderId && isProviderConfigured(provider)) {
         try {
-          const { refillOrder } = await import('@/lib/mtp');
-          await refillOrder(order.apiOrderId);
-        } catch (e) { log.warn('Admin Refill MTP', e.message); }
+          await refillOrder(provider, order.apiOrderId);
+        } catch (e) { log.warn(`Admin Refill ${providerLabel}`, e.message); }
       }
-      await logActivity(admin.name, `Requested refill for ${orderId}`, 'order');
+      await logActivity(admin.name, `Requested refill for ${orderId} (${providerLabel})`, 'order');
       return Response.json({ success: true, message: 'Refill requested' });
     }
 
     if (action === 'check') {
-      if (order.apiOrderId && process.env.MTP_API_KEY) {
+      if (order.apiOrderId && isProviderConfigured(provider)) {
         try {
-          const { checkOrder } = await import('@/lib/mtp');
-          const status = await checkOrder(order.apiOrderId);
+          const status = await checkOrder(provider, order.apiOrderId);
           const statusMap = { 'Completed': 'Completed', 'In progress': 'Processing', 'Processing': 'Processing', 'Pending': 'Pending', 'Partial': 'Partial', 'Canceled': 'Cancelled', 'Refunded': 'Cancelled' };
           const newStatus = statusMap[status.status] || order.status;
           if (newStatus !== order.status) {
             await prisma.order.update({ where: { id: order.id }, data: { status: newStatus } });
           }
-          await logActivity(admin.name, `Checked order ${orderId}: ${newStatus}`, 'order');
+          await logActivity(admin.name, `Checked order ${orderId} via ${providerLabel}: ${newStatus}`, 'order');
           return Response.json({ success: true, status: newStatus, remains: status.remains });
         } catch (e) {
           return Response.json({ success: true, status: order.status, message: e.message });
         }
       }
-      return Response.json({ success: true, status: order.status, message: 'No MTP tracking' });
+      return Response.json({ success: true, status: order.status, message: `No ${providerLabel} tracking` });
     }
 
     return Response.json({ error: 'Unknown action' }, { status: 400 });
