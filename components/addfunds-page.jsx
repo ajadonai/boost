@@ -199,7 +199,7 @@ export default function AddFundsPage({ user, dark, t, paymentStatus, setPaymentS
                 <div className="fund-line"><span style={{ color: t.textMuted }}>Coupon bonus</span><span style={{ color: dark ? "#6ee7b7" : "#059669", fontWeight: 600 }}>+{fN(discount / 100)}</span></div>
               )}
               <div style={{ height: 1, background: t.cardBorder, margin: "4px 0 14px" }} />
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 20 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 28 }}>
                 <span style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: 1.5, color: t.textMuted }}>{couponApplied && discount > 0 ? "You get" : "Total"}</span>
                 <span style={{ fontSize: 28, fontWeight: 700, color: valid ? t.accent : t.textMuted }}>{valid ? fN(numAmount + (discount > 0 ? discount / 100 : 0)) : "—"}</span>
               </div>
