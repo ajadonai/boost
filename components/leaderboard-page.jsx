@@ -8,9 +8,9 @@ const TABS = [
 ];
 
 const POD = {
-  1: { bg: "#2a2308", bgL: "#fef9e7", border: "#5c4a10", borderL: "#e8d576", medal: "🥇", valDk: "#ffd700", valLt: "#b8860b" },
-  2: { bg: "#1a1e24", bgL: "#f0f2f5", border: "#3a4050", borderL: "#b0b8c8", medal: "🥈", valDk: "#c0c0c0", valLt: "#6b7280" },
-  3: { bg: "#241a12", bgL: "#fdf3eb", border: "#5c3a1a", borderL: "#d4a574", medal: "🥉", valDk: "#cd7f32", valLt: "#a0522d" },
+  1: { bg: "#352e0c", bgL: "#fdf3c7", border: "#5c4a10", borderL: "#d4a820", medal: "🥇", valDk: "#ffd700", valLt: "#92650a" },
+  2: { bg: "#1e2430", bgL: "#e8ecf2", border: "#3a4050", borderL: "#8898b0", medal: "🥈", valDk: "#c0c0c0", valLt: "#4b5563" },
+  3: { bg: "#2e1e0e", bgL: "#fdecd8", border: "#5c3a1a", borderL: "#c48040", medal: "🥉", valDk: "#cd7f32", valLt: "#8b4513" },
 };
 
 const UserIcon = ({ size = 16 }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>;
@@ -60,7 +60,7 @@ function PodiumCard({ entry, rank, dark, tab }) {
       <div className="lb-pod-name" style={{ fontSize: isFirst ? 15 : 13, marginBottom: 4 }}>
         {entry.name}{entry.isYou ? " (You)" : ""}
       </div>
-      {entry.badge && <div style={{ display: "flex", alignItems: "center", gap: 4, marginBottom: 4 }}><ShieldBadge color={entry.badgeColor || "#6B7280"} size={14} tier={entry.badge} /><span style={{ fontSize: 11, color: entry.badgeColor || (dark ? "rgba(255,255,255,.5)" : "rgba(0,0,0,.4)") }}>{entry.badge}</span></div>}
+      {entry.badge && <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 4, marginBottom: 4 }}><ShieldBadge color={entry.badgeColor || "#6B7280"} size={14} tier={entry.badge} /><span style={{ fontSize: 11, color: entry.badgeColor || (dark ? "rgba(255,255,255,.5)" : "rgba(0,0,0,.4)") }}>{entry.badge}</span></div>}
       <div className="m lb-pod-val" style={{ color: dark ? p.valDk : p.valLt, fontSize: isFirst ? 16 : 14 }}>{val}</div>
     </div>
   );
