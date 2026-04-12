@@ -376,7 +376,7 @@ export default function NewOrderPage({ dark, t, user, onOrderSuccess, platform, 
   return (
     <>
       <div className="no-header">
-        <div className="no-title" style={{ color: t.text }}>Services</div>
+        <div className="no-title" style={{ color: t.text }}>New Order</div>
         <div className="no-subtitle" style={{ color: t.textMuted }}>{menuData ? `${allGroups.length} services across ${Object.keys(platformCounts).length} platforms — prices per 1,000` : "Browse and order social media services"}</div>
         <div className="page-divider" style={{ background: t.cardBorder }} />
       </div>
