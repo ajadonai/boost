@@ -562,7 +562,8 @@ export function AdminCouponsPage({ dark, t }) {
         </div>
 
         {loyaltyTiers.map((tier, idx) => (
-          <div key={idx} style={{ padding: 16, borderRadius: 10, border: `1px solid ${dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)"}`, marginBottom: 12, background: dark ? "rgba(255,255,255,.02)" : "rgba(0,0,0,.01)" }}>
+          <div key={idx} style={{ padding: 16, borderRadius: 10, border: `1px solid ${dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)"}`, borderLeft: `3px solid ${tier.color}`, marginBottom: 16, background: dark ? "rgba(255,255,255,.02)" : "rgba(0,0,0,.01)" }}>
+            <div style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: 1, color: tier.color, marginBottom: 8 }}>Tier {idx + 1}{idx === 0 ? " — Base" : ""}</div>
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
               <div style={{ width: 8, height: 8, borderRadius: "50%", background: tier.color, flexShrink: 0 }} />
               <input value={tier.name} onChange={e => updateTier(idx, "name", e.target.value.slice(0, 20))} style={{ ...inputStyle, fontWeight: 600, fontSize: 16, padding: "6px 10px" }} />
