@@ -274,10 +274,25 @@ export default function NewOrderPage({ dark, t, user, onOrderSuccess, platform, 
 
   useEffect(() => { setSelSvc(null); setSelTier(null); setFilterType("all"); setOrderModal(false); setOrderResult(null); setSearch(""); }, [platform]);
 
+  /* Click outside any card → collapse */
+  const listRef = useRef(null);
+  useEffect(() => {
+    if (!selSvc) return;
+    const handler = (e) => {
+      // If click is inside the service list, the card's own onClick handles it
+      // If click is outside the service list entirely, collapse
+      if (listRef.current && !listRef.current.contains(e.target)) {
+        // Don't collapse if clicking inside order form, modal, or bottom bar
+        if (e.target.closest('.no-modal-overlay') || e.target.closest('.no-bottom-bar') || e.target.closest('.no-form-wrap')) return;
+        setSelSvc(null); setSelTier(null);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [selSvc]);
+
   const pickService = (svc) => {
     if (selSvc?.id === svc.id) {
-      // If already selected and a tier is picked, deselect both
-      // If no tier, just deselect
       setSelSvc(null); setSelTier(null);
     }
     else { setSelSvc(svc); setSelTier(null); }
@@ -335,7 +350,7 @@ export default function NewOrderPage({ dark, t, user, onOrderSuccess, platform, 
     const lowestPer = svc.tiers.find(ti => ti.price === lowestPrice)?.per || "1K";
     const activeTier = isSel && selTier ? selTier : null;
     return (
-      <div onClick={() => pickService(svc)} className={`no-svc-card${isSel ? " no-svc-card-sel" : ""}${svc.ng ? " no-svc-ng" : ""}${isSel && svc.ng ? " no-svc-card-sel-ng" : ""}`} style={{ borderColor: isSel ? (svc.ng ? (dark ? "#4ade80" : "#16a34a") : t.accent) : t.cardBorder, background: isSel ? (svc.ng ? (dark ? "#0f2418" : "#dcf5e7") : (dark ? "#1e1222" : "#f5e4e8")) : svc.ng ? (dark ? "rgba(30,80,60,.15)" : "#e8f5ee") : t.cardBg, opacity: selSvc && !isSel ? (dark ? .3 : .35) : 1 }}>
+      <div onClick={() => pickService(svc)} className={`no-svc-card${isSel ? " no-svc-card-sel" : ""}${svc.ng ? " no-svc-ng" : ""}${isSel && svc.ng ? " no-svc-card-sel-ng" : ""}`} style={{ borderColor: isSel ? (svc.ng ? (dark ? "#4ade80" : "#16a34a") : t.accent) : t.cardBorder, background: isSel ? (svc.ng ? (dark ? "#0f2418" : "#d0f0db") : (dark ? "#1e1222" : "#f5e4e8")) : svc.ng ? (dark ? "rgba(30,80,60,.15)" : "#e8f5ee") : t.cardBg, opacity: selSvc && !isSel ? (dark ? .45 : .5) : 1, transform: isSel ? "scale(1.01)" : "scale(1)" }}>
         <div className="no-svc-card-top">
           <div className="no-svc-card-info">
             <div className="no-svc-card-name" style={{ color: svc.ng ? (dark ? "#5dcaa5" : "#0F6E56") : t.text }}>{svc.name}</div>
@@ -476,7 +491,7 @@ export default function NewOrderPage({ dark, t, user, onOrderSuccess, platform, 
       <input placeholder={`Search ${activePlat?.label || ""} services...`} value={search} onChange={e => setSearch(e.target.value)} className="no-svc-search" style={{ borderColor: t.cardBorder, background: dark ? "rgba(255,255,255,.03)" : "#fff", color: t.text }} />
 
       {/* ═══ SERVICE CARDS ═══ */}
-      <div className="no-svc-list">
+      <div className="no-svc-list" ref={listRef}>
         {filtered.map(svc => <ServiceCard key={svc.id} svc={svc} />)}
         {filtered.length === 0 && <div className="no-empty" style={{ color: t.textMuted }}>Coming soon.</div>}
       </div>
