@@ -187,12 +187,16 @@ export async function POST(req) {
         return Response.json({ error: 'Backing service not available' }, { status: 400 });
       }
       tierName = `${tier.group.name} (${tier.tier})`;
+      // Nitro minimum order floors
+      const NITRO_MINS = { followers: 100, likes: 50, views: 500, comments: 10, engagement: 50, plays: 500, reviews: 10 };
+      const nitroMin = NITRO_MINS[tier.group.type?.toLowerCase()] || 50;
+      const effectiveMin = Math.max(service.min, nitroMin);
       const qty = Number(quantity);
       if (!qty || isNaN(qty) || qty <= 0 || !Number.isFinite(qty)) {
         return Response.json({ error: 'Invalid quantity' }, { status: 400 });
       }
-      if (qty < service.min || qty > service.max) {
-        return Response.json({ error: `Quantity must be between ${service.min.toLocaleString()} and ${service.max.toLocaleString()}` }, { status: 400 });
+      if (qty < effectiveMin || qty > service.max) {
+        return Response.json({ error: `Quantity must be between ${effectiveMin.toLocaleString()} and ${service.max.toLocaleString()}` }, { status: 400 });
       }
       charge = Math.round((tier.sellPer1k / 1000) * qty);
       cost = Math.round((service.costPer1k / 1000) * qty);

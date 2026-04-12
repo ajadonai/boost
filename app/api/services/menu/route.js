@@ -37,24 +37,39 @@ export async function GET(req) {
       orderBy: { platform: 'asc' },
     });
 
+    // Nitro minimum order floors (overrides provider min if lower)
+    const NITRO_MINS = {
+      followers: 100,
+      likes: 50,
+      views: 500,
+      comments: 10,
+      engagement: 50,   // shares, saves, retweets, reposts
+      plays: 500,        // music streams — same as views
+      reviews: 10,       // same as comments
+    };
+    const DEFAULT_MIN = 50;
+
     return Response.json({
-      groups: groups.map(g => ({
-        id: g.id,
-        name: g.name,
-        platform: g.platform,
-        type: g.type,
-        nigerian: g.nigerian,
-        tiers: g.tiers.filter(t => t.service || t.serviceId).map(t => ({
-          id: t.id,
-          tier: t.tier,
-          price: t.sellPer1k / 100,
-          min: t.service?.min || 100,
-          max: t.service?.max || 100000,
-          refill: t.refill,
-          speed: t.speed,
-          serviceId: t.serviceId,
-        })),
-      })).filter(g => g.tiers.length > 0),
+      groups: groups.map(g => {
+        const nitroMin = NITRO_MINS[g.type?.toLowerCase()] || DEFAULT_MIN;
+        return {
+          id: g.id,
+          name: g.name,
+          platform: g.platform,
+          type: g.type,
+          nigerian: g.nigerian,
+          tiers: g.tiers.filter(t => t.service || t.serviceId).map(t => ({
+            id: t.id,
+            tier: t.tier,
+            price: t.sellPer1k / 100,
+            min: Math.max(t.service?.min || 100, nitroMin),
+            max: t.service?.max || 100000,
+            refill: t.refill,
+            speed: t.speed,
+            serviceId: t.serviceId,
+          })),
+        };
+      }).filter(g => g.tiers.length > 0),
       platforms: platforms.map(p => p.platform),
     });
   } catch (err) {
