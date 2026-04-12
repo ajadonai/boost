@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 
 export default function CookieBanner() {
   const [show, setShow] = useState(false);
+  const [dark, setDark] = useState(true);
 
   useEffect(() => {
     const consent = localStorage.getItem('nitro-cookie-consent');
@@ -10,6 +11,21 @@ export default function CookieBanner() {
       const timer = setTimeout(() => setShow(true), 2000);
       return () => clearTimeout(timer);
     }
+  }, []);
+
+  useEffect(() => {
+    const check = () => {
+      const theme = localStorage.getItem('nitro-theme');
+      if (theme === 'day') setDark(false);
+      else if (theme === 'night') setDark(true);
+      else {
+        const hour = new Date().getHours();
+        setDark(hour < 7 || hour >= 18);
+      }
+    };
+    check();
+    const interval = setInterval(check, 2000);
+    return () => clearInterval(interval);
   }, []);
 
   const accept = () => {
@@ -26,13 +42,25 @@ export default function CookieBanner() {
 
   return (
     <div className="cookie-banner">
-      <div className="cookie-inner">
+      <div className="cookie-inner" style={{
+        background: dark ? '#0f1320' : 'rgba(244,241,237,.98)',
+        borderTop: `0.5px solid ${dark ? 'rgba(196,125,142,.15)' : 'rgba(163,88,107,.18)'}`,
+        borderRight: `0.5px solid ${dark ? 'rgba(196,125,142,.15)' : 'rgba(163,88,107,.18)'}`,
+        borderBottom: `0.5px solid ${dark ? 'rgba(196,125,142,.15)' : 'rgba(163,88,107,.18)'}`,
+        boxShadow: dark ? '0 -2px 16px rgba(0,0,0,.3)' : '0 -2px 12px rgba(0,0,0,.06)',
+      }}>
         <div className="cookie-text">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c47d8e" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, opacity: 0.7 }}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-          <p>We use cookies to keep you signed in and improve your experience. <a href="/cookie">Cookie policy</a></p>
+          <p style={{ color: dark ? 'rgba(255,255,255,.6)' : 'rgba(28,27,25,.6)' }}>
+            We use cookies to keep you signed in and improve your experience.{' '}
+            <a href="/cookie" style={{ color: dark ? '#c47d8e' : '#8b4a5e' }}>Cookie policy</a>
+          </p>
         </div>
         <div className="cookie-actions">
-          <button onClick={decline} className="cookie-decline">Decline</button>
+          <button onClick={decline} className="cookie-decline" style={{
+            color: dark ? 'rgba(255,255,255,.45)' : 'rgba(28,27,25,.45)',
+            border: `0.5px solid ${dark ? 'rgba(255,255,255,.12)' : 'rgba(28,27,25,.15)'}`,
+          }}>Decline</button>
           <button onClick={accept} className="cookie-accept">Accept</button>
         </div>
       </div>
