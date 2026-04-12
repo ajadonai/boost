@@ -48,21 +48,41 @@ async function getGateways() {
   return merged;
 }
 
-export async function GET() {
+export async function GET(req) {
   try {
     const { admin, error } = await requireAdmin('payments');
     if (error) return error;
 
+    const url = new URL(req.url);
+    const search = url.searchParams.get('search') || '';
+    const status = url.searchParams.get('status') || 'all'; // all, Pending, Completed, Failed
+    const from = url.searchParams.get('from');
+    const to = url.searchParams.get('to');
+
     const gateways = await getGateways();
 
-    // Get pending manual deposits
-    const pendingManual = await prisma.transaction.findMany({
-      where: { method: 'manual', status: 'Pending' },
+    // Build deposit query
+    const where = { method: { in: ['manual', 'crypto'] }, type: 'deposit' };
+    if (status !== 'all') where.status = status;
+    if (from) where.createdAt = { ...(where.createdAt || {}), gte: new Date(from) };
+    if (to) where.createdAt = { ...(where.createdAt || {}), lte: new Date(to + 'T23:59:59') };
+    if (search) {
+      where.OR = [
+        { reference: { contains: search, mode: 'insensitive' } },
+        { note: { contains: search, mode: 'insensitive' } },
+        { user: { email: { contains: search, mode: 'insensitive' } } },
+        { user: { name: { contains: search, mode: 'insensitive' } } },
+      ];
+    }
+
+    const deposits = await prisma.transaction.findMany({
+      where,
       orderBy: { createdAt: 'desc' },
+      take: 100,
       include: { user: { select: { name: true, firstName: true, lastName: true, email: true } } },
     });
 
-    // Mask secret keys for display (show last 4 chars)
+    // Mask secret keys for display
     const masked = gateways.map(g => ({
       ...g,
       fields: Object.fromEntries(
@@ -71,10 +91,29 @@ export async function GET() {
       hasKeys: Object.values(g.fields).some(v => v && v.length > 4),
     }));
 
-    return Response.json({ gateways: masked, pendingManual: pendingManual.map(tx => { const refMatch = tx.note?.match(/\[user_confirmed:?([^\]]*)\]/); return { id: tx.id, amount: tx.amount / 100, reference: tx.reference, note: tx.note, date: tx.createdAt.toISOString(), user: tx.user ? `${tx.user.firstName || tx.user.name || ''} ${tx.user.lastName || ''}`.trim() : 'Unknown', email: tx.user?.email || '', confirmed: tx.note?.includes('[user_confirmed'), senderRef: refMatch?.[1] || null }; }) });
+    const formatTx = (tx) => {
+      const refMatch = tx.note?.match(/\[user_confirmed:?([^\]]*)\]/);
+      const approvedMatch = tx.note?.match(/\[approved_by:([^\]]*)\]/);
+      const rejectedMatch = tx.note?.match(/\[rejected_by:([^\]]*)\]/);
+      return {
+        id: tx.id, amount: tx.amount / 100, reference: tx.reference, method: tx.method,
+        status: tx.status, note: tx.note, date: tx.createdAt.toISOString(),
+        user: tx.user ? `${tx.user.firstName || tx.user.name || ''} ${tx.user.lastName || ''}`.trim() : 'Unknown',
+        email: tx.user?.email || '',
+        confirmed: tx.note?.includes('[user_confirmed'),
+        senderRef: refMatch?.[1] || null,
+        actionBy: approvedMatch?.[1] || rejectedMatch?.[1] || null,
+      };
+    };
+
+    return Response.json({
+      gateways: masked,
+      deposits: deposits.map(formatTx),
+      pendingCount: deposits.filter(d => d.status === 'Pending').length,
+    });
   } catch (err) {
     log.error('Admin Payments GET', err.message);
-    return Response.json({ error: 'Failed to load gateways' }, { status: 500 });
+    return Response.json({ error: 'Failed to load payments' }, { status: 500 });
   }
 }
 

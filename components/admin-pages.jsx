@@ -9,8 +9,10 @@ import { fN, fD } from "../lib/format";
 /* ═══════════════════════════════════════════ */
 export function AdminPaymentsPage({ dark, t }) {
   const confirm = useConfirm();
-  const [tab, setTab] = useState("pending");
+  const [tab, setTab] = useState("deposits");
   const [gateways, setGateways] = useState([]);
+  const [deposits, setDeposits] = useState([]);
+  const [pendingCount, setPendingCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [configuring, setConfiguring] = useState(null);
   const [configFields, setConfigFields] = useState({});
@@ -18,16 +20,38 @@ export function AdminPaymentsPage({ dark, t }) {
   const [msg, setMsg] = useState(null);
   const [addModal, setAddModal] = useState(false);
   const [newGw, setNewGw] = useState({ id: "", name: "", desc: "" });
-  const [pendingManual, setPendingManual] = useState([]);
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("Pending");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
 
-  const refresh = () => {
-    fetch("/api/admin/payments").then(r => r.json()).then(d => {
+  const refresh = (s, st, df, dt) => {
+    const params = new URLSearchParams();
+    if (s || search) params.set("search", s ?? search);
+    if ((st ?? statusFilter) !== "all") params.set("status", st ?? statusFilter);
+    if (df || dateFrom) params.set("from", df || dateFrom);
+    if (dt || dateTo) params.set("to", dt || dateTo);
+    fetch(`/api/admin/payments?${params}`).then(r => r.json()).then(d => {
       if (d.gateways) setGateways(d.gateways);
-      if (d.pendingManual) setPendingManual(d.pendingManual);
+      if (d.deposits) setDeposits(d.deposits);
+      if (d.pendingCount != null) setPendingCount(d.pendingCount);
       setLoading(false);
     }).catch(() => setLoading(false));
   };
   useEffect(() => { refresh(); }, []);
+
+  const doSearch = () => refresh(search, statusFilter, dateFrom, dateTo);
+  const changeStatus = (s) => { setStatusFilter(s); refresh(search, s, dateFrom, dateTo); };
+
+  const downloadCSV = () => {
+    const rows = [["Date", "Reference", "User", "Email", "Amount", "Method", "Status", "Approved/Rejected By", "Bank Ref"]];
+    deposits.forEach(tx => rows.push([tx.date, tx.reference, tx.user, tx.email, tx.amount, tx.method, tx.status, tx.actionBy || "", tx.senderRef || ""]));
+    const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a"); a.href = url; a.download = `nitro-deposits-${new Date().toISOString().slice(0,10)}.csv`; a.click();
+    URL.revokeObjectURL(url);
+  };
 
   const toggle = async (id, enabled) => {
     setMsg(null);
@@ -72,6 +96,7 @@ export function AdminPaymentsPage({ dark, t }) {
   };
 
   const FIELD_LABELS = { secretKey: "Secret Key", publicKey: "Public Key", apiKey: "API Key", contractCode: "Contract Code", bankName: "Bank Name", accountNumber: "Account Number", accountName: "Account Name" };
+  const statusColors = { Pending: { bg: dark ? "rgba(251,191,36,.08)" : "rgba(217,119,6,.04)", color: dark ? "#fbbf24" : "#d97706" }, Completed: { bg: dark ? "rgba(110,231,183,.08)" : "rgba(5,150,105,.04)", color: dark ? "#6ee7b7" : "#059669" }, Failed: { bg: dark ? "rgba(220,38,38,.08)" : "rgba(220,38,38,.04)", color: dark ? "#fca5a5" : "#dc2626" } };
 
   return (
     <>
@@ -83,9 +108,9 @@ export function AdminPaymentsPage({ dark, t }) {
 
       {/* Tab switcher */}
       <div style={{ display: "flex", gap: 0, marginBottom: 16, borderBottom: `1px solid ${t.cardBorder}` }}>
-        <button onClick={() => setTab("pending")} style={{ padding: "8px 18px", fontSize: 14, fontWeight: tab === "pending" ? 600 : 500, color: tab === "pending" ? t.accent : t.textMuted, background: "none", border: "none", borderBottom: `2px solid ${tab === "pending" ? t.accent : "transparent"}`, marginBottom: -1, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 6 }}>
-          Pending Payments
-          {pendingManual.length > 0 && <span style={{ fontSize: 11, padding: "1px 6px", borderRadius: 10, background: dark ? "rgba(196,125,142,.15)" : "rgba(196,125,142,.1)", color: t.accent, fontWeight: 700 }}>{pendingManual.length}</span>}
+        <button onClick={() => setTab("deposits")} style={{ padding: "8px 18px", fontSize: 14, fontWeight: tab === "deposits" ? 600 : 500, color: tab === "deposits" ? t.accent : t.textMuted, background: "none", border: "none", borderBottom: `2px solid ${tab === "deposits" ? t.accent : "transparent"}`, marginBottom: -1, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 6 }}>
+          Deposits
+          {pendingCount > 0 && <span style={{ fontSize: 11, padding: "1px 6px", borderRadius: 10, background: dark ? "rgba(196,125,142,.15)" : "rgba(196,125,142,.1)", color: t.accent, fontWeight: 700 }}>{pendingCount}</span>}
         </button>
         <button onClick={() => setTab("gateways")} style={{ padding: "8px 18px", fontSize: 14, fontWeight: tab === "gateways" ? 600 : 500, color: tab === "gateways" ? t.accent : t.textMuted, background: "none", border: "none", borderBottom: `2px solid ${tab === "gateways" ? t.accent : "transparent"}`, marginBottom: -1, cursor: "pointer", fontFamily: "inherit" }}>Gateway Config</button>
       </div>
@@ -95,40 +120,63 @@ export function AdminPaymentsPage({ dark, t }) {
         <button onClick={() => setMsg(null)} style={{ background: "none", border: "none", color: "inherit", cursor: "pointer", fontSize: 14 }}>✕</button>
       </div>}
 
-      {/* ═══ PENDING PAYMENTS TAB ═══ */}
-      {tab === "pending" && (
-        loading ? <div>{[1,2,3].map(i => <div key={i} className={`skel-bone ${dark ? "skel-dark" : "skel-light"}`} style={{ height: 60, borderRadius: 8, marginBottom: 6 }} />)}</div> :
-        pendingManual.length === 0 ? (
+      {/* ═══ DEPOSITS TAB ═══ */}
+      {tab === "deposits" && (<>
+        {/* Search + filters */}
+        <div style={{ display: "flex", gap: 8, marginBottom: 12, flexWrap: "wrap", alignItems: "center" }}>
+          <input value={search} onChange={e => setSearch(e.target.value)} onKeyDown={e => e.key === "Enter" && doSearch()} placeholder="Search ref, user, email..." style={{ flex: 1, minWidth: 180, padding: "8px 12px", borderRadius: 8, border: `1px solid ${t.cardBorder}`, background: dark ? "rgba(255,255,255,.04)" : "#fff", color: t.text, fontSize: 13, outline: "none", fontFamily: "inherit" }} />
+          <input type="date" value={dateFrom} onChange={e => { setDateFrom(e.target.value); refresh(search, statusFilter, e.target.value, dateTo); }} style={{ padding: "7px 10px", borderRadius: 8, border: `1px solid ${t.cardBorder}`, background: dark ? "rgba(255,255,255,.04)" : "#fff", color: t.text, fontSize: 12, fontFamily: "inherit", outline: "none" }} />
+          <input type="date" value={dateTo} onChange={e => { setDateTo(e.target.value); refresh(search, statusFilter, dateFrom, e.target.value); }} style={{ padding: "7px 10px", borderRadius: 8, border: `1px solid ${t.cardBorder}`, background: dark ? "rgba(255,255,255,.04)" : "#fff", color: t.text, fontSize: 12, fontFamily: "inherit", outline: "none" }} />
+          <button onClick={downloadCSV} style={{ padding: "7px 14px", borderRadius: 8, border: `1px solid ${t.cardBorder}`, background: "none", color: t.textMuted, fontSize: 12, cursor: "pointer", fontFamily: "inherit" }}>↓ CSV</button>
+        </div>
+
+        {/* Status filter pills */}
+        <div style={{ display: "flex", gap: 4, marginBottom: 14 }}>
+          {["Pending", "Completed", "Failed", "all"].map(s => (
+            <button key={s} onClick={() => changeStatus(s)} style={{ padding: "4px 12px", borderRadius: 16, fontSize: 12, fontWeight: 500, border: `1px solid ${statusFilter === s ? t.accent : t.cardBorder}`, color: statusFilter === s ? t.accent : t.textMuted, background: statusFilter === s ? (dark ? "rgba(196,125,142,.08)" : "rgba(196,125,142,.04)") : "transparent", cursor: "pointer", fontFamily: "inherit" }}>{s === "all" ? "All" : s}</button>
+          ))}
+        </div>
+
+        {loading ? <div>{[1,2,3].map(i => <div key={i} className={`skel-bone ${dark ? "skel-dark" : "skel-light"}`} style={{ height: 60, borderRadius: 8, marginBottom: 6 }} />)}</div> :
+        deposits.length === 0 ? (
           <div style={{ padding: "60px 20px", textAlign: "center" }}>
-            <div style={{ fontSize: 36, marginBottom: 12 }}>✓</div>
-            <div style={{ fontSize: 16, fontWeight: 500, color: t.text, marginBottom: 4 }}>No pending transfers</div>
-            <div style={{ fontSize: 14, color: t.textMuted }}>Manual bank transfer deposits will appear here for approval</div>
+            <div style={{ fontSize: 36, marginBottom: 12 }}>{statusFilter === "Pending" ? "✓" : "—"}</div>
+            <div style={{ fontSize: 16, fontWeight: 500, color: t.text, marginBottom: 4 }}>{statusFilter === "Pending" ? "No pending deposits" : "No deposits found"}</div>
+            <div style={{ fontSize: 14, color: t.textMuted }}>{statusFilter === "Pending" ? "Manual and crypto deposits will appear here" : "Try adjusting your search or filters"}</div>
           </div>
         ) : (
           <div className="adm-card" style={{ background: dark ? "rgba(255,255,255,.03)" : "rgba(255,255,255,.85)", border: `0.5px solid ${dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)"}` }}>
-            {pendingManual.map((tx, i) => (
-              <div key={tx.id} className="adm-list-row" style={{ borderBottom: i < pendingManual.length - 1 ? `1px solid ${t.cardBorder}` : "none", gap: 10, flexWrap: "wrap" }}>
-                <div style={{ flex: 1, minWidth: 160 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 2 }}>
-                    <span style={{ fontSize: 16, fontWeight: 700, color: dark ? "#6ee7b7" : "#059669" }}>{fN(tx.amount)}</span>
-                    <span style={{ fontSize: 11, padding: "2px 8px", borderRadius: 4, fontWeight: 600, background: tx.confirmed ? (dark ? "rgba(110,231,183,.08)" : "rgba(5,150,105,.04)") : (dark ? "rgba(251,191,36,.08)" : "rgba(217,119,6,.04)"), color: tx.confirmed ? (dark ? "#6ee7b7" : "#059669") : (dark ? "#fbbf24" : "#d97706") }}>{tx.confirmed ? "User confirmed" : "Awaiting transfer"}</span>
+            {deposits.map((tx, i) => {
+              const sc = statusColors[tx.status] || statusColors.Pending;
+              return (
+                <div key={tx.id} className="adm-list-row" style={{ borderBottom: i < deposits.length - 1 ? `1px solid ${t.cardBorder}` : "none", gap: 10, flexWrap: "wrap" }}>
+                  <div style={{ flex: 1, minWidth: 160 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 2 }}>
+                      <span style={{ fontSize: 16, fontWeight: 700, color: sc.color }}>{fN(tx.amount)}</span>
+                      <span style={{ fontSize: 11, padding: "2px 8px", borderRadius: 4, fontWeight: 600, background: sc.bg, color: sc.color }}>{tx.status}</span>
+                      <span style={{ fontSize: 11, padding: "2px 6px", borderRadius: 4, background: dark ? "rgba(255,255,255,.04)" : "rgba(0,0,0,.03)", color: t.textMuted }}>{tx.method}</span>
+                      {tx.confirmed && tx.status === "Pending" && <span style={{ fontSize: 11, padding: "2px 6px", borderRadius: 4, background: dark ? "rgba(110,231,183,.06)" : "rgba(5,150,105,.03)", color: dark ? "#6ee7b7" : "#059669" }}>Sent</span>}
+                    </div>
+                    <div style={{ fontSize: 14, color: t.text }}>{tx.user} · <span style={{ color: t.textMuted }}>{tx.email}</span></div>
+                    <div style={{ fontSize: 12, color: t.textMuted, marginTop: 2 }}>
+                      Ref: <span className="m" style={{ color: t.text }}>{tx.reference}</span>
+                      {tx.senderRef && <> · Bank ref: <span style={{ color: t.accent }}>{tx.senderRef}</span></>}
+                      {tx.actionBy && <> · <span style={{ color: dark ? "#a5b4fc" : "#4f46e5" }}>{tx.status === "Completed" ? "Approved" : "Rejected"} by {tx.actionBy}</span></>}
+                      {" · "}{fD(tx.date)}
+                    </div>
                   </div>
-                  <div style={{ fontSize: 14, color: t.text }}>{tx.user} · <span style={{ color: t.textMuted }}>{tx.email}</span></div>
-                  <div style={{ fontSize: 12, color: t.textMuted, marginTop: 2 }}>
-                    Ref: <span className="m" style={{ color: t.text }}>{tx.reference}</span>
-                    {tx.senderRef && <> · Bank ref: <span style={{ color: t.accent }}>{tx.senderRef}</span></>}
-                    {" · "}{new Date(tx.date).toLocaleDateString("en-NG", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
-                  </div>
+                  {tx.status === "Pending" && (
+                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                      <button onClick={() => approveManual(tx)} className="adm-btn-sm" style={{ borderColor: dark ? "rgba(110,231,183,.2)" : "rgba(5,150,105,.15)", color: dark ? "#6ee7b7" : "#059669" }}>Approve</button>
+                      <button onClick={() => rejectManual(tx)} className="adm-btn-sm" style={{ borderColor: dark ? "rgba(220,38,38,.2)" : "rgba(220,38,38,.1)", color: dark ? "#fca5a5" : "#dc2626" }}>Reject</button>
+                    </div>
+                  )}
                 </div>
-                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                  <button onClick={() => approveManual(tx)} className="adm-btn-sm" style={{ borderColor: dark ? "rgba(110,231,183,.2)" : "rgba(5,150,105,.15)", color: dark ? "#6ee7b7" : "#059669" }}>Approve</button>
-                  <button onClick={() => rejectManual(tx)} className="adm-btn-sm" style={{ borderColor: dark ? "rgba(220,38,38,.2)" : "rgba(220,38,38,.1)", color: dark ? "#fca5a5" : "#dc2626" }}>Reject</button>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
-        )
-      )}
+        )}
+      </>)}
 
       {/* ═══ GATEWAY CONFIG TAB ═══ */}
       {tab === "gateways" && (
