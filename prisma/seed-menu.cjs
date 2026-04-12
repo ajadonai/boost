@@ -20,10 +20,10 @@ const M = [
 {n:"Instagram Auto Reach + Profile Visit",p:"Instagram",y:"engagement",t:[{t:"Standard",a:6230,s:0,sp:"50-100K/day",r:0}]},
 
 {n:"Instagram Custom Comments",p:"Instagram",y:"comments",t:[{t:"Standard",a:2953,s:0,sp:"500-2K/day",r:0},{t:"Premium",a:2517,s:0,sp:"100-500/day",r:0}]},
-{n:"Instagram Random Comments",p:"Instagram",y:"comments",t:[{t:"Budget",a:5709,s:0,sp:"1-5K/day",r:0},{t:"Standard",a:2951,s:0,sp:"500-2K/day",r:0}]},
+{n:"Instagram Random Comments",p:"Instagram",y:"comments",t:[{t:"Budget",a:2951,s:0,sp:"500-2K/day",r:0},{t:"Standard",a:5709,s:0,sp:"1-5K/day",r:0}]},
 {n:"Instagram Emoji Comments",p:"Instagram",y:"comments",t:[{t:"Budget",a:5710,s:0,sp:"1-5K/day",r:0}]},
 // ─── TIKTOK (9) ───
-{n:"TikTok Video Views",p:"TikTok",y:"views",t:[{t:"Budget",a:2026,s:0,sp:"5-50K/day",r:0},{t:"Standard",a:9349,s:0,sp:"500-1M/day",r:1},{t:"Premium",a:1130,s:0,sp:"50-500K/day",r:1}]},
+{n:"TikTok Video Views",p:"TikTok",y:"views",t:[{t:"Budget",a:9349,s:0,sp:"500-1M/day",r:1},{t:"Standard",a:2026,s:0,sp:"5-50K/day",r:0},{t:"Premium",a:1130,s:0,sp:"50-500K/day",r:1}]},
 {n:"TikTok Likes",p:"TikTok",y:"likes",t:[{t:"Budget",a:1128,s:0,sp:"5-50K/day",r:0},{t:"Standard",a:1126,s:0,sp:"5-50K/day",r:1},{t:"Premium",a:1106,s:0,sp:"5-50K/day",r:1}]},
 {n:"TikTok Likes — USA 🇺🇸",p:"TikTok",y:"likes",t:[{t:"Standard",a:1111,s:0,sp:"500-1K/day",r:1},{t:"Premium",a:4862,s:0,sp:"50K/day",r:1}]},
 {n:"TikTok Saves",p:"TikTok",y:"engagement",t:[{t:"Budget",a:5025,s:0,sp:"50-100K/day",r:0},{t:"Standard",a:5827,s:0,sp:"100-200K/day",r:1},{t:"Premium",a:1116,s:0,sp:"50-100K/day",r:1}]},
@@ -49,7 +49,7 @@ const M = [
 {n:"X/Twitter Tweet Views — Last 5 Posts",p:"Twitter/X",y:"views",t:[{t:"Standard",a:8160,s:0,sp:"500-1M/day",r:0}]},
 {n:"X/Twitter Tweet Views — Last 10 Posts",p:"Twitter/X",y:"views",t:[{t:"Standard",a:8161,s:0,sp:"500-1M/day",r:0}]},
 {n:"X/Twitter Video Views (USA)",p:"Twitter/X",y:"views",t:[{t:"Standard",a:350,s:0,sp:"Fast",r:0}]},
-{n:"X/Twitter Followers",p:"Twitter/X",y:"followers",t:[{t:"Budget",a:5125,s:0,sp:"1-5K/day",r:0},{t:"Standard",a:2594,s:0,sp:"500-2K/day",r:0},{t:"Premium",a:8354,s:0,sp:"1-5K/day",r:1}]},
+{n:"X/Twitter Followers",p:"Twitter/X",y:"followers",t:[{t:"Budget",a:2594,s:0,sp:"500-2K/day",r:0},{t:"Standard",a:5125,s:0,sp:"1-5K/day",r:0},{t:"Premium",a:8354,s:0,sp:"1-5K/day",r:1}]},
 {n:"X/Twitter Followers — USA 🇺🇸",p:"Twitter/X",y:"followers",t:[{t:"Standard",a:4786,s:0,sp:"1-5K/day",r:0},{t:"Premium",a:9115,s:0,sp:"1-5K/day",r:1}]},
 {n:"X/Twitter Likes",p:"Twitter/X",y:"likes",t:[{t:"Budget",a:3663,s:0,sp:"500-1K/day",r:0},{t:"Standard",a:3661,s:0,sp:"500-1K/day",r:1},{t:"Premium",a:5802,s:0,sp:"500-1K/day",r:1}]},
 {n:"X/Twitter Retweets",p:"Twitter/X",y:"engagement",t:[{t:"Budget",a:1604,s:0,sp:"500-1K/day",r:0},{t:"Standard",a:3308,s:0,sp:"500-1K/day",r:1}]},
