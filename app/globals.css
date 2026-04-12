@@ -458,8 +458,8 @@ input { font-family: inherit; }
 .no-group-tab-on { font-weight: 600; }
 
 /* Platform icon row — desktop only */
-.no-plat-icon-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
-.no-plat-icon-btn { width: 56px; height: 56px; border-radius: 14px; border-width: 1.5px; border-style: solid; display: flex; align-items: center; justify-content: center; cursor: pointer; font-family: inherit; transition: all .15s; }
+.no-plat-icon-row { display: grid; grid-template-columns: repeat(10, 1fr); gap: 8px; margin-bottom: 16px; }
+.no-plat-icon-btn { aspect-ratio: 1; border-radius: 14px; border-width: 1.5px; border-style: solid; display: flex; align-items: center; justify-content: center; cursor: pointer; font-family: inherit; transition: all .15s; width: 100%; }
 .no-plat-icon-btn:hover { border-color: rgba(196,125,142,.3) !important; }
 .no-plat-icon-on { border-width: 2.5px; }
 .no-plat-icon-svg { display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; color: inherit; }
