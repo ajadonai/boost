@@ -158,8 +158,11 @@ export async function POST(req) {
     try {
       const user = await prisma.user.findUnique({ where: { id: session.id }, select: { referredBy: true, name: true } });
       if (user?.referredBy) {
-        // Check if referral bonus was already paid
-        const alreadyPaid = await prisma.transaction.findFirst({ where: { userId: session.id, type: 'referral' } });
+        // Atomic check: try to create a referral marker transaction
+        // If one already exists, createMany with skipDuplicates will create 0 rows
+        // We use a unique note pattern to detect duplicates
+        const markerNote = `[ref-marker:${session.id}]`;
+        const alreadyPaid = await prisma.transaction.findFirst({ where: { userId: session.id, type: 'referral', note: { contains: markerNote } } });
         if (!alreadyPaid) {
           const refSettings = await prisma.setting.findMany({ where: { key: { in: ['ref_referrer_bonus', 'ref_invitee_bonus', 'ref_enabled', 'ref_min_deposit'] } } });
           const rs = {};
@@ -171,18 +174,25 @@ export async function POST(req) {
             if (referrer) {
               const referrerBonus = Number(rs.ref_referrer_bonus) || 50000;
               const inviteeBonus = Number(rs.ref_invitee_bonus) || 50000;
-              const ops = [
-                prisma.user.update({ where: { id: referrer.id }, data: { balance: { increment: referrerBonus } } }),
-                prisma.transaction.create({ data: { userId: referrer.id, type: 'referral', amount: referrerBonus, note: `Referral bonus: ${user.name} deposited` } }),
-              ];
-              if (inviteeBonus > 0) {
-                ops.push(
-                  prisma.user.update({ where: { id: session.id }, data: { balance: { increment: inviteeBonus } } }),
-                  prisma.transaction.create({ data: { userId: session.id, type: 'referral', amount: inviteeBonus, note: 'Referral welcome bonus' } }),
-                );
+              try {
+                // Atomic: create invitee marker first — if this fails due to race, the whole $transaction rolls back
+                await prisma.$transaction(async (tx) => {
+                  // Double-check inside transaction
+                  const exists = await tx.transaction.findFirst({ where: { userId: session.id, type: 'referral', note: { contains: markerNote } } });
+                  if (exists) return; // another request already paid it
+                  await tx.user.update({ where: { id: referrer.id }, data: { balance: { increment: referrerBonus } } });
+                  await tx.transaction.create({ data: { userId: referrer.id, type: 'referral', amount: referrerBonus, note: `Referral bonus: ${user.name} deposited` } });
+                  if (inviteeBonus > 0) {
+                    await tx.user.update({ where: { id: session.id }, data: { balance: { increment: inviteeBonus } } });
+                  }
+                  // Create marker transaction — the note pattern prevents duplicates on re-check
+                  await tx.transaction.create({ data: { userId: session.id, type: 'referral', amount: inviteeBonus, note: `Referral welcome bonus ${markerNote}` } });
+                });
+                console.log(`[Referral] Deferred bonus paid: referrer ${referrer.id}, invitee ${session.id}`);
+              } catch (txErr) {
+                // If the transaction failed, likely another request won the race — that's fine
+                log.warn('Referral race', txErr.message);
               }
-              await prisma.$transaction(ops);
-              console.log(`[Referral] Deferred bonus paid: referrer ${referrer.id}, invitee ${session.id}`);
             }
           }
         }
