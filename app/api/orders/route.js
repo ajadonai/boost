@@ -181,6 +181,13 @@ export async function POST(req) {
       return Response.json({ error: 'Invalid link' }, { status: 400 });
     }
 
+    // Must be a URL (http/https) or a username handle (@user)
+    const isUrl = /^https?:\/\/.+\..+/.test(trimmedLink);
+    const isUsername = /^@?[a-zA-Z0-9._]{1,100}$/.test(trimmedLink);
+    if (!isUrl && !isUsername) {
+      return Response.json({ error: 'Please enter a valid URL (https://...) or username' }, { status: 400 });
+    }
+
     let service, tier, charge, cost, tierName;
 
     if (tierId) {
