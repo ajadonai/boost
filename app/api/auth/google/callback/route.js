@@ -5,12 +5,12 @@ import { signUserToken, setUserCookie, detectDevice, hashToken } from '@/lib/aut
 import { generateReferralCode } from '@/lib/utils';
 import { cookies, headers } from 'next/headers';
 
-const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
-const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
-const REDIRECT_URI = `${process.env.NEXT_PUBLIC_APP_URL || 'https://nitro.ng'}/api/auth/google/callback`;
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://nitro.ng';
-
 export async function GET(req) {
+  const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+  const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
+  const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://nitro.ng';
+  const REDIRECT_URI = `${APP_URL}/api/auth/google/callback`;
+
   try {
     const url = new URL(req.url);
     const code = url.searchParams.get('code');

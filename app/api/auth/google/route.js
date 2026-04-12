@@ -2,11 +2,13 @@ import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { cookies } from 'next/headers';
 
-const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
-const REDIRECT_URI = `${process.env.NEXT_PUBLIC_APP_URL || 'https://nitro.ng'}/api/auth/google/callback`;
-
 export async function GET(req) {
+  const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+  const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://nitro.ng';
+  const REDIRECT_URI = `${APP_URL}/api/auth/google/callback`;
+
   if (!GOOGLE_CLIENT_ID) {
+    console.error('[Google OAuth] GOOGLE_CLIENT_ID not set');
     return NextResponse.redirect(new URL('/?error=google_not_configured', req.url));
   }
 
