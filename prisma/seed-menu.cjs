@@ -183,25 +183,71 @@ const M = [
 {n:"Twitch Followers",p:"Twitch",y:"followers",t:[{t:"Standard",a:7789,s:600,sp:"1K/day",r:1}]},
 {n:"Twitch Clip Views",p:"Twitch",y:"views",t:[{t:"Standard",a:7791,s:4500,sp:"Fast",r:0}]},
 {n:"Twitch Video Views",p:"Twitch",y:"views",t:[{t:"Standard",a:7790,s:4500,sp:"Fast",r:0}]},
+// ─── 🇳🇬 INSTAGRAM NIGERIAN (7) ───
+{n:"Instagram Followers — Nigerian 🇳🇬",p:"Instagram",y:"followers",ng:1,t:[{t:"Budget",a:2716,s:122000,sp:"0-24hr",r:0},{t:"Standard",a:6242,s:166000,sp:"0-24hr",r:1},{t:"Premium",a:5381,s:348000,sp:"0-24hr",r:1}]},
+{n:"Instagram Likes — Nigerian 🇳🇬",p:"Instagram",y:"likes",ng:1,t:[{t:"Standard",a:2731,s:162000,sp:"0-24hr",r:0}]},
+{n:"Instagram Comments — Nigerian 🇳🇬",p:"Instagram",y:"comments",ng:1,t:[{t:"Budget",a:2732,s:172000,sp:"0-24hr",r:0},{t:"Premium",a:2733,s:448000,sp:"0-24hr",r:0}]},
+{n:"Instagram Saves — Nigerian 🇳🇬",p:"Instagram",y:"engagement",ng:1,t:[{t:"Standard",a:2736,s:198000,sp:"0-24hr",r:0}]},
+{n:"Instagram Reposts — Nigerian 🇳🇬",p:"Instagram",y:"engagement",ng:1,t:[{t:"Standard",a:2734,s:155000,sp:"0-24hr",r:0}]},
+{n:"Instagram Story Shares — Nigerian 🇳🇬",p:"Instagram",y:"engagement",ng:1,t:[{t:"Standard",a:2735,s:142000,sp:"0-24hr",r:0}]},
+{n:"Instagram Channel Members — Nigerian 🇳🇬",p:"Instagram",y:"followers",ng:1,t:[{t:"Standard",a:2293,s:19000,sp:"Fast",r:0}]},
+// ─── 🇳🇬 TIKTOK NIGERIAN (7) ───
+{n:"TikTok Followers — Nigerian 🇳🇬",p:"TikTok",y:"followers",ng:1,t:[{t:"Budget",a:626,s:81000,sp:"0-24hr",r:1},{t:"Premium",a:2748,s:172000,sp:"0-24hr",r:0}]},
+{n:"TikTok Likes — Nigerian 🇳🇬",p:"TikTok",y:"likes",ng:1,t:[{t:"Budget",a:627,s:7000,sp:"0-24hr",r:1},{t:"Premium",a:2749,s:162000,sp:"0-24hr",r:0}]},
+{n:"TikTok Views — Nigerian 🇳🇬",p:"TikTok",y:"views",ng:1,t:[{t:"Standard",a:2752,s:81000,sp:"0-24hr",r:0}]},
+{n:"TikTok Comments — Nigerian 🇳🇬",p:"TikTok",y:"comments",ng:1,t:[{t:"Standard",a:2750,s:164000,sp:"0-24hr",r:0}]},
+{n:"TikTok Saves — Nigerian 🇳🇬",p:"TikTok",y:"engagement",ng:1,t:[{t:"Standard",a:2753,s:164000,sp:"0-24hr",r:0}]},
+{n:"TikTok Duet — Nigerian 🇳🇬",p:"TikTok",y:"engagement",ng:1,t:[{t:"Premium",a:2754,s:943000,sp:"0-24hr",r:0}]},
+{n:"TikTok Use Sound — Nigerian 🇳🇬",p:"TikTok",y:"engagement",ng:1,t:[{t:"Premium",a:2751,s:2031000,sp:"0-24hr",r:0}]},
+// ─── 🇳🇬 TWITTER/X NIGERIAN (5) ───
+{n:"X/Twitter Views — Nigerian 🇳🇬",p:"Twitter/X",y:"views",ng:1,t:[{t:"Budget",a:5917,s:600,sp:"Fast",r:1},{t:"Premium",a:2744,s:101000,sp:"0-24hr",r:0}]},
+{n:"X/Twitter Likes — Nigerian 🇳🇬",p:"Twitter/X",y:"likes",ng:1,t:[{t:"Standard",a:4512,s:162000,sp:"0-24hr",r:0}]},
+{n:"X/Twitter Comments — Nigerian 🇳🇬",p:"Twitter/X",y:"comments",ng:1,t:[{t:"Budget",a:2746,s:148000,sp:"0-24hr",r:0},{t:"Premium",a:2747,s:414000,sp:"0-24hr",r:0}]},
+{n:"X/Twitter Retweets — Nigerian 🇳🇬",p:"Twitter/X",y:"engagement",ng:1,t:[{t:"Standard",a:2743,s:155000,sp:"0-24hr",r:0}]},
+{n:"X/Twitter Followers — Nigerian 🇳🇬",p:"Twitter/X",y:"followers",ng:1,t:[{t:"Standard",a:2742,s:414000,sp:"0-24hr",r:0}]},
+// ─── 🇳🇬 FACEBOOK NIGERIAN (11) ───
+{n:"Facebook Followers — Nigerian 🇳🇬",p:"Facebook",y:"followers",ng:1,t:[{t:"Budget",a:2760,s:203000,sp:"0-24hr",r:0},{t:"Standard",a:973,s:216000,sp:"0-24hr",r:1}]},
+{n:"Facebook Page Likes — Nigerian 🇳🇬",p:"Facebook",y:"likes",ng:1,t:[{t:"Budget",a:2761,s:203000,sp:"0-24hr",r:0},{t:"Standard",a:948,s:216000,sp:"0-24hr",r:1}]},
+{n:"Facebook Post Likes — Nigerian 🇳🇬",p:"Facebook",y:"likes",ng:1,t:[{t:"Budget",a:2762,s:162000,sp:"0-24hr",r:0},{t:"Standard",a:990,s:151000,sp:"0-24hr",r:1}]},
+{n:"Facebook Post Reactions — Nigerian 🇳🇬",p:"Facebook",y:"engagement",ng:1,t:[{t:"Standard",a:1020,s:151000,sp:"0-24hr",r:1},{t:"Premium",a:1022,s:151000,sp:"0-24hr",r:1}]},
+{n:"Facebook Views — Nigerian 🇳🇬",p:"Facebook",y:"views",ng:1,t:[{t:"Standard",a:2768,s:81000,sp:"Fast",r:0}]},
+{n:"Facebook Shares — Nigerian 🇳🇬",p:"Facebook",y:"engagement",ng:1,t:[{t:"Budget",a:2763,s:223000,sp:"0-24hr",r:0},{t:"Standard",a:1135,s:259000,sp:"0-24hr",r:1}]},
+{n:"Facebook Group Members — Nigerian 🇳🇬",p:"Facebook",y:"followers",ng:1,t:[{t:"Budget",a:2766,s:203000,sp:"0-24hr",r:0},{t:"Standard",a:1009,s:194000,sp:"0-24hr",r:1}]},
+{n:"Facebook Comments — Nigerian 🇳🇬",p:"Facebook",y:"comments",ng:1,t:[{t:"Budget",a:1079,s:323000,sp:"0-24hr",r:1},{t:"Standard",a:1080,s:323000,sp:"0-24hr",r:1},{t:"Premium",a:1081,s:323000,sp:"0-24hr",r:1}]},
+{n:"Facebook Comment Reactions — Nigerian 🇳🇬",p:"Facebook",y:"engagement",ng:1,t:[{t:"Standard",a:1085,s:151000,sp:"0-24hr",r:1}]},
+{n:"Facebook Reviews — Nigerian 🇳🇬",p:"Facebook",y:"reviews",ng:1,t:[{t:"Budget",a:1115,s:345000,sp:"0-24hr",r:1},{t:"Standard",a:1114,s:345000,sp:"0-24hr",r:1},{t:"Premium",a:2767,s:414000,sp:"0-24hr",r:0}]},
+{n:"Facebook Event Interest — Nigerian 🇳🇬",p:"Facebook",y:"engagement",ng:1,t:[{t:"Standard",a:1134,s:194000,sp:"0-24hr",r:1}]},
+// ─── 🇳🇬 YOUTUBE NIGERIAN (4) ───
+{n:"YouTube Views — Nigerian 🇳🇬",p:"YouTube",y:"views",ng:1,t:[{t:"Budget",a:2755,s:97000,sp:"Fast",r:0},{t:"Standard",a:2058,s:104000,sp:"70K/day",r:0}]},
+{n:"YouTube Likes — Nigerian 🇳🇬",p:"YouTube",y:"likes",ng:1,t:[{t:"Budget",a:2429,s:12000,sp:"100K/day",r:1},{t:"Standard",a:4205,s:12000,sp:"Fast",r:0},{t:"Premium",a:2756,s:162000,sp:"0-24hr",r:0}]},
+{n:"YouTube Comments — Nigerian 🇳🇬",p:"YouTube",y:"comments",ng:1,t:[{t:"Budget",a:2758,s:190000,sp:"0-24hr",r:0},{t:"Premium",a:2759,s:465000,sp:"0-24hr",r:0}]},
+{n:"YouTube Subscribers — Nigerian 🇳🇬",p:"YouTube",y:"followers",ng:1,t:[{t:"Premium",a:5376,s:689000,sp:"0-24hr",r:0}]},
+// ─── 🇳🇬 THREADS NIGERIAN (4) ───
+{n:"Threads Followers — Nigerian 🇳🇬",p:"Threads",y:"followers",ng:1,t:[{t:"Standard",a:2737,s:172000,sp:"0-24hr",r:0}]},
+{n:"Threads Likes — Nigerian 🇳🇬",p:"Threads",y:"likes",ng:1,t:[{t:"Standard",a:2738,s:152000,sp:"0-24hr",r:0}]},
+{n:"Threads Comments — Nigerian 🇳🇬",p:"Threads",y:"comments",ng:1,t:[{t:"Standard",a:2739,s:207000,sp:"0-24hr",r:0}]},
+{n:"Threads Reposts — Nigerian 🇳🇬",p:"Threads",y:"engagement",ng:1,t:[{t:"Budget",a:2741,s:233000,sp:"0-24hr",r:0},{t:"Standard",a:2740,s:250000,sp:"0-24hr",r:0}]},
 ];
 async function seed(){
 console.log('🌱 Seeding Nitro full menu...\n');
 const allApi=[...new Set(M.flatMap(g=>g.t.map(x=>x.a)))];
-const svcs=await p.service.findMany({where:{apiId:{in:allApi}},select:{id:true,apiId:true}});
-const m={};svcs.forEach(s=>{m[s.apiId]=s.id;});
+// Lookup by apiId — handles multi-provider (first match wins, DAO services have unique apiIds)
+const svcs=await p.service.findMany({where:{apiId:{in:allApi}},select:{id:true,apiId:true,provider:true}});
+const m={};svcs.forEach(s=>{if(!m[s.apiId])m[s.apiId]=s.id;});
 const miss=allApi.filter(id=>!m[id]);
 if(miss.length)console.log('⚠️  Missing apiIds:',miss.join(', '),'\n');
 await p.serviceTier.deleteMany();await p.serviceGroup.deleteMany();
 console.log('🗑️  Cleared existing menu\n');
-let gc=0,tc=0,sk=0;
+let gc=0,tc=0,sk=0,ngc=0;
 for(let i=0;i<M.length;i++){const g=M[i];
-const grp=await p.serviceGroup.create({data:{name:g.n,platform:g.p,type:g.y||'Standard',nigerian:!!g.ng,enabled:true,sortOrder:i+1}});gc++;
+const grp=await p.serviceGroup.create({data:{name:g.n,platform:g.p,type:g.y||'Standard',nigerian:!!g.ng,enabled:true,sortOrder:i+1}});gc++;if(g.ng)ngc++;
 for(let j=0;j<g.t.length;j++){const x=g.t[j];const sid=m[x.a];
 if(!sid){console.log('   ⏭️  Skip:',g.n,'→',x.t,'(apiId',x.a,'missing)');sk++;continue;}
 await p.serviceTier.create({data:{groupId:grp.id,serviceId:sid,tier:x.t,sellPer1k:x.s,refill:!!x.r,speed:x.sp,enabled:true,sortOrder:j+1}});tc++;}
-console.log('   ✅',g.p,'→',g.n,'('+g.t.length+' tiers)');}
+console.log('   ✅',g.p,'→',g.n,'('+g.t.length+' tiers)'+(g.ng?' 🇳🇬':''));}
 const plats=[...new Set(M.map(g=>g.p))];
 console.log('\n🎉 Done!',gc,'groups,',tc,'tiers,',sk,'skipped');
+console.log('🇳🇬',ngc,'Nigerian groups');
 console.log('📊',plats.length,'platforms:',plats.join(', '));
 }
 seed().catch(e=>{console.error('❌',e.message);}).finally(()=>p.$disconnect());

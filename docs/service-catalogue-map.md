@@ -275,33 +275,70 @@
 
 ---
 
-## 🇳🇬 NIGERIA-SPECIFIC SERVICES (25 services)
-**These are the differentiator.** No other Nigerian panel offers these.
+## 🇳🇬 NIGERIA-SPECIFIC SERVICES (38 groups, 60 tiers)
+**These are the differentiator.** No other Nigerian panel offers these. All from DaoSMM.
 
-| Service | Platform | Provider | Notes |
-|---------|----------|----------|-------|
-| Nigerian Followers | Instagram | DAO | Real 🇳🇬 accounts |
-| Nigerian Followers | Twitter/X | DAO | Real 🇳🇬 accounts |
-| Nigerian Followers | TikTok | DAO | Real 🇳🇬 accounts |
-| Nigerian Comments | Instagram | DAO | Pidgin/local language |
-| Nigerian Comments | YouTube | DAO | Local comments |
-| Nigerian Likes | Instagram | DAO | From 🇳🇬 accounts |
-| Nigerian Likes | Twitter/X | DAO | From 🇳🇬 accounts |
-| Nigerian Views | TikTok | DAO | 🇳🇬 geo views |
-| Nigerian Views | YouTube | DAO | 🇳🇬 geo views |
-| Nigerian Traffic | Website | DAO | Nigerian IP traffic |
-| Nigerian Retweets | Twitter/X | DAO | |
-| Nigerian Shares | Facebook | DAO | |
-| WhatsApp Channel Followers | WhatsApp | DAO | Huge in Nigeria |
-| WhatsApp Group Members | WhatsApp | DAO | |
-| WhatsApp Status Views | WhatsApp | DAO | |
-| Audiomack Plays | Audiomack | JAP/DAO | Popular in 🇳🇬 |
-| Audiomack Followers | Audiomack | JAP/DAO | |
-| Boomplay Plays | Boomplay | JAP/DAO | Popular in 🇳🇬 |
-| Boomplay Followers | Boomplay | JAP/DAO | |
-| Apple Music Plays | Apple Music | DAO | |
-| Google Reviews (Nigeria) | Google | MTP | Local businesses |
-| Telegram Members (Nigerian) | Telegram | DAO | |
+### Instagram Nigerian (7 groups)
+| Service | Tiers | ApiIds | Notes |
+|---------|-------|--------|-------|
+| Followers 🇳🇬 | B/S/P | 2716/6242/5381 | Budget=no refill, Std=Female+30D, Prem=Female+30D HQ |
+| Likes 🇳🇬 | S | 2731 | HQ profiles |
+| Comments 🇳🇬 | B/P | 2732/2733 | Budget=random, Premium=custom text |
+| Saves 🇳🇬 | S | 2736 | Algorithm boost |
+| Reposts 🇳🇬 | S | 2734 | Content redistribution |
+| Story Shares 🇳🇬 | S | 2735 | Organic-looking |
+| Channel Members 🇳🇬 | S | 2293 | ₦75/1K, 1M max |
+
+### TikTok Nigerian (7 groups)
+| Service | Tiers | ApiIds | Notes |
+|---------|-------|--------|-------|
+| Followers 🇳🇬 | B/P | 626/2748 | Budget=volume+60D refill, Prem=HQ |
+| Likes 🇳🇬 | B/P | 627/2749 | Budget=₦26/1K bulk, Prem=HQ |
+| Views 🇳🇬 | S | 2752 | Nigerian geo-views |
+| Comments 🇳🇬 | S | 2750 | Video comments |
+| Saves 🇳🇬 | S | 2753 | Favorites |
+| Duet 🇳🇬 | P | 2754 | Premium niche, ₦6,287/1K |
+| Use Sound 🇳🇬 | P | 2751 | Music promo, ₦13,537/1K |
+
+### Twitter/X Nigerian (5 groups)
+| Service | Tiers | ApiIds | Notes |
+|---------|-------|--------|-------|
+| Views 🇳🇬 | B/P | 5917/2744 | Budget=₦2/1K 500M max, Prem=HQ |
+| Likes 🇳🇬 | S | 4512 | HQ profiles |
+| Comments 🇳🇬 | B/P | 2746/2747 | Budget=random, Prem=custom |
+| Retweets 🇳🇬 | S | 2743 | Amplification |
+| Followers 🇳🇬 | S | 2742 | HQ, 500 max |
+
+### Facebook Nigerian (11 groups)
+| Service | Tiers | ApiIds | Notes |
+|---------|-------|--------|-------|
+| Followers 🇳🇬 | B/S | 2760/973 | Budget=instant, Std=30D refill |
+| Page Likes 🇳🇬 | B/S | 2761/948 | Budget=instant, Std=30D refill |
+| Post Likes 🇳🇬 | B/S | 2762/990 | Budget=instant, Std=30D refill |
+| Post Reactions 🇳🇬 | S/P | 1020/1022 | Std=Likes👍, Prem=Male-targeted |
+| Views 🇳🇬 | S | 2768 | Video views |
+| Shares 🇳🇬 | B/S | 2763/1135 | Budget=post, Std=all links+refill |
+| Group Members 🇳🇬 | B/S | 2766/1009 | Budget=instant, Std=30D refill |
+| Comments 🇳🇬 | B/S/P | 1079/1080/1081 | B=random, S=custom, P=male custom |
+| Comment Reactions 🇳🇬 | S | 1085 | Likes👍 on comments |
+| Reviews 🇳🇬 | B/S/P | 1115/1114/2767 | B=random, S=custom, P=HQ instant |
+| Event Interest 🇳🇬 | S | 1134 | 30D refill |
+
+### YouTube Nigerian (4 groups)
+| Service | Tiers | ApiIds | Notes |
+|---------|-------|--------|-------|
+| Views 🇳🇬 | B/S | 2755/2058 | Budget=HQ, Std=Real Views |
+| Likes 🇳🇬 | B/S/P | 2429/4205/2756 | B=30D refill, S=Shorts, P=HQ |
+| Comments 🇳🇬 | B/P | 2758/2759 | Budget=random, Prem=custom |
+| Subscribers 🇳🇬 | P | 5376 | HQ, 500 max, ₦4,056/1K |
+
+### Threads Nigerian (4 groups)
+| Service | Tiers | ApiIds | Notes |
+|---------|-------|--------|-------|
+| Followers 🇳🇬 | S | 2737 | HQ profiles |
+| Likes 🇳🇬 | S | 2738 | HQ profiles |
+| Comments 🇳🇬 | S | 2739 | Thread replies |
+| Reposts 🇳🇬 | B/S | 2741/2740 | B=quote repost, S=plain repost |
 
 ---
 
@@ -348,8 +385,8 @@
 | Reviews | 5 | 1 |
 | Kick | 5 | 1 |
 | Other (Tumblr, Vimeo, etc.) | ~15 | 1 |
-| **🇳🇬 Nigerian Specials** | **25** | **1** |
-| **TOTAL** | **~297** | |
+| **🇳🇬 Nigerian Specials** | **38 groups / 60 tiers** | **3 (per group)** |
+| **TOTAL** | **~185 groups / ~278 tiers** | |
 
 ---
 
