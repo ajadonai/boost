@@ -26,7 +26,7 @@ export default function HowToPage({ dark, t }) {
       </div>
 
       {loading ? (
-        <div style={{ padding: 40, textAlign: "center", color: t.textMuted }}>Loading tutorials...</div>
+        <div style={{ padding: 24 }}>{[1,2,3].map(i => <div key={i} className={`skel-bone ${dark ? "skel-dark" : "skel-light"}`} style={{ height: 80, borderRadius: 12, marginBottom: 10 }} />)}</div>
       ) : posts.length === 0 ? (
         <div style={{ padding: 40, textAlign: "center" }}>
           <div style={{ fontSize: 48, marginBottom: 16, opacity: .4 }}>📖</div>

@@ -93,7 +93,7 @@ export default function AdminTicketsPage({ dark, t, adminName }) {
     };
   }, []);
 
-  if (loading) return <div style={{ padding: 24, color: t.textMuted }}>Loading tickets...</div>;
+  if (loading) return <div style={{ padding: 24 }}>{[1,2,3,4].map(i => <div key={i} className={`skel-bone ${dark ? "skel-dark" : "skel-light"}`} style={{ height: 52, borderRadius: 8, marginBottom: 8 }} />)}</div>;
 
   return (
     <div className={`sup-split ${mobileView === "chat" ? "sup-view-chat" : "sup-view-list"}`} style={{ borderRadius: 12, border: `1px solid ${t.cardBorder}` }}>
