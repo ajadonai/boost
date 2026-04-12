@@ -66,9 +66,43 @@ export const viewport = {
 };
 
 export default function RootLayout({ children }) {
+  const orgSchema = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "Nitro",
+    url: "https://nitro.ng",
+    logo: "https://nitro.ng/icon-512.png",
+    description: "Nigeria's #1 SMM Panel. Buy Instagram followers, TikTok views, YouTube subscribers and more.",
+    sameAs: [
+      "https://instagram.com/Nitro.ng",
+      "https://instagram.com/TheNitroNg",
+      "https://twitter.com/TheNitroNG",
+    ],
+    contactPoint: {
+      "@type": "ContactPoint",
+      contactType: "customer support",
+      email: "TheNitroNG@gmail.com",
+      availableLanguage: "English",
+    },
+  };
+
+  const websiteSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "Nitro",
+    url: "https://nitro.ng",
+    potentialAction: {
+      "@type": "SearchAction",
+      target: "https://nitro.ng/dashboard?search={search_term_string}",
+      "query-input": "required name=search_term_string",
+    },
+  };
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema) }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }} />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
