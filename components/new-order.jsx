@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { fN } from "../lib/format";
 
 /* ═══════════════════════════════════════════ */
@@ -497,10 +497,20 @@ export default function NewOrderPage({ dark, t, user, onOrderSuccess, platform, 
 /* ═══════════════════════════════════════════ */
 function MobileGuide({ dark, t }) {
   const [open, setOpen] = useState(false);
+  const ref = useRef(null);
   const TS_MINI = { Budget: { icon: "💰", color: "#e0a458" }, Standard: { icon: "⚡", color: "#60a5fa" }, Premium: { icon: "👑", color: "#a78bfa" } };
+
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    document.addEventListener("mousedown", handler);
+    document.addEventListener("touchstart", handler);
+    return () => { document.removeEventListener("mousedown", handler); document.removeEventListener("touchstart", handler); };
+  }, [open]);
+
   return (
-    <div style={{ borderRadius: 12, background: dark ? "rgba(255,255,255,.04)" : "rgba(0,0,0,.02)", border: `1px solid ${dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)"}`, overflow: "hidden", marginBottom: 12 }}>
-      <button onClick={() => setOpen(!open)} style={{ width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 14px", background: "none", border: "none", cursor: "pointer", color: t.text }}>
+    <div ref={ref} style={{ borderRadius: 12, background: dark ? "rgba(255,255,255,.06)" : "rgba(255,255,255,.85)", border: `1px solid ${dark ? "rgba(255,255,255,.08)" : "rgba(0,0,0,.08)"}`, overflow: "hidden", marginBottom: 12, boxShadow: dark ? "none" : "0 2px 8px rgba(0,0,0,.04)" }}>
+      <button onClick={() => setOpen(!open)} style={{ width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 14px", background: "none", border: "none", cursor: "pointer", color: t.text, fontFamily: "inherit" }}>
         <span style={{ fontSize: 14, fontWeight: 600 }}>📖 How Our Services Work</span>
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transform: open ? "rotate(180deg)" : "rotate(0deg)", transition: "transform .2s" }}><polyline points="6 9 12 15 18 9"/></svg>
       </button>
