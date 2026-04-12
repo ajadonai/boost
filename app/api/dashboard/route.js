@@ -124,11 +124,13 @@ export async function GET() {
     const currentIdx = loyaltyTiers.findIndex(t2 => t2.name === badge.name);
     const nextTier = currentIdx < loyaltyTiers.length - 1 ? loyaltyTiers[currentIdx + 1] : null;
 
+    const tc = (s) => s ? s.toLowerCase().replace(/\b[a-z]/g, c => c.toUpperCase()) : '';
+
     return ok({
       user: {
-        id: user.id, name: user.name,
-        firstName: user.firstName || user.name.split(' ')[0],
-        lastName: user.lastName || user.name.split(' ').slice(1).join(' ') || '',
+        id: user.id, name: tc(user.name),
+        firstName: tc(user.firstName || user.name.split(' ')[0]),
+        lastName: tc(user.lastName || user.name.split(' ').slice(1).join(' ') || ''),
         phone: user.phone || '',
         email: user.email,
         balance: user.balance / 100,

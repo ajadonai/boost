@@ -347,23 +347,8 @@ export default function SettingsPage({ user, dark, t, themeMode, setThemeMode, s
 /* ═══ SETTINGS RIGHT SIDEBAR              ═══ */
 /* ═══════════════════════════════════════════ */
 export function SettingsSidebar({ user, dark, t }) {
-  const initials = user ? ((user.firstName?.[0] || "") + (user.lastName?.[0] || "")).toUpperCase() || user.name?.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2) : "";
   return (
     <>
-      <div className="set-rs-title" style={{ color: t.textMuted }}>Account</div>
-      <div className="set-rs-account" style={{ background: t.cardBg, borderWidth: 1, borderStyle: "solid", borderColor: t.cardBorder }}>
-        <div className="set-rs-avatar" style={{ background: t.accent }}><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
-        <div className="set-rs-name" style={{ color: t.text }}>{user?.name?.toUpperCase() || "USER"}</div>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 4, marginBottom: 4 }}>
-          {user?.badgeColor && <ShieldBadge color={user.badgeColor} size={14} tier={user.badge} />}
-          <span style={{ fontSize: 12, color: user?.badgeColor || t.textMuted, fontWeight: 600 }}>{user?.badge || "Starter"}</span>
-        </div>
-        <div className="set-rs-email" style={{ color: t.textMuted }}>{user?.email || ""}</div>
-        <div className="m set-rs-ref" style={{ color: t.accent }}>{user?.refCode || "—"}</div>
-      </div>
-
-      <div className="set-rs-divider" style={{ background: t.sidebarBorder }} />
-
       <div className="set-rs-title" style={{ color: t.textMuted }}>Quick Links</div>
       {[
         ["Change Password", "set-change-password"],

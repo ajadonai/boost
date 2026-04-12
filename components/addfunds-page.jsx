@@ -204,7 +204,7 @@ export default function AddFundsPage({ user, dark, t, paymentStatus, setPaymentS
           {/* LEFT — Amount + Presets + Coupon */}
           <div style={{ flex: 1, minWidth: 0, display: "flex" }}>
             <div style={{ flex: 1, display: "flex", flexDirection: "column", background: dark ? "rgba(255,255,255,.03)" : "rgba(255,255,255,.85)", border: `0.5px solid ${t.cardBorder}`, borderRadius: 14, padding: 22 }}>
-              <div className="fund-deposit-label" style={{ color: t.textMuted }}>Amount to deposit</div>
+              <div className="fund-deposit-label" style={{ color: t.textSoft }}>Amount to deposit</div>
               <div className="fund-amount-wrap" style={{ background: dark ? "#0d1020" : "#fff", borderWidth: 1, borderStyle: "solid", borderColor: amount ? t.accent : t.cardBorder }}>
                 <span className="m fund-currency" style={{ color: dark ? "rgba(255,255,255,.55)" : "rgba(0,0,0,.4)" }}>₦</span>
                 <input type="number" value={amount} onChange={e => setAmount(e.target.value)} placeholder="0" className="m fund-amount-input" style={{ color: t.text }} />
@@ -291,7 +291,7 @@ export default function AddFundsPage({ user, dark, t, paymentStatus, setPaymentS
 
               {payError && <div style={{ padding: "8px 12px", borderRadius: 8, marginBottom: 8, fontSize: 13, background: dark ? "rgba(220,38,38,.08)" : "#fef2f2", border: `1px solid ${dark ? "rgba(220,38,38,.15)" : "#fecaca"}`, color: dark ? "#fca5a5" : "#dc2626", display: "flex", justifyContent: "space-between", alignItems: "center" }}><span>⚠️ {payError}</span><button onClick={() => setPayError(null)} style={{ background: "none", border: "none", color: "inherit", cursor: "pointer", fontSize: 14 }}>✕</button></div>}
               <button onClick={handlePay} disabled={!valid || loading} className="fund-pay-btn" style={{ background: valid ? `linear-gradient(135deg,#c47d8e,#8b5e6b)` : (dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)"), color: valid ? "#fff" : t.textMuted }}>
-                {loading ? "Processing..." : valid ? `Pay ${fN(numAmount)} Now` : "How much?"}
+                {loading ? "Processing..." : valid ? `Pay ${fN(numAmount)} Now` : "Amount to deposit"}
               </button>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, marginTop: 10, fontSize: 12, color: t.textMuted }}>
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
@@ -319,7 +319,7 @@ export default function AddFundsPage({ user, dark, t, paymentStatus, setPaymentS
 
             {/* Amount card */}
             <div className="fund-mob-amount" style={{ background: dark ? "rgba(255,255,255,.03)" : "rgba(255,255,255,.85)", border: `0.5px solid ${t.cardBorder}` }}>
-              <div className="fund-deposit-label" style={{ color: t.textMuted }}>How much?</div>
+              <div className="fund-deposit-label" style={{ color: t.textSoft }}>Amount to deposit</div>
               <div className="fund-amount-wrap" style={{ background: dark ? "#0d1020" : "#fff", borderWidth: 1, borderStyle: "solid", borderColor: amount ? t.accent : t.cardBorder }}>
                 <span className="m fund-currency" style={{ color: dark ? "rgba(255,255,255,.55)" : "rgba(0,0,0,.4)" }}>₦</span>
                 <input type="number" value={amount} onChange={e => setAmount(e.target.value)} placeholder="0" className="m fund-amount-input" style={{ color: t.text }} />

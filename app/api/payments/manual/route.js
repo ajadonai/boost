@@ -42,7 +42,7 @@ export async function POST(req) {
     const { bankName, accountNumber, accountName } = config.fields || {};
     if (!bankName || !accountNumber || !accountName) return Response.json({ error: 'Bank details not configured. Contact admin.' }, { status: 503 });
 
-    const reference = `NTR-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
+    const reference = `NTR-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
     const amountKobo = Math.round(amountNum * 100);
 
     await prisma.transaction.create({
