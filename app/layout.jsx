@@ -1,5 +1,6 @@
 import './globals.css';
 import SentryInit from '@/components/sentry-init';
+import CookieBanner from '@/components/cookie-banner';
 
 export const metadata = {
   title: {
@@ -112,42 +113,7 @@ export default function RootLayout({ children }) {
       </head>
       <body>
         <SentryInit />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "WebSite",
-            "name": "Nitro",
-            "url": "https://nitro.ng",
-            "description": "Nigeria's #1 SMM Panel. Buy Instagram followers, TikTok views, YouTube subscribers and more.",
-            "potentialAction": {
-              "@type": "SearchAction",
-              "target": "https://nitro.ng/dashboard?search={search_term_string}",
-              "query-input": "required name=search_term_string"
-            }
-          })}}
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "Organization",
-            "name": "Nitro",
-            "url": "https://nitro.ng",
-            "logo": "https://nitro.ng/icon-512.png",
-            "description": "Nigeria's #1 SMM Panel — instant social media growth across 35+ platforms.",
-            "sameAs": [
-              "https://instagram.com/Nitro.ng",
-              "https://instagram.com/TheNitroNg",
-              "https://x.com/TheNitroNG"
-            ],
-            "contactPoint": {
-              "@type": "ContactPoint",
-              "email": "TheNitroNG@gmail.com",
-              "contactType": "customer support"
-            }
-          })}}
-        />
+        <CookieBanner />
         {children}
       </body>
     </html>
