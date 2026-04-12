@@ -1,22 +1,19 @@
-'use client';
-import { useEffect, useState, useRef } from 'react';
-import LoadingScreen from '@/components/loading-screen';
+import dynamic from 'next/dynamic';
 
-export default function HomePage() {
-  const [ready, setReady] = useState(false);
-  const [minWait, setMinWait] = useState(false);
-  const LandingRef = useRef(null);
+const HomePage = dynamic(() => import('@/components/landing-page'), {
+  loading: () => {
+    const LoadingScreen = require('@/components/loading-screen').default;
+    return <LoadingScreen />;
+  },
+  ssr: false,
+});
 
-  useEffect(() => {
-    const timer = setTimeout(() => setMinWait(true), 1500);
-    import('@/components/landing-page').then(mod => {
-      LandingRef.current = mod.default;
-      setReady(true);
-    });
-    return () => clearTimeout(timer);
-  }, []);
+export const metadata = {
+  title: 'Nitro — #1 SMM Panel in Nigeria | Buy Followers, Views & Likes',
+  description: 'Buy Instagram followers, TikTok views, YouTube subscribers and more. Instant delivery, real engagement, Nigerian targeting. 35+ platforms, cheapest rates.',
+  alternates: { canonical: 'https://nitro.ng' },
+};
 
-  if (!ready || !minWait || !LandingRef.current) return <LoadingScreen />;
-  const Landing = LandingRef.current;
-  return <Landing />;
+export default function Page() {
+  return <HomePage />;
 }
