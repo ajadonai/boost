@@ -275,10 +275,14 @@ export default function NewOrderPage({ dark, t, user, onOrderSuccess, platform, 
   useEffect(() => { setSelSvc(null); setSelTier(null); setFilterType("all"); setOrderModal(false); setOrderResult(null); setSearch(""); }, [platform]);
 
   const pickService = (svc) => {
-    if (selSvc?.id === svc.id) { setSelSvc(null); setSelTier(null); }
+    if (selSvc?.id === svc.id) {
+      // If already selected and a tier is picked, deselect both
+      // If no tier, just deselect
+      setSelSvc(null); setSelTier(null);
+    }
     else { setSelSvc(svc); setSelTier(null); }
   };
-  const pickTier = (tier, e) => { e.stopPropagation(); setSelTier(tier); setQty(tier.min || 100); };
+  const pickTier = (tier, e) => { e.stopPropagation(); e.preventDefault(); setSelTier(tier); setQty(tier.min || 100); };
 
   /* Place order */
   const submitOrder = async () => {

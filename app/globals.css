@@ -511,7 +511,7 @@ input { font-family: inherit; }
 .no-empty { padding: 40px; text-align: center; font-size: 15px; }
 
 /* Fixed bottom bar */
-.no-bottom-bar { display: flex; position: fixed; bottom: 0; left: 0; right: 0; backdrop-filter: blur(16px); padding: 10px 20px; align-items: center; justify-content: space-between; z-index: 25; gap: 12px; }
+.no-bottom-bar { display: flex; position: fixed; bottom: 0; left: 0; right: 0; backdrop-filter: blur(16px); padding: 10px 20px; align-items: center; justify-content: space-between; z-index: 30; gap: 12px; }
 .no-bar-info { min-width: 0; flex: 1; }
 .no-bar-name { font-size: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .no-bar-tier { font-size: 14px; margin-top: 1px; }
@@ -556,7 +556,7 @@ input { font-family: inherit; }
   .no-svc-card-price-val { font-size: 16px; }
   .no-plat-icon-row { display: none; }
   .no-mob-plat { display: block; }
-  .no-bottom-bar { display: flex; position: fixed; bottom: 0; left: 0; right: 0; backdrop-filter: blur(16px); padding: 10px 20px; align-items: center; justify-content: space-between; z-index: 25; gap: 12px; }
+  .no-bottom-bar { display: flex; position: fixed; bottom: 0; left: 0; right: 0; backdrop-filter: blur(16px); padding: 10px 20px; align-items: center; justify-content: space-between; z-index: 30; gap: 12px; }
   .no-modal-overlay { display: flex; position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 50; align-items: center; justify-content: center; padding: 24px; }
   .no-modal { width: 100%; max-width: 420px; border-radius: 16px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,.3); }
 }
@@ -582,7 +582,7 @@ input { font-family: inherit; }
   .no-svc-search { font-size: 13px; padding: 9px 12px; }
   .no-tier-chip { font-size: 11px; padding: 4px 10px; }
   .no-tier-detail { padding: 10px 12px; }
-  .no-bottom-bar { display: flex; position: fixed; bottom: 0; left: 0; right: 0; backdrop-filter: blur(16px); padding: 10px 16px; align-items: center; justify-content: space-between; z-index: 25; gap: 12px; }
+  .no-bottom-bar { display: flex; position: fixed; bottom: 0; left: 0; right: 0; backdrop-filter: blur(16px); padding: 10px 16px; align-items: center; justify-content: space-between; z-index: 30; gap: 12px; }
   .no-bar-price { font-size: 16px; }
   .no-bar-btn { padding: 10px 18px; }
   .no-bar-name { font-size: 14px; }
