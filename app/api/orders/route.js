@@ -46,7 +46,7 @@ export async function PATCH(req) {
 
     const order = await prisma.order.findFirst({
       where: { OR: [{ orderId }, { id: orderId }], userId: session.id, deletedAt: null },
-      include: { service: true },
+      include: { service: true, tier: { select: { sellPer1k: true } } },
     });
     if (!order) return Response.json({ error: 'Order not found' }, { status: 404 });
 
@@ -92,12 +92,22 @@ export async function PATCH(req) {
     }
 
     if (action === 'reorder') {
-      // Re-place the same order with same service, link, quantity
+      // Re-place the same order with same service, link, quantity — but at CURRENT price
       if (!order.service || !order.service.enabled) {
         return Response.json({ error: 'Service no longer available' }, { status: 400 });
       }
+
+      // Recalculate charge from current tier/service price (not the old order's charge)
+      const currentSellPer1k = order.tier?.sellPer1k || order.service.sellPer1k;
+      const charge = Math.round((currentSellPer1k / 1000) * order.quantity);
+      const cost = Math.round((order.service.costPer1k / 1000) * order.quantity);
+
+      if (!charge || charge <= 0) {
+        return Response.json({ error: 'Service pricing not configured' }, { status: 400 });
+      }
+
       const user = await prisma.user.findUnique({ where: { id: session.id } });
-      if (user.balance < order.charge) {
+      if (user.balance < charge) {
         return Response.json({ error: 'Insufficient balance' }, { status: 400 });
       }
 
@@ -112,19 +122,19 @@ export async function PATCH(req) {
       }
 
       const newOrder = await prisma.$transaction(async (tx) => {
-        const updated = await tx.$executeRaw`UPDATE users SET balance = balance - ${order.charge} WHERE id = ${session.id} AND balance >= ${order.charge}`;
+        const updated = await tx.$executeRaw`UPDATE users SET balance = balance - ${charge} WHERE id = ${session.id} AND balance >= ${charge}`;
         if (updated === 0) throw new Error('INSUFFICIENT_BALANCE');
         const created = await tx.order.create({
           data: {
             orderId: newOrderId, userId: session.id, serviceId: order.serviceId,
             tierId: order.tierId, link: order.link, quantity: order.quantity,
-            charge: order.charge, cost: order.cost,
+            charge, cost,
             status: apiOrderId ? 'Processing' : 'Pending', apiOrderId,
           },
         });
         await tx.transaction.create({
           data: {
-            userId: session.id, type: 'order', amount: -order.charge,
+            userId: session.id, type: 'order', amount: -charge,
             method: 'wallet', status: 'Completed', reference: newOrderId,
             note: `Reorder ${newOrderId} — ${order.service.name} x${order.quantity.toLocaleString()}`,
           },
@@ -134,7 +144,7 @@ export async function PATCH(req) {
 
       return Response.json({
         success: true,
-        order: { id: newOrderId, service: order.service.name, quantity: order.quantity, charge: order.charge / 100, status: newOrder.status },
+        order: { id: newOrderId, service: order.service.name, quantity: order.quantity, charge: charge / 100, status: newOrder.status },
       });
     }
 
