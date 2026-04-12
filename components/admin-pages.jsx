@@ -180,7 +180,7 @@ export function AdminAnalyticsPage({ dark, t }) {
 
   const changeRange = (r) => { setRange(r); load(r); };
 
-  if (loading) return <><div className="adm-header"><div className="adm-title" style={{ color: t.text }}>Analytics</div><div className="adm-subtitle" style={{ color: t.textMuted }}>Loading...</div><div className="page-divider" style={{ background: t.cardBorder }} /></div></>;
+  if (loading) return <><div className="adm-header"><div className="adm-title" style={{ color: t.text }}>Analytics</div><div className="adm-subtitle" style={{ color: t.textMuted }}>Loading data...</div><div className="page-divider" style={{ background: t.cardBorder }} /></div><div className="adm-stats">{[1,2,3,4].map(i => <div key={i} className={`skel-bone ${dark ? "skel-dark" : "skel-light"}`} style={{ height: 90, borderRadius: 12 }} />)}</div><div style={{ marginTop: 16 }}>{[1,2].map(i => <div key={i} className={`skel-bone ${dark ? "skel-dark" : "skel-light"}`} style={{ height: 200, borderRadius: 12, marginBottom: 12 }} />)}</div></>;
 
   const s = stats || {};
   return (
@@ -435,7 +435,7 @@ export function AdminAlertsPage({ dark, t }) {
     );
   };
 
-  if (loading) return <><div className="adm-header"><div className="adm-title" style={{ color: t.text }}>Announcements</div><div className="adm-subtitle" style={{ color: t.textMuted }}>Loading...</div><div className="page-divider" style={{ background: t.cardBorder }} /></div></>;
+  if (loading) return <><div className="adm-header"><div className="adm-title" style={{ color: t.text }}>Announcements</div><div className="adm-subtitle" style={{ color: t.textMuted }}>Loading...</div><div className="page-divider" style={{ background: t.cardBorder }} /></div><div>{[1,2,3].map(i => <div key={i} className={`skel-bone ${dark ? "skel-dark" : "skel-light"}`} style={{ height: 60, borderRadius: 10, marginBottom: 8 }} />)}</div></>;
 
   return (
     <>

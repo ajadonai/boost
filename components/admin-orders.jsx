@@ -86,7 +86,7 @@ export default function AdminOrdersPage({ dark, t }) {
       {/* Orders list */}
       <div className="adm-card" style={{ background: dark ? "rgba(255,255,255,.03)" : "rgba(255,255,255,.85)", border: `0.5px solid ${dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)"}` }}>
         {loading ? (
-          <div className="adm-empty" style={{ color: t.textMuted }}>Loading orders...</div>
+          <div className="adm-empty">{[1,2,3,4,5].map(i => <div key={i} className={`skel-bone ${dark ? "skel-dark" : "skel-light"}`} style={{ height: 52, borderRadius: 8, marginBottom: 6 }} />)}</div>
         ) : paged.length > 0 ? paged.map((o, i) => (
           <div key={o.id}>
             <div className="adm-list-row" onClick={() => setExpanded(expanded === o.id ? null : o.id)} style={{ borderBottom: (i < paged.length - 1 || expanded === o.id) ? `1px solid ${t.cardBorder}` : "none", cursor: "pointer" }}>

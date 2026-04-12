@@ -543,7 +543,7 @@ export function AdminNotificationsPage({ dark, t }) {
         <div className="adm-card-title" style={{ color: t.textMuted, padding: "16px 16px 0" }}>Sent history</div>
         <div className="adm-card-divider" style={{ background: dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)", margin: "12px 0 0" }} />
         {loading ? (
-          <div className="adm-empty" style={{ color: t.textMuted }}>Loading...</div>
+          <div className="adm-empty">{[1,2,3].map(i => <div key={i} className={`skel-bone ${dark ? "skel-dark" : "skel-light"}`} style={{ height: 44, borderRadius: 6, marginBottom: 6 }} />)}</div>
         ) : history.length > 0 ? history.map((n, i) => (
           <div key={n.id} className="adm-list-row" style={{ borderBottom: i < history.length - 1 ? `1px solid ${t.cardBorder}` : "none" }}>
             <div style={{ flex: 1, minWidth: 0 }}>

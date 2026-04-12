@@ -115,7 +115,12 @@ export default function LeaderboardPage({ dark, t }) {
       </div>
 
       {loading ? (
-        <div style={{ padding: 40, textAlign: "center", color: t.textMuted }}>Loading leaderboard...</div>
+        <div>
+          <div style={{ display: "flex", gap: 4, marginBottom: 16 }}>{[1,2].map(i => <div key={i} className={`skel-bone ${dark ? "skel-dark" : "skel-light"}`} style={{ height: 30, width: 90, borderRadius: 20 }} />)}</div>
+          <div className={`skel-bone ${dark ? "skel-dark" : "skel-light"}`} style={{ height: 52, borderRadius: 10, marginBottom: 16 }} />
+          <div style={{ display: "flex", gap: 12, marginBottom: 20 }}>{[1,2,3].map(i => <div key={i} className={`skel-bone ${dark ? "skel-dark" : "skel-light"}`} style={{ flex: 1, height: 140, borderRadius: 14 }} />)}</div>
+          {[1,2,3,4].map(i => <div key={i} className={`skel-bone ${dark ? "skel-dark" : "skel-light"}`} style={{ height: 48, borderRadius: 8, marginBottom: 6 }} />)}
+        </div>
       ) : list.length === 0 ? (
         <div style={{ padding: 40, textAlign: "center", color: t.textMuted }}>No data yet. Place orders to appear on the leaderboard!</div>
       ) : <>

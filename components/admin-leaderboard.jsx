@@ -186,7 +186,7 @@ export default function AdminLeaderboardPage({ dark, t }) {
       </div>
 
       {/* Table */}
-      {loading ? <div style={{ padding: 40, textAlign: "center", color: t.textMuted }}>Loading...</div> : list.length === 0 ? <div style={{ padding: 40, textAlign: "center", color: t.textMuted }}>No data for this period</div> : (
+      {loading ? <div>{[1,2,3,4,5,6].map(i => <div key={i} className={`skel-bone ${dark ? "skel-dark" : "skel-light"}`} style={{ height: 48, borderRadius: 8, marginBottom: 6 }} />)}</div> : list.length === 0 ? <div style={{ padding: 40, textAlign: "center", color: t.textMuted }}>No data for this period</div> : (
         <div style={{ borderRadius: 12, overflow: "hidden", border: `1px solid ${t.cardBorder}`, background: dark ? "rgba(255,255,255,.03)" : "rgba(255,255,255,.85)" }}>
           <div style={{ display: "flex", padding: "10px 16px", fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: 1, color: t.textMuted, borderBottom: `1px solid ${t.cardBorder}`, gap: 12, alignItems: "center" }}>
             <span style={{ width: 24 }}></span><span style={{ width: 30 }}>#</span><span style={{ flex: 1 }}>User</span>
