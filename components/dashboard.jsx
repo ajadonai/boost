@@ -22,6 +22,8 @@ const AddFundsPage = dynamic(() => import("./addfunds-page").then(m => m.default
 const AddFundsSidebar = dynamic(() => import("./addfunds-page").then(m => m.AddFundsSidebar), { ssr: false });
 const HowToPage = dynamic(() => import("./howto-page").then(m => m.default), { ssr: false });
 const HowToSidebar = dynamic(() => import("./howto-page").then(m => m.HowToSidebar), { ssr: false });
+const LeaderboardPage = dynamic(() => import("./leaderboard-page").then(m => m.default), { ssr: false });
+const LeaderboardCard = dynamic(() => import("./leaderboard-page").then(m => m.LeaderboardCard), { ssr: false });
 
 /* ═══════════════════════════════════════════ */
 /* ═══ SVG ICONS                          ═══ */
@@ -35,6 +37,7 @@ const I = {
   referrals: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>,
   support: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>,
   settings: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>,
+  leaderboard: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M8 21V12H2v9h6zM22 21V8h-6v13h6zM15 21V4H9v17h6z"/></svg>,
 };
 
 const NAV_ITEMS = [
@@ -42,6 +45,7 @@ const NAV_ITEMS = [
   { id: "services", label: "New Order" },
   { id: "orders", label: "History" },
   { id: "add-funds", label: "Wallet" },
+  { id: "leaderboard", label: "Leaderboard" },
   { id: "how-to", label: "Guide" },
   { id: "referrals", label: "Referrals" },
   { id: "support", label: "Support" },
@@ -455,6 +459,7 @@ function DashboardInner() {
   const isSupport = active === "support";
   const isAddFunds = active === "add-funds";
   const isHowTo = active === "how-to";
+  const isLeaderboard = active === "leaderboard";
   const noHasOrder = noSelSvc && noSelTier;
 
   /* Theme — provided by ThemeProvider */
@@ -695,6 +700,8 @@ function DashboardInner() {
         return <AddFundsPage user={user} dark={dark} t={t} paymentStatus={paymentStatus} setPaymentStatus={setPaymentStatus} />;
       case "how-to":
         return <HowToPage dark={dark} t={t} />;
+      case "leaderboard":
+        return <LeaderboardPage dark={dark} t={t} />;
       default:
         return (
           <div className="dash-placeholder" style={{ background: dark ? "rgba(255,255,255,.03)" : "rgba(255,255,255,.85)", border: `0.5px solid ${t.cardBorder}` }}>
@@ -879,6 +886,8 @@ function DashboardInner() {
             <AddFundsSidebar user={user} txs={txs} dark={dark} t={t} />
           ) : isHowTo ? (
             <HowToSidebar dark={dark} t={t} />
+          ) : isLeaderboard ? (
+            <LeaderboardCard dark={dark} t={t} />
           ) : (
             <RightSidebar orders={orders} user={user} dark={dark} t={t} setActive={setActive} />
           )}
