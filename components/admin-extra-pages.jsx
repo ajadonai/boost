@@ -693,26 +693,30 @@ export function AdminAPIPage({ dark, t }) {
   ];
 
   const [loading, setLoading] = useState(true);
-  const [svcCount, setSvcCount] = useState(0);
+  const [svcCounts, setSvcCounts] = useState({});
   const [envStatus, setEnvStatus] = useState({});
   const [testing, setTesting] = useState(null);
   const [syncing, setSyncing] = useState(null);
   const [result, setResult] = useState(null);
 
-  useEffect(() => {
-    async function load() {
-      try {
-        const [svcsRes, statusRes] = await Promise.all([
-          fetch("/api/admin/services"),
-          fetch("/api/admin/sync"),
-        ]);
-        if (svcsRes.ok) { const d = await svcsRes.json(); setSvcCount(d.services?.length || 0); }
-        if (statusRes.ok) { const d = await statusRes.json(); setEnvStatus(d.status || {}); }
-      } catch {}
-      setLoading(false);
-    }
-    load();
-  }, []);
+  const loadData = async () => {
+    try {
+      const [svcsRes, statusRes] = await Promise.all([
+        fetch("/api/admin/services"),
+        fetch("/api/admin/sync"),
+      ]);
+      if (svcsRes.ok) {
+        const d = await svcsRes.json();
+        const counts = {};
+        (d.services || []).forEach(s => { const p = s.provider || "mtp"; counts[p] = (counts[p] || 0) + 1; });
+        setSvcCounts(counts);
+      }
+      if (statusRes.ok) { const d = await statusRes.json(); setEnvStatus(d.status || {}); }
+    } catch {}
+    setLoading(false);
+  };
+
+  useEffect(() => { loadData(); }, []);
 
   const testConnection = async (provider) => {
     setTesting(provider.id); setResult(null);
@@ -738,7 +742,7 @@ export function AdminAPIPage({ dark, t }) {
       const data = await res.json();
       if (res.ok) {
         setResult({ id: provider.id, type: "success", message: `Synced! ${data.created} new, ${data.updated} updated, ${data.skipped} skipped (${data.total} total)` });
-        setSvcCount(prev => prev + (data.created || 0));
+        loadData(); // Refresh counts
       } else setResult({ id: provider.id, type: "error", message: data.error || "Sync failed" });
     } catch (e) { setResult({ id: provider.id, type: "error", message: e.message || "Network error" }); }
     setSyncing(null);
@@ -751,7 +755,7 @@ export function AdminAPIPage({ dark, t }) {
       <div className="adm-header">
         <div>
           <div className="adm-title" style={{ color: t.text }}>API Management</div>
-          <div className="adm-subtitle" style={{ color: t.textMuted }}>SMM provider connections · {svcCount.toLocaleString()} services in database</div>
+          <div className="adm-subtitle" style={{ color: t.textMuted }}>SMM provider connections · {Object.values(svcCounts).reduce((a, b) => a + b, 0).toLocaleString()} services in database</div>
         </div>
         <div className="page-divider" style={{ background: t.cardBorder }} />
       </div>
@@ -789,7 +793,7 @@ export function AdminAPIPage({ dark, t }) {
 
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12, marginTop: 14, paddingTop: 14, borderTop: `1px solid ${t.cardBorder}`, fontSize: 13 }}>
                 <div><span style={{ color: t.textMuted }}>Env var:</span> <span style={{ color: t.textSoft }}>{p.envKey}</span></div>
-                <div><span style={{ color: t.textMuted }}>Services:</span> <span style={{ color: t.text }}>{p.id === "mtp" ? svcCount.toLocaleString() : "—"}</span></div>
+                <div><span style={{ color: t.textMuted }}>Services:</span> <span style={{ color: t.text }}>{(svcCounts[p.id] || 0).toLocaleString()}</span></div>
                 <div><span style={{ color: t.textMuted }}>Priority:</span> <span style={{ color: t.text }}>{i + 1}</span></div>
               </div>
             </div>
