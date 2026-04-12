@@ -642,11 +642,12 @@ input { font-family: inherit; }
   .lb-tab { padding: 6px 12px; font-size: 12px; }
   .lb-tab-full { display: none; }
   .lb-tab-short { display: inline; }
-  .lb-podium { gap: 8px; }
-  .lb-pod { padding: 14px 10px; border-radius: 12px; }
-  .lb-pod-name { font-size: 12px; }
-  .lb-pod-val { font-size: 13px; }
-  .lb-pod-avatar { width: 36px !important; height: 36px !important; font-size: 13px !important; }
+  .lb-podium { gap: 6px; }
+  .lb-pod { padding: 10px 6px; border-radius: 10px; }
+  .lb-pod-name { font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .lb-pod-val { font-size: 12px; white-space: nowrap; }
+  .lb-pod-avatar { width: 32px !important; height: 32px !important; font-size: 12px !important; }
+  .lb-medal { font-size: 20px !important; }
   .lb-row { padding: 10px 12px; gap: 10px; }
   .lb-rank { font-size: 13px; }
   .lb-avatar { width: 30px; height: 30px; font-size: 11px; }

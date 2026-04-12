@@ -48,15 +48,14 @@ function PodiumCard({ entry, rank, dark, tab }) {
       background: dark ? p.bg : p.bgL,
       borderColor: dark ? p.border : p.borderL,
       order: rank === 1 ? 0 : rank === 2 ? -1 : 1,
-      padding: isFirst ? "20px 16px" : "16px 12px",
     }}>
       <div className="lb-medal" style={{ fontSize: isFirst ? 30 : 24 }}>{p.medal}</div>
       <div className="lb-pod-avatar" style={{
-        width: isFirst ? 52 : 42, height: isFirst ? 52 : 42,
+        width: isFirst ? 48 : 40, height: isFirst ? 48 : 40,
         background: dark ? "rgba(196,125,142,.12)" : "rgba(196,125,142,.1)",
         color: dark ? "#c47d8e" : "#a3586b",
         ...(entry.isYou ? { border: "2px solid #c47d8e" } : {}),
-      }}><UserIcon size={isFirst ? 22 : 17} /></div>
+      }}><UserIcon size={isFirst ? 20 : 16} /></div>
       <div className="lb-pod-name" style={{ fontSize: isFirst ? 15 : 13, marginBottom: 4 }}>
         {entry.name}{entry.isYou ? " (You)" : ""}
       </div>
