@@ -1,7 +1,7 @@
 import { log } from "@/lib/logger";
 import prisma from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/auth';
-import { checkOrder } from '@/lib/mtp';
+import { checkOrder, isProviderConfigured } from '@/lib/smm';
 
 export async function POST(req) {
   try {
@@ -13,24 +13,27 @@ export async function POST(req) {
 
     const order = await prisma.order.findFirst({
       where: { OR: [{ orderId }, { id: orderId }], userId: session.id },
+      include: { service: { select: { provider: true } } },
     });
 
     if (!order) return Response.json({ error: 'Order not found' }, { status: 404 });
 
-    // If no MTP order ID, can't check externally
+    // If no external order ID, can't check with provider
     if (!order.apiOrderId) {
       return Response.json({ status: order.status, message: 'Order pending — no external tracking yet' });
     }
 
-    // Check with MTP
-    if (!process.env.MTP_API_KEY) {
-      return Response.json({ status: order.status, message: 'API not configured' });
+    // Determine provider from the backing service
+    const provider = order.service?.provider || 'mtp';
+
+    if (!isProviderConfigured(provider)) {
+      return Response.json({ status: order.status, message: `${provider.toUpperCase()} API not configured` });
     }
 
     try {
-      const mtpStatus = await checkOrder(order.apiOrderId);
+      const providerStatus = await checkOrder(provider, order.apiOrderId);
 
-      // Map MTP status to our status
+      // Map provider status to our status (all 3 providers use the same status strings)
       const statusMap = {
         'Completed': 'Completed',
         'In progress': 'Processing',
@@ -41,7 +44,7 @@ export async function POST(req) {
         'Refunded': 'Canceled',
       };
 
-      const newStatus = statusMap[mtpStatus.status] || order.status;
+      const newStatus = statusMap[providerStatus.status] || order.status;
 
       // Update if status changed
       if (newStatus !== order.status) {
@@ -53,12 +56,12 @@ export async function POST(req) {
 
       return Response.json({
         status: newStatus,
-        remains: mtpStatus.remains,
-        startCount: mtpStatus.start_count,
+        remains: providerStatus.remains,
+        startCount: providerStatus.start_count,
         charge: order.charge / 100,
       });
     } catch (err) {
-      log.error('Order Check MTP', err.message);
+      log.error(`Order Check ${provider.toUpperCase()}`, err.message);
       return Response.json({ status: order.status, message: 'Could not check status' });
     }
   } catch (err) {
