@@ -493,6 +493,7 @@ input { font-family: inherit; }
 .no-svc-list { display: flex; flex-direction: column; gap: 8px; }
 .no-svc-card { border-radius: 14px; padding: 16px 20px; cursor: pointer; border-width: 1px; border-style: solid; transition: all .15s ease; }
 .no-svc-card-sel { border-left-width: 4px; border-left-color: #c47d8e; border-color: #c47d8e; box-shadow: 0 8px 30px rgba(196,125,142,.2); position: relative; z-index: 1; }
+.no-svc-card-sel-ng { border-left-color: #16a34a !important; border-color: #16a34a !important; box-shadow: 0 8px 30px rgba(22,163,74,.15) !important; }
 
 /* Prompt text when service expanded but no tier selected */
 .no-svc-prompt { display: flex; align-items: center; gap: 6px; margin-top: 8px; font-size: 12px; font-weight: 500; padding: 8px 12px; border-radius: 8px; background: rgba(196,125,142,.06); }
