@@ -350,7 +350,7 @@ export default function NewOrderPage({ dark, t, user, onOrderSuccess, platform, 
     const lowestPer = svc.tiers.find(ti => ti.price === lowestPrice)?.per || "1K";
     const activeTier = isSel && selTier ? selTier : null;
     return (
-      <div onClick={() => pickService(svc)} className={`no-svc-card${isSel ? " no-svc-card-sel" : ""}${svc.ng ? " no-svc-ng" : ""}${isSel && svc.ng ? " no-svc-card-sel-ng" : ""}`} style={{ borderColor: isSel ? (svc.ng ? (dark ? "#4ade80" : "#16a34a") : t.accent) : t.cardBorder, background: isSel ? (svc.ng ? (dark ? "#0f2418" : "#d0f0db") : (dark ? "#1e1222" : "#f5e4e8")) : svc.ng ? (dark ? "rgba(30,80,60,.15)" : "#e8f5ee") : t.cardBg, opacity: selSvc && !isSel ? (dark ? .45 : .5) : 1, transform: isSel ? "scale(1.01)" : "scale(1)" }}>
+      <div onClick={() => pickService(svc)} className={`no-svc-card${isSel ? " no-svc-card-sel" : ""}${svc.ng ? " no-svc-ng" : ""}${isSel && svc.ng ? " no-svc-card-sel-ng" : ""}`} style={{ borderColor: isSel ? (svc.ng ? (dark ? "#4ade80" : "#16a34a") : t.accent) : t.cardBorder, background: isSel ? (svc.ng ? (dark ? "#122a1c" : "#d0f0db") : (dark ? "#2a1828" : "#f5e4e8")) : svc.ng ? (dark ? "rgba(30,80,60,.15)" : "#e8f5ee") : t.cardBg, opacity: selSvc && !isSel ? (dark ? .3 : .45) : 1, transform: isSel ? "scale(1.01)" : "scale(1)" }}>
         <div className="no-svc-card-top">
           <div className="no-svc-card-info">
             <div className="no-svc-card-name" style={{ color: svc.ng ? (dark ? "#5dcaa5" : "#0F6E56") : t.text }}>{svc.name}</div>
