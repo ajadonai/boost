@@ -19,6 +19,7 @@ export async function GET(req) {
       include: {
         user: { select: { name: true, email: true } },
         service: { select: { name: true, category: true } },
+        tier: { select: { tier: true, group: { select: { name: true, platform: true } } } },
       },
     });
 
@@ -32,7 +33,9 @@ export async function GET(req) {
         internalId: o.id,
         user: o.user?.name || 'Unknown',
         email: o.user?.email || '',
-        service: o.service?.name || o.serviceId,
+        service: o.tier?.group?.name || o.service?.name || o.serviceId,
+        tier: o.tier?.tier || null,
+        platform: o.tier?.group?.platform || o.service?.category || 'unknown',
         category: o.service?.category || 'unknown',
         link: o.link,
         quantity: o.quantity,

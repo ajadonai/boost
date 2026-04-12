@@ -91,7 +91,7 @@ export default function AdminOrdersPage({ dark, t }) {
           <div key={o.id}>
             <div className="adm-list-row" onClick={() => setExpanded(expanded === o.id ? null : o.id)} style={{ borderBottom: (i < paged.length - 1 || expanded === o.id) ? `1px solid ${t.cardBorder}` : "none", cursor: "pointer" }}>
               <div style={{ minWidth: 0, flex: 1 }}>
-                <div style={{ fontSize: 15, fontWeight: 500, color: t.text }}>{o.service}</div>
+                <div style={{ fontSize: 15, fontWeight: 500, color: t.text }}>{o.service}{o.tier ? ` · ${o.tier}` : ""}</div>
                 <div style={{ fontSize: 14, color: t.textMuted, marginTop: 2 }}>
                   <span className="m">{o.id}</span> · {o.user} · {o.quantity?.toLocaleString() || 0} qty
                 </div>
