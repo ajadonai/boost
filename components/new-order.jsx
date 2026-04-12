@@ -289,6 +289,7 @@ export default function NewOrderPage({ dark, t, user, onOrderSuccess, platform, 
   };
 
   const [platGroup, setPlatGroup] = useState("Social Platforms");
+  const [platExpanded, setPlatExpanded] = useState(false);
 
   /* Platforms in the selected group with services */
   const groupPlatforms = PLATFORM_GROUPS.find(g => g.label === platGroup)?.platforms || [];
@@ -411,46 +412,38 @@ export default function NewOrderPage({ dark, t, user, onOrderSuccess, platform, 
         })}
       </div>
 
-      {/* ═══ PLATFORM DROPDOWN — mobile/tablet only ═══ */}
-      <div className="no-plat-btn-wrap">
-        <button onClick={() => setCatModal(true)} className="no-plat-btn" style={{ borderWidth: 1, borderStyle: "solid", borderColor: t.accent, background: dark ? "#2a1a22" : "#fdf2f4", color: t.accent }}>
-          <span style={{ display: "flex", alignItems: "center" }}>{activePlat?.icon}</span>
-          {activePlat?.label}
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" style={{ marginLeft: "auto" }}><polyline points="6 9 12 15 18 9" /></svg>
-        </button>
-      </div>
-
-      {/* Category modal — for "More" on desktop + platform select on mobile/tablet */}
-      {catModal && (
-        <div className="no-cat-overlay" onClick={() => setCatModal(false)}>
-          <div className="no-cat-modal" onClick={e => e.stopPropagation()} style={{ background: dark ? "#0e1120" : "#ffffff" }}>
-            <div className="no-cat-header">
-              <div className="no-cat-title" style={{ color: t.text }}>Select Platform</div>
-              <button onClick={() => setCatModal(false)} className="no-cat-close" style={{ borderColor: t.cardBorder, color: t.textSoft }}>✕</button>
-            </div>
-            <div className="no-cat-scroll">
-              {PLATFORM_GROUPS.map(group => (
-                <div key={group.label} className="no-cat-group">
-                  <div className="no-cat-group-label" style={{ color: t.textMuted }}>{group.label}</div>
-                  <div className="no-cat-grid">
-                    {group.platforms.map(p => {
-                      const act = platform === p.id;
-                      const count = platformCounts[p.id] || 0;
-                      return (
-                        <button key={p.id} onClick={() => { setPlatform(p.id); setPlatGroup(group.label); setCatModal(false); }} className="no-cat-item" style={{ borderWidth: 1, borderStyle: "solid", borderColor: act ? t.accent : t.cardBorder, background: act ? (dark ? "#2a1a22" : "#fdf2f4") : "transparent", color: act ? t.accent : t.text, position: "relative" }}>
-                          <span className="no-cat-icon">{p.icon}</span>
-                          <span className="no-cat-label">{p.label}</span>
-                          {count > 0 && <span style={{ fontSize: 10, fontWeight: 600, color: act ? t.accent : t.textMuted, position: "absolute", top: 4, right: 6 }}>{count}</span>}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              ))}
+      {/* ═══ MOBILE/TABLET: 5 popular icons + expandable grid ═══ */}
+      <div className="no-mob-plat">
+        <div className="no-mob-popular">
+          {visiblePlatforms.slice(0, 5).map(p => {
+            const isActive = platform === p.id;
+            return (
+              <button key={p.id} onClick={() => { setPlatform(p.id); setPlatExpanded(false); }} className={`no-mob-plat-btn${isActive ? " no-mob-plat-on" : ""}`} style={{ borderColor: isActive ? t.accent : t.cardBorder, background: isActive ? (dark ? "rgba(196,125,142,.1)" : "rgba(196,125,142,.06)") : (dark ? "rgba(255,255,255,.04)" : "rgba(255,255,255,.8)"), color: isActive ? t.accent : (dark ? "rgba(255,255,255,.55)" : "rgba(0,0,0,.5)") }}>
+                <span className="no-mob-plat-icon">{p.icon}</span>
+              </button>
+            );
+          })}
+        </div>
+        {visiblePlatforms.length > 5 && (
+          <button onClick={() => setPlatExpanded(!platExpanded)} className="no-mob-viewall" style={{ color: t.textMuted, borderColor: t.cardBorder }}>
+            {platExpanded ? "Collapse ▴" : `View all ${visiblePlatforms.length} platforms ▾`}
+          </button>
+        )}
+        {platExpanded && (
+          <div className="no-mob-expanded" style={{ borderColor: t.cardBorder, background: dark ? "rgba(255,255,255,.02)" : "rgba(0,0,0,.01)" }}>
+            <div className="no-mob-expanded-grid">
+              {visiblePlatforms.map(p => {
+                const isActive = platform === p.id;
+                return (
+                  <button key={p.id} onClick={() => { setPlatform(p.id); setPlatExpanded(false); }} className={`no-mob-plat-btn${isActive ? " no-mob-plat-on" : ""}`} style={{ borderColor: isActive ? t.accent : t.cardBorder, background: isActive ? (dark ? "rgba(196,125,142,.1)" : "rgba(196,125,142,.06)") : (dark ? "rgba(255,255,255,.04)" : "rgba(255,255,255,.8)"), color: isActive ? t.accent : (dark ? "rgba(255,255,255,.55)" : "rgba(0,0,0,.5)") }}>
+                    <span className="no-mob-plat-icon">{p.icon}</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       {/* ═══ SEARCH ═══ */}
       <input placeholder={`Search ${activePlat?.label || ""} services...`} value={search} onChange={e => setSearch(e.target.value)} className="no-svc-search" style={{ borderColor: t.cardBorder, background: dark ? "rgba(255,255,255,.03)" : "#fff", color: t.text }} />
