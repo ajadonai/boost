@@ -71,6 +71,17 @@ export function OrderForm({ selSvc, selTier, platform, qty, setQty, link, setLin
   const s = selTier ? TS[selTier.tier] : null;
   const minQty = selTier?.min || 100;
   const maxQty = selTier?.max || 50000;
+  const [linkError, setLinkError] = useState("");
+
+  /* Link validation */
+  const validateLink = (val) => {
+    setLink(val);
+    if (!val.trim()) { setLinkError(""); return; }
+    const v = val.trim();
+    if (!/^https?:\/\//i.test(v)) { setLinkError("Link must start with https://"); return; }
+    try { new URL(v); setLinkError(""); } catch { setLinkError("Enter a valid URL"); }
+  };
+  const linkValid = link.trim() && !linkError;
 
   /* Detect service type from name + type field */
   const svcName = (selSvc?.name || "").toLowerCase();
@@ -135,7 +146,8 @@ export function OrderForm({ selSvc, selTier, platform, qty, setQty, link, setLin
       {selTier && <>
         <div className="no-form-field">
           <label className="no-form-label" style={{ color: t.textMuted }}>{linkLabel}</label>
-          <input type="text" placeholder={linkPlaceholder} value={link} onChange={e => setLink(e.target.value)} className="m no-form-input" style={{ borderColor: dark ? "rgba(255,255,255,.1)" : "rgba(0,0,0,.12)", background: dark ? "#0d1020" : "#fff", color: t.text }} />
+          <input type="url" inputMode="url" placeholder={linkPlaceholder} value={link} onChange={e => validateLink(e.target.value)} className="m no-form-input" style={{ borderColor: linkError ? (dark ? "#f87171" : "#dc2626") : dark ? "rgba(255,255,255,.1)" : "rgba(0,0,0,.12)", background: dark ? "#0d1020" : "#fff", color: t.text }} />
+          {linkError && <div style={{ fontSize: 11, color: dark ? "#f87171" : "#dc2626", marginTop: 3 }}>{linkError}</div>}
         </div>
         {needsComments && (
           <div className="no-form-field">
@@ -183,7 +195,7 @@ export function OrderForm({ selSvc, selTier, platform, qty, setQty, link, setLin
           <span className="m no-form-tag" style={{ borderColor: t.cardBorder, color: t.textMuted }}>refill: {selTier.refill}</span>
           <span className="m no-form-tag" style={{ borderColor: t.cardBorder, color: t.textMuted }}>speed: {selTier.speed || "Instant"}</span>
         </div>
-        <button onClick={onSubmit} disabled={!link || ((needsComments || needsUsernames) && !(comments || "").trim()) || (needsAnswer && !(comments || "").trim()) || orderLoading} className="no-form-submit" style={{ opacity: link && (!(needsComments || needsUsernames || needsAnswer) || (comments || "").trim()) && !orderLoading ? 1 : .5 }}>{orderLoading ? "Placing..." : "Place Order"}</button>
+        <button onClick={onSubmit} disabled={!linkValid || ((needsComments || needsUsernames) && !(comments || "").trim()) || (needsAnswer && !(comments || "").trim()) || orderLoading} className="no-form-submit" style={{ opacity: linkValid && (!(needsComments || needsUsernames || needsAnswer) || (comments || "").trim()) && !orderLoading ? 1 : .5 }}>{orderLoading ? "Placing..." : "Place Order"}</button>
       </>}
     </div>
   );
@@ -302,7 +314,7 @@ export default function NewOrderPage({ dark, t, user, onOrderSuccess, platform, 
         const s = TS[tier.tier];
         const isSel = selTier?.tier === tier.tier && selSvc?.id === svc.id;
         return (
-          <button key={tier.tier} onClick={e => pickTier(tier, e)} className={`no-tier-chip${isSel ? " no-tier-chip-sel" : ""}`} style={{ background: isSel ? (dark ? s.bgD : s.bg) : "transparent", color: s.text, borderColor: isSel ? s.text : (dark ? s.borderD : s.border) }}>
+          <button key={tier.tier} onClick={e => pickTier(tier, e)} className={`no-tier-chip${isSel ? " no-tier-chip-sel" : ""}`} style={{ background: isSel ? (dark ? s.bgD : s.bg) : (dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.04)"), color: s.text, borderColor: isSel ? s.text : (dark ? "rgba(255,255,255,.12)" : "rgba(0,0,0,.1)") }}>
             {s.label} {tier.tier} · ₦{tier.price.toLocaleString()}
           </button>
         );

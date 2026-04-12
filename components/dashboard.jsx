@@ -857,18 +857,16 @@ function DashboardInner() {
         {/* ── RIGHT SIDEBAR ── */}
         <aside className="dash-right" style={{ background: t.sidebarBg, borderLeft: `0.5px solid ${t.sidebarBorder}` }}>
           {isServices ? (
-            noHasOrder ? (
-              <OrderForm selSvc={noSelSvc} selTier={noSelTier} platform={noPlatform} qty={noQty} setQty={setNoQty} link={noLink} setLink={setNoLink} comments={noComments} setComments={setNoComments} dark={dark} t={t} compact />
-            ) : (
-              <>
+            <>
               <ServicesSidebar dark={dark} t={t} />
+              {!noHasOrder && (
               <div className="dash-rs-empty" style={{ marginTop: 16 }}>
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke={t.textMuted} strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: .3, marginBottom: 12 }}><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
                 <div style={{ fontSize: 15, color: t.textMuted, textAlign: "center", fontWeight: 450 }}>Select a service</div>
                 <div style={{ fontSize: 14, color: t.textMuted, opacity: .5, marginTop: 4, textAlign: "center" }}>Choose a platform and service to place an order</div>
               </div>
-              </>
-            )
+              )}
+            </>
           ) : isOrders ? (
             <OrdersSidebar orders={orders} dark={dark} t={t} />
           ) : isReferrals ? (
