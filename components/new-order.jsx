@@ -262,7 +262,7 @@ export default function NewOrderPage({ dark, t, user, onOrderSuccess, platform, 
 
   const pickService = (svc) => {
     if (selSvc?.id === svc.id) { setSelSvc(null); setSelTier(null); }
-    else { setSelSvc(svc); setSelTier(svc.tiers.length === 1 ? svc.tiers[0] : null); if (svc.tiers.length === 1) setQty(svc.tiers[0].min || 100); }
+    else { setSelSvc(svc); setSelTier(null); }
   };
   const pickTier = (tier, e) => { e.stopPropagation(); setSelTier(tier); setQty(tier.min || 100); };
 
@@ -290,13 +290,14 @@ export default function NewOrderPage({ dark, t, user, onOrderSuccess, platform, 
   };
 
   const [platGroup, setPlatGroup] = useState("Social Platforms");
+  const [platPage, setPlatPage] = useState(0);
 
   /* Platforms in the selected group with services */
   const groupPlatforms = PLATFORM_GROUPS.find(g => g.label === platGroup)?.platforms || [];
   const visiblePlatforms = groupPlatforms.filter(p => (platformCounts[p.id] || 0) > 0);
   const MAX_GRID = 5;
-  const gridPlatforms = visiblePlatforms.slice(0, MAX_GRID);
-  const overflowCount = visiblePlatforms.length - MAX_GRID;
+  const totalPlatPages = Math.ceil(visiblePlatforms.length / MAX_GRID);
+  const gridPlatforms = visiblePlatforms.slice(platPage * MAX_GRID, (platPage + 1) * MAX_GRID);
 
   const TierChips = ({ svc }) => (
     <div className="no-tier-chips">
@@ -318,7 +319,7 @@ export default function NewOrderPage({ dark, t, user, onOrderSuccess, platform, 
     const lowestPer = svc.tiers.find(ti => ti.price === lowestPrice)?.per || "1K";
     const activeTier = isSel && selTier ? selTier : null;
     return (
-      <div onClick={() => pickService(svc)} className={`no-svc-card${isSel ? " no-svc-card-sel" : ""}${svc.ng ? " no-svc-ng" : ""}`} style={{ borderColor: isSel ? t.accent : t.cardBorder, background: isSel ? (dark ? "rgba(196,125,142,.04)" : "rgba(196,125,142,.02)") : svc.ng ? (dark ? "rgba(30,80,60,.15)" : "#e8f5ee") : t.cardBg, opacity: selSvc && !isSel ? (dark ? .4 : .45) : 1 }}>
+      <div onClick={() => pickService(svc)} className={`no-svc-card${isSel ? " no-svc-card-sel" : ""}${svc.ng ? " no-svc-ng" : ""}`} style={{ borderColor: isSel ? t.accent : t.cardBorder, background: isSel ? (dark ? "rgba(196,125,142,.06)" : "rgba(196,125,142,.035)") : svc.ng ? (dark ? "rgba(30,80,60,.15)" : "#e8f5ee") : t.cardBg, opacity: selSvc && !isSel ? (dark ? .4 : .45) : 1 }}>
         <div className="no-svc-card-top">
           <div className="no-svc-card-info">
             <div className="no-svc-card-name" style={{ color: svc.ng ? (dark ? "#5dcaa5" : "#0F6E56") : t.text }}>{svc.name}</div>
@@ -336,20 +337,20 @@ export default function NewOrderPage({ dark, t, user, onOrderSuccess, platform, 
             <div className="m no-svc-card-price-val" style={{ color: t.accent }}>₦{(activeTier ? activeTier.price : lowestPrice).toLocaleString()}<span className="no-svc-card-price-per" style={{ color: t.textMuted }}>/{activeTier ? activeTier.per : lowestPer}</span></div>
           </div>
         </div>
-        {/* Tier selection chips — shown when expanded */}
-        {isSel && svc.tiers.length > 1 && <TierChips svc={svc} />}
-        {/* Tier detail — only when a tier is picked */}
+        {/* Tier selection chips — always shown when expanded (single or multi) */}
+        {isSel && <TierChips svc={svc} />}
+        {/* Prompt — shown when expanded but no tier selected yet */}
+        {isSel && !activeTier && (
+          <div className="no-svc-prompt" style={{ color: t.textMuted }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+            Select a tier to see details and order
+          </div>
+        )}
+        {/* Tier detail — shown when a tier is picked */}
         {isSel && activeTier && (
           <div className="no-tier-detail" style={{ background: dark ? `${TS[activeTier.tier].text}08` : `${TS[activeTier.tier].text}06`, borderColor: dark ? `${TS[activeTier.tier].text}18` : `${TS[activeTier.tier].text}12` }}>
             <div style={{ fontSize: 12, color: t.textMuted }}>Refill: {activeTier.refill} · {activeTier.speed} · Min {(activeTier.min || 100).toLocaleString()}</div>
             <div className="m" style={{ fontSize: 15, fontWeight: 700, color: TS[activeTier.tier].text }}>₦{activeTier.price.toLocaleString()}<span style={{ fontSize: 11, fontWeight: 400, color: t.textMuted }}>/{activeTier.per}</span></div>
-          </div>
-        )}
-        {/* Single tier — auto-selected, show detail immediately */}
-        {isSel && svc.tiers.length === 1 && (
-          <div className="no-tier-detail" style={{ background: dark ? `${TS[svc.tiers[0].tier].text}08` : `${TS[svc.tiers[0].tier].text}06`, borderColor: dark ? `${TS[svc.tiers[0].tier].text}18` : `${TS[svc.tiers[0].tier].text}12` }}>
-            <div style={{ fontSize: 12, color: t.textMuted }}>{TS[svc.tiers[0].tier].label} {svc.tiers[0].tier} · Refill: {svc.tiers[0].refill} · {svc.tiers[0].speed}</div>
-            <div className="m" style={{ fontSize: 15, fontWeight: 700, color: TS[svc.tiers[0].tier].text }}>₦{svc.tiers[0].price.toLocaleString()}<span style={{ fontSize: 11, fontWeight: 400, color: t.textMuted }}>/{svc.tiers[0].per}</span></div>
           </div>
         )}
       </div>
@@ -397,29 +398,35 @@ export default function NewOrderPage({ dark, t, user, onOrderSuccess, platform, 
       {/* ═══ GROUP TABS ═══ */}
       <div className="no-group-tabs" style={{ borderBottomColor: t.cardBorder }}>
         {PLATFORM_GROUPS.map(g => (
-          <button key={g.label} onClick={() => { setPlatGroup(g.label); const first = g.platforms.find(p => (platformCounts[p.id] || 0) > 0); if (first) setPlatform(first.id); }} className={`no-group-tab${platGroup === g.label ? " no-group-tab-on" : ""}`} style={{ color: platGroup === g.label ? t.accent : t.textMuted, borderBottomColor: platGroup === g.label ? t.accent : "transparent" }}>
+          <button key={g.label} onClick={() => { setPlatGroup(g.label); setPlatPage(0); const first = g.platforms.find(p => (platformCounts[p.id] || 0) > 0); if (first) setPlatform(first.id); }} className={`no-group-tab${platGroup === g.label ? " no-group-tab-on" : ""}`} style={{ color: platGroup === g.label ? t.accent : t.textMuted, borderBottomColor: platGroup === g.label ? t.accent : "transparent" }}>
             {g.label.replace(" Platforms", "").replace("SEO & ", "")}
           </button>
         ))}
       </div>
 
-      {/* ═══ PLATFORM GRID — desktop only (max 5 + More) ═══ */}
-      <div className="no-plat-grid">
-        {gridPlatforms.map(p => {
-          const isActive = platform === p.id;
-          const count = platformCounts[p.id] || 0;
-          return (
-            <button key={p.id} onClick={() => setPlatform(p.id)} className={`no-plat-card${isActive ? " no-plat-card-on" : ""}`} style={{ borderColor: isActive ? t.accent : t.cardBorder, background: isActive ? (dark ? "rgba(196,125,142,.06)" : "rgba(196,125,142,.04)") : (dark ? "rgba(255,255,255,.02)" : "rgba(255,255,255,.7)") }}>
-              <div className="no-plat-card-icon">{p.icon}</div>
-              <div className="no-plat-card-name" style={{ color: isActive ? t.accent : t.textSoft }}>{p.label}</div>
-              {count > 0 && <div className="no-plat-card-count" style={{ color: isActive ? t.accent : t.textMuted }}>{count}</div>}
-            </button>
-          );
-        })}
-        {overflowCount > 0 && (
-          <button onClick={() => setCatModal(true)} className="no-plat-card no-plat-card-more" style={{ borderColor: t.cardBorder, color: t.textMuted, cursor: "pointer" }}>
-            <div className="no-plat-card-icon" style={{ fontSize: 14, color: t.textMuted }}>+{overflowCount}</div>
-            <div className="no-plat-card-name" style={{ color: t.textMuted }}>More</div>
+      {/* ═══ PLATFORM GRID — desktop only (paginated, max 5 per page) ═══ */}
+      <div className="no-plat-grid-wrap">
+        {platPage > 0 && (
+          <button onClick={() => setPlatPage(platPage - 1)} className="no-plat-nav no-plat-nav-prev" style={{ color: t.textMuted, borderColor: t.cardBorder }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+        )}
+        <div className="no-plat-grid">
+          {gridPlatforms.map(p => {
+            const isActive = platform === p.id;
+            const count = platformCounts[p.id] || 0;
+            return (
+              <button key={p.id} onClick={() => setPlatform(p.id)} className={`no-plat-card${isActive ? " no-plat-card-on" : ""}`} style={{ borderColor: isActive ? t.accent : t.cardBorder, background: isActive ? (dark ? "rgba(196,125,142,.06)" : "rgba(196,125,142,.04)") : (dark ? "rgba(255,255,255,.02)" : "rgba(255,255,255,.7)") }}>
+                <div className="no-plat-card-icon">{p.icon}</div>
+                <div className="no-plat-card-name" style={{ color: isActive ? t.accent : t.textSoft }}>{p.label}</div>
+                {count > 0 && <div className="no-plat-card-count" style={{ color: isActive ? t.accent : t.textMuted }}>{count}</div>}
+              </button>
+            );
+          })}
+        </div>
+        {platPage < totalPlatPages - 1 && (
+          <button onClick={() => setPlatPage(platPage + 1)} className="no-plat-nav no-plat-nav-next" style={{ color: t.textMuted, borderColor: t.cardBorder }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="9 18 15 12 9 6"/></svg>
           </button>
         )}
       </div>
