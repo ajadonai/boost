@@ -148,7 +148,7 @@ async function refundOrder(order, amount = null) {
         method: 'POST',
         headers: { 'api-key': process.env.BREVO_API_KEY, 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          sender: { name: 'Nitro', email: 'noreply@thenitro.ng' },
+          sender: { name: 'Nitro', email: 'noreply@nitro.ng' },
           to: [{ email: userEmail }],
           subject: isPartial ? `Partial Refund — ₦${nairaAmount} returned to your wallet` : `Order Refund — ₦${nairaAmount} returned to your wallet`,
           htmlContent: `

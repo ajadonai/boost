@@ -80,7 +80,7 @@ export async function GET(req) {
               method: 'POST',
               headers: { 'api-key': brevoKey, 'Content-Type': 'application/json' },
               body: JSON.stringify({
-                sender: { name: 'Nitro System', email: 'noreply@thenitro.ng' },
+                sender: { name: 'Nitro System', email: 'noreply@nitro.ng' },
                 to: [{ email: adminEmail }],
                 subject: '⚠️ Low Provider Balance Alert',
                 htmlContent: `<h2>Provider Balance Alert</h2><p>The following providers have low balances:</p><ul>${alerts.map(a => `<li><strong>${a.provider}</strong>: $${a.balance.toFixed(2)} (threshold: $${a.threshold})</li>`).join('')}</ul><p>Please top up to avoid order failures.</p><p>— Nitro System</p>`,

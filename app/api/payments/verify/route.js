@@ -7,7 +7,6 @@ async function getGatewayKeys(gatewayId) {
   if (setting) {
     try { const data = JSON.parse(setting.value); if (data.fields) return data.fields; } catch {}
   }
-  if (gatewayId === 'paystack') return { secretKey: process.env.PAYSTACK_SECRET_KEY || '' };
   if (gatewayId === 'flutterwave') return { secretKey: process.env.FLUTTERWAVE_SECRET_KEY || '' };
   return {};
 }
@@ -41,7 +40,7 @@ export async function POST(req) {
       where: { reference, userId: session.id, status: 'Processing' },
     });
 
-    const gateway = existing.method || 'paystack';
+    const gateway = existing.method || 'flutterwave';
     const keys = await getGatewayKeys(gateway);
 
     if (!keys.secretKey) {
@@ -50,18 +49,6 @@ export async function POST(req) {
 
     let verified = false;
     let paidAmount = existing.amount; // fallback
-
-    // ═══ PAYSTACK VERIFY ═══
-    if (gateway === 'paystack') {
-      const res = await fetch(`https://api.paystack.co/transaction/verify/${encodeURIComponent(reference)}`, {
-        headers: { 'Authorization': `Bearer ${keys.secretKey}` },
-      });
-      const data = await res.json();
-      if (data.status && data.data.status === 'success') {
-        verified = true;
-        paidAmount = data.data.amount; // kobo
-      }
-    }
 
     // ═══ FLUTTERWAVE VERIFY ═══
     if (gateway === 'flutterwave') {
