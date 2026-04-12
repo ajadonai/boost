@@ -66,8 +66,10 @@ const TS = {
 /* ═══════════════════════════════════════════ */
 /* ═══ ORDER FORM                          ═══ */
 /* ═══════════════════════════════════════════ */
-export function OrderForm({ selSvc, selTier, platform, qty, setQty, link, setLink, dark, t, onClose, compact, onSubmit, orderLoading, comments, setComments, orderResult }) {
-  const price = selTier ? Math.round((qty / 1000) * selTier.price) : 0;
+export function OrderForm({ selSvc, selTier, platform, qty, setQty, link, setLink, dark, t, onClose, compact, onSubmit, orderLoading, comments, setComments, orderResult, loyaltyDiscount = 0, loyaltyTier = null }) {
+  const basePrice = selTier ? Math.round((qty / 1000) * selTier.price) : 0;
+  const discountAmount = loyaltyDiscount > 0 ? Math.round(basePrice * (loyaltyDiscount / 100)) : 0;
+  const price = Math.max(0, basePrice - discountAmount);
   const s = selTier ? TS[selTier.tier] : null;
   const minQty = selTier?.min || 100;
   const maxQty = selTier?.max || 50000;
@@ -186,6 +188,7 @@ export function OrderForm({ selSvc, selTier, platform, qty, setQty, link, setLin
         <div className="no-form-summary" style={{ background: dark ? "rgba(255,255,255,.02)" : "rgba(0,0,0,.02)", borderColor: t.cardBorder }}>
           <div className="no-form-sum-row" style={{ color: t.textMuted }}><span>Rate</span><span>₦{selTier.price.toLocaleString()} / {selTier.per}</span></div>
           <div className="no-form-sum-row" style={{ color: t.textMuted }}><span>Quantity</span><span>{qty.toLocaleString()}</span></div>
+          {discountAmount > 0 && <div className="no-form-sum-row" style={{ color: dark ? "#6ee7b7" : "#059669" }}><span>{loyaltyTier} discount ({loyaltyDiscount}%)</span><span>-₦{discountAmount.toLocaleString()}</span></div>}
           <div className="no-form-sum-total" style={{ borderColor: t.cardBorder }}>
             <span style={{ color: t.textMuted, fontWeight: 600 }}>Total</span>
             <span className="m no-form-sum-price" style={{ color: t.accent }}>₦{price.toLocaleString()}</span>
@@ -517,7 +520,7 @@ export default function NewOrderPage({ dark, t, user, onOrderSuccess, platform, 
       {orderModal && hasOrder && (
         <div className="no-modal-overlay" onClick={() => setOrderModal(false)}>
           <div className="no-modal" onClick={e => e.stopPropagation()} style={{ background: dark ? "#0e1120" : "#ffffff", borderWidth: 1, borderStyle: "solid", borderColor: t.cardBorder }}>
-            <OrderForm selSvc={selSvc} selTier={selTier} platform={platform} qty={qty} setQty={setQty} link={link} setLink={setLink} comments={comments} setComments={setComments} dark={dark} t={t} onClose={() => setOrderModal(false)} onSubmit={submitOrder} orderLoading={orderLoading} orderResult={orderResult} />
+            <OrderForm selSvc={selSvc} selTier={selTier} platform={platform} qty={qty} setQty={setQty} link={link} setLink={setLink} comments={comments} setComments={setComments} dark={dark} t={t} onClose={() => setOrderModal(false)} onSubmit={submitOrder} orderLoading={orderLoading} orderResult={orderResult} loyaltyDiscount={menuData?.loyaltyDiscount || 0} loyaltyTier={menuData?.loyaltyTier || null} />
           </div>
         </div>
       )}

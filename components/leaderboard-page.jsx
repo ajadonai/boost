@@ -186,10 +186,20 @@ export default function LeaderboardPage({ dark, t }) {
           {[1,2,3,4].map(i => <div key={i} className={`skel-bone ${dark ? "skel-dark" : "skel-light"}`} style={{ height: 48, borderRadius: 8, marginBottom: 6 }} />)}
         </div>
       ) : list.length === 0 ? (
-        <div style={{ padding: 40, textAlign: "center", color: t.textMuted }}>
-          {tab === "spenders" && "No orders yet. Be the first to top the leaderboard!"}
-          {tab === "referrers" && "No referrals yet. Share your code to climb the ranks!"}
-          {tab === "active" && "No activity yet. Place your first order to get started!"}
+        <div style={{ padding: "60px 20px", textAlign: "center" }}>
+          {tab === "spenders" && <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke={dark ? "rgba(255,255,255,.15)" : "rgba(0,0,0,.1)"} strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" style={{ margin: "0 auto 16px", display: "block" }}><path d="M8 21V12H2v9h6zM22 21V8h-6v13h6zM15 21V4H9v17h6z"/></svg>}
+          {tab === "referrers" && <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke={dark ? "rgba(255,255,255,.15)" : "rgba(0,0,0,.1)"} strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" style={{ margin: "0 auto 16px", display: "block" }}><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>}
+          {tab === "active" && <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke={dark ? "rgba(255,255,255,.15)" : "rgba(0,0,0,.1)"} strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" style={{ margin: "0 auto 16px", display: "block" }}><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>}
+          <div style={{ fontSize: 15, fontWeight: 600, color: t.text, marginBottom: 6 }}>
+            {tab === "spenders" && "No top spenders yet"}
+            {tab === "referrers" && "No referrals yet"}
+            {tab === "active" && "No activity yet"}
+          </div>
+          <div style={{ fontSize: 13, color: t.textMuted, maxWidth: 280, margin: "0 auto" }}>
+            {tab === "spenders" && "Place orders to climb the leaderboard and unlock loyalty perks."}
+            {tab === "referrers" && "Share your referral code with friends to appear here."}
+            {tab === "active" && "Start ordering to see your name on the board."}
+          </div>
         </div>
       ) : <>
 
