@@ -74,7 +74,7 @@ export async function GET(req) {
         // Send email alert to admin
         try {
           const brevoKey = process.env.BREVO_API_KEY;
-          const adminEmail = process.env.ADMIN_EMAIL || 'admin@thenitro.ng';
+          const adminEmail = process.env.ADMIN_EMAIL || 'TheNitroNG@gmail.com';
           if (brevoKey) {
             await fetch('https://api.brevo.com/v3/smtp/email', {
               method: 'POST',
