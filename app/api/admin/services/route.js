@@ -28,6 +28,7 @@ export async function GET() {
         refill: s.refill,
         avgTime: s.avgTime,
         enabled: s.enabled,
+        provider: s.provider || 'mtp',
         orders: s._count.orders,
         tiers: s._count.tiers,
       })),

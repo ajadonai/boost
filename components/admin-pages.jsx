@@ -43,6 +43,11 @@ export function AdminPaymentsPage({ dark, t }) {
     }).catch(() => setLoading(false));
   };
   useEffect(() => { refresh(); }, []);
+  useEffect(() => {
+    if (tab !== "deposits") return;
+    const interval = setInterval(() => refresh(), 30000);
+    return () => clearInterval(interval);
+  }, [tab]);
 
   const doSearch = () => refresh(search, statusFilter, dateFrom, dateTo);
   const changeStatus = (s) => { setStatusFilter(s); refresh(search, s, dateFrom, dateTo); };

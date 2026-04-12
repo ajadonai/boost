@@ -17,6 +17,7 @@ export default function AdminServicesPage({ dark, t }) {
   const [search, setSearch] = useState("");
   const [catFilter, setCatFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [providerFilter, setProviderFilter] = useState("all");
   const [expanded, setExpanded] = useState(null);
   const [editMode, setEditMode] = useState(null);
 
@@ -25,11 +26,13 @@ export default function AdminServicesPage({ dark, t }) {
   }, []);
 
   const categories = [...new Set(services.map(s => s.category))].filter(Boolean);
+  const providers = [...new Set(services.map(s => s.provider || "mtp"))];
   const activeCount = services.filter(s => s.enabled).length;
   const inactiveCount = services.filter(s => !s.enabled).length;
   const inUseCount = services.filter(s => s.tiers > 0).length;
   const inUseDisabledCount = services.filter(s => s.tiers > 0 && !s.enabled).length;
   const filtered = services.filter(s => {
+    if (providerFilter !== "all" && (s.provider || "mtp") !== providerFilter) return false;
     if (statusFilter === "active" && !s.enabled) return false;
     if (statusFilter === "inactive" && s.enabled) return false;
     if (statusFilter === "in-use" && s.tiers === 0) return false;
@@ -130,6 +133,18 @@ export default function AdminServicesPage({ dark, t }) {
 
       {inUseDisabledCount > 0 && <div style={{ padding: "10px 14px", borderRadius: 8, marginBottom: 12, background: dark ? "rgba(224,164,88,.06)" : "rgba(217,119,6,.04)", border: `1px solid ${dark ? "rgba(224,164,88,.15)" : "rgba(217,119,6,.1)"}`, color: dark ? "#e0a458" : "#92400e", fontSize: 13, lineHeight: 1.5 }}>⚠️ {inUseDisabledCount} service{inUseDisabledCount > 1 ? "s" : ""} used by Menu Builder {inUseDisabledCount > 1 ? "are" : "is"} disabled. Users can see {inUseDisabledCount > 1 ? "them" : "it"} in the menu but orders may fail.</div>}
 
+      {/* Provider selector */}
+      {providers.length > 1 && (
+        <div style={{ display: "flex", gap: 0, marginBottom: 14, borderBottom: `1px solid ${t.cardBorder}` }}>
+          <button onClick={() => setProviderFilter("all")} style={{ padding: "8px 16px", fontSize: 13, fontWeight: providerFilter === "all" ? 600 : 500, color: providerFilter === "all" ? t.accent : t.textMuted, background: "none", border: "none", borderBottom: `2px solid ${providerFilter === "all" ? t.accent : "transparent"}`, marginBottom: -1, cursor: "pointer", fontFamily: "inherit" }}>All ({services.length})</button>
+          {providers.map(p => {
+            const count = services.filter(s => (s.provider || "mtp") === p).length;
+            const label = p === "mtp" ? "MTP" : p === "jap" ? "JAP" : p === "dao" ? "DaoSMM" : p.toUpperCase();
+            return <button key={p} onClick={() => setProviderFilter(p)} style={{ padding: "8px 16px", fontSize: 13, fontWeight: providerFilter === p ? 600 : 500, color: providerFilter === p ? t.accent : t.textMuted, background: "none", border: "none", borderBottom: `2px solid ${providerFilter === p ? t.accent : "transparent"}`, marginBottom: -1, cursor: "pointer", fontFamily: "inherit" }}>{label} ({count})</button>;
+          })}
+        </div>
+      )}
+
       <div style={{ display: "flex", gap: 6, marginBottom: 10 }}>
         {[["all", `All (${services.length})`], ["active", `Active (${activeCount})`], ["inactive", `Inactive (${inactiveCount})`], ["in-use", `In Use (${inUseCount})`], ...(inUseDisabledCount > 0 ? [["in-use-disabled", `⚠️ In Use + Disabled (${inUseDisabledCount})`]] : [])].map(([val, label]) => (
           <button key={val} onClick={() => setStatusFilter(val)} style={{ padding: "5px 14px", borderRadius: 8, fontSize: 13, fontWeight: 600, border: `1px solid ${statusFilter === val ? (val === "in-use-disabled" ? (dark ? "rgba(224,164,88,.3)" : "rgba(217,119,6,.2)") : val === "inactive" ? (dark ? "rgba(252,165,165,.3)" : "rgba(220,38,38,.2)") : val === "active" ? (dark ? "rgba(110,231,183,.3)" : "rgba(5,150,105,.2)") : val === "in-use" ? (dark ? "rgba(96,165,250,.3)" : "rgba(37,99,235,.2)") : t.accent) : t.cardBorder}`, background: statusFilter === val ? (val === "in-use-disabled" ? (dark ? "rgba(224,164,88,.06)" : "rgba(217,119,6,.04)") : val === "inactive" ? (dark ? "rgba(252,165,165,.06)" : "rgba(220,38,38,.04)") : val === "active" ? (dark ? "rgba(110,231,183,.06)" : "rgba(5,150,105,.04)") : val === "in-use" ? (dark ? "rgba(96,165,250,.06)" : "rgba(37,99,235,.04)") : (dark ? "#2a1a22" : "#fdf2f4")) : "transparent", color: statusFilter === val ? (val === "in-use-disabled" ? (dark ? "#e0a458" : "#d97706") : val === "inactive" ? (dark ? "#fca5a5" : "#dc2626") : val === "active" ? (dark ? "#6ee7b7" : "#059669") : val === "in-use" ? (dark ? "#60a5fa" : "#2563eb") : t.accent) : t.textMuted, cursor: "pointer" }}>{label}</button>
@@ -155,6 +170,7 @@ export default function AdminServicesPage({ dark, t }) {
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                   <span style={{ fontSize: 15, fontWeight: 500, color: t.text }}>{s.name}</span>
+                  {s.provider && s.provider !== "mtp" && <span style={{ fontSize: 10, padding: "1px 5px", borderRadius: 3, background: dark ? "rgba(165,180,252,.1)" : "rgba(79,70,229,.06)", color: dark ? "#a5b4fc" : "#4f46e5", fontWeight: 700, textTransform: "uppercase" }}>{s.provider === "jap" ? "JAP" : s.provider === "dao" ? "DAO" : s.provider}</span>}
                   {s.tiers > 0 && <span style={{ fontSize: 12, padding: "1px 6px", borderRadius: 4, background: dark ? "rgba(96,165,250,.1)" : "rgba(37,99,235,.06)", color: dark ? "#60a5fa" : "#2563eb", fontWeight: 600 }}>In Use · {s.tiers}</span>}
                   {!s.enabled && <span style={{ fontSize: 12, padding: "1px 6px", borderRadius: 4, background: dark ? "rgba(252,165,165,.1)" : "rgba(220,38,38,.06)", color: t.red, fontWeight: 600 }}>Disabled</span>}
                   {s.tiers > 0 && !s.enabled && <span style={{ fontSize: 12, padding: "1px 6px", borderRadius: 4, background: dark ? "rgba(224,164,88,.1)" : "rgba(217,119,6,.06)", color: dark ? "#e0a458" : "#d97706", fontWeight: 600 }}>⚠️</span>}

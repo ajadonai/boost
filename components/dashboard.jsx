@@ -485,6 +485,13 @@ function DashboardInner() {
     } catch {}
   };
 
+  /* Auto-poll when on orders page (every 30s) */
+  useEffect(() => {
+    if (active !== "orders") return;
+    const interval = setInterval(refreshDashboard, 30000);
+    return () => clearInterval(interval);
+  }, [active]);
+
   /* Data fetch */
   useEffect(() => {
     async function load() {
