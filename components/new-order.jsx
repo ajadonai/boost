@@ -446,15 +446,15 @@ export default function NewOrderPage({ dark, t, user, onOrderSuccess, platform, 
         )}
       </div>
 
-      {/* ═══ SEARCH ═══ */}
-      <input placeholder={`Search ${activePlat?.label || ""} services...`} value={search} onChange={e => setSearch(e.target.value)} className="no-svc-search" style={{ borderColor: t.cardBorder, background: dark ? "rgba(255,255,255,.03)" : "#fff", color: t.text }} />
-
       {/* ═══ SECTION HEADER ═══ */}
       <div className="no-sec-hdr" style={{ borderBottomColor: t.cardBorder }}>
         <div className="no-sec-icon">{activePlat?.icon}</div>
         <span style={{ fontSize: 17, fontWeight: 600, color: t.text }}>{activePlat?.label}</span>
         <span style={{ fontSize: 13, color: t.textMuted, marginLeft: "auto" }}>{filtered.length} service{filtered.length !== 1 ? "s" : ""}</span>
       </div>
+
+      {/* ═══ SEARCH ═══ */}
+      <input placeholder={`Search ${activePlat?.label || ""} services...`} value={search} onChange={e => setSearch(e.target.value)} className="no-svc-search" style={{ borderColor: t.cardBorder, background: dark ? "rgba(255,255,255,.03)" : "#fff", color: t.text }} />
 
       {/* ═══ SERVICE CARDS ═══ */}
       <div className="no-svc-list">
