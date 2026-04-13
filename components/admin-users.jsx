@@ -103,11 +103,19 @@ export default function AdminUsersPage({ dark, t }) {
       </div>
 
       <div className="adm-filters">
-        {[["all", "All", users.length], ["active", "Active", users.filter(u => u.status === "Active").length], ["suspended", "Banned", users.filter(u => u.status === "Suspended").length], ["pending-deletion", "Pending Del.", users.filter(u => u.status === "PendingDeletion").length], ["deleted", "Deleted", users.filter(u => u.status === "Deleted").length]].map(([id, label, count]) => (
-          <button key={id} onClick={() => { setFilter(id); setPage(1); }} className="adm-filter-pill" style={{ borderWidth: 1, borderStyle: "solid", borderColor: filter === id ? t.accent : t.cardBorder, background: filter === id ? (dark ? "#2a1a22" : "#fdf2f4") : "transparent", color: filter === id ? t.accent : t.textMuted }}>
-            {label} <span>({count})</span>
-          </button>
-        ))}
+        <select value={filter} onChange={e => { setFilter(e.target.value); setPage(1); }} style={{
+          padding: "7px 28px 7px 10px", borderRadius: 8, fontSize: 13, fontWeight: 500,
+          background: dark ? "rgba(255,255,255,.04)" : "rgba(0,0,0,.03)",
+          border: `1px solid ${dark ? "rgba(255,255,255,.08)" : "rgba(0,0,0,.08)"}`,
+          color: dark ? "rgba(255,255,255,.7)" : "rgba(0,0,0,.7)",
+          appearance: "none", cursor: "pointer", fontFamily: "inherit",
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='${dark ? "%23666" : "%23999"}' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E")`,
+          backgroundRepeat: "no-repeat", backgroundPosition: "right 8px center",
+        }}>
+          {[["all", "All", users.length], ["active", "Active", users.filter(u => u.status === "Active").length], ["suspended", "Banned", users.filter(u => u.status === "Suspended").length], ["pending-deletion", "Pending Del.", users.filter(u => u.status === "PendingDeletion").length], ["deleted", "Deleted", users.filter(u => u.status === "Deleted").length]].map(([id, label, count]) => (
+            <option key={id} value={id}>{label} ({count})</option>
+          ))}
+        </select>
       </div>
 
       <input value={search} onChange={e => { setSearch(e.target.value); setPage(1); }} placeholder="Search by name or email..." className="m adm-search" style={{ borderColor: t.cardBorder, background: dark ? "#0d1020" : "#fff", color: t.text }} />

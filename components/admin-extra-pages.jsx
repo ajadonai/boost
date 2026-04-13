@@ -39,10 +39,18 @@ export function AdminActivityPage({ dark, t }) {
       </div>
 
       <div className="adm-filters">
-        <button onClick={() => setFilter("all")} className="adm-filter-pill" style={{ borderWidth: 1, borderStyle: "solid", borderColor: filter === "all" ? t.accent : t.cardBorder, background: filter === "all" ? (dark ? "#2a1a22" : "#fdf2f4") : "transparent", color: filter === "all" ? t.accent : t.textMuted }}>All ({logs.length})</button>
-        {types.map(ty => (
-          <button key={ty} onClick={() => setFilter(ty)} className="adm-filter-pill" style={{ borderWidth: 1, borderStyle: "solid", borderColor: filter === ty ? t.accent : t.cardBorder, background: filter === ty ? (dark ? "#2a1a22" : "#fdf2f4") : "transparent", color: filter === ty ? t.accent : t.textMuted }}>{ty} ({logs.filter(l => l.type === ty).length})</button>
-        ))}
+        <select value={filter} onChange={e => setFilter(e.target.value)} style={{
+          padding: "7px 28px 7px 10px", borderRadius: 8, fontSize: 13, fontWeight: 500,
+          background: dark ? "rgba(255,255,255,.04)" : "rgba(0,0,0,.03)",
+          border: `1px solid ${dark ? "rgba(255,255,255,.08)" : "rgba(0,0,0,.08)"}`,
+          color: dark ? "rgba(255,255,255,.7)" : "rgba(0,0,0,.7)",
+          appearance: "none", cursor: "pointer", fontFamily: "inherit",
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='${dark ? "%23666" : "%23999"}' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E")`,
+          backgroundRepeat: "no-repeat", backgroundPosition: "right 8px center",
+        }}>
+          <option value="all">All ({logs.length})</option>
+          {types.map(ty => <option key={ty} value={ty}>{ty} ({logs.filter(l => l.type === ty).length})</option>)}
+        </select>
       </div>
 
       <div className="adm-card" style={{ background: dark ? "rgba(255,255,255,.03)" : "rgba(255,255,255,.85)", border: `0.5px solid ${dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)"}` }}>

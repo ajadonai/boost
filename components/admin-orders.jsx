@@ -73,11 +73,19 @@ export default function AdminOrdersPage({ dark, t }) {
 
       {/* Filters */}
       <div className="adm-filters">
-        {["all", "Completed", "Processing", "Pending", "Partial", "Canceled"].map(f => (
-          <button key={f} onClick={() => { setFilter(f); setPage(1); }} className="adm-filter-pill" style={{ borderWidth: 1, borderStyle: "solid", borderColor: filter === f ? t.accent : t.cardBorder, background: filter === f ? (dark ? "#2a1a22" : "#fdf2f4") : "transparent", color: filter === f ? t.accent : t.textMuted }}>
-            {f === "all" ? "All" : f} <span>({counts[f] || 0})</span>
-          </button>
-        ))}
+        <select value={filter} onChange={e => { setFilter(e.target.value); setPage(1); }} style={{
+          padding: "7px 28px 7px 10px", borderRadius: 8, fontSize: 13, fontWeight: 500,
+          background: dark ? "rgba(255,255,255,.04)" : "rgba(0,0,0,.03)",
+          border: `1px solid ${dark ? "rgba(255,255,255,.08)" : "rgba(0,0,0,.08)"}`,
+          color: dark ? "rgba(255,255,255,.7)" : "rgba(0,0,0,.7)",
+          appearance: "none", cursor: "pointer", fontFamily: "inherit",
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='${dark ? "%23666" : "%23999"}' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E")`,
+          backgroundRepeat: "no-repeat", backgroundPosition: "right 8px center",
+        }}>
+          {["all", "Completed", "Processing", "Pending", "Partial", "Canceled"].map(f => (
+            <option key={f} value={f}>{f === "all" ? `All (${orders.length})` : `${f} (${counts[f] || 0})`}</option>
+          ))}
+        </select>
       </div>
 
       {/* Search */}
