@@ -727,7 +727,7 @@ function DashboardInner() {
   return (
     <ToastProvider dark={dark}>
     <ConfirmProvider dark={dark}>
-    <div className="dash-root" style={{ background: t.bg }}>
+    <div className="dash-root user-dash" style={{ background: t.bg }}>
 
       {/* ═══ TOP NAV ═══ */}
       <nav className="dash-nav" style={{ background: t.sidebarBg, borderBottom: `0.5px solid ${t.sidebarBorder}` }}>

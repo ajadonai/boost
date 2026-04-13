@@ -1700,9 +1700,9 @@ input { font-family: inherit; }
   .dash-bottom-tab.primary.active .dash-bottom-icon svg { width: 24px; height: 24px; }
   .dash-main { padding-bottom: 64px !important; }
   .dash-footer { margin-bottom: 0; }
-  .dash-hamburger-bars { display: none !important; }
-  .dash-menu-btn { pointer-events: none; }
-  .dash-menu-btn > svg { display: none !important; }
+  .user-dash .dash-hamburger-bars { display: none !important; }
+  .user-dash .dash-menu-btn { pointer-events: none; }
+  .user-dash .dash-menu-btn > svg { display: none !important; }
   .dash-more-overlay {
     display: block; position: fixed; inset: 0; z-index: 88;
     background: rgba(0,0,0,0.4);
