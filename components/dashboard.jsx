@@ -908,7 +908,7 @@ function DashboardInner() {
       {/* ═══ MOBILE BOTTOM NAV ═══ */}
       {moreOpen && <div className="dash-more-overlay" onClick={() => setMoreOpen(false)} />}
       {moreOpen && (
-        <div className="dash-more-popup" style={{ background: dark ? "#161b2e" : "#fff", border: `1px solid ${dark ? "rgba(255,255,255,.15)" : "rgba(0,0,0,.12)"}` }}>
+        <div className="dash-more-popup" style={{ background: dark ? "#161b2e" : "#fff", border: `1.5px solid ${dark ? "rgba(196,125,142,.25)" : "rgba(196,125,142,.2)"}` }}>
           {MORE_ITEMS.map(item => (
             <button key={item.id} onClick={() => { setActive(item.id); setMoreOpen(false); }} className="dash-more-item" style={{ background: active === item.id ? (dark ? "rgba(196,125,142,.08)" : "rgba(196,125,142,.04)") : (dark ? "rgba(255,255,255,.03)" : "rgba(0,0,0,.02)"), color: active === item.id ? t.accent : (dark ? "rgba(255,255,255,.6)" : "rgba(0,0,0,.6)"), fontWeight: active === item.id ? 600 : 500 }}>
               <div className="dash-more-item-icon" style={{ background: active === item.id ? (dark ? "rgba(196,125,142,.12)" : "rgba(196,125,142,.08)") : (dark ? "rgba(255,255,255,.05)" : "rgba(0,0,0,.04)"), color: active === item.id ? t.accent : (dark ? "rgba(255,255,255,.4)" : "rgba(0,0,0,.35)") }}>{I[item.id]}</div>
