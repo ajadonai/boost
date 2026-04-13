@@ -2,28 +2,27 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 
 const STEPS = [
-  { target: "no-platform-tabs", findFirst: ".no-plat-icon-on, .no-mob-plat-on, .no-plat-icon-btn:first-child, .no-mob-plat-btn:first-child", noScroll: true, title: "Pick a platform", desc: "Choose which platform you want to grow. Instagram, TikTok, YouTube — we support 35+.", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg> },
-  { target: "no-service-list", title: "Choose a service", desc: "Browse available services — followers, likes, views, comments, and more. Tap one to select it.", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg> },
-  { target: "no-tier-select", title: "Select your tier", desc: "Budget is cheapest, Standard is balanced, Premium is highest quality. Pick what fits your needs.", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg> },
-  { target: "no-link-input", title: "Enter your link & quantity", desc: "Paste your profile or post URL and set how many you want. Minimum varies by service.", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg> },
-  { target: "no-submit-btn", title: "Place your order", desc: "Review the total, hit the button, and you're done. We start processing immediately.", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> },
+  { target: "no-platform-tabs", findFirst: ".no-plat-icon-on, .no-mob-plat-on, .no-plat-icon-btn:first-child, .no-mob-plat-btn:first-child", noScroll: true, title: "Pick a platform", desc: "Choose which platform you want to grow. Instagram, TikTok, YouTube — we support 35+.", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>, autoAction: null },
+  { target: "no-service-list", title: "Choose a service", desc: "Browse available services — followers, likes, views, comments, and more. Tap one to select it.", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg>, autoAction: null },
+  { target: "no-tier-select", title: "Select your tier", desc: "Budget is cheapest, Standard is balanced, Premium is highest quality. Pick what fits your needs.", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg>, autoAction: "selectService" },
+  { target: "no-link-input", title: "Enter your link & quantity", desc: "Paste your profile or post URL and set how many you want. Minimum varies by service.", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>, autoAction: "selectTier" },
+  { target: "no-submit-btn", title: "Place your order", desc: "Review the total, hit the button, and you're done. We start processing immediately.", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>, autoAction: null },
 ];
 
 function findTarget(s) {
-  // For platform step, find the first visible platform button
   if (s.findFirst) {
     const el = document.querySelector(s.findFirst);
     if (el && el.offsetParent !== null) return el;
   }
-  // Fallback to data-tour attribute
   return document.querySelector(`[data-tour="${s.target}"]`);
 }
 
-export default function OrderTour({ dark, onComplete }) {
+export default function OrderTour({ dark, onComplete, setSelSvc, setSelTier, setQty }) {
   const [step, setStep] = useState(0);
   const [visible, setVisible] = useState(false);
   const [spotRect, setSpotRect] = useState(null);
   const rafRef = useRef(null);
+  const servicesRef = useRef(null);
 
   useEffect(() => {
     const timer = setTimeout(() => setVisible(true), 400);
@@ -33,12 +32,54 @@ export default function OrderTour({ dark, onComplete }) {
   const finish = useCallback(() => {
     setVisible(false);
     try { localStorage.setItem("nitro-order-tour-done", "1"); } catch {}
+    // Reset selections made during tour
+    setSelSvc?.(null);
+    setSelTier?.(null);
     setTimeout(() => onComplete?.(), 300);
-  }, [onComplete]);
+  }, [onComplete, setSelSvc, setSelTier]);
+
+  // Grab the first service from the DOM for auto-selection
+  const getFirstService = () => {
+    if (servicesRef.current) return servicesRef.current;
+    // Find service cards and extract data from first one
+    const cards = document.querySelectorAll(".no-svc-card");
+    if (cards.length > 0) {
+      // Click the first card to select it — this triggers pickService in new-order
+      cards[0]?.click();
+      return true;
+    }
+    return false;
+  };
+
+  const getFirstTier = () => {
+    // Click the first tier chip
+    const chips = document.querySelectorAll(".no-tier-chip");
+    if (chips.length > 0) {
+      chips[0]?.click();
+      return true;
+    }
+    return false;
+  };
 
   const next = () => {
-    if (step < STEPS.length - 1) setStep(step + 1);
-    else finish();
+    const nextIdx = step + 1;
+    if (nextIdx >= STEPS.length) { finish(); return; }
+
+    const nextStep = STEPS[nextIdx];
+
+    // Auto-actions before showing next step
+    if (nextStep.autoAction === "selectService") {
+      getFirstService();
+      // Delay to let React re-render with the selected service
+      setTimeout(() => setStep(nextIdx), 300);
+      return;
+    }
+    if (nextStep.autoAction === "selectTier") {
+      setTimeout(() => { getFirstTier(); setTimeout(() => setStep(nextIdx), 300); }, 100);
+      return;
+    }
+
+    setStep(nextIdx);
   };
 
   // Track target element position
@@ -54,7 +95,7 @@ export default function OrderTour({ dark, onComplete }) {
       }
       rafRef.current = requestAnimationFrame(update);
     };
-    const timer = setTimeout(update, 150);
+    const timer = setTimeout(update, 200);
     return () => { clearTimeout(timer); if (rafRef.current) cancelAnimationFrame(rafRef.current); };
   }, [step, visible]);
 
@@ -68,11 +109,11 @@ export default function OrderTour({ dark, onComplete }) {
         const inView = r.top >= 0 && r.bottom <= window.innerHeight - 160;
         if (!inView) el.scrollIntoView({ behavior: "smooth", block: "center" });
       }
-    }, 100);
+    }, 150);
     return () => clearTimeout(timer);
   }, [step, visible]);
 
-  // Highlight "Order" tab on bottom nav throughout the tour
+  // Highlight "Order" tab on bottom nav
   useEffect(() => {
     if (!visible) return;
     const tab = document.querySelector('[data-tab="services"]');
@@ -96,7 +137,6 @@ export default function OrderTour({ dark, onComplete }) {
     <>
       <style>{`@keyframes otFadeIn { from { opacity: 0; transform: translateX(-50%) translateY(8px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }`}</style>
 
-      {/* SVG overlay with spotlight */}
       <svg onClick={finish} style={{ position: "fixed", inset: 0, width: "100%", height: "100%", zIndex: 60 }}>
         <defs>
           <mask id="orderTourMask">
@@ -112,7 +152,6 @@ export default function OrderTour({ dark, onComplete }) {
         )}
       </svg>
 
-      {/* Tooltip */}
       <div style={{
         position: "fixed", zIndex: 61, left: "50%", bottom: 90,
         transform: "translateX(-50%)", animation: "otFadeIn 0.3s ease",

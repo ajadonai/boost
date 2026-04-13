@@ -929,7 +929,7 @@ function DashboardInner() {
 
       {/* ═══ TOUR GUIDE ═══ */}
       {showTour && <TourGuide dark={dark} onComplete={() => setShowTour(false)} onNavigate={(page) => setActive(page)} onOpenMore={() => setMoreOpen(true)} />}
-      {showOrderTour && !showTour && <OrderTour dark={dark} onComplete={() => setShowOrderTour(false)} />}
+      {showOrderTour && !showTour && <OrderTour dark={dark} onComplete={() => setShowOrderTour(false)} setSelSvc={setNoSelSvc} setSelTier={setNoSelTier} setQty={setNoQty} />}
 
       {/* ═══ MOBILE BOTTOM NAV ═══ */}
       {moreOpen && <div className="dash-more-overlay" onClick={() => setMoreOpen(false)} />}
