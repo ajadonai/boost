@@ -133,22 +133,39 @@ export default function AdminServicesPage({ dark, t }) {
 
       {inUseDisabledCount > 0 && <div style={{ padding: "10px 14px", borderRadius: 8, marginBottom: 12, background: dark ? "rgba(224,164,88,.06)" : "rgba(217,119,6,.04)", border: `1px solid ${dark ? "rgba(224,164,88,.15)" : "rgba(217,119,6,.1)"}`, color: dark ? "#e0a458" : "#92400e", fontSize: 13, lineHeight: 1.5 }}>⚠️ {inUseDisabledCount} service{inUseDisabledCount > 1 ? "s" : ""} used by Menu Builder {inUseDisabledCount > 1 ? "are" : "is"} disabled. Users can see {inUseDisabledCount > 1 ? "them" : "it"} in the menu but orders may fail.</div>}
 
-      {/* Provider selector */}
-      {providers.length > 1 && (
-        <div style={{ display: "flex", gap: 0, marginBottom: 14, borderBottom: `1px solid ${t.cardBorder}` }}>
-          <button onClick={() => setProviderFilter("all")} style={{ padding: "8px 16px", fontSize: 13, fontWeight: providerFilter === "all" ? 600 : 500, color: providerFilter === "all" ? t.accent : t.textMuted, background: "none", border: "none", borderBottom: `2px solid ${providerFilter === "all" ? t.accent : "transparent"}`, marginBottom: -1, cursor: "pointer", fontFamily: "inherit" }}>All ({services.length})</button>
-          {providers.map(p => {
-            const count = services.filter(s => (s.provider || "mtp") === p).length;
-            const label = p === "mtp" ? "MTP" : p === "jap" ? "JAP" : p === "dao" ? "DaoSMM" : p.toUpperCase();
-            return <button key={p} onClick={() => setProviderFilter(p)} style={{ padding: "8px 16px", fontSize: 13, fontWeight: providerFilter === p ? 600 : 500, color: providerFilter === p ? t.accent : t.textMuted, background: "none", border: "none", borderBottom: `2px solid ${providerFilter === p ? t.accent : "transparent"}`, marginBottom: -1, cursor: "pointer", fontFamily: "inherit" }}>{label} ({count})</button>;
-          })}
-        </div>
-      )}
-
-      <div style={{ display: "flex", gap: 6, marginBottom: 10 }}>
-        {[["all", `All (${services.length})`], ["active", `Active (${activeCount})`], ["inactive", `Inactive (${inactiveCount})`], ["in-use", `In Use (${inUseCount})`], ...(inUseDisabledCount > 0 ? [["in-use-disabled", `⚠️ In Use + Disabled (${inUseDisabledCount})`]] : [])].map(([val, label]) => (
-          <button key={val} onClick={() => setStatusFilter(val)} style={{ padding: "5px 14px", borderRadius: 8, fontSize: 13, fontWeight: 600, border: `1px solid ${statusFilter === val ? (val === "in-use-disabled" ? (dark ? "rgba(224,164,88,.3)" : "rgba(217,119,6,.2)") : val === "inactive" ? (dark ? "rgba(252,165,165,.3)" : "rgba(220,38,38,.2)") : val === "active" ? (dark ? "rgba(110,231,183,.3)" : "rgba(5,150,105,.2)") : val === "in-use" ? (dark ? "rgba(96,165,250,.3)" : "rgba(37,99,235,.2)") : t.accent) : t.cardBorder}`, background: statusFilter === val ? (val === "in-use-disabled" ? (dark ? "rgba(224,164,88,.06)" : "rgba(217,119,6,.04)") : val === "inactive" ? (dark ? "rgba(252,165,165,.06)" : "rgba(220,38,38,.04)") : val === "active" ? (dark ? "rgba(110,231,183,.06)" : "rgba(5,150,105,.04)") : val === "in-use" ? (dark ? "rgba(96,165,250,.06)" : "rgba(37,99,235,.04)") : (dark ? "#2a1a22" : "#fdf2f4")) : "transparent", color: statusFilter === val ? (val === "in-use-disabled" ? (dark ? "#e0a458" : "#d97706") : val === "inactive" ? (dark ? "#fca5a5" : "#dc2626") : val === "active" ? (dark ? "#6ee7b7" : "#059669") : val === "in-use" ? (dark ? "#60a5fa" : "#2563eb") : t.accent) : t.textMuted, cursor: "pointer" }}>{label}</button>
-        ))}
+      {/* Provider + Status filters */}
+      <div style={{ display: "flex", gap: 8, marginBottom: 12, flexWrap: "wrap" }}>
+        {providers.length > 1 && (
+          <select value={providerFilter} onChange={e => setProviderFilter(e.target.value)} style={{
+            padding: "7px 28px 7px 10px", borderRadius: 8, fontSize: 13, fontWeight: 500,
+            background: dark ? "rgba(255,255,255,.04)" : "rgba(0,0,0,.03)",
+            border: `1px solid ${dark ? "rgba(255,255,255,.08)" : "rgba(0,0,0,.08)"}`,
+            color: dark ? "rgba(255,255,255,.7)" : "rgba(0,0,0,.7)",
+            appearance: "none", cursor: "pointer", fontFamily: "inherit",
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='${dark ? "%23666" : "%23999"}' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E")`,
+            backgroundRepeat: "no-repeat", backgroundPosition: "right 8px center",
+          }}>
+            <option value="all">All providers ({services.length})</option>
+            {providers.map(p => {
+              const count = services.filter(s => (s.provider || "mtp") === p).length;
+              const label = p === "mtp" ? "MTP" : p === "jap" ? "JAP" : p === "dao" ? "DaoSMM" : p.toUpperCase();
+              return <option key={p} value={p}>{label} ({count})</option>;
+            })}
+          </select>
+        )}
+        <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} style={{
+          padding: "7px 28px 7px 10px", borderRadius: 8, fontSize: 13, fontWeight: 500,
+          background: dark ? "rgba(255,255,255,.04)" : "rgba(0,0,0,.03)",
+          border: `1px solid ${dark ? "rgba(255,255,255,.08)" : "rgba(0,0,0,.08)"}`,
+          color: dark ? "rgba(255,255,255,.7)" : "rgba(0,0,0,.7)",
+          appearance: "none", cursor: "pointer", fontFamily: "inherit",
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='${dark ? "%23666" : "%23999"}' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E")`,
+          backgroundRepeat: "no-repeat", backgroundPosition: "right 8px center",
+        }}>
+          {[["all", `All (${services.length})`], ["active", `Active (${activeCount})`], ["inactive", `Inactive (${inactiveCount})`], ["in-use", `In Use (${inUseCount})`], ...(inUseDisabledCount > 0 ? [["in-use-disabled", `⚠️ In Use + Disabled (${inUseDisabledCount})`]] : [])].map(([val, label]) => (
+            <option key={val} value={val}>{label}</option>
+          ))}
+        </select>
       </div>
 
       <div style={{ display: "flex", gap: 8, marginBottom: 12, flexWrap: "wrap", alignItems: "center" }}>

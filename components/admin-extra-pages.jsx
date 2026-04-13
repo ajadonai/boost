@@ -193,11 +193,17 @@ export function AdminTeamPage({ admin: currentAdmin, dark, t }) {
             <div><label style={{ fontSize: 14, color: t.textMuted, display: "block", marginBottom: 4 }}>Email</label><input value={newEmail} onChange={e => setNewEmail(e.target.value)} placeholder="admin@nitro.ng" type="email" style={inputStyle} /></div>
             <div><label style={{ fontSize: 14, color: t.textMuted, display: "block", marginBottom: 4 }}>Password</label><input value={newPw} onChange={e => setNewPw(e.target.value)} placeholder="Password" type="password" style={inputStyle} /></div>
             <div><label style={{ fontSize: 14, color: t.textMuted, display: "block", marginBottom: 4 }}>Role</label>
-              <div style={{ display: "flex", gap: 4 }}>
-                {ASSIGNABLE_ROLES.map(r => (
-                  <button key={r} onClick={() => setNewRole(r)} className="adm-filter-pill" style={{ borderWidth: 1, borderStyle: "solid", borderColor: newRole === r ? t.accent : t.cardBorder, background: newRole === r ? (dark ? "#2a1a22" : "#fdf2f4") : "transparent", color: newRole === r ? t.accent : t.textMuted, textTransform: "capitalize" }}>{r}</button>
-                ))}
-              </div>
+              <select value={newRole} onChange={e => setNewRole(e.target.value)} style={{
+                padding: "7px 28px 7px 10px", borderRadius: 8, fontSize: 13, fontWeight: 500, width: "100%",
+                background: dark ? "rgba(255,255,255,.04)" : "rgba(0,0,0,.03)",
+                border: `1px solid ${dark ? "rgba(255,255,255,.08)" : "rgba(0,0,0,.08)"}`,
+                color: dark ? "rgba(255,255,255,.7)" : "rgba(0,0,0,.7)",
+                appearance: "none", cursor: "pointer", fontFamily: "inherit", textTransform: "capitalize",
+                backgroundImage: `url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='${dark ? "%23666" : "%23999"}' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E")`,
+                backgroundRepeat: "no-repeat", backgroundPosition: "right 8px center",
+              }}>
+                {ASSIGNABLE_ROLES.map(r => <option key={r} value={r}>{r}</option>)}
+              </select>
             </div>
           </div>
           <button onClick={createAdmin} disabled={saving} className="adm-btn-primary" style={{ opacity: newName && newEmail && newPw && !saving ? 1 : .4 }}>{saving ? "Creating..." : "Create Admin"}</button>
@@ -513,11 +519,18 @@ export function AdminCouponsPage({ dark, t }) {
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
               <div><label style={{ fontSize: 13, color: t.textMuted, display: "block", marginBottom: 4 }}>Code</label><input value={form.code} onChange={e => setForm({ ...form, code: e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 20) })} placeholder="WELCOME20" style={inputStyle} /></div>
               <div><label style={{ fontSize: 13, color: t.textMuted, display: "block", marginBottom: 4 }}>Type</label>
-                <div style={{ display: "flex", gap: 4 }}>
-                  {[["percent", "% Bonus"], ["fixed", "₦ Bonus"]].map(([id, lb]) => (
-                    <button key={id} onClick={() => setForm({ ...form, type: id })} className="adm-filter-pill" style={{ borderWidth: 1, borderStyle: "solid", borderColor: form.type === id ? t.accent : t.cardBorder, background: form.type === id ? (dark ? "#2a1a22" : "#fdf2f4") : "transparent", color: form.type === id ? t.accent : t.textMuted }}>{lb}</button>
-                  ))}
-                </div>
+                <select value={form.type} onChange={e => setForm({ ...form, type: e.target.value })} style={{
+                  padding: "7px 28px 7px 10px", borderRadius: 8, fontSize: 13, fontWeight: 500, width: "100%",
+                  background: dark ? "rgba(255,255,255,.04)" : "rgba(0,0,0,.03)",
+                  border: `1px solid ${dark ? "rgba(255,255,255,.08)" : "rgba(0,0,0,.08)"}`,
+                  color: dark ? "rgba(255,255,255,.7)" : "rgba(0,0,0,.7)",
+                  appearance: "none", cursor: "pointer", fontFamily: "inherit",
+                  backgroundImage: `url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='${dark ? "%23666" : "%23999"}' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E")`,
+                  backgroundRepeat: "no-repeat", backgroundPosition: "right 8px center",
+                }}>
+                  <option value="percent">% Bonus</option>
+                  <option value="fixed">₦ Bonus</option>
+                </select>
               </div>
               <div><label style={{ fontSize: 13, color: t.textMuted, display: "block", marginBottom: 4 }}>Value</label><input type="number" value={form.value} onChange={e => setForm({ ...form, value: e.target.value })} placeholder={form.type === "percent" ? "20" : "500"} style={inputStyle} /></div>
               <div><label style={{ fontSize: 13, color: t.textMuted, display: "block", marginBottom: 4 }}>Min Deposit (₦)</label><input type="number" value={form.minOrder} onChange={e => setForm({ ...form, minOrder: e.target.value })} placeholder="0" style={inputStyle} /></div>
@@ -677,11 +690,19 @@ export function AdminNotificationsPage({ dark, t }) {
           <textarea value={message} onChange={e => setMessage(e.target.value)} placeholder="Write your message..." rows={3} style={{ ...inputStyle, resize: "vertical", lineHeight: 1.5 }} />
         </div>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10 }}>
-          <div style={{ display: "flex", gap: 4 }}>
-            <label style={{ fontSize: 14, color: t.textMuted, marginRight: 6, lineHeight: "28px" }}>Send to:</label>
-            {["all", "active", "new"].map(tg => (
-              <button key={tg} onClick={() => setTarget(tg)} className="adm-filter-pill" style={{ borderWidth: 1, borderStyle: "solid", borderColor: target === tg ? t.accent : t.cardBorder, background: target === tg ? (dark ? "#2a1a22" : "#fdf2f4") : "transparent", color: target === tg ? t.accent : t.textMuted, textTransform: "capitalize" }}>{tg} users</button>
-            ))}
+          <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+            <label style={{ fontSize: 14, color: t.textMuted }}>Send to:</label>
+            <select value={target} onChange={e => setTarget(e.target.value)} style={{
+              padding: "7px 28px 7px 10px", borderRadius: 8, fontSize: 13, fontWeight: 500,
+              background: dark ? "rgba(255,255,255,.04)" : "rgba(0,0,0,.03)",
+              border: `1px solid ${dark ? "rgba(255,255,255,.08)" : "rgba(0,0,0,.08)"}`,
+              color: dark ? "rgba(255,255,255,.7)" : "rgba(0,0,0,.7)",
+              appearance: "none", cursor: "pointer", fontFamily: "inherit",
+              backgroundImage: `url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='${dark ? "%23666" : "%23999"}' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E")`,
+              backgroundRepeat: "no-repeat", backgroundPosition: "right 8px center",
+            }}>
+              {["all", "active", "new"].map(tg => <option key={tg} value={tg}>{tg.charAt(0).toUpperCase() + tg.slice(1)} users</option>)}
+            </select>
           </div>
           <button onClick={send} disabled={sending || !message.trim()} className="adm-btn-primary" style={{ opacity: message.trim() && !sending ? 1 : .4 }}>{sending ? "Sending..." : "Send Notification"}</button>
         </div>
