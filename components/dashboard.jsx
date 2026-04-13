@@ -9,6 +9,7 @@ import AnnouncementBanner from "./announcement-banner";
 import { PlatformIcon } from "./platform-icon";
 import { fN, fD } from "../lib/format";
 import TourGuide, { shouldShowTour } from "./tour-guide";
+import OrderTour, { shouldShowOrderTour } from "./order-tour";
 
 /* Dynamic imports — only load when user navigates to that page */
 const OrdersPage = dynamic(() => import("./orders-page").then(m => m.default), { ssr: false });
@@ -405,6 +406,8 @@ function DashboardInner() {
   const [leftOpen, setLeftOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
   const [showTour, setShowTour] = useState(false);
+  const [showOrderTour, setShowOrderTour] = useState(false);
+  const orderTourChecked = useRef(false);
   const bottomNavRef = useRef(null);
   const [notifOpen, setNotifOpen] = useState(false);
   const [readNotifIds, setReadNotifIds] = useState(() => {
@@ -470,6 +473,25 @@ function DashboardInner() {
   const isHowTo = active === "how-to";
   const isLeaderboard = active === "leaderboard";
   const noHasOrder = noSelSvc && noSelTier;
+
+  // Trigger order tour on first visit to services page
+  useEffect(() => {
+    if (isServices && !orderTourChecked.current && !showTour) {
+      orderTourChecked.current = true;
+      if (shouldShowOrderTour()) {
+        // Small delay so the page renders first
+        const timer = setTimeout(() => setShowOrderTour(true), 800);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [isServices, showTour]);
+
+  // Manual order tour trigger from sidebar button
+  useEffect(() => {
+    const handler = () => setShowOrderTour(true);
+    window.addEventListener("nitro-order-tour", handler);
+    return () => window.removeEventListener("nitro-order-tour", handler);
+  }, []);
 
   /* Theme — provided by ThemeProvider */
 
@@ -907,6 +929,7 @@ function DashboardInner() {
 
       {/* ═══ TOUR GUIDE ═══ */}
       {showTour && <TourGuide dark={dark} onComplete={() => setShowTour(false)} onNavigate={(page) => setActive(page)} onOpenMore={() => setMoreOpen(true)} />}
+      {showOrderTour && !showTour && <OrderTour dark={dark} onComplete={() => setShowOrderTour(false)} />}
 
       {/* ═══ MOBILE BOTTOM NAV ═══ */}
       {moreOpen && <div className="dash-more-overlay" onClick={() => setMoreOpen(false)} />}

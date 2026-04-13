@@ -146,7 +146,7 @@ export function OrderForm({ selSvc, selTier, platform, qty, setQty, link, setLin
         </div>}
       </div>
       {selTier && <>
-        <div className="no-form-field">
+        <div className="no-form-field" data-tour="no-link-input">
           <label className="no-form-label" style={{ color: t.textMuted }}>{linkLabel}</label>
           <input type="url" inputMode="url" placeholder={linkPlaceholder} value={link} onChange={e => validateLink(e.target.value)} className="m no-form-input" style={{ borderColor: linkError ? (dark ? "#f87171" : "#dc2626") : dark ? "rgba(255,255,255,.1)" : "rgba(0,0,0,.12)", background: dark ? "#0d1020" : "#fff", color: t.text }} />
           {linkError && <div style={{ fontSize: 11, color: dark ? "#f87171" : "#dc2626", marginTop: 3 }}>{linkError}</div>}
@@ -201,7 +201,7 @@ export function OrderForm({ selSvc, selTier, platform, qty, setQty, link, setLin
         {orderResult?.type === "error" && (
           <div style={{ padding: "8px 12px", borderRadius: 8, marginBottom: 10, background: dark ? "rgba(220,38,38,.08)" : "#fef2f2", border: `1px solid ${dark ? "rgba(220,38,38,.2)" : "#fecaca"}`, color: dark ? "#fca5a5" : "#dc2626", fontSize: 13 }}>⚠️ {orderResult.message}</div>
         )}
-        <button onClick={onSubmit} disabled={!linkValid || ((needsComments || needsUsernames) && !(comments || "").trim()) || (needsAnswer && !(comments || "").trim()) || orderLoading} className="no-form-submit" style={{ opacity: linkValid && (!(needsComments || needsUsernames || needsAnswer) || (comments || "").trim()) && !orderLoading ? 1 : .5 }}>{orderLoading ? "Placing..." : "Place Order"}</button>
+        <button onClick={onSubmit} data-tour="no-submit-btn" disabled={!linkValid || ((needsComments || needsUsernames) && !(comments || "").trim()) || (needsAnswer && !(comments || "").trim()) || orderLoading} className="no-form-submit" style={{ opacity: linkValid && (!(needsComments || needsUsernames || needsAnswer) || (comments || "").trim()) && !orderLoading ? 1 : .5 }}>{orderLoading ? "Placing..." : "Place Order"}</button>
       </>}
     </div>
   );
@@ -334,7 +334,7 @@ export default function NewOrderPage({ dark, t, user, onOrderSuccess, platform, 
   const visiblePlatforms = groupPlatforms.filter(p => (platformCounts[p.id] || 0) > 0);
 
   const TierChips = ({ svc }) => (
-    <div className="no-tier-chips">
+    <div className="no-tier-chips" data-tour="no-tier-select">
       {svc.tiers.map(tier => {
         const s = TS[tier.tier];
         const isSel = selTier?.tier === tier.tier && selSvc?.id === svc.id;
@@ -430,7 +430,7 @@ export default function NewOrderPage({ dark, t, user, onOrderSuccess, platform, 
       {!menuLoading && !menuError && <>
 
       {/* ═══ GROUP TABS ═══ */}
-      <div className="no-group-tabs" style={{ borderBottomColor: t.cardBorder }}>
+      <div className="no-group-tabs" data-tour="no-platform-tabs" style={{ borderBottomColor: t.cardBorder }}>
         {PLATFORM_GROUPS.map(g => (
           <button key={g.label} onClick={() => { setPlatGroup(g.label); const first = g.platforms.find(p => (platformCounts[p.id] || 0) > 0); if (first) setPlatform(first.id); }} className={`no-group-tab${platGroup === g.label ? " no-group-tab-on" : ""}`} style={{ color: platGroup === g.label ? t.accent : t.textMuted, borderBottomColor: platGroup === g.label ? t.accent : "transparent" }}>
             {g.label.replace(" Platforms", "").replace("SEO & ", "")}
@@ -494,7 +494,7 @@ export default function NewOrderPage({ dark, t, user, onOrderSuccess, platform, 
       <input placeholder={`Search ${activePlat?.label || ""} services...`} value={search} onChange={e => setSearch(e.target.value)} className="no-svc-search" style={{ borderColor: t.cardBorder, background: dark ? "rgba(255,255,255,.03)" : "#fff", color: t.text }} />
 
       {/* ═══ SERVICE CARDS ═══ */}
-      <div className="no-svc-list" ref={listRef}>
+      <div className="no-svc-list" data-tour="no-service-list" ref={listRef}>
         {filtered.map(svc => <ServiceCard key={svc.id} svc={svc} />)}
         {filtered.length === 0 && <div className="no-empty" style={{ color: t.textMuted }}>Coming soon.</div>}
       </div>
@@ -611,6 +611,12 @@ export function ServicesSidebar({ dark, t }) {
         <div style={{ marginBottom: 4 }}>• <b style={{ color: t.text }}>Set profile to public</b> before ordering</div>
         <div>• Don't order same link from multiple providers</div>
       </div>
+
+      {/* Walkthrough trigger */}
+      <button onClick={() => window.dispatchEvent(new CustomEvent("nitro-order-tour"))} style={{ marginTop: 16, padding: "10px 0", width: "100%", borderRadius: 8, border: `1px solid ${dark ? "rgba(196,125,142,.2)" : "rgba(196,125,142,.15)"}`, background: dark ? "rgba(196,125,142,.06)" : "rgba(196,125,142,.03)", color: "#c47d8e", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        Need a walkthrough?
+      </button>
     </>
   );
 }
