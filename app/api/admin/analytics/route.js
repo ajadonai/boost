@@ -19,7 +19,7 @@ export async function GET(req) {
 
     const [ordersAgg, userCount, depositAgg, ordersByStatus, topServices, allOrders] = await Promise.all([
       prisma.order.aggregate({
-        where: { createdAt: { gte: since }, deletedAt: null },
+        where: { createdAt: { gte: since }, deletedAt: null, status: { notIn: ['Cancelled'] } },
         _sum: { charge: true, cost: true },
         _count: true,
       }),
@@ -37,7 +37,7 @@ export async function GET(req) {
       }),
       prisma.order.groupBy({
         by: ['serviceId'],
-        where: { createdAt: { gte: since }, deletedAt: null },
+        where: { createdAt: { gte: since }, deletedAt: null, status: { notIn: ['Cancelled'] } },
         _count: true,
         _sum: { charge: true },
         orderBy: { _count: { serviceId: 'desc' } },
@@ -45,7 +45,7 @@ export async function GET(req) {
       }),
       // For platform aggregation — get orders with service category
       prisma.order.findMany({
-        where: { createdAt: { gte: since }, deletedAt: null },
+        where: { createdAt: { gte: since }, deletedAt: null, status: { notIn: ['Cancelled'] } },
         select: { charge: true, service: { select: { category: true } } },
       }),
     ]);
@@ -78,13 +78,25 @@ export async function GET(req) {
     const orderCount = ordersAgg._count || 0;
     const avgOrderValue = orderCount > 0 ? totalRevenue / orderCount : 0;
     const completedCount = ordersByStatus.find(s => s.status === 'Completed')?._count || 0;
+    const cancelledCount = ordersByStatus.find(s => s.status === 'Cancelled')?._count || 0;
     const conversionRate = orderCount > 0 ? Math.round((completedCount / orderCount) * 100) : 0;
+
+    // Refund tracking
+    const refundAgg = await prisma.transaction.aggregate({
+      where: { type: 'refund', status: 'Completed', createdAt: { gte: since } },
+      _sum: { amount: true },
+      _count: true,
+    });
+    const totalRefunds = (refundAgg._sum.amount || 0) / 100;
 
     return Response.json({
       range,
       totalRevenue,
       totalCost,
       profit: totalRevenue - totalCost,
+      totalRefunds,
+      refundCount: refundAgg._count || 0,
+      netRevenue: totalRevenue - totalRefunds,
       orderCount,
       avgOrderValue: Math.round(avgOrderValue),
       conversionRate,
