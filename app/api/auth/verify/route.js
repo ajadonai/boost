@@ -112,8 +112,8 @@ export async function PUT(req) {
       data: { verifyToken, verifyExpires },
     });
 
-    sendVerificationEmail(user.email, user.firstName || user.name, verifyToken).catch(err =>
-      log.error('Verify', 'Resend email failed')
+    await sendVerificationEmail(user.email, user.firstName || user.name, verifyToken).catch(err =>
+      log.error('Verify', `Resend email failed: ${err.message}`)
     );
     if (process.env.NODE_ENV === 'development') {
       console.log(`\n${'='.repeat(50)}\n📧 CODE for ${user.email} (resend): ${verifyToken}\n${'='.repeat(50)}\n`);

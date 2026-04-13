@@ -48,8 +48,8 @@ export async function POST(req) {
         const verifyToken = generateVerifyCode();
         const verifyExpires = new Date(Date.now() + 30 * 60 * 1000);
         await prisma.user.update({ where: { id: existing.id }, data: { verifyToken, verifyExpires } });
-        sendVerificationEmail(email, existing.firstName || existing.name, verifyToken).catch(err => 
-          log.error('Signup', 'Resend email failed')
+        await sendVerificationEmail(email, existing.firstName || existing.name, verifyToken).catch(err => 
+          log.error('Signup', `Resend email failed: ${err.message}`)
         );
         if (process.env.NODE_ENV === 'development') {
           console.log(`\n${'='.repeat(50)}\n📧 CODE for ${email} (re-signup): ${verifyToken}\n${'='.repeat(50)}\n`);
@@ -109,8 +109,8 @@ export async function POST(req) {
     });
 
     // Send verification email
-    sendVerificationEmail(email, firstName || name, verifyToken).catch(err => 
-      log.error('Signup', 'Email send failed')
+    await sendVerificationEmail(email, firstName || name, verifyToken).catch(err => 
+      log.error('Signup', `Email send failed: ${err.message}`)
     );
     // Also log to terminal in dev
     if (process.env.NODE_ENV === 'development') {
