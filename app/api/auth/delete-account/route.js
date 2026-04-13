@@ -2,6 +2,7 @@ import prisma from '@/lib/prisma';
 import { log } from "@/lib/logger";
 import { getCurrentUser, clearUserCookie } from '@/lib/auth';
 import { sendEmail } from '@/lib/email';
+import { cancelOrder, isProviderConfigured } from '@/lib/smm';
 import bcrypt from 'bcryptjs';
 
 export async function POST(req) {
@@ -24,8 +25,30 @@ export async function POST(req) {
 
     const deletionDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days
 
-    // Mark account for pending deletion
+    // Cancel active orders and refund wallet
+    const activeOrders = await prisma.order.findMany({
+      where: { userId: user.id, status: { in: ['Pending', 'Processing'] } },
+      include: { service: { select: { provider: true } } },
+    });
+
+    const refundOps = [];
+    let totalRefund = 0;
+    for (const order of activeOrders) {
+      const provider = order.service?.provider || 'mtp';
+      if (order.apiOrderId && isProviderConfigured(provider)) {
+        try { await cancelOrder(provider, order.apiOrderId); } catch {}
+      }
+      refundOps.push(prisma.order.update({ where: { id: order.id }, data: { status: 'Cancelled' } }));
+      refundOps.push(prisma.transaction.create({
+        data: { userId: user.id, type: 'refund', amount: order.charge, status: 'Completed', note: `Refund — account deletion (order ${order.orderId})` },
+      }));
+      totalRefund += order.charge;
+    }
+
+    // Mark account for pending deletion + refund active orders
     await prisma.$transaction([
+      ...refundOps,
+      ...(totalRefund > 0 ? [prisma.user.update({ where: { id: user.id }, data: { balance: { increment: totalRefund } } })] : []),
       prisma.user.update({
         where: { id: user.id },
         data: {
@@ -60,7 +83,8 @@ export async function POST(req) {
             <tr><td style="color: #999; padding: 6px 0;">Email</td><td style="text-align: right; padding: 6px 0; font-weight: 600; color: #1a1a1a;">${user.email}</td></tr>
             <tr><td style="color: #999; padding: 6px 0;">Balance</td><td style="text-align: right; padding: 6px 0; font-weight: 600; color: #059669;">₦${(user.balance / 100).toLocaleString()}</td></tr>
             <tr><td style="color: #999; padding: 6px 0;">Total Orders</td><td style="text-align: right; padding: 6px 0; font-weight: 600; color: #1a1a1a;">${orderCount}</td></tr>
-            <tr><td style="color: #999; padding: 6px 0;">Active Orders</td><td style="text-align: right; padding: 6px 0; font-weight: 600; color: ${activeOrderCount > 0 ? '#dc2626' : '#1a1a1a'};">${activeOrderCount}${activeOrderCount > 0 ? ' ⚠️' : ''}</td></tr>
+            <tr><td style="color: #999; padding: 6px 0;">Active Orders</td><td style="text-align: right; padding: 6px 0; font-weight: 600; color: ${activeOrderCount > 0 ? '#dc2626' : '#1a1a1a'};">${activeOrderCount}${activeOrderCount > 0 ? ' (cancelled + refunded)' : ''}</td></tr>
+            <tr><td style="color: #999; padding: 6px 0;">Refunded</td><td style="text-align: right; padding: 6px 0; font-weight: 600; color: ${totalRefund > 0 ? '#dc2626' : '#1a1a1a'};">₦${(totalRefund / 100).toLocaleString()}</td></tr>
             <tr><td style="color: #999; padding: 6px 0;">Total Spent</td><td style="text-align: right; padding: 6px 0; font-weight: 600; color: #1a1a1a;">₦${((totalSpent._sum.amount || 0) / 100).toLocaleString()}</td></tr>
             <tr><td style="color: #999; padding: 6px 0;">Referral Code</td><td style="text-align: right; padding: 6px 0; font-family: monospace; font-size: 12px; color: #666;">${user.referralCode || 'None'}</td></tr>
             <tr><td style="color: #999; padding: 6px 0;">User ID</td><td style="text-align: right; padding: 6px 0; font-family: monospace; font-size: 12px; color: #666;">${user.id}</td></tr>
@@ -87,6 +111,7 @@ export async function POST(req) {
         </table>
         <h1 style="font-size: 22px; font-weight: 600; color: #1a1a1a; text-align: center; margin-bottom: 8px;">Account Deletion Scheduled</h1>
         <p style="font-size: 15px; color: #666; text-align: center; margin-bottom: 24px;">Hi ${user.firstName || user.name}, your account is scheduled for permanent deletion.</p>
+        ${activeOrders.length > 0 ? `<p style="font-size: 14px; color: #dc2626; text-align: center; margin-bottom: 16px;">${activeOrders.length} active order${activeOrders.length > 1 ? 's were' : ' was'} cancelled and ₦${(totalRefund / 100).toLocaleString()} has been refunded to your wallet.</p>` : ''}
         <div style="background: #f5f3f0; border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 24px;">
           <div style="font-size: 14px; color: #999; margin-bottom: 4px;">Your data will be permanently deleted on</div>
           <div style="font-size: 20px; font-weight: 700; color: #dc2626;">${deletionDate.toLocaleDateString('en-NG', { year: 'numeric', month: 'long', day: 'numeric' })}</div>

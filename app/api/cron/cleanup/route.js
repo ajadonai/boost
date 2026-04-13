@@ -55,6 +55,8 @@ export async function GET(req) {
     for (const pu of pendingUsers) {
       try {
         const uid = pu.id;
+        // Clear referral chain — users referred by this person keep their accounts
+        await prisma.user.updateMany({ where: { referredBy: uid }, data: { referredBy: null } });
         await prisma.$transaction([
           prisma.ticketReply.deleteMany({ where: { ticket: { userId: uid } } }),
           prisma.transaction.deleteMany({ where: { userId: uid } }),
