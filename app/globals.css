@@ -421,6 +421,7 @@ input { font-family: inherit; }
 
 /* ── MOBILE: 0-767px ── */
 @media (max-width: 767px) {
+  .adm-header-row { flex-direction: column; gap: 8px; }
   .dash-nav { height: 52px; padding: 0 16px; }
   .dash-nav-name { display: none; }
   .dash-nav-right { gap: 12px; }
@@ -1405,6 +1406,7 @@ input { font-family: inherit; }
 /* ══ ADMIN DASHBOARD ══ */
 /* ══════════════════════════════════════ */
 .adm-header { padding: 0 0 14px; }
+.adm-header-row { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px; }
 .adm-title { font-size: 20px; font-weight: 600; margin-bottom: 2px; }
 .adm-subtitle { font-size: 14px; }
 .adm-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 20px; margin-bottom: 24px; }

@@ -120,7 +120,7 @@ export default function AdminLeaderboardPage({ dark, t }) {
     <>
       {/* Header */}
       <div className="adm-header">
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 10 }}>
+        <div className="adm-header-row">
           <div>
             <div className="adm-title" style={{ color: t.text }}>Leaderboard</div>
             <div className="adm-subtitle" style={{ color: t.textMuted }}>{view === "settings" ? "Announcement & reward settings" : `Top users · ${periodLabel}`}</div>

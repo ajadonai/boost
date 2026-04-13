@@ -110,7 +110,7 @@ export function AdminPaymentsPage({ dark, t }) {
   return (
     <>
       <div className="adm-header">
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 10 }}>
+        <div className="adm-header-row">
           <div>
             <div className="adm-title" style={{ color: t.text }}>Payments</div>
             <div className="adm-subtitle" style={{ color: t.textMuted }}>Manage deposits and payment gateways</div>
@@ -312,7 +312,7 @@ export function AdminFinancePage({ dark, t, admin }) {
   return (
     <>
       <div className="adm-header">
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 10 }}>
+        <div className="adm-header-row">
           <div>
             <div className="adm-title" style={{ color: t.text }}>Finance</div>
             <div className="adm-subtitle" style={{ color: t.textMuted }}>{tab === "overview" ? "Revenue, growth, and performance" : "Complete money flow breakdown"}</div>

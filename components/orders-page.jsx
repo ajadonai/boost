@@ -113,7 +113,7 @@ export default function OrdersPage({ orders: initialOrders, txs, dark, t }) {
     <>
       {/* Header */}
       <div className="ord-header">
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 10 }}>
+        <div className="adm-header-row">
           <div>
             <div className="ord-title" style={{ color: t.text }}>History</div>
             <div className="ord-subtitle" style={{ color: t.textMuted }}>Your order history and transactions</div>

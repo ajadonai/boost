@@ -450,7 +450,7 @@ export function AdminCouponsPage({ dark, t }) {
   return (
     <>
       <div className="adm-header">
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 10 }}>
+        <div className="adm-header-row">
           <div>
             <div className="adm-title" style={{ color: t.text }}>Rewards</div>
             <div className="adm-subtitle" style={{ color: t.textMuted }}>Manage referrals, coupons, and loyalty program</div>
@@ -914,7 +914,7 @@ export function AdminAPIPage({ dark, t }) {
 
           return (
             <div key={p.id} className="adm-card" style={{ background: dark ? "rgba(255,255,255,.03)" : "rgba(255,255,255,.85)", border: `0.5px solid ${dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)"}`, padding: 18, marginBottom: 12, boxShadow: dark ? "0 4px 20px rgba(0,0,0,.25)" : "0 4px 20px rgba(0,0,0,.04)", borderRadius: 14 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 10 }}>
+              <div className="adm-header-row">
                 <div>
                   <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                     <span style={{ fontSize: 16, fontWeight: 600, color: t.text }}>{p.name}</span>
