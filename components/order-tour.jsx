@@ -69,20 +69,28 @@ export default function OrderTour({ dark, onComplete, setSelSvc, setSelTier, set
     }
 
     if (s.before === "selectTier") {
-      // Wait for tier chips, click the first one
       waitForEl(".no-tier-chip", (chip) => {
-        chip.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
-        // On mobile, also open the order modal
+        chip.click();
+        // Wait for the form to appear (desktop: sidebar, mobile: need modal)
+        const checkForm = () => {
+          waitForEl('[data-tour="no-link-input"]', () => {
+            setStep(idx);
+          }, 2000);
+        };
+        // On mobile, the modal needs to open — pickTier sets orderModal(true)
+        // but if it didn't work, try clicking the bar button
         if (window.innerWidth < 1200) {
           setTimeout(() => {
-            const modalBtn = document.querySelector(".no-bar-btn");
-            if (modalBtn) modalBtn.click();
-          }, 300);
+            const form = document.querySelector('[data-tour="no-link-input"]');
+            if (!form) {
+              const modalBtn = document.querySelector(".no-bar-btn");
+              if (modalBtn) modalBtn.click();
+            }
+            setTimeout(checkForm, 200);
+          }, 400);
+        } else {
+          setTimeout(checkForm, 300);
         }
-        // Wait for the form/submit button to appear
-        waitForEl('[data-tour="no-link-input"]', () => {
-          setStep(idx);
-        });
       });
       return;
     }
