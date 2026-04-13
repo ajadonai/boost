@@ -83,18 +83,18 @@ export default function TourGuide({ dark, onComplete, onNavigate, onOpenMore }) 
     }
   };
 
-  // Track the spotlight target element position
+  // Track spotlight target
   useEffect(() => {
     if (phase !== "touring" || !visible) { setSpotRect(null); return; }
 
     const updateRect = () => {
       const s = STEPS[step];
       const mobile = isMobile();
-      // Find the target element
       let el = null;
+
       if (mobile) {
         if (s.mobileAction === "openMore") {
-          // Find support inside More popup
+          // Find Support inside More popup
           el = [...document.querySelectorAll(".dash-more-item")].find(e => e.textContent?.includes("Support"));
           if (!el) el = document.querySelector(`[data-tab="${s.bottomId}"]`);
         } else {
@@ -113,15 +113,25 @@ export default function TourGuide({ dark, onComplete, onNavigate, onOpenMore }) 
       rafRef.current = requestAnimationFrame(updateRect);
     };
 
-    // Small delay for DOM to settle after navigation
-    const timer = setTimeout(() => {
-      updateRect();
-    }, 200);
+    const timer = setTimeout(updateRect, 300);
+    return () => { clearTimeout(timer); if (rafRef.current) cancelAnimationFrame(rafRef.current); };
+  }, [step, phase, visible]);
 
-    return () => {
-      clearTimeout(timer);
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-    };
+  // During support step on mobile, raise More popup above overlay
+  useEffect(() => {
+    if (phase !== "touring" || !visible) return;
+    const s = STEPS[step];
+    const mobile = isMobile();
+    if (mobile && s.mobileAction === "openMore") {
+      const popup = document.querySelector(".dash-more-popup");
+      const overlay = document.querySelector(".dash-more-overlay");
+      if (popup) popup.style.zIndex = "52";
+      if (overlay) overlay.style.zIndex = "51";
+      return () => {
+        if (popup) popup.style.zIndex = "";
+        if (overlay) overlay.style.zIndex = "";
+      };
+    }
   }, [step, phase, visible]);
 
   if (!visible) return null;
@@ -133,19 +143,19 @@ export default function TourGuide({ dark, onComplete, onNavigate, onOpenMore }) 
   const sub = dark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.5)";
   const skipC = dark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.3)";
   const dotOff = dark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.1)";
-
   const pad = 6;
   const sr = spotRect;
+
+  const isSupportStep = STEPS[step]?.mobileAction === "openMore" && isMobile();
 
   return (
     <>
       <style>{`
         @keyframes tourFadeIn { from { opacity: 0; transform: translateX(-50%) translateY(8px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
         @keyframes tourWelcomeFadeIn { from { opacity: 0; transform: translate(-50%, -48%); } to { opacity: 1; transform: translate(-50%, -50%); } }
-        @keyframes tourGlow { 0%,100% { opacity: 0.4; } 50% { opacity: 0.8; } }
       `}</style>
 
-      {/* ═══ OVERLAY WITH SPOTLIGHT CUTOUT ═══ */}
+      {/* SVG overlay with spotlight cutout */}
       <svg onClick={finish} style={{ position: "fixed", inset: 0, width: "100%", height: "100%", zIndex: 50 }}>
         <defs>
           <mask id="tourSpotMask">
@@ -155,8 +165,7 @@ export default function TourGuide({ dark, onComplete, onNavigate, onOpenMore }) 
             )}
           </mask>
         </defs>
-        <rect width="100%" height="100%" fill={phase === "welcome" ? "rgba(0,0,0,0.65)" : "rgba(0,0,0,0.55)"} mask="url(#tourSpotMask)" style={{ backdropFilter: phase === "welcome" ? "blur(4px)" : "blur(1px)" }} />
-        {/* Glow ring around spotlight */}
+        <rect width="100%" height="100%" fill={phase === "welcome" ? "rgba(0,0,0,0.65)" : "rgba(0,0,0,0.55)"} mask="url(#tourSpotMask)" />
         {phase === "touring" && sr && (
           <rect x={sr.x - pad} y={sr.y - pad} width={sr.w + pad * 2} height={sr.h + pad * 2} rx="10" fill="none" stroke={accent} strokeWidth="2.5">
             <animate attributeName="opacity" values="0.3;0.8;0.3" dur="2s" repeatCount="indefinite" />
@@ -164,7 +173,7 @@ export default function TourGuide({ dark, onComplete, onNavigate, onOpenMore }) 
         )}
       </svg>
 
-      {/* ═══ WELCOME ═══ */}
+      {/* WELCOME */}
       {phase === "welcome" && (
         <div style={{
           position: "fixed", zIndex: 53, top: "50%", left: "50%",
@@ -184,7 +193,7 @@ export default function TourGuide({ dark, onComplete, onNavigate, onOpenMore }) 
         </div>
       )}
 
-      {/* ═══ TOUR STEP ═══ */}
+      {/* TOUR STEP */}
       {phase === "touring" && (
         <div className="tour-tooltip" style={{
           position: "fixed", zIndex: 53,
@@ -192,7 +201,7 @@ export default function TourGuide({ dark, onComplete, onNavigate, onOpenMore }) 
           padding: "22px 24px", maxWidth: 360, width: "calc(100% - 32px)",
           boxShadow: dark ? "0 12px 40px rgba(0,0,0,0.5)" : "0 12px 40px rgba(0,0,0,0.12)",
           animation: "tourFadeIn 0.3s ease",
-          left: "50%", bottom: 90, transform: "translateX(-50%)",
+          left: "50%", bottom: isSupportStep ? 260 : 90, transform: "translateX(-50%)",
         }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
             <div style={{ width: 36, height: 36, borderRadius: 10, background: dark ? "rgba(196,125,142,0.1)" : "rgba(196,125,142,0.06)", display: "flex", alignItems: "center", justifyContent: "center", color: accent }}>{STEPS[step].icon}</div>
