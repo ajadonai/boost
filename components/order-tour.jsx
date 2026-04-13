@@ -18,12 +18,13 @@ function findTarget(s) {
 }
 
 // Wait for an element to appear in DOM, then call callback
-function waitForEl(selector, cb, maxWait = 3000) {
+function waitForEl(selector, cb, onTimeout, maxWait = 3000) {
   const start = Date.now();
   const check = () => {
     const el = document.querySelector(selector);
     if (el) { cb(el); return; }
     if (Date.now() - start < maxWait) requestAnimationFrame(check);
+    else if (onTimeout) onTimeout();
   };
   check();
 }
@@ -37,6 +38,7 @@ export default function OrderTour({ dark, onComplete, setSelSvc, setSelTier, set
   const [step, setStep] = useState(saved?.step || 0);
   const [visible, setVisible] = useState(false);
   const [spotRect, setSpotRect] = useState(null);
+  const [skipMsg, setSkipMsg] = useState(null);
   const rafRef = useRef(null);
 
   useEffect(() => {
@@ -68,6 +70,21 @@ export default function OrderTour({ dark, onComplete, setSelSvc, setSelTier, set
     setTimeout(() => onComplete?.(), 300);
   }, [onComplete, setSelSvc, setSelTier]);
 
+  const showSkip = (msg) => {
+    setSkipMsg(msg);
+    setTimeout(() => setSkipMsg(null), 2000);
+  };
+
+  const skipToNext = (fromIdx) => {
+    if (fromIdx < STEPS.length - 1) {
+      showSkip("Skipping step...");
+      setTimeout(() => setStep(fromIdx + 1), 500);
+    } else {
+      showSkip("Finishing tour...");
+      setTimeout(() => finish(), 500);
+    }
+  };
+
   const startTour = () => {
     setPhase("touring");
     setStep(0);
@@ -78,19 +95,17 @@ export default function OrderTour({ dark, onComplete, setSelSvc, setSelTier, set
 
     if (s.before === "selectService") {
       window.dispatchEvent(new CustomEvent("nitro-tour-select-service"));
-      // Wait for tier chips to render
       waitForEl(".no-tier-chip", () => {
         setStep(idx);
-      });
+      }, () => skipToNext(idx));
       return;
     }
 
     if (s.before === "selectTier") {
       window.dispatchEvent(new CustomEvent("nitro-tour-select-tier"));
-      // Wait for form to appear
       waitForEl('[data-tour="no-link-input"]', () => {
         setStep(idx);
-      });
+      }, () => skipToNext(idx));
       return;
     }
 
@@ -265,6 +280,11 @@ export default function OrderTour({ dark, onComplete, setSelSvc, setSelTier, set
             </div>
           </div>
         </div>
+      )}
+
+      {/* Skip message */}
+      {skipMsg && (
+        <div style={{ position: "fixed", zIndex: 102, top: 20, left: "50%", transform: "translateX(-50%)", padding: "8px 18px", borderRadius: 10, background: dark ? "rgba(17,22,40,.95)" : "rgba(255,255,255,.95)", border: `1px solid ${dark ? "rgba(255,255,255,.1)" : "rgba(0,0,0,.08)"}`, color: dark ? "rgba(255,255,255,.6)" : "rgba(0,0,0,.5)", fontSize: 13, fontWeight: 500, backdropFilter: "blur(8px)" }}>{skipMsg}</div>
       )}
     </>
   );

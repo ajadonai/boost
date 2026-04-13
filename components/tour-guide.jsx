@@ -46,6 +46,7 @@ export default function TourGuide({ dark, onComplete, onNavigate, onOpenMore }) 
   const [step, setStep] = useState(saved?.step || 0);
   const [visible, setVisible] = useState(false);
   const [spotRect, setSpotRect] = useState(null);
+  const [skipMsg, setSkipMsg] = useState(null);
   const rafRef = useRef(null);
 
   useEffect(() => {
@@ -284,6 +285,11 @@ export default function TourGuide({ dark, onComplete, onNavigate, onOpenMore }) 
             </div>
           </div>
         </div>
+      )}
+
+      {/* Skip message */}
+      {skipMsg && (
+        <div style={{ position: "fixed", zIndex: 102, top: 20, left: "50%", transform: "translateX(-50%)", padding: "8px 18px", borderRadius: 10, background: dark ? "rgba(17,22,40,.95)" : "rgba(255,255,255,.95)", border: `1px solid ${dark ? "rgba(255,255,255,.1)" : "rgba(0,0,0,.08)"}`, color: dark ? "rgba(255,255,255,.6)" : "rgba(0,0,0,.5)", fontSize: 13, fontWeight: 500, backdropFilter: "blur(8px)" }}>{skipMsg}</div>
       )}
     </>
   );
