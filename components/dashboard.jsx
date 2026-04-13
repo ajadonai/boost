@@ -108,9 +108,6 @@ function OverviewPage({ user, orders, alerts, dark, t, setActive }) {
 
   return (
     <>
-      {/* Mobile menu hint */}
-      <MobileMenuHint dark={dark} t={t} />
-
       {/* Stat cards */}
       <div className="dash-stats">
         {[
@@ -929,10 +926,9 @@ function DashboardInner() {
       {moreOpen && <div className="dash-more-overlay" onClick={() => setMoreOpen(false)} />}
       {moreOpen && (
         <div className="dash-more-popup" style={{ background: dark ? "#161b2e" : "#fff", border: `1px solid ${dark ? "rgba(255,255,255,.1)" : "rgba(0,0,0,.08)"}` }}>
-          <div style={{ fontSize: 11, fontWeight: 600, color: t.textMuted, textTransform: "uppercase", letterSpacing: 1, padding: "4px 12px 8px" }}>More</div>
-          {MORE_ITEMS.map((item, idx) => (
-            <button key={item.id} onClick={() => { setActive(item.id); setMoreOpen(false); }} style={{ display: "flex", alignItems: "center", gap: 12, padding: "11px 12px", borderRadius: 10, width: "100%", background: "none", border: "none", cursor: "pointer", color: active === item.id ? t.accent : (dark ? "rgba(255,255,255,.6)" : "rgba(0,0,0,.6)"), fontSize: 14, fontWeight: active === item.id ? 600 : 500, borderTop: idx > 0 ? `0.5px solid ${dark ? "rgba(255,255,255,.04)" : "rgba(0,0,0,.04)"}` : "none" }}>
-              <div style={{ width: 32, height: 32, borderRadius: 8, background: active === item.id ? (dark ? "rgba(196,125,142,.1)" : "rgba(196,125,142,.06)") : (dark ? "rgba(255,255,255,.04)" : "rgba(0,0,0,.03)"), display: "flex", alignItems: "center", justifyContent: "center", color: active === item.id ? t.accent : (dark ? "rgba(255,255,255,.4)" : "rgba(0,0,0,.4)") }}>{I[item.id]}</div>
+          {MORE_ITEMS.map(item => (
+            <button key={item.id} onClick={() => { setActive(item.id); setMoreOpen(false); }} className="dash-more-item" style={{ background: active === item.id ? (dark ? "rgba(196,125,142,.08)" : "rgba(196,125,142,.04)") : (dark ? "rgba(255,255,255,.03)" : "rgba(0,0,0,.02)"), color: active === item.id ? t.accent : (dark ? "rgba(255,255,255,.6)" : "rgba(0,0,0,.6)"), fontWeight: active === item.id ? 600 : 500 }}>
+              <div className="dash-more-item-icon" style={{ background: active === item.id ? (dark ? "rgba(196,125,142,.12)" : "rgba(196,125,142,.08)") : (dark ? "rgba(255,255,255,.05)" : "rgba(0,0,0,.04)"), color: active === item.id ? t.accent : (dark ? "rgba(255,255,255,.4)" : "rgba(0,0,0,.35)") }}>{I[item.id]}</div>
               {item.label}
             </button>
           ))}
@@ -946,7 +942,7 @@ function DashboardInner() {
           return (
             <button key={tab.id} onClick={() => { if (isMore) { setMoreOpen(!moreOpen); } else { setActive(tab.id); setMoreOpen(false); setLeftOpen(false); } }} className={`dash-bottom-tab${isActive ? " dash-bottom-tab-active" : ""}${isPrimary ? " dash-bottom-tab-primary" : ""}`} style={{ color: isActive ? t.accent : (dark ? "rgba(255,255,255,.35)" : "rgba(0,0,0,.35)") }}>
               {isPrimary ? (
-                <div className="dash-bottom-order-btn" style={{ background: isActive ? t.accent : (dark ? "rgba(196,125,142,.1)" : "rgba(196,125,142,.06)"), color: isActive ? "#fff" : t.accent, width: isActive ? 38 : 34, height: isActive ? 38 : 34, borderRadius: isActive ? 12 : 10 }}>{isMore ? MoreIcon : I[tab.id]}</div>
+                <div className="dash-bottom-order-btn" style={{ background: isActive ? t.accent : (dark ? "rgba(196,125,142,.1)" : "rgba(196,125,142,.06)"), color: isActive ? "#fff" : t.accent }}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
               ) : (
                 <span className="dash-bottom-icon">{isMore ? MoreIcon : I[tab.id]}</span>
               )}
