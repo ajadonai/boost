@@ -128,13 +128,20 @@ export default function OrderTour({ dark, onComplete, setSelSvc, setSelTier, set
   useEffect(() => {
     if (phase !== "touring" || !visible || step !== 4) return;
     const timer = setTimeout(() => {
-      const modal = document.querySelector(".no-modal-overlay");
-      if (modal) modal.style.zIndex = "101";
+      const modalOverlay = document.querySelector(".no-modal-overlay");
+      const modalContent = document.querySelector(".no-modal");
+      if (modalOverlay) {
+        modalOverlay.style.zIndex = "101";
+        modalOverlay.style.background = "transparent";
+      }
+      if (modalContent) modalContent.style.zIndex = "102";
     }, 200);
     return () => {
       clearTimeout(timer);
-      const modal = document.querySelector(".no-modal-overlay");
-      if (modal) modal.style.zIndex = "";
+      const modalOverlay = document.querySelector(".no-modal-overlay");
+      const modalContent = document.querySelector(".no-modal");
+      if (modalOverlay) { modalOverlay.style.zIndex = ""; modalOverlay.style.background = ""; }
+      if (modalContent) modalContent.style.zIndex = "";
     };
   }, [step, phase, visible]);
 
