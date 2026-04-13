@@ -110,18 +110,20 @@ export function AdminPaymentsPage({ dark, t }) {
   return (
     <>
       <div className="adm-header">
-        <div className="adm-title" style={{ color: t.text }}>Payments</div>
-        <div className="adm-subtitle" style={{ color: t.textMuted }}>Manage deposits and payment gateways</div>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 10 }}>
+          <div>
+            <div className="adm-title" style={{ color: t.text }}>Payments</div>
+            <div className="adm-subtitle" style={{ color: t.textMuted }}>Manage deposits and payment gateways</div>
+          </div>
+          <div style={{ display: "flex", gap: 4 }}>
+            <button onClick={() => setTab("deposits")} style={{ padding: "8px 20px", borderRadius: 8, fontSize: 13, fontWeight: tab === "deposits" ? 600 : 400, background: tab === "deposits" ? (dark ? "rgba(196,125,142,.12)" : "rgba(196,125,142,.08)") : "transparent", color: tab === "deposits" ? t.accent : t.textMuted, border: `1px solid ${tab === "deposits" ? (dark ? "rgba(196,125,142,.2)" : "rgba(196,125,142,.15)") : "transparent"}`, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 6 }}>
+              Deposits
+              {pendingCount > 0 && <span style={{ fontSize: 11, padding: "1px 6px", borderRadius: 10, background: dark ? "rgba(196,125,142,.15)" : "rgba(196,125,142,.1)", color: t.accent, fontWeight: 700 }}>{pendingCount}</span>}
+            </button>
+            {canConfigure && <button onClick={() => setTab("gateways")} style={{ padding: "8px 20px", borderRadius: 8, fontSize: 13, fontWeight: tab === "gateways" ? 600 : 400, background: tab === "gateways" ? (dark ? "rgba(196,125,142,.12)" : "rgba(196,125,142,.08)") : "transparent", color: tab === "gateways" ? t.accent : t.textMuted, border: `1px solid ${tab === "gateways" ? (dark ? "rgba(196,125,142,.2)" : "rgba(196,125,142,.15)") : "transparent"}`, cursor: "pointer", fontFamily: "inherit" }}>Gateway Config</button>}
+          </div>
+        </div>
         <div className="page-divider" style={{ background: t.cardBorder }} />
-      </div>
-
-      {/* Tab switcher */}
-      <div style={{ display: "flex", gap: 4, marginBottom: 16 }}>
-        <button onClick={() => setTab("deposits")} style={{ padding: "8px 20px", borderRadius: 8, fontSize: 13, fontWeight: tab === "deposits" ? 600 : 400, background: tab === "deposits" ? (dark ? "rgba(196,125,142,.12)" : "rgba(196,125,142,.08)") : "transparent", color: tab === "deposits" ? t.accent : t.textMuted, border: `1px solid ${tab === "deposits" ? (dark ? "rgba(196,125,142,.2)" : "rgba(196,125,142,.15)") : "transparent"}`, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 6 }}>
-          Deposits
-          {pendingCount > 0 && <span style={{ fontSize: 11, padding: "1px 6px", borderRadius: 10, background: dark ? "rgba(196,125,142,.15)" : "rgba(196,125,142,.1)", color: t.accent, fontWeight: 700 }}>{pendingCount}</span>}
-        </button>
-        {canConfigure && <button onClick={() => setTab("gateways")} style={{ padding: "8px 20px", borderRadius: 8, fontSize: 13, fontWeight: tab === "gateways" ? 600 : 400, background: tab === "gateways" ? (dark ? "rgba(196,125,142,.12)" : "rgba(196,125,142,.08)") : "transparent", color: tab === "gateways" ? t.accent : t.textMuted, border: `1px solid ${tab === "gateways" ? (dark ? "rgba(196,125,142,.2)" : "rgba(196,125,142,.15)") : "transparent"}`, cursor: "pointer", fontFamily: "inherit" }}>Gateway Config</button>}
       </div>
 
       {msg && <div style={{ padding: "10px 14px", borderRadius: 8, marginBottom: 12, background: msg.type === "success" ? (dark ? "rgba(110,231,183,.08)" : "#ecfdf5") : (dark ? "rgba(220,38,38,.08)" : "#fef2f2"), color: msg.type === "success" ? (dark ? "#6ee7b7" : "#059669") : (dark ? "#fca5a5" : "#dc2626"), fontSize: 14, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -344,23 +346,20 @@ function FinanceOverviewTab({ dark, t }) {
   return (
     <>
       {/* Range filter */}
-      <div style={{ marginBottom: 16 }}>
-        <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
-          <span style={{ fontSize: 10, fontWeight: 600, textTransform: "uppercase", letterSpacing: 1, color: dark ? "rgba(255,255,255,.3)" : "rgba(0,0,0,.3)" }}>Time range</span>
-          <select value={range} onChange={e => changeRange(e.target.value)} style={{
-            padding: "7px 28px 7px 10px", borderRadius: 8, fontSize: 13, fontWeight: 500, width: "fit-content",
-            background: dark ? "rgba(255,255,255,.04)" : "rgba(0,0,0,.03)",
-            border: `1px solid ${dark ? "rgba(255,255,255,.08)" : "rgba(0,0,0,.08)"}`,
-            color: dark ? "rgba(255,255,255,.7)" : "rgba(0,0,0,.7)",
-            appearance: "none", cursor: "pointer", fontFamily: "inherit",
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='${dark ? "%23666" : "%23999"}' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E")`,
-            backgroundRepeat: "no-repeat", backgroundPosition: "right 8px center",
-          }}>
-            {[["24h", "Today"], ["7d", "Last 7 days"], ["30d", "Last 30 days"], ["90d", "Last 90 days"]].map(([v, l]) => (
-              <option key={v} value={v}>{l}</option>
-            ))}
-          </select>
-        </div>
+      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 16 }}>
+        <select value={range} onChange={e => changeRange(e.target.value)} style={{
+          padding: "7px 28px 7px 10px", borderRadius: 8, fontSize: 13, fontWeight: 500,
+          background: dark ? "rgba(255,255,255,.04)" : "rgba(0,0,0,.03)",
+          border: `1px solid ${dark ? "rgba(255,255,255,.08)" : "rgba(0,0,0,.08)"}`,
+          color: dark ? "rgba(255,255,255,.7)" : "rgba(0,0,0,.7)",
+          appearance: "none", cursor: "pointer", fontFamily: "inherit",
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='${dark ? "%23666" : "%23999"}' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E")`,
+          backgroundRepeat: "no-repeat", backgroundPosition: "right 8px center",
+        }}>
+          {[["24h", "Today"], ["7d", "Last 7 days"], ["30d", "Last 30 days"], ["90d", "Last 90 days"]].map(([v, l]) => (
+            <option key={v} value={v}>{l}</option>
+          ))}
+        </select>
       </div>
 
       <div className="adm-stats" style={{ marginTop: 0 }}>
@@ -924,21 +923,18 @@ function FinanceBreakdownTab({ dark, t }) {
   const subText = dark ? "rgba(255,255,255,.35)" : "rgba(0,0,0,.35)";
   const rowBorder = dark ? "rgba(255,255,255,.04)" : "rgba(0,0,0,.04)";
 
-  const DropdownFilter = ({ value, onChange, options, label }) => (
-    <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
-      <span style={{ fontSize: 10, fontWeight: 600, textTransform: "uppercase", letterSpacing: 1, color: subText }}>{label}</span>
-      <select value={value} onChange={e => onChange(e.target.value)} style={{
-        padding: "7px 28px 7px 10px", borderRadius: 8, fontSize: 13, fontWeight: 500,
-        background: dark ? "rgba(255,255,255,.04)" : "rgba(0,0,0,.03)",
-        border: `1px solid ${dark ? "rgba(255,255,255,.08)" : "rgba(0,0,0,.08)"}`,
-        color: dark ? "rgba(255,255,255,.7)" : "rgba(0,0,0,.7)",
-        appearance: "none", cursor: "pointer", fontFamily: "inherit",
-        backgroundImage: `url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='${dark ? "%23666" : "%23999"}' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E")`,
-        backgroundRepeat: "no-repeat", backgroundPosition: "right 8px center",
-      }}>
-        {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-      </select>
-    </div>
+  const DropdownFilter = ({ value, onChange, options }) => (
+    <select value={value} onChange={e => onChange(e.target.value)} style={{
+      padding: "7px 28px 7px 10px", borderRadius: 8, fontSize: 13, fontWeight: 500,
+      background: dark ? "rgba(255,255,255,.04)" : "rgba(0,0,0,.03)",
+      border: `1px solid ${dark ? "rgba(255,255,255,.08)" : "rgba(0,0,0,.08)"}`,
+      color: dark ? "rgba(255,255,255,.7)" : "rgba(0,0,0,.7)",
+      appearance: "none", cursor: "pointer", fontFamily: "inherit",
+      backgroundImage: `url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='${dark ? "%23666" : "%23999"}' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E")`,
+      backgroundRepeat: "no-repeat", backgroundPosition: "right 8px center",
+    }}>
+      {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+    </select>
   );
 
   const MetricCard = ({ label, value, sub, color }) => (
@@ -970,24 +966,24 @@ function FinanceBreakdownTab({ dark, t }) {
   return (
     <>
       {/* Filters */}
-      <div style={{ display: "flex", gap: 8, marginBottom: 20, flexWrap: "wrap" }}>
-        <DropdownFilter label="Time range" value={range} onChange={setRange} options={[
+      <div style={{ display: "flex", gap: 8, marginBottom: 20, flexWrap: "wrap", justifyContent: "flex-end" }}>
+        <DropdownFilter value={range} onChange={setRange} options={[
           { value: "24h", label: "Today" }, { value: "7d", label: "Last 7 days" },
           { value: "30d", label: "Last 30 days" }, { value: "90d", label: "Last 90 days" },
           { value: "month", label: "This month" }, { value: "lastmonth", label: "Last month" },
           { value: "year", label: "This year" },
         ]} />
-        <DropdownFilter label="Platform" value={platform} onChange={setPlatform} options={[
+        <DropdownFilter value={platform} onChange={setPlatform} options={[
           { value: "all", label: "All platforms" }, { value: "instagram", label: "Instagram" },
           { value: "tiktok", label: "TikTok" }, { value: "youtube", label: "YouTube" },
           { value: "twitter", label: "Twitter/X" }, { value: "telegram", label: "Telegram" },
           { value: "facebook", label: "Facebook" }, { value: "spotify", label: "Spotify" },
         ]} />
-        <DropdownFilter label="Tier" value={tier} onChange={setTier} options={[
+        <DropdownFilter value={tier} onChange={setTier} options={[
           { value: "all", label: "All tiers" }, { value: "budget", label: "Budget" },
           { value: "standard", label: "Standard" }, { value: "premium", label: "Premium" },
         ]} />
-        <DropdownFilter label="Provider" value={provider} onChange={setProvider} options={[
+        <DropdownFilter value={provider} onChange={setProvider} options={[
           { value: "all", label: "All providers" }, { value: "mtp", label: "MTP" },
           { value: "jap", label: "JAP" }, { value: "dao", label: "DaoSMM" },
         ]} />
