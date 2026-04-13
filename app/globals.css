@@ -951,9 +951,12 @@ input { font-family: inherit; }
 .fund-warn { font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 6px; }
 
 /* Accepted types */
-.fund-accepted { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-.fund-accepted-label { font-size: 13px; }
-.fund-accepted-pill { font-size: 12px; padding: 3px 8px; border-radius: 6px; font-weight: 500; }
+.fund-accepted { display: flex; align-items: center; gap: 6px; flex-wrap: nowrap; justify-content: center; }
+.fund-accepted-label { font-size: 13px; display: none; }
+.fund-accepted-pill { font-size: 12px; padding: 3px 8px; border-radius: 6px; font-weight: 500; white-space: nowrap; }
+@media (min-width: 1200px) {
+  .fund-accepted-label { display: inline; }
+}
 
 /* Invoice card */
 .fund-invoice { border-radius: 16px; overflow: hidden; }
