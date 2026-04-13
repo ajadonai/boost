@@ -1268,12 +1268,12 @@ input { font-family: inherit; }
   .nav-login-btn { padding: 6px 14px !important; font-size: 13px !important; border-radius: 8px !important; }
   .theme-toggle { width: 44px !important; height: 24px !important; }
   .theme-toggle > div { width: 18px !important; height: 18px !important; }
-  .auth-card { max-width: 100%; height: 620px; max-height: 85dvh; padding: 20px 18px; border-radius: 16px; overflow-y: auto; overflow-x: hidden; }
-  .auth-card h2 { font-size: 19px; }
-  .auth-card p { font-size: 14px; margin-bottom: 12px; }
-  .auth-card input { padding: 9px 12px; font-size: 15px; border-radius: 10px; margin-bottom: 6px; }
-  .auth-card button { font-size: 15px; padding: 11px 0; border-radius: 10px; }
-  .auth-card label { font-size: 12px; margin-bottom: 2px; }
+  .auth-card { max-width: 100%; height: 620px; max-height: 85dvh; padding: 16px 18px; border-radius: 16px; overflow-y: auto; overflow-x: hidden; }
+  .auth-card h2 { font-size: 19px; margin-bottom: 2px; }
+  .auth-card p { font-size: 13px; margin-bottom: 8px; }
+  .auth-card input { padding: 8px 12px; font-size: 14px; border-radius: 10px; margin-bottom: 2px; }
+  .auth-card button { font-size: 14px; padding: 10px 0; border-radius: 10px; }
+  .auth-card label { font-size: 11px; margin-bottom: 1px; }
   .auth-card .auth-close { width: 26px; height: 26px; font-size: 15px; }
   /* Section 2 mobile */
   .s2 { padding: 40px 20px; }
