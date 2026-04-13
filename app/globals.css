@@ -1724,3 +1724,14 @@ input { font-family: inherit; }
     display: flex; align-items: center; justify-content: center; flex-shrink: 0;
   }
 }
+
+/* ═══ FINANCIALS RESPONSIVE ═══ */
+@media (max-width: 767px) {
+  .fin-table-header { display: none !important; }
+  .fin-table-row {
+    display: flex !important; flex-wrap: wrap !important; gap: 4px 12px !important;
+    padding: 12px 14px !important;
+  }
+  .fin-table-row > div { text-align: left !important; }
+  .fin-table-row > div:first-child { width: 100%; font-size: 14px !important; margin-bottom: 2px; }
+}

@@ -859,3 +859,251 @@ export function AdminSettingsPage({ admin, dark, t, themeMode, setThemeMode, set
     </>
   );
 }
+
+/* ═══════════════════════════════════════════ */
+/* ═══ FINANCIALS PAGE                     ═══ */
+/* ═══════════════════════════════════════════ */
+export function AdminFinancialsPage({ dark, t }) {
+  const [stats, setStats] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [range, setRange] = useState("30d");
+  const [platform, setPlatform] = useState("all");
+  const [tier, setTier] = useState("all");
+  const [provider, setProvider] = useState("all");
+
+  const load = () => {
+    setLoading(true);
+    fetch(`/api/admin/financials?range=${range}&platform=${platform}&tier=${tier}&provider=${provider}`)
+      .then(r => r.json()).then(d => { setStats(d); setLoading(false); }).catch(() => setLoading(false));
+  };
+  useEffect(() => { load(); }, [range, platform, tier, provider]);
+
+  const green = dark ? "#6ee7b7" : "#059669";
+  const red = dark ? "#fca5a5" : "#dc2626";
+  const amber = dark ? "#fbbf24" : "#d97706";
+  const blue = dark ? "#93c5fd" : "#2563eb";
+  const cardBg = dark ? "rgba(255,255,255,.03)" : "rgba(255,255,255,.85)";
+  const cardBorder = dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)";
+  const subText = dark ? "rgba(255,255,255,.35)" : "rgba(0,0,0,.35)";
+  const rowBorder = dark ? "rgba(255,255,255,.04)" : "rgba(0,0,0,.04)";
+
+  const DropdownFilter = ({ value, onChange, options, label }) => (
+    <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
+      <span style={{ fontSize: 10, fontWeight: 600, textTransform: "uppercase", letterSpacing: 1, color: subText }}>{label}</span>
+      <select value={value} onChange={e => onChange(e.target.value)} style={{
+        padding: "7px 28px 7px 10px", borderRadius: 8, fontSize: 13, fontWeight: 500,
+        background: dark ? "rgba(255,255,255,.04)" : "rgba(0,0,0,.03)",
+        border: `1px solid ${dark ? "rgba(255,255,255,.08)" : "rgba(0,0,0,.08)"}`,
+        color: dark ? "rgba(255,255,255,.7)" : "rgba(0,0,0,.7)",
+        appearance: "none", cursor: "pointer", fontFamily: "inherit",
+        backgroundImage: `url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='${dark ? "%23666" : "%23999"}' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E")`,
+        backgroundRepeat: "no-repeat", backgroundPosition: "right 8px center",
+      }}>
+        {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+      </select>
+    </div>
+  );
+
+  const MetricCard = ({ label, value, sub, color }) => (
+    <div style={{ padding: "14px 16px", borderRadius: 12, background: cardBg, border: `0.5px solid ${cardBorder}` }}>
+      <div style={{ fontSize: 10, fontWeight: 600, textTransform: "uppercase", letterSpacing: 1, color: subText, marginBottom: 6 }}>{label}</div>
+      <div className="m" style={{ fontSize: 20, fontWeight: 700, color: color || t.text }}>{value}</div>
+      {sub && <div style={{ fontSize: 11, color: subText, marginTop: 3 }}>{sub}</div>}
+    </div>
+  );
+
+  const MiniBar = ({ value, max, color }) => (
+    <div style={{ height: 3, borderRadius: 2, background: dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)", overflow: "hidden" }}>
+      <div style={{ height: "100%", width: `${Math.min((value / (max || 1)) * 100, 100)}%`, borderRadius: 2, background: color }} />
+    </div>
+  );
+
+  if (loading) return (
+    <>
+      <div className="adm-header"><div className="adm-title" style={{ color: t.text }}>Financials</div><div className="adm-subtitle" style={{ color: t.textMuted }}>Loading...</div><div className="page-divider" style={{ background: t.cardBorder }} /></div>
+      <div className="adm-stats">{[1,2,3,4,5,6].map(i => <div key={i} className={`skel-bone ${dark ? "skel-dark" : "skel-light"}`} style={{ height: 80, borderRadius: 12 }} />)}</div>
+    </>
+  );
+
+  const s = stats || {};
+  const p = s.profitability || {};
+  const mIn = s.moneyIn || {};
+  const mOut = s.moneyOut || {};
+  const lib = s.liability || {};
+  const totalIn = (mIn.deposits || 0) + (mIn.couponBonuses || 0) + (mIn.adminCredits || 0) + (mIn.referralBonuses || 0);
+  const totalOut = (mOut.providerCosts || 0) + (mOut.refunds || 0) + (mOut.referralBonuses || 0);
+
+  return (
+    <>
+      <div className="adm-header">
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 10 }}>
+          <div>
+            <div className="adm-title" style={{ color: t.text }}>Financials</div>
+            <div className="adm-subtitle" style={{ color: t.textMuted }}>Complete money flow overview</div>
+          </div>
+        </div>
+        <div className="page-divider" style={{ background: t.cardBorder }} />
+      </div>
+
+      {/* Filters */}
+      <div style={{ display: "flex", gap: 8, marginBottom: 20, flexWrap: "wrap" }}>
+        <DropdownFilter label="Time range" value={range} onChange={setRange} options={[
+          { value: "24h", label: "Today" }, { value: "7d", label: "Last 7 days" },
+          { value: "30d", label: "Last 30 days" }, { value: "90d", label: "Last 90 days" },
+          { value: "month", label: "This month" }, { value: "lastmonth", label: "Last month" },
+          { value: "year", label: "This year" },
+        ]} />
+        <DropdownFilter label="Platform" value={platform} onChange={setPlatform} options={[
+          { value: "all", label: "All platforms" }, { value: "instagram", label: "Instagram" },
+          { value: "tiktok", label: "TikTok" }, { value: "youtube", label: "YouTube" },
+          { value: "twitter", label: "Twitter/X" }, { value: "telegram", label: "Telegram" },
+          { value: "facebook", label: "Facebook" }, { value: "spotify", label: "Spotify" },
+        ]} />
+        <DropdownFilter label="Tier" value={tier} onChange={setTier} options={[
+          { value: "all", label: "All tiers" }, { value: "budget", label: "Budget" },
+          { value: "standard", label: "Standard" }, { value: "premium", label: "Premium" },
+        ]} />
+        <DropdownFilter label="Provider" value={provider} onChange={setProvider} options={[
+          { value: "all", label: "All providers" }, { value: "mtp", label: "MTP" },
+          { value: "jap", label: "JAP" }, { value: "dao", label: "DaoSMM" },
+        ]} />
+      </div>
+
+      {/* Profitability */}
+      <div style={{ fontSize: 12, fontWeight: 600, textTransform: "uppercase", letterSpacing: 1.5, color: subText, marginBottom: 10 }}>Profitability</div>
+      <div className="adm-stats" style={{ marginBottom: 20 }}>
+        <MetricCard label="Gross Revenue" value={fN(p.grossRevenue || 0)} sub="Total order charges" />
+        <MetricCard label="Refunds" value={fN(p.totalRefunds || 0)} sub={`${p.refundRate || 0}% refund rate`} color={red} />
+        <MetricCard label="Net Revenue" value={fN(p.netRevenue || 0)} sub="After refunds" color={green} />
+        <MetricCard label="Provider Cost" value={fN(p.totalCost || 0)} sub="MTP + JAP + DAO" color={amber} />
+        <MetricCard label="Gross Profit" value={fN(p.grossProfit || 0)} sub={`${p.margin || 0}% margin`} color={p.grossProfit >= 0 ? green : red} />
+        <MetricCard label="Per Order" value={fN(p.profitPerOrder || 0)} sub={`${p.orderCount || 0} orders`} />
+      </div>
+
+      {/* Money In / Money Out */}
+      <div className="adm-grid-2" style={{ marginBottom: 20 }}>
+        <div>
+          <div style={{ background: cardBg, border: `0.5px solid ${cardBorder}`, borderRadius: 14, padding: "14px 16px" }}>
+            <div style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: 1, color: green, marginBottom: 12, display: "flex", alignItems: "center", gap: 6 }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/></svg>
+              Money In
+            </div>
+            {[
+              ["Deposits", mIn.deposits],
+              ["Coupon Bonuses", mIn.couponBonuses],
+              ["Admin Credits", mIn.adminCredits],
+              ["Referral Bonuses", mIn.referralBonuses],
+            ].map(([label, val]) => (
+              <div key={label} style={{ display: "flex", justifyContent: "space-between", padding: "7px 0", borderBottom: `0.5px solid ${rowBorder}` }}>
+                <span style={{ fontSize: 13, color: dark ? "rgba(255,255,255,.5)" : "rgba(0,0,0,.5)" }}>{label}</span>
+                <span className="m" style={{ fontSize: 13, fontWeight: 600, color: green }}>{fN(val || 0)}</span>
+              </div>
+            ))}
+            <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 0 2px", marginTop: 4 }}>
+              <span style={{ fontSize: 13, fontWeight: 700, color: dark ? "rgba(255,255,255,.7)" : "rgba(0,0,0,.7)" }}>Total In</span>
+              <span className="m" style={{ fontSize: 15, fontWeight: 700, color: green }}>{fN(totalIn)}</span>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div style={{ background: cardBg, border: `0.5px solid ${cardBorder}`, borderRadius: 14, padding: "14px 16px" }}>
+            <div style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: 1, color: red, marginBottom: 12, display: "flex", alignItems: "center", gap: 6 }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>
+              Money Out
+            </div>
+            {[
+              ["Provider Costs", mOut.providerCosts],
+              ["Order Refunds", mOut.refunds],
+              ["Referral Bonuses", mOut.referralBonuses],
+            ].map(([label, val]) => (
+              <div key={label} style={{ display: "flex", justifyContent: "space-between", padding: "7px 0", borderBottom: `0.5px solid ${rowBorder}` }}>
+                <span style={{ fontSize: 13, color: dark ? "rgba(255,255,255,.5)" : "rgba(0,0,0,.5)" }}>{label}</span>
+                <span className="m" style={{ fontSize: 13, fontWeight: 600, color: red }}>{fN(val || 0)}</span>
+              </div>
+            ))}
+            <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 0 2px", marginTop: 4 }}>
+              <span style={{ fontSize: 13, fontWeight: 700, color: dark ? "rgba(255,255,255,.7)" : "rgba(0,0,0,.7)" }}>Total Out</span>
+              <span className="m" style={{ fontSize: 15, fontWeight: 700, color: red }}>{fN(totalOut)}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Liability */}
+      <div style={{ fontSize: 12, fontWeight: 600, textTransform: "uppercase", letterSpacing: 1.5, color: subText, marginBottom: 10 }}>Liability & Cash</div>
+      <div className="adm-stats" style={{ marginBottom: 20 }}>
+        <MetricCard label="Wallet Liability" value={fN(lib.walletBalances || 0)} sub={`${lib.walletUsers || 0} users with balance`} color={amber} />
+        <MetricCard label="Net Cash Flow" value={fN(totalIn - totalOut)} sub="Money in - Money out" color={totalIn - totalOut >= 0 ? green : red} />
+        <MetricCard label="Retained Profit" value={fN((p.grossProfit || 0))} sub={`${p.margin || 0}% margin`} color={green} />
+      </div>
+
+      {/* Profit by Platform */}
+      {(s.byPlatform || []).length > 0 && <>
+        <div style={{ fontSize: 12, fontWeight: 600, textTransform: "uppercase", letterSpacing: 1.5, color: subText, marginBottom: 10, marginTop: 4 }}>Profit by platform</div>
+        <div className="adm-card" style={{ background: cardBg, border: `0.5px solid ${cardBorder}`, marginBottom: 20, overflow: "hidden" }}>
+          {/* Header */}
+          <div className="fin-table-header" style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr 0.7fr 0.6fr", padding: "10px 14px", borderBottom: `0.5px solid ${dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)"}` }}>
+            {["Platform", "Revenue", "Cost", "Profit", "Orders", "Margin"].map(h => (
+              <div key={h} style={{ fontSize: 10, fontWeight: 600, textTransform: "uppercase", letterSpacing: 1, color: subText, textAlign: h !== "Platform" ? "right" : "left" }}>{h}</div>
+            ))}
+          </div>
+          {s.byPlatform.map((pl, i) => (
+            <div key={pl.name}>
+              <div className="fin-table-row" style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr 0.7fr 0.6fr", padding: "10px 14px", borderBottom: i < s.byPlatform.length - 1 ? `0.5px solid ${rowBorder}` : "none" }}>
+                <div style={{ fontSize: 13, fontWeight: 600, color: t.text }}>{pl.name}</div>
+                <div className="m" style={{ fontSize: 12, color: dark ? "rgba(255,255,255,.6)" : "rgba(0,0,0,.6)", textAlign: "right" }}>{fN(pl.revenue || 0)}</div>
+                <div className="m" style={{ fontSize: 12, color: red, textAlign: "right" }}>{fN(pl.cost || 0)}</div>
+                <div className="m" style={{ fontSize: 12, color: green, textAlign: "right", fontWeight: 600 }}>{fN(pl.profit || 0)}</div>
+                <div style={{ fontSize: 12, color: dark ? "rgba(255,255,255,.5)" : "rgba(0,0,0,.5)", textAlign: "right" }}>{pl.orders}</div>
+                <div style={{ fontSize: 12, fontWeight: 600, color: (pl.margin || 0) >= 50 ? green : amber, textAlign: "right" }}>{pl.margin || 0}%</div>
+              </div>
+              <div style={{ padding: "0 14px 6px" }}><MiniBar value={pl.profit || 0} max={(s.byPlatform[0]?.profit || 1)} color={t.accent} /></div>
+            </div>
+          ))}
+        </div>
+      </>}
+
+      {/* Profit by Tier */}
+      {(s.byTier || []).length > 0 && <>
+        <div style={{ fontSize: 12, fontWeight: 600, textTransform: "uppercase", letterSpacing: 1.5, color: subText, marginBottom: 10 }}>Profit by tier</div>
+        <div className="adm-stats" style={{ marginBottom: 20 }}>
+          {s.byTier.map(tr => {
+            const tierColor = tr.name === "Budget" ? "#f59e0b" : tr.name === "Standard" ? "#3b82f6" : "#8b5cf6";
+            return (
+              <div key={tr.name} style={{ padding: "14px 16px", borderRadius: 12, background: cardBg, border: `0.5px solid ${cardBorder}` }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
+                  <div style={{ width: 8, height: 8, borderRadius: "50%", background: tierColor }} />
+                  <span style={{ fontSize: 13, fontWeight: 600, color: t.text }}>{tr.name}</span>
+                </div>
+                <div className="m" style={{ fontSize: 18, fontWeight: 700, color: green, marginBottom: 3 }}>{fN(tr.profit || 0)}</div>
+                <div style={{ fontSize: 11, color: subText, marginBottom: 8 }}>{tr.orders} orders · {tr.margin || 0}% margin</div>
+                <MiniBar value={tr.margin || 0} max={100} color={tierColor} />
+                <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8, fontSize: 11, color: subText }}>
+                  <span>Rev: {fN(tr.revenue || 0)}</span>
+                  <span>Cost: {fN(tr.cost || 0)}</span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </>}
+
+      {/* Top Spenders */}
+      {(s.topSpenders || []).length > 0 && <>
+        <div style={{ fontSize: 12, fontWeight: 600, textTransform: "uppercase", letterSpacing: 1.5, color: subText, marginBottom: 10 }}>Top spenders</div>
+        <div className="adm-card" style={{ background: cardBg, border: `0.5px solid ${cardBorder}`, overflow: "hidden" }}>
+          {s.topSpenders.map((sp, i) => (
+            <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", borderBottom: i < s.topSpenders.length - 1 ? `0.5px solid ${rowBorder}` : "none" }}>
+              <div style={{ width: 24, height: 24, borderRadius: "50%", background: dark ? "rgba(196,125,142,.1)" : "rgba(196,125,142,.06)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, color: t.accent, flexShrink: 0 }}>{i + 1}</div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 13, fontWeight: 600, color: t.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{sp.name}</div>
+                <div style={{ fontSize: 11, color: subText }}>{sp.orders} orders</div>
+              </div>
+              <div className="m" style={{ fontSize: 14, fontWeight: 700, color: green, flexShrink: 0 }}>{fN(sp.spent || 0)}</div>
+            </div>
+          ))}
+        </div>
+      </>}
+    </>
+  );
+}
