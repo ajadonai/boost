@@ -38,20 +38,33 @@ const STEPS = [
 ];
 
 export default function TourGuide({ dark, onComplete, onNavigate, onOpenMore }) {
-  const [phase, setPhase] = useState("welcome");
-  const [step, setStep] = useState(0);
+  // Resume from saved progress
+  const saved = (() => {
+    try { const s = localStorage.getItem("nitro-tour-progress"); return s ? JSON.parse(s) : null; } catch { return null; }
+  })();
+  const [phase, setPhase] = useState(saved?.phase || "welcome");
+  const [step, setStep] = useState(saved?.step || 0);
   const [visible, setVisible] = useState(false);
   const [spotRect, setSpotRect] = useState(null);
   const rafRef = useRef(null);
 
   useEffect(() => {
-    const timer = setTimeout(() => setVisible(true), 500);
+    const timer = setTimeout(() => {
+      setVisible(true);
+      // If resuming mid-tour, navigate to the current step's page
+      if (saved?.phase === "touring") goToStep(saved.step);
+    }, 500);
     return () => clearTimeout(timer);
   }, []);
 
+  // Save progress on every step/phase change
+  useEffect(() => {
+    try { localStorage.setItem("nitro-tour-progress", JSON.stringify({ phase, step })); } catch {}
+  }, [phase, step]);
+
   const finish = useCallback(() => {
     setVisible(false);
-    try { localStorage.setItem("nitro-tour-done", "1"); } catch {}
+    try { localStorage.setItem("nitro-tour-done", "1"); localStorage.removeItem("nitro-tour-progress"); } catch {}
     fetch("/api/auth/tour", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ tour: "nav" }) }).catch(() => {});
     onNavigate?.("overview");
     setTimeout(() => onComplete?.(), 300);

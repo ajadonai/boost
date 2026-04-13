@@ -29,20 +29,39 @@ function waitForEl(selector, cb, maxWait = 3000) {
 }
 
 export default function OrderTour({ dark, onComplete, setSelSvc, setSelTier, setQty }) {
-  const [phase, setPhase] = useState("welcome");
-  const [step, setStep] = useState(0);
+  // Resume from saved progress
+  const saved = (() => {
+    try { const s = localStorage.getItem("nitro-order-tour-progress"); return s ? JSON.parse(s) : null; } catch { return null; }
+  })();
+  const [phase, setPhase] = useState(saved?.phase || "welcome");
+  const [step, setStep] = useState(saved?.step || 0);
   const [visible, setVisible] = useState(false);
   const [spotRect, setSpotRect] = useState(null);
   const rafRef = useRef(null);
 
   useEffect(() => {
-    const timer = setTimeout(() => setVisible(true), 400);
+    const timer = setTimeout(() => {
+      setVisible(true);
+      // If resuming mid-tour, re-run auto-selections to reach the saved step
+      if (saved?.phase === "touring" && saved.step >= 2) {
+        // Need to select service first
+        window.dispatchEvent(new CustomEvent("nitro-tour-select-service"));
+        if (saved.step >= 3) {
+          setTimeout(() => window.dispatchEvent(new CustomEvent("nitro-tour-select-tier")), 800);
+        }
+      }
+    }, 400);
     return () => clearTimeout(timer);
   }, []);
 
+  // Save progress on every step/phase change
+  useEffect(() => {
+    try { localStorage.setItem("nitro-order-tour-progress", JSON.stringify({ phase, step })); } catch {}
+  }, [phase, step]);
+
   const finish = useCallback(() => {
     setVisible(false);
-    try { localStorage.setItem("nitro-order-tour-done", "1"); } catch {}
+    try { localStorage.setItem("nitro-order-tour-done", "1"); localStorage.removeItem("nitro-order-tour-progress"); } catch {}
     fetch("/api/auth/tour", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ tour: "order" }) }).catch(() => {});
     setSelSvc?.(null);
     setSelTier?.(null);
