@@ -1395,7 +1395,11 @@ input { font-family: inherit; }
 @keyframes toastShrink { from { width: 100%; } to { width: 0%; } }
 
 @media (max-width: 767px) {
-  .toast-container { top: 56px; right: 8px; left: 8px; width: auto; }
+  .toast-container { top: 12px; right: 12px; left: 12px; width: auto; }
+  .toast-item { border-radius: 14px; }
+  .toast-content { padding: 12px 14px; gap: 10px; }
+  .toast-title { font-size: 14px; }
+  .toast-desc { font-size: 13px; }
   .toast-enter { animation: toastDropIn .3s ease forwards; }
   .toast-exit { animation: toastDropOut .3s ease forwards; }
   @keyframes toastDropIn { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
