@@ -53,6 +53,22 @@ const NAV_ITEMS = [
   { id: "settings", label: "Settings" },
 ];
 
+const BOTTOM_TABS = [
+  { id: "overview", label: "Home" },
+  { id: "add-funds", label: "Wallet" },
+  { id: "services", label: "Order", primary: true },
+  { id: "orders", label: "History" },
+  { id: "more", label: "More" },
+];
+const MORE_ITEMS = [
+  { id: "leaderboard", label: "Leaderboard" },
+  { id: "referrals", label: "Referrals" },
+  { id: "how-to", label: "Guide" },
+  { id: "support", label: "Support" },
+  { id: "settings", label: "Settings" },
+];
+const MoreIcon = <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/><circle cx="5" cy="12" r="1.5"/></svg>;
+
 
 /* ── Status helpers ── */
 function sClr(s, dk) { return s === "Completed" ? (dk ? "#6ee7b7" : "#059669") : s === "Processing" ? (dk ? "#a5b4fc" : "#4f46e5") : s === "Pending" ? (dk ? "#fcd34d" : "#d97706") : s === "Partial" ? (dk ? "#fca5a5" : "#dc2626") : (dk ? "#555250" : "#8a8785"); }
@@ -405,6 +421,7 @@ function DashboardInner() {
     } catch {}
   }, []);
   const [leftOpen, setLeftOpen] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const [readNotifIds, setReadNotifIds] = useState(() => {
     if (typeof window === 'undefined') return new Set();
@@ -907,6 +924,37 @@ function DashboardInner() {
           )}
         </aside>
       </div>
+
+      {/* ═══ MOBILE BOTTOM NAV ═══ */}
+      {moreOpen && <div className="dash-more-overlay" onClick={() => setMoreOpen(false)} />}
+      {moreOpen && (
+        <div className="dash-more-popup" style={{ background: dark ? "#161b2e" : "#fff", border: `1px solid ${dark ? "rgba(255,255,255,.1)" : "rgba(0,0,0,.08)"}` }}>
+          <div style={{ fontSize: 11, fontWeight: 600, color: t.textMuted, textTransform: "uppercase", letterSpacing: 1, padding: "4px 12px 8px" }}>More</div>
+          {MORE_ITEMS.map((item, idx) => (
+            <button key={item.id} onClick={() => { setActive(item.id); setMoreOpen(false); }} style={{ display: "flex", alignItems: "center", gap: 12, padding: "11px 12px", borderRadius: 10, width: "100%", background: "none", border: "none", cursor: "pointer", color: active === item.id ? t.accent : (dark ? "rgba(255,255,255,.6)" : "rgba(0,0,0,.6)"), fontSize: 14, fontWeight: active === item.id ? 600 : 500, borderTop: idx > 0 ? `0.5px solid ${dark ? "rgba(255,255,255,.04)" : "rgba(0,0,0,.04)"}` : "none" }}>
+              <div style={{ width: 32, height: 32, borderRadius: 8, background: active === item.id ? (dark ? "rgba(196,125,142,.1)" : "rgba(196,125,142,.06)") : (dark ? "rgba(255,255,255,.04)" : "rgba(0,0,0,.03)"), display: "flex", alignItems: "center", justifyContent: "center", color: active === item.id ? t.accent : (dark ? "rgba(255,255,255,.4)" : "rgba(0,0,0,.4)") }}>{I[item.id]}</div>
+              {item.label}
+            </button>
+          ))}
+        </div>
+      )}
+      <nav className="dash-bottom-nav" style={{ background: dark ? "#0a0e1a" : "#f8f5f1", borderTop: `1px solid ${dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.08)"}` }}>
+        {BOTTOM_TABS.map(tab => {
+          const isMore = tab.id === "more";
+          const isActive = isMore ? moreOpen : active === tab.id;
+          const isPrimary = tab.primary;
+          return (
+            <button key={tab.id} onClick={() => { if (isMore) { setMoreOpen(!moreOpen); } else { setActive(tab.id); setMoreOpen(false); setLeftOpen(false); } }} className={`dash-bottom-tab${isActive ? " dash-bottom-tab-active" : ""}${isPrimary ? " dash-bottom-tab-primary" : ""}`} style={{ color: isActive ? t.accent : (dark ? "rgba(255,255,255,.35)" : "rgba(0,0,0,.35)") }}>
+              {isPrimary ? (
+                <div className="dash-bottom-order-btn" style={{ background: isActive ? t.accent : (dark ? "rgba(196,125,142,.1)" : "rgba(196,125,142,.06)"), color: isActive ? "#fff" : t.accent, width: isActive ? 38 : 34, height: isActive ? 38 : 34, borderRadius: isActive ? 12 : 10 }}>{isMore ? MoreIcon : I[tab.id]}</div>
+              ) : (
+                <span className="dash-bottom-icon">{isMore ? MoreIcon : I[tab.id]}</span>
+              )}
+              <span className="dash-bottom-label">{tab.label}</span>
+            </button>
+          );
+        })}
+      </nav>
     </div>
     </ConfirmProvider>
     </ToastProvider>
