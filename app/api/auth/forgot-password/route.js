@@ -22,6 +22,11 @@ export async function POST(req) {
       return ok({ message: 'If an account exists, a reset link has been sent.' });
     }
 
+    // Don't send reset for deleted/pending deletion accounts
+    if (user.status === 'PendingDeletion' || user.status === 'Deleted' || user.status === 'Suspended') {
+      return ok({ message: 'If an account exists, a reset link has been sent.' });
+    }
+
     const resetToken = crypto.randomBytes(32).toString('hex');
     const resetExpires = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes
 

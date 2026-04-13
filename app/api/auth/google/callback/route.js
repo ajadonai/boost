@@ -90,6 +90,9 @@ export async function GET(req) {
       if (user.status === 'Deleted') {
         return NextResponse.redirect(`${APP_URL}/?error=google_account_deleted`);
       }
+      if (user.status === 'PendingDeletion') {
+        return NextResponse.redirect(`${APP_URL}/?error=account_pending_deletion`);
+      }
 
       // If not yet verified, auto-verify (Google already confirmed the email)
       if (!user.emailVerified) {

@@ -40,9 +40,10 @@ export async function POST(req) {
     ]);
 
     // Count user stats for admin email
-    const [orderCount, totalSpent] = await Promise.all([
+    const [orderCount, totalSpent, activeOrderCount] = await Promise.all([
       prisma.order.count({ where: { userId: user.id } }),
       prisma.transaction.aggregate({ where: { userId: user.id, type: 'order' }, _sum: { amount: true } }),
+      prisma.order.count({ where: { userId: user.id, status: { in: ['Pending', 'Processing'] } } }),
     ]);
 
     // Send data dump email to accounts@nitro.ng
@@ -59,7 +60,9 @@ export async function POST(req) {
             <tr><td style="color: #999; padding: 6px 0;">Email</td><td style="text-align: right; padding: 6px 0; font-weight: 600; color: #1a1a1a;">${user.email}</td></tr>
             <tr><td style="color: #999; padding: 6px 0;">Balance</td><td style="text-align: right; padding: 6px 0; font-weight: 600; color: #059669;">₦${(user.balance / 100).toLocaleString()}</td></tr>
             <tr><td style="color: #999; padding: 6px 0;">Total Orders</td><td style="text-align: right; padding: 6px 0; font-weight: 600; color: #1a1a1a;">${orderCount}</td></tr>
+            <tr><td style="color: #999; padding: 6px 0;">Active Orders</td><td style="text-align: right; padding: 6px 0; font-weight: 600; color: ${activeOrderCount > 0 ? '#dc2626' : '#1a1a1a'};">${activeOrderCount}${activeOrderCount > 0 ? ' ⚠️' : ''}</td></tr>
             <tr><td style="color: #999; padding: 6px 0;">Total Spent</td><td style="text-align: right; padding: 6px 0; font-weight: 600; color: #1a1a1a;">₦${((totalSpent._sum.amount || 0) / 100).toLocaleString()}</td></tr>
+            <tr><td style="color: #999; padding: 6px 0;">Referral Code</td><td style="text-align: right; padding: 6px 0; font-family: monospace; font-size: 12px; color: #666;">${user.referralCode || 'None'}</td></tr>
             <tr><td style="color: #999; padding: 6px 0;">User ID</td><td style="text-align: right; padding: 6px 0; font-family: monospace; font-size: 12px; color: #666;">${user.id}</td></tr>
             <tr><td style="color: #999; padding: 6px 0;">Signed Up</td><td style="text-align: right; padding: 6px 0; color: #1a1a1a;">${user.createdAt.toLocaleDateString('en-NG')}</td></tr>
           </table>
