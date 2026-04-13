@@ -124,6 +124,19 @@ export default function OrderTour({ dark, onComplete, setSelSvc, setSelTier, set
     return () => { if (tab) tab.classList.remove("tour-nav-ring"); };
   }, [visible, phase]);
 
+  // Raise order modal/form above tour overlay for steps 3-5
+  useEffect(() => {
+    if (phase !== "touring" || !visible || step < 2) return;
+    const modal = document.querySelector(".no-modal-overlay");
+    const sidebar = document.querySelector(".no-form-wrap, .dash-right");
+    if (modal) modal.style.zIndex = "101";
+    if (sidebar) sidebar.style.zIndex = "101";
+    return () => {
+      if (modal) modal.style.zIndex = "";
+      if (sidebar) sidebar.style.zIndex = "";
+    };
+  }, [step, phase, visible]);
+
   if (!visible) return null;
 
   const accent = "#c47d8e";
