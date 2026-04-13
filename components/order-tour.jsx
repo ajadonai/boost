@@ -196,7 +196,7 @@ export default function OrderTour({ dark, onComplete, setSelSvc, setSelTier, set
 
       {/* TOUR STEP */}
       {phase === "touring" && (
-        <div style={{
+        <div data-tour-tooltip style={{
           position: "fixed", zIndex: 101, left: "50%", bottom: 90,
           transform: "translateX(-50%)", animation: "otFadeIn 0.3s ease",
           background: bg, border: `1.5px solid ${border}`, borderRadius: 14,
