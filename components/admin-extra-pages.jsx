@@ -47,7 +47,7 @@ export function AdminActivityPage({ dark, t }) {
         <div className="page-divider" style={{ background: t.cardBorder }} />
       </div>
 
-      <div className="adm-filters">
+      <div className="adm-filters" style={{ display: "flex", justifyContent: "flex-end" }}>
         <select value={filter} onChange={e => setFilter(e.target.value)} style={{
           padding: "7px 28px 7px 10px", borderRadius: 8, fontSize: 13, fontWeight: 500,
           background: dark ? "rgba(255,255,255,.04)" : "rgba(0,0,0,.03)",
@@ -450,16 +450,18 @@ export function AdminCouponsPage({ dark, t }) {
   return (
     <>
       <div className="adm-header">
-        <div className="adm-title" style={{ color: t.text }}>Rewards</div>
-        <div className="adm-subtitle" style={{ color: t.textMuted }}>Manage referrals, coupons, and loyalty program</div>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 10 }}>
+          <div>
+            <div className="adm-title" style={{ color: t.text }}>Rewards</div>
+            <div className="adm-subtitle" style={{ color: t.textMuted }}>Manage referrals, coupons, and loyalty program</div>
+          </div>
+          <div style={{ display: "flex", gap: 4 }}>
+            {[["referrals", "Referrals"], ["coupons", "Coupons"], ["loyalty", "Loyalty"]].map(([id, label]) => (
+              <button key={id} onClick={() => setRewardsTab(id)} style={{ padding: "8px 20px", borderRadius: 8, fontSize: 13, fontWeight: rewardsTab === id ? 600 : 400, background: rewardsTab === id ? (dark ? "rgba(196,125,142,.12)" : "rgba(196,125,142,.08)") : "transparent", color: rewardsTab === id ? t.accent : t.textMuted, border: `1px solid ${rewardsTab === id ? (dark ? "rgba(196,125,142,.2)" : "rgba(196,125,142,.15)") : "transparent"}`, cursor: "pointer", fontFamily: "inherit" }}>{label}</button>
+            ))}
+          </div>
+        </div>
         <div className="page-divider" style={{ background: t.cardBorder }} />
-      </div>
-
-      {/* ═══ TABS ═══ */}
-      <div style={{ display: "flex", gap: 4, marginBottom: 20 }}>
-        {[["referrals", "Referrals"], ["coupons", "Coupons"], ["loyalty", "Loyalty"]].map(([id, label]) => (
-          <button key={id} onClick={() => setRewardsTab(id)} style={{ padding: "8px 20px", borderRadius: 8, fontSize: 13, fontWeight: rewardsTab === id ? 600 : 400, background: rewardsTab === id ? (dark ? "rgba(196,125,142,.12)" : "rgba(196,125,142,.08)") : "transparent", color: rewardsTab === id ? t.accent : t.textMuted, border: `1px solid ${rewardsTab === id ? (dark ? "rgba(196,125,142,.2)" : "rgba(196,125,142,.15)") : "transparent"}`, cursor: "pointer", fontFamily: "inherit" }}>{label}</button>
-        ))}
       </div>
 
       {/* ═══ REFERRAL TAB ═══ */}

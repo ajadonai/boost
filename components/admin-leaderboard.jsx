@@ -115,8 +115,17 @@ export default function AdminLeaderboardPage({ dark, t }) {
   return (
     <div style={{ padding: "24px", maxWidth: 900 }}>
       <div style={{ marginBottom: 20 }}>
-        <div style={{ fontSize: 22, fontWeight: 600, color: t.text, marginBottom: 2 }}>Leaderboard</div>
-        <div style={{ fontSize: 14, color: t.textMuted }}>Top users · {periodLabel}</div>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 10 }}>
+          <div>
+            <div style={{ fontSize: 22, fontWeight: 600, color: t.text, marginBottom: 2 }}>Leaderboard</div>
+            <div style={{ fontSize: 14, color: t.textMuted }}>Top users · {periodLabel}</div>
+          </div>
+          <div style={{ display: "flex", gap: 4 }}>
+            {TABS.map(tb => (
+              <button key={tb.id} onClick={() => { setTab(tb.id); clearSel(); }} style={{ padding: "8px 20px", borderRadius: 8, fontSize: 13, fontWeight: tab === tb.id ? 600 : 400, background: tab === tb.id ? (dark ? "rgba(196,125,142,.12)" : "rgba(196,125,142,.08)") : "transparent", color: tab === tb.id ? t.accent : t.textMuted, border: `1px solid ${tab === tb.id ? (dark ? "rgba(196,125,142,.2)" : "rgba(196,125,142,.15)") : "transparent"}`, cursor: "pointer", fontFamily: "inherit" }}>{tb.label}</button>
+            ))}
+          </div>
+        </div>
         <div className="page-divider" style={{ background: t.cardBorder, marginTop: 12 }} />
       </div>
 
@@ -161,13 +170,6 @@ export default function AdminLeaderboardPage({ dark, t }) {
             </div>
           </div>
         )}
-      </div>
-
-      {/* Tabs */}
-      <div style={{ display: "flex", gap: 4, marginBottom: 16 }}>
-        {TABS.map(tb => (
-          <button key={tb.id} onClick={() => { setTab(tb.id); clearSel(); }} style={{ padding: "8px 20px", borderRadius: 8, fontSize: 13, fontWeight: tab === tb.id ? 600 : 400, background: tab === tb.id ? (dark ? "rgba(196,125,142,.12)" : "rgba(196,125,142,.08)") : "transparent", color: tab === tb.id ? t.accent : t.textMuted, border: `1px solid ${tab === tb.id ? (dark ? "rgba(196,125,142,.2)" : "rgba(196,125,142,.15)") : "transparent"}`, cursor: "pointer", fontFamily: "inherit" }}>{tb.label}</button>
-        ))}
       </div>
 
       {/* Time + mass actions */}
