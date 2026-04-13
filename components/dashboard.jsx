@@ -8,6 +8,7 @@ import { ConfirmProvider } from "./confirm-dialog";
 import AnnouncementBanner from "./announcement-banner";
 import { PlatformIcon } from "./platform-icon";
 import { fN, fD } from "../lib/format";
+import TourGuide, { shouldShowTour } from "./tour-guide";
 
 /* Dynamic imports — only load when user navigates to that page */
 const OrdersPage = dynamic(() => import("./orders-page").then(m => m.default), { ssr: false });
@@ -403,6 +404,7 @@ function DashboardInner() {
   }, []);
   const [leftOpen, setLeftOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
+  const [showTour, setShowTour] = useState(false);
   const bottomNavRef = useRef(null);
   const [notifOpen, setNotifOpen] = useState(false);
   const [readNotifIds, setReadNotifIds] = useState(() => {
@@ -538,7 +540,7 @@ function DashboardInner() {
         } catch {}
       } catch { setUser({ name: "User", email: "", balance: 0, refCode: "—", refs: 0, earnings: 0 }); }
     }
-    load();
+    load().then(() => { if (shouldShowTour()) setShowTour(true); });
   }, []);
 
   /* Smart polling — refresh data every 45s, pause when tab is hidden */
@@ -793,7 +795,7 @@ function DashboardInner() {
               {NAV_ITEMS.map(item => {
                 const processingCount = item.id === "orders" ? orders.filter(o => o.status === "Processing" || o.status === "Pending").length : 0;
                 return (
-                  <button key={item.id} onClick={() => { setActive(item.id); setLeftOpen(false); }} className="dash-nav-item" style={{ background: active === item.id ? t.navActive : "transparent", color: active === item.id ? t.accent : t.textSoft, fontWeight: active === item.id ? 600 : 450 }}>
+                  <button key={item.id} data-nav={item.id} onClick={() => { setActive(item.id); setLeftOpen(false); }} className="dash-nav-item" style={{ background: active === item.id ? t.navActive : "transparent", color: active === item.id ? t.accent : t.textSoft, fontWeight: active === item.id ? 600 : 450 }}>
                     <span style={{ opacity: active === item.id ? 1 : .6, flexShrink: 0 }}>{I[item.id]}</span>
                     {item.label}
                     {processingCount > 0 && <span className="m dash-nav-badge">{processingCount > 9 ? "9+" : processingCount}</span>}
@@ -902,6 +904,9 @@ function DashboardInner() {
           )}
         </aside>
       </div>
+
+      {/* ═══ TOUR GUIDE ═══ */}
+      {showTour && <TourGuide dark={dark} onComplete={() => setShowTour(false)} />}
 
       {/* ═══ MOBILE BOTTOM NAV ═══ */}
       {moreOpen && <div className="dash-more-overlay" onClick={() => setMoreOpen(false)} />}

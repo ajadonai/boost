@@ -1739,3 +1739,11 @@ input { font-family: inherit; }
   .fin-table-row > div { text-align: left !important; }
   .fin-table-row > div:first-child { width: 100%; font-size: 14px !important; margin-bottom: 2px; }
 }
+
+/* ═══ TOUR GUIDE ═══ */
+@media (min-width: 1200px) {
+  .tour-tooltip { left: 260px !important; bottom: auto !important; top: 50% !important; transform: translateY(-50%) !important; }
+}
+@media (min-width: 768px) and (max-width: 1199px) {
+  .tour-tooltip { left: 50% !important; bottom: 40px !important; }
+}
