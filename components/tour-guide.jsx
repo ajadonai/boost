@@ -1,27 +1,35 @@
 'use client';
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 
 const STEPS = [
   {
     page: "add-funds",
+    sidebarId: "add-funds",
+    bottomId: "add-funds",
     title: "Fund your wallet",
     desc: "This is where you add money to your account. We support bank transfers and card payments.",
     icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 10h20"/><circle cx="16" cy="15" r="1.5"/></svg>,
   },
   {
     page: "services",
+    sidebarId: "services",
+    bottomId: "services",
     title: "Browse & order",
     desc: "Pick a platform, choose your service tier, enter your link and quantity — and place your order.",
     icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14"/></svg>,
   },
   {
     page: "orders",
+    sidebarId: "orders",
+    bottomId: "orders",
     title: "Track your orders",
     desc: "All your orders show up here with real-time status updates. Processing starts within seconds.",
     icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>,
   },
   {
     page: "support",
+    sidebarId: "support",
+    bottomId: "more",
     mobileAction: "openMore",
     title: "Need help?",
     desc: "Our support team is here for you. Create a ticket anytime — we respond fast.",
@@ -33,6 +41,8 @@ export default function TourGuide({ dark, onComplete, onNavigate, onOpenMore }) 
   const [phase, setPhase] = useState("welcome");
   const [step, setStep] = useState(0);
   const [visible, setVisible] = useState(false);
+  const [spotRect, setSpotRect] = useState(null);
+  const rafRef = useRef(null);
 
   useEffect(() => {
     const timer = setTimeout(() => setVisible(true), 500);
@@ -73,37 +83,44 @@ export default function TourGuide({ dark, onComplete, onNavigate, onOpenMore }) 
     }
   };
 
-  // Highlight nav items
+  // Track the spotlight target element position
   useEffect(() => {
-    if (phase !== "touring" || !visible) return;
-    const s = STEPS[step];
-    const mobile = isMobile();
+    if (phase !== "touring" || !visible) { setSpotRect(null); return; }
 
-    const sidebarItem = document.querySelector(`[data-nav="${s.page}"]`);
-    const bottomId = (mobile && s.mobileAction === "openMore") ? "more" : s.page;
-    const bottomItem = document.querySelector(`[data-tab="${bottomId}"]`);
+    const updateRect = () => {
+      const s = STEPS[step];
+      const mobile = isMobile();
+      // Find the target element
+      let el = null;
+      if (mobile) {
+        if (s.mobileAction === "openMore") {
+          // Find support inside More popup
+          el = [...document.querySelectorAll(".dash-more-item")].find(e => e.textContent?.includes("Support"));
+          if (!el) el = document.querySelector(`[data-tab="${s.bottomId}"]`);
+        } else {
+          el = document.querySelector(`[data-tab="${s.bottomId}"]`);
+        }
+      } else {
+        el = document.querySelector(`[data-nav="${s.sidebarId}"]`);
+      }
 
-    sidebarItem?.classList.add("tour-highlight");
-    bottomItem?.classList.add("tour-highlight");
+      if (el) {
+        const r = el.getBoundingClientRect();
+        setSpotRect({ x: r.left, y: r.top, w: r.width, h: r.height });
+      } else {
+        setSpotRect(null);
+      }
+      rafRef.current = requestAnimationFrame(updateRect);
+    };
 
-    // Highlight support inside More popup on mobile
-    let moreItem = null;
-    if (mobile && s.mobileAction === "openMore") {
-      const timer = setTimeout(() => {
-        moreItem = [...document.querySelectorAll(".dash-more-item")].find(el => el.textContent?.includes("Support"));
-        moreItem?.classList.add("tour-highlight");
-      }, 150);
-      return () => {
-        clearTimeout(timer);
-        sidebarItem?.classList.remove("tour-highlight");
-        bottomItem?.classList.remove("tour-highlight");
-        moreItem?.classList.remove("tour-highlight");
-      };
-    }
+    // Small delay for DOM to settle after navigation
+    const timer = setTimeout(() => {
+      updateRect();
+    }, 200);
 
     return () => {
-      sidebarItem?.classList.remove("tour-highlight");
-      bottomItem?.classList.remove("tour-highlight");
+      clearTimeout(timer);
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
   }, [step, phase, visible]);
 
@@ -117,34 +134,46 @@ export default function TourGuide({ dark, onComplete, onNavigate, onOpenMore }) 
   const skipC = dark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.3)";
   const dotOff = dark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.1)";
 
-  const tooltipBase = {
-    position: "fixed", zIndex: 53,
-    background: bg, border: `1.5px solid ${border}`, borderRadius: 16,
-    padding: "22px 24px", maxWidth: 360, width: "calc(100% - 32px)",
-    boxShadow: dark ? "0 12px 40px rgba(0,0,0,0.5)" : "0 12px 40px rgba(0,0,0,0.12)",
-    animation: "tourFadeIn 0.3s ease",
-    left: "50%", transform: "translateX(-50%)",
-  };
+  const pad = 6;
+  const sr = spotRect;
 
   return (
     <>
       <style>{`
         @keyframes tourFadeIn { from { opacity: 0; transform: translateX(-50%) translateY(8px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
-        @keyframes tourPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(196,125,142,0.4); } 70% { box-shadow: 0 0 0 8px rgba(196,125,142,0); } }
-        .tour-highlight { position: relative; z-index: 52 !important; animation: tourPulse 2s ease-in-out infinite; border-radius: 8px; }
+        @keyframes tourWelcomeFadeIn { from { opacity: 0; transform: translate(-50%, -48%); } to { opacity: 1; transform: translate(-50%, -50%); } }
+        @keyframes tourGlow { 0%,100% { opacity: 0.4; } 50% { opacity: 0.8; } }
       `}</style>
 
-      {/* Overlay */}
-      <div onClick={finish} style={{
-        position: "fixed", inset: 0, zIndex: 50,
-        background: phase === "welcome" ? "rgba(0,0,0,0.6)" : "rgba(0,0,0,0.4)",
-        backdropFilter: phase === "welcome" ? "blur(4px)" : "blur(1px)",
-        transition: "all 0.3s",
-      }} />
+      {/* ═══ OVERLAY WITH SPOTLIGHT CUTOUT ═══ */}
+      <svg onClick={finish} style={{ position: "fixed", inset: 0, width: "100%", height: "100%", zIndex: 50 }}>
+        <defs>
+          <mask id="tourSpotMask">
+            <rect width="100%" height="100%" fill="white" />
+            {phase === "touring" && sr && (
+              <rect x={sr.x - pad} y={sr.y - pad} width={sr.w + pad * 2} height={sr.h + pad * 2} rx="10" fill="black" />
+            )}
+          </mask>
+        </defs>
+        <rect width="100%" height="100%" fill={phase === "welcome" ? "rgba(0,0,0,0.65)" : "rgba(0,0,0,0.55)"} mask="url(#tourSpotMask)" style={{ backdropFilter: phase === "welcome" ? "blur(4px)" : "blur(1px)" }} />
+        {/* Glow ring around spotlight */}
+        {phase === "touring" && sr && (
+          <rect x={sr.x - pad} y={sr.y - pad} width={sr.w + pad * 2} height={sr.h + pad * 2} rx="10" fill="none" stroke={accent} strokeWidth="2.5">
+            <animate attributeName="opacity" values="0.3;0.8;0.3" dur="2s" repeatCount="indefinite" />
+          </rect>
+        )}
+      </svg>
 
       {/* ═══ WELCOME ═══ */}
       {phase === "welcome" && (
-        <div className="tour-tooltip" style={{ ...tooltipBase, top: "50%", bottom: "auto", transform: "translate(-50%, -50%)", textAlign: "center" }}>
+        <div style={{
+          position: "fixed", zIndex: 53, top: "50%", left: "50%",
+          transform: "translate(-50%, -50%)", textAlign: "center",
+          background: bg, border: `1.5px solid ${border}`, borderRadius: 16,
+          padding: "28px 28px 24px", maxWidth: 360, width: "calc(100% - 32px)",
+          boxShadow: dark ? "0 12px 40px rgba(0,0,0,0.5)" : "0 12px 40px rgba(0,0,0,0.12)",
+          animation: "tourWelcomeFadeIn 0.3s ease",
+        }}>
           <div style={{ width: 48, height: 48, borderRadius: 14, background: "linear-gradient(135deg, #c47d8e, #8b5e6b)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", fontSize: 22, fontWeight: 700, color: "#fff" }}>N</div>
           <div style={{ fontSize: 20, fontWeight: 700, color: text, marginBottom: 6 }}>Welcome to Nitro!</div>
           <div style={{ fontSize: 14, lineHeight: 1.6, color: sub, marginBottom: 24 }}>Let us show you around. It only takes a few seconds.</div>
@@ -157,7 +186,14 @@ export default function TourGuide({ dark, onComplete, onNavigate, onOpenMore }) 
 
       {/* ═══ TOUR STEP ═══ */}
       {phase === "touring" && (
-        <div className="tour-tooltip" style={{ ...tooltipBase, bottom: 90 }}>
+        <div className="tour-tooltip" style={{
+          position: "fixed", zIndex: 53,
+          background: bg, border: `1.5px solid ${border}`, borderRadius: 16,
+          padding: "22px 24px", maxWidth: 360, width: "calc(100% - 32px)",
+          boxShadow: dark ? "0 12px 40px rgba(0,0,0,0.5)" : "0 12px 40px rgba(0,0,0,0.12)",
+          animation: "tourFadeIn 0.3s ease",
+          left: "50%", bottom: 90, transform: "translateX(-50%)",
+        }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
             <div style={{ width: 36, height: 36, borderRadius: 10, background: dark ? "rgba(196,125,142,0.1)" : "rgba(196,125,142,0.06)", display: "flex", alignItems: "center", justifyContent: "center", color: accent }}>{STEPS[step].icon}</div>
             <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", color: accent }}>Step {step + 1} of {STEPS.length}</span>
