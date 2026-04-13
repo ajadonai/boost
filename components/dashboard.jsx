@@ -948,7 +948,7 @@ function DashboardInner() {
             }
             if (item.id === "logout") {
               return (
-                <button key={item.id} onClick={() => { setMoreOpen(false); handleLogout(); }} className="dash-more-item" style={{ background: dark ? "rgba(220,38,38,.06)" : "rgba(220,38,38,.03)", color: dark ? "#fca5a5" : "#dc2626", fontWeight: 500 }}>
+                <button key={item.id} onClick={() => { setMoreOpen(false); handleLogout(); }} className="dash-more-item" style={{ background: dark ? "rgba(220,38,38,.06)" : "rgba(220,38,38,.03)", color: dark ? "#fca5a5" : "#dc2626", fontWeight: 500, gridColumn: "1 / -1", justifyContent: "center" }}>
                   <div className="dash-more-item-icon" style={{ background: dark ? "rgba(220,38,38,.1)" : "rgba(220,38,38,.06)", color: dark ? "#fca5a5" : "#dc2626" }}>{I[item.id]}</div>
                   {item.label}
                 </button>

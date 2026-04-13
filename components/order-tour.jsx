@@ -57,40 +57,19 @@ export default function OrderTour({ dark, onComplete, setSelSvc, setSelTier, set
     const s = STEPS[idx];
 
     if (s.before === "selectService") {
-      // Wait for service cards to exist, then click the first one
-      waitForEl(".no-svc-card", (card) => {
-        card.click();
-        // Wait for tier chips to render after selection
-        waitForEl(".no-tier-chip", () => {
-          setStep(idx);
-        });
+      window.dispatchEvent(new CustomEvent("nitro-tour-select-service"));
+      // Wait for tier chips to render
+      waitForEl(".no-tier-chip", () => {
+        setStep(idx);
       });
       return;
     }
 
     if (s.before === "selectTier") {
-      waitForEl(".no-tier-chip", (chip) => {
-        chip.click();
-        // Wait for the form to appear (desktop: sidebar, mobile: need modal)
-        const checkForm = () => {
-          waitForEl('[data-tour="no-link-input"]', () => {
-            setStep(idx);
-          }, 2000);
-        };
-        // On mobile, the modal needs to open — pickTier sets orderModal(true)
-        // but if it didn't work, try clicking the bar button
-        if (window.innerWidth < 1200) {
-          setTimeout(() => {
-            const form = document.querySelector('[data-tour="no-link-input"]');
-            if (!form) {
-              const modalBtn = document.querySelector(".no-bar-btn");
-              if (modalBtn) modalBtn.click();
-            }
-            setTimeout(checkForm, 200);
-          }, 400);
-        } else {
-          setTimeout(checkForm, 300);
-        }
+      window.dispatchEvent(new CustomEvent("nitro-tour-select-tier"));
+      // Wait for form to appear
+      waitForEl('[data-tour="no-link-input"]', () => {
+        setStep(idx);
       });
       return;
     }

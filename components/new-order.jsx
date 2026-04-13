@@ -300,7 +300,30 @@ export default function NewOrderPage({ dark, t, user, onOrderSuccess, platform, 
     }
     else { setSelSvc(svc); setSelTier(null); }
   };
-  const pickTier = (tier, e) => { e.stopPropagation(); e.preventDefault(); setSelTier(tier); setQty(tier.min || 100); setOrderModal(true); };
+  const pickTier = (tier, e) => { if (e?.stopPropagation) e.stopPropagation(); if (e?.preventDefault) e.preventDefault(); setSelTier(tier); setQty(tier.min || 100); setOrderModal(true); };
+
+  // Tour integration — listen for tour events to auto-select service/tier
+  useEffect(() => {
+    const handleSelectService = () => {
+      const svc = services[0];
+      if (svc) { setSelSvc(svc); setSelTier(null); }
+    };
+    const handleSelectTier = () => {
+      const svc = selSvc || services[0];
+      if (svc && svc.tiers?.[0]) {
+        if (!selSvc) setSelSvc(svc);
+        setSelTier(svc.tiers[0]);
+        setQty(svc.tiers[0].min || 100);
+        setOrderModal(true);
+      }
+    };
+    window.addEventListener("nitro-tour-select-service", handleSelectService);
+    window.addEventListener("nitro-tour-select-tier", handleSelectTier);
+    return () => {
+      window.removeEventListener("nitro-tour-select-service", handleSelectService);
+      window.removeEventListener("nitro-tour-select-tier", handleSelectTier);
+    };
+  }, [services, selSvc]);
 
   /* Place order */
   const submitOrder = async () => {
