@@ -148,7 +148,7 @@ export async function POST(req) {
         });
       });
 
-      await logActivity(admin.id, 'leaderboard_reward', `Rewarded ${user.name || user.email} with ₦${amount.toLocaleString()}`);
+      await logActivity(admin.name, `Rewarded ${user.name || user.email} with ₦${amount.toLocaleString()}`, 'reward');
 
       // Email notification
       if (user.email) {
@@ -177,7 +177,7 @@ export async function POST(req) {
         update: { value },
         create: { key: 'leaderboard_reward_announcement', value },
       });
-      await logActivity(admin.id, 'leaderboard_announcement', `Updated leaderboard announcement`);
+      await logActivity(admin.name, `Updated leaderboard announcement`, 'reward');
       return Response.json({ success: true });
     }
 
@@ -189,7 +189,7 @@ export async function POST(req) {
         update: { value },
         create: { key: 'leaderboard_auto_reward', value },
       });
-      await logActivity(admin.id, 'auto_reward_config', `Updated auto-reward config`);
+      await logActivity(admin.name, `Updated auto-reward config`, 'reward');
       return Response.json({ success: true });
     }
 

@@ -19,7 +19,7 @@ export function AdminActivityPage({ dark, t }) {
     fetch("/api/admin/activity").then(r => r.json()).then(d => { setLogs(d.activity || []); setLoading(false); }).catch(() => setLoading(false));
   }, []);
 
-  const typeLabels = { user: "Users", order: "Orders", alert: "Alerts", blog: "Blog", coupon: "Coupons", settings: "Settings", service: "Services", payment: "Payments", leaderboard_reward: "Rewards", leaderboard_announcement: "Rewards", auto_reward_config: "Rewards", team: "Team" };
+  const typeLabels = { user: "Users", order: "Orders", alert: "Alerts", blog: "Blog", coupon: "Coupons", settings: "Settings", service: "Services", payment: "Payments", reward: "Rewards", leaderboard_reward: "Rewards", leaderboard_announcement: "Rewards", auto_reward_config: "Rewards", team: "Team", admin: "Admin", ticket: "Tickets", maintenance: "Maintenance" };
   const groupedTypes = {};
   logs.forEach(l => { const label = typeLabels[l.type] || (l.type ? l.type.charAt(0).toUpperCase() + l.type.slice(1) : "Other"); groupedTypes[label] = (groupedTypes[label] || 0) + 1; });
   const typeEntries = Object.entries(groupedTypes).sort((a, b) => b[1] - a[1]);
