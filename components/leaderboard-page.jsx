@@ -175,6 +175,12 @@ export default function LeaderboardPage({ dark, t }) {
         </details>
       )}
 
+      <div style={{ fontSize: 12, color: t.textMuted, marginBottom: 12, fontStyle: "italic" }}>
+        {tab === "spenders" && "Ranked by total amount spent, not number of orders placed."}
+        {tab === "referrers" && "Ranked by number of successful referrals who signed up and verified their account."}
+        {tab === "active" && "Ranked by total number of orders placed within the selected period."}
+      </div>
+
       {loading ? (
         <div>
           <div style={{ display: "flex", gap: 4, marginBottom: 16 }}>{[1,2].map(i => <div key={i} className={`skel-bone ${dark ? "skel-dark" : "skel-light"}`} style={{ height: 30, width: 90, borderRadius: 20 }} />)}</div>
