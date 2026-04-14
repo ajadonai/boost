@@ -121,36 +121,38 @@ export async function GET(req) {
     const orderCount = ordersAgg._count || 0;
     const refundRate = orderCount > 0 ? Math.round(((cancelledAgg._count || 0) / (orderCount + (cancelledAgg._count || 0))) * 1000) / 10 : 0;
 
+    const k = (v) => Math.round((v || 0) / 100); // kobo to naira
+
     return Response.json({
       range,
       filters: { platform, tier, provider },
       profitability: {
-        grossRevenue, totalRefunds, netRevenue, totalCost, grossProfit,
+        grossRevenue: k(grossRevenue), totalRefunds: k(totalRefunds), netRevenue: k(netRevenue), totalCost: k(totalCost), grossProfit: k(grossProfit),
         margin: netRevenue > 0 ? Math.round((grossProfit / netRevenue) * 1000) / 10 : 0,
-        profitPerOrder: orderCount > 0 ? Math.round(grossProfit / orderCount) : 0,
+        profitPerOrder: orderCount > 0 ? k(Math.round(grossProfit / orderCount)) : 0,
         orderCount, refundRate,
       },
       moneyIn: {
-        deposits: depositsAgg._sum.amount || 0,
-        couponBonuses: couponBonusAgg._sum.amount || 0,
-        adminCredits: adminCreditAgg._sum.amount || 0,
-        referralBonuses: referralBonusAgg._sum.amount || 0,
+        deposits: k(depositsAgg._sum.amount),
+        couponBonuses: k(couponBonusAgg._sum.amount),
+        adminCredits: k(adminCreditAgg._sum.amount),
+        referralBonuses: k(referralBonusAgg._sum.amount),
       },
       moneyOut: {
-        providerCosts: totalCost,
-        refunds: totalRefunds,
-        referralBonuses: referralBonusAgg._sum.amount || 0,
+        providerCosts: k(totalCost),
+        refunds: k(totalRefunds),
+        referralBonuses: k(referralBonusAgg._sum.amount),
       },
       liability: {
-        walletBalances: walletLiability._sum.balance || 0,
+        walletBalances: k(walletLiability._sum.balance),
         walletUsers: walletLiability._count || 0,
       },
-      byPlatform: byPlatform.slice(0, 10),
-      byTier,
+      byPlatform: byPlatform.map(p => ({ ...p, revenue: k(p.revenue), cost: k(p.cost), profit: k(p.profit) })).slice(0, 10),
+      byTier: byTier.map(t => ({ ...t, revenue: k(t.revenue), cost: k(t.cost), profit: k(t.profit) })),
       topSpenders: topSpenders.map(s => ({
         name: userMap[s.userId]?.name || 'Unknown',
         email: userMap[s.userId]?.email || '',
-        spent: s._sum.charge || 0,
+        spent: k(s._sum.charge),
         orders: s._count,
       })),
     });
