@@ -313,7 +313,7 @@ function NotifDropdown({ orders, txs, dark, t, onClose, readIds, setReadIds, cle
     if (clearedIds.has(n.id)) return false;
     if (notifClearedAt && n.ts && n.ts <= notifClearedAt) return false;
     return true;
-  });
+  }).sort((a, b) => (b.ts || 0) - (a.ts || 0));
   const filtered = filter === "all" ? items : items.filter(n => n.type === filter);
   const display = filtered.slice(0, 10);
   const hasMore = filtered.length > 10;
