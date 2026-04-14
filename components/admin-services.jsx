@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from "react";
 import { useConfirm } from "./confirm-dialog";
+import { useToast } from "./toast";
 import { fN } from "../lib/format";
 
 
@@ -12,6 +13,7 @@ const TIER_COLORS = {
 
 export default function AdminServicesPage({ dark, t }) {
   const confirm = useConfirm();
+  const toast = useToast();
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -48,7 +50,7 @@ export default function AdminServicesPage({ dark, t }) {
 
   const [editData, setEditData] = useState({});
   const [saving, setSaving] = useState(false);
-  const [msg, setMsg] = useState(null);
+  
   const [syncing, setSyncing] = useState(false);
 
   const toggleEnabled = async (id, enabled) => {
@@ -57,25 +59,25 @@ export default function AdminServicesPage({ dark, t }) {
       const data = await res.json();
       if (res.ok) {
         setServices(prev => prev.map(s => s.id === id ? { ...s, enabled: data.enabled } : s));
-        if (data.cascaded) setMsg({ type: "success", text: data.message });
+        if (data.cascaded) toast.success("Done", data.message);
       }
     } catch {}
   };
 
   const syncEnable = async () => {
-    setSyncing(true); setMsg(null);
+    setSyncing(true); 
     try {
       const res = await fetch("/api/admin/services", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "sync-enable" }) });
       const data = await res.json();
       if (res.ok) {
-        setMsg({ type: "success", text: data.message });
+        toast.success("Done", data.message);
         // Refresh list
         const r = await fetch("/api/admin/services");
         if (r.ok) { const d = await r.json(); setServices(d.services || []); }
       } else {
-        setMsg({ type: "error", text: data.error || "Sync failed" });
+        toast.error("Sync failed", data.error || "Sync failed");
       }
-    } catch { setMsg({ type: "error", text: "Request failed" }); }
+    } catch { toast.error("Request failed", "Check your connection"); }
     setSyncing(false);
   };
 
@@ -85,18 +87,18 @@ export default function AdminServicesPage({ dark, t }) {
   };
 
   const saveEdit = async (id) => {
-    setSaving(true); setMsg(null);
+    setSaving(true); 
     try {
       const res = await fetch("/api/admin/services", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "edit", serviceId: id, ...editData }) });
       const data = await res.json();
       if (res.ok) {
         setServices(prev => prev.map(s => s.id === id ? { ...s, ...data.service } : s));
         setEditMode(null);
-        setMsg({ type: "success", text: "Service updated" });
+        toast.success("Saved", "Service updated");
       } else {
-        setMsg({ type: "error", text: data.error || "Failed to save" });
+        toast.error("Failed", data.error || "Failed to save");
       }
-    } catch { setMsg({ type: "error", text: "Request failed" }); }
+    } catch { toast.error("Request failed", "Check your connection"); }
     setSaving(false);
   };
 
@@ -109,15 +111,15 @@ export default function AdminServicesPage({ dark, t }) {
       if (res.ok) {
         if (data.deleted) {
           setServices(prev => prev.filter(x => x.id !== s.id));
-          setMsg({ type: "success", text: "Service deleted" });
+          toast.success("Deleted", "Service deleted");
         } else if (data.disabled) {
           setServices(prev => prev.map(x => x.id === s.id ? { ...x, enabled: false } : x));
-          setMsg({ type: "success", text: data.message });
+          toast.success("Done", data.message);
         }
       } else {
-        setMsg({ type: "error", text: data.error || "Failed to delete" });
+        toast.error("Failed", data.error || "Failed to delete");
       }
-    } catch { setMsg({ type: "error", text: "Request failed" }); }
+    } catch { toast.error("Request failed", "Check your connection"); }
   };
 
   return (
@@ -189,7 +191,6 @@ export default function AdminServicesPage({ dark, t }) {
         </select>
       </div>
 
-      {msg && <div style={{ padding: "10px 14px", borderRadius: 8, marginBottom: 12, background: msg.type === "success" ? (dark ? "rgba(110,231,183,.08)" : "#f0fdf4") : (dark ? "rgba(220,38,38,.08)" : "#fef2f2"), color: msg.type === "success" ? (dark ? "#6ee7b7" : "#059669") : (dark ? "#fca5a5" : "#dc2626"), fontSize: 13, display: "flex", justifyContent: "space-between", alignItems: "center" }}><span>{msg.text}</span><button onClick={() => setMsg(null)} style={{ background: "none", color: "inherit", fontSize: 15, border: "none", cursor: "pointer" }}>✕</button></div>}
 
       <div className="adm-card" style={{ background: dark ? "rgba(255,255,255,.03)" : "rgba(255,255,255,.85)", border: `0.5px solid ${dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)"}` }}>
         {loading ? (

@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect, useRef } from "react";
 import { useConfirm } from "./confirm-dialog";
+import { useToast } from "./toast";
 
 const DEF_BRACKETS = [
   { min: 0, max: 20, multiplier: 3, label: "Micro" },
@@ -71,6 +72,7 @@ function Row({ label, hint, children, dark }) {
 
 export default function AdminPricingPage({ dark, t }) {
   const confirm = useConfirm();
+  const toast = useToast();
   const [brackets, setBrackets] = useState(DEF_BRACKETS);
   const [floorPct, setFloorPct] = useState(50);
   const [floorCeiling, setFloorCeiling] = useState(5000);
@@ -79,7 +81,6 @@ export default function AdminPricingPage({ dark, t }) {
   const [tierMults, setTierMults] = useState({ Budget: 1.0, Standard: 1.15, Premium: 1.35 });
   const [saving, setSaving] = useState(false);
   const [recalcing, setRecalcing] = useState(false);
-  const [msg, setMsg] = useState(null);
   const [simCost, setSimCost] = useState(500);
 
   useEffect(() => {
@@ -102,21 +103,21 @@ export default function AdminPricingPage({ dark, t }) {
   const pack = () => ({ markup_brackets: JSON.stringify(brackets), markup_margin_floor: String(floorPct), markup_floor_ceiling: String(floorCeiling), markup_ng_bonus: String(ngBonus), markup_usd_rate: String(usdRate), markup_tier_multipliers: JSON.stringify(tierMults) });
 
   const save = async () => {
-    setSaving(true); setMsg(null);
-    try { const r = await fetch("/api/admin/settings", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ settings: pack() }) }); setMsg(r.ok ? { ok: 1, text: "Settings saved" } : { text: "Failed to save" }); } catch { setMsg({ text: "Request failed" }); }
+    setSaving(true);
+    try { const r = await fetch("/api/admin/settings", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ settings: pack() }) }); if (r.ok) toast.success("Settings saved", ""); else toast.error("Failed to save", ""); } catch { toast.error("Request failed", "Check your connection"); }
     setSaving(false);
   };
 
   const recalc = async () => {
     if (!await confirm({ title: "Recalculate All Prices", message: "This overwrites ALL existing tier sell prices with the current bracket formula. Custom prices will be replaced.", confirmLabel: "Recalculate All", danger: true })) return;
-    setRecalcing(true); setMsg(null);
+    setRecalcing(true);
     try { await fetch("/api/admin/settings", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ settings: pack() }) });
       const r = await fetch("/api/admin/service-groups", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "recalculate-prices" }) }); const d = await r.json();
-      setMsg(r.ok ? { ok: 1, text: `${d.updated || 0} prices recalculated` } : { text: d.error || "Failed" }); } catch { setMsg({ text: "Request failed" }); }
+      if (r.ok) toast.success("Prices recalculated", `${d.updated || 0} tiers updated`); else toast.error("Failed", d.error || ""); } catch { toast.error("Request failed", "Check your connection"); }
     setRecalcing(false);
   };
 
-  const reset = () => { setBrackets(DEF_BRACKETS); setFloorPct(50); setFloorCeiling(5000); setNgBonus(25); setUsdRate(1600); setMsg({ ok: 1, text: "Reset to defaults — not saved yet" }); };
+  const reset = () => { setBrackets(DEF_BRACKETS); setFloorPct(50); setFloorCeiling(5000); setNgBonus(25); setUsdRate(1600); toast.info("Reset to defaults", "Not saved yet"); };
 
   // Simulator
   const simSell = calcSell(simCost, brackets, floorPct, floorCeiling);
@@ -141,7 +142,6 @@ export default function AdminPricingPage({ dark, t }) {
         <div className="page-divider" style={{ background: t.cardBorder }} />
       </div>
 
-      {msg && <div style={{ padding: "8px 14px", borderRadius: 8, marginBottom: 16, fontSize: 13, background: msg.ok ? (dark ? "rgba(110,231,183,.08)" : "#ecfdf5") : (dark ? "rgba(220,38,38,.08)" : "#fef2f2"), color: msg.ok ? (dark ? "#6ee7b7" : "#059669") : (dark ? "#fca5a5" : "#dc2626"), display: "flex", justifyContent: "space-between", alignItems: "center" }}><span>{msg.ok ? "✓" : "⚠️"} {msg.text}</span><button onClick={() => setMsg(null)} style={{ background: "none", color: "inherit", border: "none", fontSize: 16, cursor: "pointer" }}>✕</button></div>}
 
       {/* ═══ BRACKETS ═══ */}
       <div className="adm-card" style={{ ...cardS, padding: 20, marginBottom: 16 }}>

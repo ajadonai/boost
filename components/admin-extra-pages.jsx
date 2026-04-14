@@ -121,6 +121,7 @@ const ACTION_GROUPS = [...new Set(GRANTABLE_ACTIONS.map(a => a.g))];
 
 export function AdminTeamPage({ admin: currentAdmin, dark, t }) {
   const confirm = useConfirm();
+  const toast = useToast();
   const parseActions = (str) => { try { return str ? JSON.parse(str) : []; } catch(e) { return []; } };
   const [admins, setAdmins] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -136,25 +137,24 @@ export function AdminTeamPage({ admin: currentAdmin, dark, t }) {
   const [localPages, setLocalPages] = useState(null);
   const [localActions, setLocalActions] = useState(null);
   const [saving, setSaving] = useState(false);
-  const [msg, setMsg] = useState(null);
 
   const reload = () => fetch("/api/admin/team").then(r => r.json()).then(d => setAdmins(d.admins || []));
   useEffect(() => { reload().finally(() => setLoading(false)); }, []);
 
   const act = async (body) => {
-    setSaving(true); setMsg(null);
+    setSaving(true); 
     try {
       const res = await fetch("/api/admin/team", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
       const data = await res.json();
-      if (!res.ok) { setMsg({ type: "error", text: data.error || "Failed" }); setSaving(false); return false; }
+      if (!res.ok) { toast.error("Failed", data.error || "Something went wrong"); setSaving(false); return false; }
       await reload(); setSaving(false); return data;
-    } catch { setMsg({ type: "error", text: "Request failed" }); setSaving(false); return false; }
+    } catch { toast.error("Request failed", "Check your connection"); setSaving(false); return false; }
   };
 
   const createAdmin = async () => {
     if (!newName.trim() || !newEmail.trim() || !newPw.trim()) return;
     const ok = await act({ action: "create", name: newName, email: newEmail, password: newPw, role: newRole });
-    if (ok) { setShowAdd(false); setNewName(""); setNewEmail(""); setNewPw(""); setMsg({ type: "success", text: "Admin created" }); }
+    if (ok) { setShowAdd(false); setNewName(""); setNewEmail(""); setNewPw(""); toast.success("Admin created", ""); }
   };
 
   const getEffective = (a) => {
@@ -181,7 +181,6 @@ export function AdminTeamPage({ admin: currentAdmin, dark, t }) {
         <div className="page-divider" style={{ background: t.cardBorder }} />
       </div>
 
-      {msg && <div style={{ padding: "8px 14px", borderRadius: 8, marginTop: 12, fontSize: 14, background: msg.type === "success" ? (dark ? "rgba(110,231,183,.08)" : "#ecfdf5") : (dark ? "rgba(220,38,38,.08)" : "#fef2f2"), color: msg.type === "success" ? (dark ? "#6ee7b7" : "#059669") : (dark ? "#fca5a5" : "#dc2626"), display: "flex", justifyContent: "space-between", alignItems: "center" }}><span>{msg.type === "success" ? "✓" : "⚠️"} {msg.text}</span><button onClick={() => setMsg(null)} style={{ background: "none", color: "inherit", border: "none", fontSize: 16, cursor: "pointer" }}>✕</button></div>}
 
       {showGuide && (
         <div className="adm-card" style={{ background: dark ? "rgba(255,255,255,.03)" : "rgba(255,255,255,.85)", border: `0.5px solid ${dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)"}`, padding: 18, marginTop: 16, marginBottom: 16, boxShadow: dark ? "0 4px 20px rgba(0,0,0,.25)" : "0 4px 20px rgba(0,0,0,.04)", borderRadius: 14 }}>
@@ -229,7 +228,7 @@ export function AdminTeamPage({ admin: currentAdmin, dark, t }) {
 
           return (
             <div key={a.id} style={{ borderBottom: i < admins.length - 1 ? `1px solid ${t.cardBorder}` : "none" }}>
-              <div onClick={() => { if (!owner && canManage) { if (expanded) { setExpandedId(null); } else { setExpandedId(a.id); setPermTab("permissions"); setResetPw(""); setLocalPages(null); setLocalActions(null); setMsg(null); } } }} style={{ padding: "12px 16px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, flexWrap: "wrap", cursor: owner || !canManage ? "default" : "pointer", background: expanded ? (dark ? "rgba(196,125,142,.03)" : "rgba(196,125,142,.02)") : "transparent" }}>
+              <div onClick={() => { if (!owner && canManage) { if (expanded) { setExpandedId(null); } else { setExpandedId(a.id); setPermTab("permissions"); setResetPw(""); setLocalPages(null); setLocalActions(null); } } }} style={{ padding: "12px 16px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, flexWrap: "wrap", cursor: owner || !canManage ? "default" : "pointer", background: expanded ? (dark ? "rgba(196,125,142,.03)" : "rgba(196,125,142,.02)") : "transparent" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 10, flex: 1, minWidth: 180 }}>
                   <div className="adm-user-avatar" style={{ background: ri.color }}>{(a.name || "A")[0]}</div>
                   <div>
@@ -261,7 +260,7 @@ export function AdminTeamPage({ admin: currentAdmin, dark, t }) {
                     <div>
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
                         <span style={{ fontSize: 13, color: t.textSoft }}>{pages.length} of {ALL_PAGES.length} pages enabled</span>
-                        {(localPages !== null || a.customPages !== null) && <button onClick={e => { e.stopPropagation(); setLocalPages(null); act({ action: "updatePermissions", adminId: a.id, pages: null }).then(() => setMsg({ type: "success", text: "Reset to default" })); }} style={{ fontSize: 12, color: t.textMuted, background: "none", border: "none", cursor: "pointer", textDecoration: "underline" }}>Reset to default</button>}
+                        {(localPages !== null || a.customPages !== null) && <button onClick={e => { e.stopPropagation(); setLocalPages(null); act({ action: "updatePermissions", adminId: a.id, pages: null }).then(() => toast.success("Reset to default", "")); }} style={{ fontSize: 12, color: t.textMuted, background: "none", border: "none", cursor: "pointer", textDecoration: "underline" }}>Reset to default</button>}
                       </div>
                       {PAGE_GROUPS.map(group => (
                         <div key={group} style={{ marginBottom: 12 }}>
@@ -310,7 +309,7 @@ export function AdminTeamPage({ admin: currentAdmin, dark, t }) {
                         ))}
                       </div>
 
-                      <button onClick={e => { e.stopPropagation(); const savePages = act({ action: "updatePermissions", adminId: a.id, pages: localPages || pages }); const saveActions = localActions !== null ? act({ action: "updateActions", adminId: a.id, actions: localActions }) : Promise.resolve(true); Promise.all([savePages, saveActions]).then(([p, ac]) => { if (p && ac !== false) { setMsg({ type: "success", text: "Permissions saved" }); setLocalPages(null); setLocalActions(null); } }); }} disabled={saving} className="adm-btn-primary" style={{ width: "100%", marginTop: 8, opacity: saving ? .5 : 1 }}>{saving ? "Saving..." : "Save Permissions"}</button>
+                      <button onClick={e => { e.stopPropagation(); const savePages = act({ action: "updatePermissions", adminId: a.id, pages: localPages || pages }); const saveActions = localActions !== null ? act({ action: "updateActions", adminId: a.id, actions: localActions }) : Promise.resolve(true); Promise.all([savePages, saveActions]).then(([p, ac]) => { if (p && ac !== false) { toast.success("Permissions saved", ""); setLocalPages(null); setLocalActions(null); } }); }} disabled={saving} className="adm-btn-primary" style={{ width: "100%", marginTop: 8, opacity: saving ? .5 : 1 }}>{saving ? "Saving..." : "Save Permissions"}</button>
                     </div>
                   ) : <div style={{ padding: "16px 0", textAlign: "center", color: t.textMuted, fontSize: 13 }}>Superadmin has full access. No customization needed.</div>)}
 
@@ -321,7 +320,7 @@ export function AdminTeamPage({ admin: currentAdmin, dark, t }) {
                         <label style={{ fontSize: 12, color: t.textMuted, fontWeight: 600, display: "block", marginBottom: 4, textTransform: "uppercase", letterSpacing: 1 }}>New Password</label>
                         <input type="password" placeholder="Min. 6 characters" value={resetPw} onChange={e => setResetPw(e.target.value)} onClick={e => e.stopPropagation()} style={inputStyle} />
                       </div>
-                      <button onClick={e => { e.stopPropagation(); act({ action: "resetPassword", adminId: a.id, newPassword: resetPw }).then(ok => { if (ok) { setMsg({ type: "success", text: `Password reset for ${a.name}` }); setResetPw(""); } }); }} disabled={resetPw.length < 6 || saving} className="adm-btn-primary" style={{ width: "100%", opacity: resetPw.length >= 6 && !saving ? 1 : .4 }}>{saving ? "Resetting..." : "Reset Password"}</button>
+                      <button onClick={e => { e.stopPropagation(); act({ action: "resetPassword", adminId: a.id, newPassword: resetPw }).then(ok => { if (ok) { toast.success("Password reset", a.name); setResetPw(""); } }); }} disabled={resetPw.length < 6 || saving} className="adm-btn-primary" style={{ width: "100%", opacity: resetPw.length >= 6 && !saving ? 1 : .4 }}>{saving ? "Resetting..." : "Reset Password"}</button>
                     </div>
                   )}
 
@@ -331,11 +330,11 @@ export function AdminTeamPage({ admin: currentAdmin, dark, t }) {
                       <div style={{ display: "flex", gap: 6, marginBottom: 14, flexWrap: "wrap" }}>
                         {ASSIGNABLE_ROLES.map(r => {
                           const ri2 = ROLE_INFO[r]; const active = a.role === r;
-                          return <button key={r} onClick={e => { e.stopPropagation(); act({ action: "updateRole", adminId: a.id, role: r }).then(ok => { if (ok) setMsg({ type: "success", text: `${a.name} is now ${r}` }); }); }} style={{ padding: "8px 16px", borderRadius: 8, borderWidth: 1, borderStyle: "solid", borderColor: active ? ri2.color : t.cardBorder, background: active ? `${ri2.color}15` : "transparent", color: active ? ri2.color : t.textMuted, fontSize: 14, fontWeight: active ? 600 : 430, cursor: "pointer", textTransform: "capitalize" }}>{r}</button>;
+                          return <button key={r} onClick={e => { e.stopPropagation(); act({ action: "updateRole", adminId: a.id, role: r }).then(ok => { if (ok) toast.success("Role updated", `${a.name} is now ${r}`); }); }} style={{ padding: "8px 16px", borderRadius: 8, borderWidth: 1, borderStyle: "solid", borderColor: active ? ri2.color : t.cardBorder, background: active ? `${ri2.color}15` : "transparent", color: active ? ri2.color : t.textMuted, fontSize: 14, fontWeight: active ? 600 : 430, cursor: "pointer", textTransform: "capitalize" }}>{r}</button>;
                         })}
                       </div>
-                      <button onClick={async e => { e.stopPropagation(); const ok = await confirm({ title: a.status === "Active" ? "Deactivate Admin" : "Activate Admin", message: a.status === "Active" ? `Deactivate ${a.name}?` : `Reactivate ${a.name}?`, confirmLabel: a.status === "Active" ? "Deactivate" : "Activate", danger: a.status === "Active" }); if (ok) { const r = await act({ action: "toggleStatus", adminId: a.id }); if (r) setMsg({ type: "success", text: `${a.name} ${r.status === "Active" ? "activated" : "deactivated"}` }); } }} className="adm-btn-sm" style={{ borderColor: t.cardBorder, color: a.status === "Active" ? (dark ? "#fca5a5" : "#dc2626") : (dark ? "#6ee7b7" : "#059669") }}>{a.status === "Active" ? "Deactivate" : "Activate"}</button>
-                      <button onClick={async e => { e.stopPropagation(); const ok = await confirm({ title: "Delete Admin", message: `Permanently delete ${a.name}? This cannot be undone.`, confirmLabel: "Delete", danger: true }); if (ok) { const r = await act({ action: "delete", adminId: a.id }); if (r) setMsg({ type: "success", text: `${a.name} deleted` }); } }} className="adm-btn-sm" style={{ borderColor: dark ? "rgba(252,165,165,.2)" : "rgba(220,38,38,.1)", color: dark ? "#fca5a5" : "#dc2626" }}>Delete</button>
+                      <button onClick={async e => { e.stopPropagation(); const ok = await confirm({ title: a.status === "Active" ? "Deactivate Admin" : "Activate Admin", message: a.status === "Active" ? `Deactivate ${a.name}?` : `Reactivate ${a.name}?`, confirmLabel: a.status === "Active" ? "Deactivate" : "Activate", danger: a.status === "Active" }); if (ok) { const r = await act({ action: "toggleStatus", adminId: a.id }); if (r) toast.success("Status changed", `${a.name} ${r.status === "Active" ? "activated" : "deactivated"}`); } }} className="adm-btn-sm" style={{ borderColor: t.cardBorder, color: a.status === "Active" ? (dark ? "#fca5a5" : "#dc2626") : (dark ? "#6ee7b7" : "#059669") }}>{a.status === "Active" ? "Deactivate" : "Activate"}</button>
+                      <button onClick={async e => { e.stopPropagation(); const ok = await confirm({ title: "Delete Admin", message: `Permanently delete ${a.name}? This cannot be undone.`, confirmLabel: "Delete", danger: true }); if (ok) { const r = await act({ action: "delete", adminId: a.id }); if (r) toast.success("Admin deleted", a.name); } }} className="adm-btn-sm" style={{ borderColor: dark ? "rgba(252,165,165,.2)" : "rgba(220,38,38,.1)", color: dark ? "#fca5a5" : "#dc2626" }}>Delete</button>
                     </div>
                   )}
                 </div>
@@ -638,13 +637,13 @@ export function AdminCouponsPage({ dark, t }) {
 /* ═══ NOTIFICATIONS                       ═══ */
 /* ═══════════════════════════════════════════ */
 export function AdminNotificationsPage({ dark, t }) {
+  const toast = useToast();
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
   const [target, setTarget] = useState("all");
   const [sending, setSending] = useState(false);
-  const [msg, setMsg] = useState(null);
 
   useEffect(() => {
     fetch("/api/admin/notifications").then(r => r.json()).then(d => { setHistory(d.history || []); setLoading(false); }).catch(() => setLoading(false));
@@ -652,29 +651,28 @@ export function AdminNotificationsPage({ dark, t }) {
 
   const send = async () => {
     if (!message.trim() || sending) return;
-    setSending(true); setMsg(null);
+    setSending(true); 
     try {
       const res = await fetch("/api/admin/notifications", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ subject, message, target }) });
       const data = await res.json();
       if (res.ok) {
-        setMsg({ type: "success", text: data.message || "Sending..." });
+        toast.success("Sending", data.message || "Email blast started");
         setSubject(""); setMessage("");
-        // Poll history every 3s until status changes from "sending"
         const pollDone = setInterval(() => {
           fetch("/api/admin/notifications").then(r => r.json()).then(d => {
             setHistory(d.history || []);
             const latest = (d.history || [])[0];
             if (latest && latest.status !== "sending") {
               clearInterval(pollDone);
-              setMsg({ type: latest.status === "failed" ? "error" : "success", text: `${latest.sent}/${latest.recipients} delivered` });
+              if (latest.status === "failed") toast.error("Send failed", `${latest.sent}/${latest.recipients} delivered`);
+              else toast.success("Delivered", `${latest.sent}/${latest.recipients} delivered`);
             }
           });
         }, 3000);
-        // Stop polling after 2 minutes max
         setTimeout(() => clearInterval(pollDone), 120000);
       }
-      else setMsg({ type: "error", text: data.error || "Failed" });
-    } catch { setMsg({ type: "error", text: "Request failed" }); }
+      else toast.error("Failed", data.error || "Something went wrong");
+    } catch { toast.error("Request failed", "Check your connection"); }
     setSending(false);
   };
 
@@ -691,7 +689,6 @@ export function AdminNotificationsPage({ dark, t }) {
       {/* Compose */}
       <div className="adm-card" style={{ background: dark ? "rgba(255,255,255,.03)" : "rgba(255,255,255,.85)", border: `0.5px solid ${dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)"}`, padding: 18, marginTop: 16, marginBottom: 20, boxShadow: dark ? "0 4px 20px rgba(0,0,0,.25)" : "0 4px 20px rgba(0,0,0,.04)", borderRadius: 14 }}>
         <div style={{ fontSize: 16, fontWeight: 600, color: t.text, marginBottom: 12 }}>Compose Notification</div>
-        {msg && <div style={{ padding: "8px 12px", borderRadius: 8, marginBottom: 12, fontSize: 14, background: msg.type === "success" ? (dark ? "rgba(110,231,183,.08)" : "#ecfdf5") : (dark ? "rgba(220,38,38,.08)" : "#fef2f2"), color: msg.type === "success" ? (dark ? "#6ee7b7" : "#059669") : (dark ? "#fca5a5" : "#dc2626") }}>{msg.type === "success" ? "✓" : "⚠️"} {msg.text}</div>}
         <div style={{ marginBottom: 12 }}>
           <label style={{ fontSize: 14, color: t.textMuted, display: "block", marginBottom: 4 }}>Subject</label>
           <input value={subject} onChange={e => setSubject(e.target.value)} placeholder="Notification subject..." style={inputStyle} />

@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from "react";
 import { useConfirm } from "./confirm-dialog";
+import { useToast } from "./toast";
 import { fN } from "../lib/format";
 import { SITE } from "../lib/site";
 
@@ -34,6 +35,7 @@ function Toggle({ on, onToggle, accent }) {
 /* ═══════════════════════════════════════════ */
 export default function SettingsPage({ user, dark, t, themeMode, setThemeMode, setDark }) {
   const confirm = useConfirm();
+  const toast = useToast();
   const [notifOrders, setNotifOrders] = useState(true);
   const [notifPromo, setNotifPromo] = useState(false);
   const [notifEmail, setNotifEmail] = useState(true);
@@ -63,7 +65,6 @@ export default function SettingsPage({ user, dark, t, themeMode, setThemeMode, s
   const [curPw, setCurPw] = useState("");
   const [newPw, setNewPw] = useState("");
   const [confirmPw, setConfirmPw] = useState("");
-  const [pwMsg, setPwMsg] = useState(null);
   const [pwLoading, setPwLoading] = useState(false);
 
   // Fetch API key on mount
@@ -106,16 +107,15 @@ export default function SettingsPage({ user, dark, t, themeMode, setThemeMode, s
   };
 
   const changePassword = async () => {
-    setPwMsg(null);
-    if (!curPw || !newPw || !confirmPw) { setPwMsg({ type: "error", text: "All fields required" }); return; }
-    if (newPw !== confirmPw) { setPwMsg({ type: "error", text: "New passwords don't match" }); return; }
-    if (newPw.length < 6) { setPwMsg({ type: "error", text: "Minimum 6 characters" }); return; }
+    if (!curPw || !newPw || !confirmPw) { toast.error("Missing fields", "All fields required"); return; }
+    if (newPw !== confirmPw) { toast.error("Mismatch", "New passwords don't match"); return; }
+    if (newPw.length < 6) { toast.error("Too short", "Minimum 6 characters"); return; }
     setPwLoading(true);
     try {
       const res = await fetch("/api/auth/change-password", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ currentPassword: curPw, newPassword: newPw }), signal: AbortSignal.timeout(15000) });
       const data = await res.json();
-      if (!res.ok) { setPwMsg({ type: "error", text: data.error || "Failed" }); } else { setPwMsg({ type: "success", text: "Password updated" }); setCurPw(""); setNewPw(""); setConfirmPw(""); }
-    } catch (err) { setPwMsg({ type: "error", text: err?.name === "TimeoutError" ? "Request timed out" : "Network error. Check your connection." }); }
+      if (!res.ok) { toast.error("Failed", data.error || "Password change failed"); } else { toast.success("Password updated", "Your password has been changed"); setCurPw(""); setNewPw(""); setConfirmPw(""); }
+    } catch (err) { toast.error(err?.name === "TimeoutError" ? "Timed out" : "Network error", "Check your connection"); }
     setPwLoading(false);
   };
 
@@ -187,7 +187,6 @@ export default function SettingsPage({ user, dark, t, themeMode, setThemeMode, s
           <div className="set-card" style={{ background: dark ? "rgba(255,255,255,.03)" : "rgba(255,255,255,.85)", border: `0.5px solid ${t.cardBorder}` }}>
             <div className="set-card-title" style={{ color: t.textMuted }}>Change password</div>
             <div className="set-card-divider" style={{ background: t.cardBorder }} />
-            {pwMsg && <div style={{ padding: "8px 12px", borderRadius: 8, marginBottom: 12, fontSize: 14, background: pwMsg.type === "success" ? (dark ? "rgba(110,231,183,.08)" : "#ecfdf5") : (dark ? "rgba(220,38,38,.08)" : "#fef2f2"), color: pwMsg.type === "success" ? (dark ? "#6ee7b7" : "#059669") : (dark ? "#fca5a5" : "#dc2626") }}>{pwMsg.text}</div>}
             <div className="set-input-group">
               <label className="set-input-label" style={{ color: t.textMuted }}>Current password</label>
               <input type="password" value={curPw} onChange={e => setCurPw(e.target.value)} className="set-input" style={{ borderColor: dark ? "rgba(255,255,255,.08)" : "rgba(0,0,0,.1)", background: dark ? "rgba(255,255,255,.04)" : "#fff", color: t.text }} />

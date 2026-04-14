@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect, useRef } from "react";
 import { useConfirm } from "./confirm-dialog";
+import { useToast } from "./toast";
 import { fN, fD } from "../lib/format";
 
 
@@ -8,6 +9,7 @@ import { fN, fD } from "../lib/format";
 /* ═══ PAYMENTS PAGE                       ═══ */
 /* ═══════════════════════════════════════════ */
 export function AdminPaymentsPage({ dark, t }) {
+  const toast = useToast();
   const confirm = useConfirm();
   const [tab, setTab] = useState("deposits");
   const [gateways, setGateways] = useState([]);
@@ -17,7 +19,7 @@ export function AdminPaymentsPage({ dark, t }) {
   const [configuring, setConfiguring] = useState(null);
   const [configFields, setConfigFields] = useState({});
   const [saving, setSaving] = useState(false);
-  const [msg, setMsg] = useState(null);
+  
   const [addModal, setAddModal] = useState(false);
   const [newGw, setNewGw] = useState({ id: "", name: "", desc: "" });
   const [search, setSearch] = useState("");
@@ -77,10 +79,10 @@ export function AdminPaymentsPage({ dark, t }) {
   };
 
   const toggle = async (id, enabled) => {
-    setMsg(null);
+    
     const res = await fetch("/api/admin/payments", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "toggle", gatewayId: id, enabled }) });
-    if (res.ok) { refresh(); setMsg({ type: "success", text: `${id} ${enabled ? "enabled" : "disabled"}` }); }
-    else { const d = await res.json(); setMsg({ type: "error", text: d.error || "Failed" }); }
+    if (res.ok) { refresh(); toast.success("Updated", `${id} ${enabled ? "enabled" : "disabled"}`); }
+    else { const d = await res.json(); toast.error("Failed", d.error || "Failed"); }
   };
 
   const openConfig = (g) => {
@@ -94,11 +96,11 @@ export function AdminPaymentsPage({ dark, t }) {
   const saveConfig = async () => {
     if (!configuring) return;
     const nonEmpty = Object.fromEntries(Object.entries(configFields).filter(([, v]) => v.trim()));
-    if (Object.keys(nonEmpty).length === 0) { setMsg({ type: "error", text: "Enter at least one field" }); return; }
+    if (Object.keys(nonEmpty).length === 0) { toast.error("Missing fields", "Enter at least one field"); return; }
     setSaving(true);
     const res = await fetch("/api/admin/payments", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "configure", gatewayId: configuring.id, fields: nonEmpty }) });
-    if (res.ok) { setMsg({ type: "success", text: `${configuring.name} saved` }); setConfiguring(null); refresh(); }
-    else { const d = await res.json(); setMsg({ type: "error", text: d.error || "Save failed" }); }
+    if (res.ok) { toast.success("Saved", `${configuring.name} saved`); setConfiguring(null); refresh(); }
+    else { const d = await res.json(); toast.error("Save failed", d.error || "Save failed"); }
     setSaving(false);
   };
 
@@ -106,16 +108,16 @@ export function AdminPaymentsPage({ dark, t }) {
     const ok = await confirm({ title: "Approve deposit?", message: `Credit ₦${tx.amount.toLocaleString()} to ${tx.user} (${tx.email})?\nRef: ${tx.reference}${tx.senderRef ? `\nBank ref: ${tx.senderRef}` : ""}`, confirmText: "Approve", danger: false });
     if (!ok) return;
     const res = await fetch("/api/admin/payments", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "approve_manual", gatewayId: tx.id }) });
-    if (res.ok) { setMsg({ type: "success", text: `₦${tx.amount.toLocaleString()} approved for ${tx.user}` }); refresh(); }
-    else { const d = await res.json(); setMsg({ type: "error", text: d.error || "Failed" }); }
+    if (res.ok) { toast.success("Approved", `₦${tx.amount.toLocaleString()} approved for ${tx.user}`); refresh(); }
+    else { const d = await res.json(); toast.error("Failed", d.error || "Failed"); }
   };
 
   const rejectManual = async (tx) => {
     const ok = await confirm({ title: "Reject deposit?", message: `Reject ₦${tx.amount.toLocaleString()} from ${tx.user}? This cannot be undone.`, confirmText: "Reject", danger: true });
     if (!ok) return;
     const res = await fetch("/api/admin/payments", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "reject_manual", gatewayId: tx.id }) });
-    if (res.ok) { setMsg({ type: "success", text: "Deposit rejected" }); refresh(); }
-    else { const d = await res.json(); setMsg({ type: "error", text: d.error || "Failed" }); }
+    if (res.ok) { toast.success("Rejected", "Deposit rejected"); refresh(); }
+    else { const d = await res.json(); toast.error("Failed", d.error || "Failed"); }
   };
 
   const FIELD_LABELS = { secretKey: "Secret Key", publicKey: "Public Key", apiKey: "API Key", contractCode: "Contract Code", bankName: "Bank Name", accountNumber: "Account Number", accountName: "Account Name" };
@@ -140,10 +142,6 @@ export function AdminPaymentsPage({ dark, t }) {
         <div className="page-divider" style={{ background: t.cardBorder }} />
       </div>
 
-      {msg && <div style={{ padding: "10px 14px", borderRadius: 8, marginBottom: 12, background: msg.type === "success" ? (dark ? "rgba(110,231,183,.08)" : "#ecfdf5") : (dark ? "rgba(220,38,38,.08)" : "#fef2f2"), color: msg.type === "success" ? (dark ? "#6ee7b7" : "#059669") : (dark ? "#fca5a5" : "#dc2626"), fontSize: 14, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <span>{msg.text}</span>
-        <button onClick={() => setMsg(null)} style={{ background: "none", border: "none", color: "inherit", cursor: "pointer", fontSize: 14 }}>✕</button>
-      </div>}
 
       {/* ═══ DEPOSITS TAB ═══ */}
       {tab === "deposits" && (<>
@@ -305,12 +303,12 @@ export function AdminPaymentsPage({ dark, t }) {
             </div>
             <div style={{ display: "flex", gap: 8 }}>
               <button onClick={async () => {
-                if (!newGw.id || !newGw.name) { setMsg({ type: "error", text: "ID and name required" }); return; }
-                if (gateways.some(g => g.id === newGw.id)) { setMsg({ type: "error", text: "Gateway ID already exists" }); return; }
+                if (!newGw.id || !newGw.name) { toast.error("Missing fields", "ID and name required"); return; }
+                if (gateways.some(g => g.id === newGw.id)) { toast.error("Duplicate", "Gateway ID already exists"); return; }
                 setSaving(true);
                 const res = await fetch("/api/admin/payments", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "add", gatewayId: newGw.id, name: newGw.name, desc: newGw.desc }) });
-                if (res.ok) { setMsg({ type: "success", text: `${newGw.name} added` }); setAddModal(false); setNewGw({ id: "", name: "", desc: "" }); refresh(); }
-                else { const d = await res.json(); setMsg({ type: "error", text: d.error || "Failed" }); }
+                if (res.ok) { toast.success("Gateway added", newGw.name); setAddModal(false); setNewGw({ id: "", name: "", desc: "" }); refresh(); }
+                else { const d = await res.json(); toast.error("Failed", d.error || "Failed"); }
                 setSaving(false);
               }} disabled={saving || !newGw.id || !newGw.name} style={{ flex: 1, padding: "11px 0", borderRadius: 8, background: newGw.id && newGw.name ? "linear-gradient(135deg,#c47d8e,#8b5e6b)" : (dark ? "rgba(255,255,255,.04)" : "rgba(0,0,0,.03)"), color: newGw.id && newGw.name ? "#fff" : t.textMuted, fontSize: 14, fontWeight: 600, border: "none", cursor: newGw.id && newGw.name ? "pointer" : "default" }}>{saving ? "Adding..." : "Add Gateway"}</button>
               <button onClick={() => setAddModal(false)} style={{ padding: "11px 20px", borderRadius: 8, background: "none", border: `1px solid ${t.cardBorder}`, color: t.textMuted, fontSize: 14, cursor: "pointer" }}>Cancel</button>

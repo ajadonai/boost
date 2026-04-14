@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from "react";
 import { useConfirm } from "./confirm-dialog";
+import { useToast } from "./toast";
 import { fN, fD } from "../lib/format";
 
 
@@ -19,6 +20,7 @@ function Badge({ status, dark }) {
 
 export default function AdminOrdersPage({ dark, t }) {
   const confirm = useConfirm();
+  const toast = useToast();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
@@ -45,20 +47,17 @@ export default function AdminOrdersPage({ dark, t }) {
   const counts = { all: orders.length };
   ["Completed", "Processing", "Pending", "Partial", "Canceled"].forEach(s => { counts[s] = orders.filter(o => o.status === s).length; });
 
-  const [msg, setMsg] = useState(null);
-
   const doAction = async (orderId, action) => {
-    setMsg(null);
     try {
       const res = await fetch("/api/admin/orders", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action, orderId }) });
       const data = await res.json();
-      if (!res.ok) { setMsg({ type: "error", text: data.error || "Action failed" }); return; }
+      if (!res.ok) { toast.error("Action failed", data.error || "Something went wrong"); return; }
       if (data.status) {
         setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: data.status } : o));
       }
       const label = action === "check" ? `Status: ${data.status || "unknown"}${data.remains != null ? ` · ${data.remains} remaining` : ""}` : action === "cancel" ? "Order cancelled" : "Refill requested";
-      setMsg({ type: "success", text: `${orderId} — ${label}` });
-    } catch { setMsg({ type: "error", text: "Request failed" }); }
+      toast.success(orderId, label);
+    } catch { toast.error("Request failed", "Check your connection"); }
   };
 
   return (
@@ -69,7 +68,6 @@ export default function AdminOrdersPage({ dark, t }) {
         <div className="page-divider" style={{ background: t.cardBorder }} />
       </div>
 
-      {msg && <div style={{ padding: "8px 14px", borderRadius: 8, marginBottom: 12, fontSize: 14, background: msg.type === "success" ? (dark ? "rgba(110,231,183,.08)" : "#ecfdf5") : (dark ? "rgba(220,38,38,.08)" : "#fef2f2"), color: msg.type === "success" ? (dark ? "#6ee7b7" : "#059669") : (dark ? "#fca5a5" : "#dc2626"), display: "flex", justifyContent: "space-between", alignItems: "center" }}><span>{msg.type === "success" ? "✓" : "⚠️"} {msg.text}</span><button onClick={() => setMsg(null)} style={{ background: "none", color: "inherit", border: "none", cursor: "pointer" }}>✕</button></div>}
 
       {/* Search */}
       <input value={search} onChange={e => { setSearch(e.target.value); setPage(1); }} placeholder="Search by order ID, service, or user..." className="adm-search" style={{ borderColor: t.cardBorder, background: dark ? "rgba(255,255,255,.03)" : "#fff", color: t.text }} />

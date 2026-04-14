@@ -1,16 +1,17 @@
 'use client';
 import { useState, useEffect } from "react";
 import { useConfirm } from "./confirm-dialog";
+import { useToast } from "./toast";
 import { fD } from "../lib/format";
 
 const CATEGORIES = ["Tutorials", "Tips & Tricks", "Announcements", "Updates", "Guides"];
 
 export default function AdminBlogPage({ dark, t }) {
   const confirm = useConfirm();
+  const toast = useToast();
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [editing, setEditing] = useState(null); // null = list, "new" = create, post object = edit
-  const [msg, setMsg] = useState(null);
+  const [editing, setEditing] = useState(null);
   const [saving, setSaving] = useState(false);
 
   // Form state
@@ -37,31 +38,31 @@ export default function AdminBlogPage({ dark, t }) {
   const startNew = () => { resetForm(); setEditing("new"); };
 
   const act = async (body) => {
-    setSaving(true); setMsg(null);
+    setSaving(true); 
     try {
       const res = await fetch("/api/admin/blog", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
       const data = await res.json();
-      if (!res.ok) { setMsg({ type: "error", text: data.error || "Failed" }); setSaving(false); return false; }
+      if (!res.ok) { toast.error("Failed", data.error || "Something went wrong"); setSaving(false); return false; }
       await load(); setSaving(false); return data;
-    } catch { setMsg({ type: "error", text: "Request failed" }); setSaving(false); return false; }
+    } catch { toast.error("Request failed", "Check your connection"); setSaving(false); return false; }
   };
 
   const savePost = async () => {
-    if (!title.trim() || !content.trim()) { setMsg({ type: "error", text: "Title and content required" }); return; }
+    if (!title.trim() || !content.trim()) { toast.error("Missing fields", "Title and content required"); return; }
     const body = { title, slug: slug || undefined, excerpt, content, category, thumbnail, published, showInHowTo };
     if (editing === "new") {
       const ok = await act({ action: "create", ...body });
-      if (ok) { setEditing(null); resetForm(); setMsg({ type: "success", text: "Post created" }); }
+      if (ok) { setEditing(null); resetForm(); toast.success("Post created", ""); }
     } else {
       const ok = await act({ action: "update", postId: editing.id, ...body });
-      if (ok) { setEditing(null); resetForm(); setMsg({ type: "success", text: "Post updated" }); }
+      if (ok) { setEditing(null); resetForm(); toast.success("Post updated", ""); }
     }
   };
 
   const deletePost = async (post) => {
     if (!await confirm({ title: "Delete Post", message: `Delete "${post.title}"? This cannot be undone.`, confirmLabel: "Delete", danger: true })) return;
     const ok = await act({ action: "delete", postId: post.id });
-    if (ok) setMsg({ type: "success", text: "Post deleted" });
+    if (ok) toast.success("Post deleted", "");
   };
 
   const quickToggle = async (post, field) => {
@@ -85,7 +86,6 @@ export default function AdminBlogPage({ dark, t }) {
           <div className="page-divider" style={{ background: t.cardBorder }} />
         </div>
 
-        {msg && <div style={{ padding: "8px 14px", borderRadius: 8, marginTop: 12, fontSize: 14, background: msg.type === "success" ? (dark ? "rgba(110,231,183,.08)" : "#ecfdf5") : (dark ? "rgba(220,38,38,.08)" : "#fef2f2"), color: msg.type === "success" ? (dark ? "#6ee7b7" : "#059669") : (dark ? "#fca5a5" : "#dc2626"), display: "flex", justifyContent: "space-between", alignItems: "center" }}><span>{msg.type === "success" ? "✓" : "⚠️"} {msg.text}</span><button onClick={() => setMsg(null)} style={{ background: "none", color: "inherit", border: "none", cursor: "pointer" }}>✕</button></div>}
 
         <div className="adm-card" style={{ background: dark ? "rgba(255,255,255,.03)" : "rgba(255,255,255,.85)", border: `0.5px solid ${dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)"}`, padding: 20, marginTop: 16, borderRadius: 14 }}>
           {/* Title + Slug */}
@@ -188,7 +188,6 @@ export default function AdminBlogPage({ dark, t }) {
         <div className="page-divider" style={{ background: t.cardBorder }} />
       </div>
 
-      {msg && <div style={{ padding: "8px 14px", borderRadius: 8, marginTop: 12, fontSize: 14, background: msg.type === "success" ? (dark ? "rgba(110,231,183,.08)" : "#ecfdf5") : (dark ? "rgba(220,38,38,.08)" : "#fef2f2"), color: msg.type === "success" ? (dark ? "#6ee7b7" : "#059669") : (dark ? "#fca5a5" : "#dc2626"), display: "flex", justifyContent: "space-between", alignItems: "center" }}><span>{msg.type === "success" ? "✓" : "⚠️"} {msg.text}</span><button onClick={() => setMsg(null)} style={{ background: "none", color: "inherit", border: "none", cursor: "pointer" }}>✕</button></div>}
 
       <div className="adm-card" style={{ background: dark ? "rgba(255,255,255,.03)" : "rgba(255,255,255,.85)", border: `0.5px solid ${dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)"}`, marginTop: 16 }}>
         {loading ? <div className="adm-empty">{[1,2,3].map(i => <div key={i} className={`skel-bone ${dark ? "skel-dark" : "skel-light"}`} style={{ height: 60, borderRadius: 8, marginBottom: 8 }} />)}</div> : posts.length === 0 ? (

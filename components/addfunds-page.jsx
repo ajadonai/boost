@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect } from "react";
+import { useToast } from "./toast";
 import { fN, fD } from "../lib/format";
 
 const PRESETS = [1000, 2000, 5000, 10000, 20000, 50000];
@@ -15,6 +16,7 @@ const ACCEPTED_TYPES = [
 /* ═══ ADD FUNDS PAGE                      ═══ */
 /* ═══════════════════════════════════════════ */
 export default function AddFundsPage({ user, dark, t, paymentStatus, setPaymentStatus }) {
+  const toast = useToast();
   const [amount, setAmount] = useState("");
   const [method, setMethod] = useState("");
   const [loading, setLoading] = useState(false);
@@ -71,11 +73,11 @@ export default function AddFundsPage({ user, dark, t, paymentStatus, setPaymentS
   // Recalculate discount when amount changes
   const discount = couponApplied ? (couponApplied.type === "percent" ? Math.round(numAmount * 100 * (couponApplied.value / 100)) : couponApplied.value * 100) : 0;
 
-  const [payError, setPayError] = useState(null);
+  
 
   const handlePay = async () => {
     if (!valid || loading) return;
-    setLoading(true); setPayError(null);
+    setLoading(true);
 
     // ═══ CRYPTO — different flow ═══
     if (method === "crypto") {
@@ -107,10 +109,10 @@ export default function AddFundsPage({ user, dark, t, paymentStatus, setPaymentS
           // Stop polling after 30 minutes
           setTimeout(() => { clearInterval(poll); setCryptoPolling(false); }, 30 * 60 * 1000);
         } else {
-          setPayError(data.error || "Failed to create crypto payment");
+          toast.error("Payment failed", data.error || "Failed to create crypto payment");
         }
       } catch (err) {
-        setPayError(err?.name === "TimeoutError" ? "Request timed out." : "Network error.");
+        toast.error(err?.name === "TimeoutError" ? "Timed out" : "Network error", "Check your connection");
       }
       setLoading(false);
       return;
@@ -130,9 +132,9 @@ export default function AddFundsPage({ user, dark, t, paymentStatus, setPaymentS
           setManualDone(false);
           setManualRef("");
         } else {
-          setPayError(data.error || "Failed to create transfer request");
+          toast.error("Transfer failed", data.error || "Failed to create request");
         }
-      } catch { setPayError("Network error"); }
+      } catch { toast.error("Network error", "Check your connection"); }
       setLoading(false);
       return;
     }
@@ -149,11 +151,11 @@ export default function AddFundsPage({ user, dark, t, paymentStatus, setPaymentS
       if (data.authorization_url) {
         window.location.href = data.authorization_url;
       } else {
-        setPayError(data.error || "Payment initialization failed");
+        toast.error("Payment failed", data.error || "Initialization failed");
         setLoading(false);
       }
     } catch (err) {
-      setPayError(err?.name === "TimeoutError" ? "Request timed out. Check your connection." : "Network error. Check your internet and try again.");
+      toast.error(err?.name === "TimeoutError" ? "Timed out" : "Network error", "Check your connection");
       setLoading(false);
     }
   };
@@ -289,7 +291,6 @@ export default function AddFundsPage({ user, dark, t, paymentStatus, setPaymentS
               {/* Spacer pushes button to bottom */}
               <div style={{ flex: 1, minHeight: 16 }} />
 
-              {payError && <div style={{ padding: "8px 12px", borderRadius: 8, marginBottom: 8, fontSize: 13, background: dark ? "rgba(220,38,38,.08)" : "#fef2f2", border: `1px solid ${dark ? "rgba(220,38,38,.15)" : "#fecaca"}`, color: dark ? "#fca5a5" : "#dc2626", display: "flex", justifyContent: "space-between", alignItems: "center" }}><span>⚠️ {payError}</span><button onClick={() => setPayError(null)} style={{ background: "none", border: "none", color: "inherit", cursor: "pointer", fontSize: 14 }}>✕</button></div>}
               <button onClick={handlePay} disabled={!valid || loading} className="fund-pay-btn" style={{ background: valid ? `linear-gradient(135deg,#c47d8e,#8b5e6b)` : (dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)"), color: valid ? "#fff" : t.textMuted }}>
                 {loading ? "Processing..." : valid ? `Pay ${fN(numAmount)} Now` : "Amount to deposit"}
               </button>
@@ -413,7 +414,6 @@ export default function AddFundsPage({ user, dark, t, paymentStatus, setPaymentS
                   <option>Select payment method</option>
                 </select>
               )}
-              {payError && <div style={{ padding: "8px 12px", borderRadius: 8, marginTop: 8, fontSize: 13, background: dark ? "rgba(220,38,38,.08)" : "#fef2f2", border: `1px solid ${dark ? "rgba(220,38,38,.15)" : "#fecaca"}`, color: dark ? "#fca5a5" : "#dc2626" }}>⚠️ {payError}</div>}
               <button onClick={handlePay} disabled={loading} className="fund-pay-btn" style={{ background: `linear-gradient(135deg,#c47d8e,#8b5e6b)`, color: "#fff", marginTop: 12 }}>
                 {loading ? "Processing..." : `Pay ${fN(numAmount)} Now`}
               </button>
@@ -551,8 +551,8 @@ export default function AddFundsPage({ user, dark, t, paymentStatus, setPaymentS
                     try {
                       const res = await fetch("/api/payments/manual", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ reference: manualModal.reference, senderRef: manualModal.reference }) });
                       if (res.ok) setManualDone(true);
-                      else { const d = await res.json(); setPayError(d.error || "Failed"); }
-                    } catch { setPayError("Network error"); }
+                      else { const d = await res.json(); toast.error("Failed", d.error || "Something went wrong"); }
+                    } catch { toast.error("Network error", "Check your connection"); }
                     setManualSubmitting(false);
                   }} disabled={manualSubmitting} style={{ flex: 1, padding: "10px 0", borderRadius: 8, border: "none", background: "linear-gradient(135deg,#c47d8e,#8b5e6b)", color: "#fff", fontSize: 14, fontWeight: 600, cursor: "pointer", fontFamily: "inherit", opacity: manualSubmitting ? .5 : 1 }}>{manualSubmitting ? "Submitting..." : "I've sent the money"}</button>
                 </div>
