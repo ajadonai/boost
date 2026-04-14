@@ -97,10 +97,13 @@ export async function PATCH(req) {
         return Response.json({ error: 'Service no longer available' }, { status: 400 });
       }
 
+      const usdRateSetting = await prisma.setting.findUnique({ where: { key: 'markup_usd_rate' } });
+      const usdRate = Number(usdRateSetting?.value || 1600);
+
       // Recalculate charge from current tier/service price (not the old order's charge)
       const currentSellPer1k = order.tier?.sellPer1k || order.service.sellPer1k;
       let charge = Math.round((currentSellPer1k / 1000) * order.quantity);
-      const cost = Math.round((order.service.costPer1k / 1000) * order.quantity);
+      const cost = Math.round((order.service.costPer1k * usdRate / 1000) * order.quantity);
 
       if (!charge || charge <= 0) {
         return Response.json({ error: 'Service pricing not configured' }, { status: 400 });
@@ -188,6 +191,10 @@ export async function POST(req) {
 
     const { tierId, serviceId, link, quantity, comments, serviceType } = await req.json();
 
+    // Get USD→NGN rate for cost calculation
+    const usdRateSetting = await prisma.setting.findUnique({ where: { key: 'markup_usd_rate' } });
+    const usdRate = Number(usdRateSetting?.value || 1600);
+
     if (!link || !quantity) {
       return Response.json({ error: 'Link and quantity required' }, { status: 400 });
     }
@@ -236,7 +243,7 @@ export async function POST(req) {
         return Response.json({ error: `Quantity must be between ${effectiveMin.toLocaleString()} and ${service.max.toLocaleString()}` }, { status: 400 });
       }
       charge = Math.round((tier.sellPer1k / 1000) * qty);
-      cost = Math.round((service.costPer1k / 1000) * qty);
+      cost = Math.round((service.costPer1k * usdRate / 1000) * qty);
     } else {
       // Legacy flow: direct serviceId
       service = await prisma.service.findUnique({ where: { id: serviceId } });
@@ -251,7 +258,7 @@ export async function POST(req) {
         return Response.json({ error: `Quantity must be between ${service.min.toLocaleString()} and ${service.max.toLocaleString()}` }, { status: 400 });
       }
       charge = Math.round((service.sellPer1k / 1000) * qty);
-      cost = Math.round((service.costPer1k / 1000) * qty);
+      cost = Math.round((service.costPer1k * usdRate / 1000) * qty);
       tierName = service.name;
     }
 
