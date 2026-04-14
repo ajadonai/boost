@@ -1,7 +1,7 @@
 import prisma from '@/lib/prisma';
 import { log } from "@/lib/logger";
 import { getCurrentUser, clearUserCookie } from '@/lib/auth';
-import { sendEmail } from '@/lib/email';
+import { sendEmail, accountDeletionEmail } from '@/lib/email';
 import { cancelOrder, isProviderConfigured } from '@/lib/smm';
 import bcrypt from 'bcryptjs';
 
@@ -104,25 +104,7 @@ export async function POST(req) {
     );
 
     // Send confirmation to user
-    const userHtml = `
-      <div style="font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 480px; margin: 0 auto; padding: 40px 20px;">
-        <table width="48" height="48" cellpadding="0" cellspacing="0" border="0" style="margin: 0 auto 24px;">
-          <tr><td align="center" valign="middle" width="48" height="48" style="border-radius: 14px; background-color: #c47d8e; font-size: 22px; font-weight: 700; color: #ffffff; font-family: Arial, sans-serif;">N</td></tr>
-        </table>
-        <h1 style="font-size: 22px; font-weight: 600; color: #1a1a1a; text-align: center; margin-bottom: 8px;">Account Deletion Scheduled</h1>
-        <p style="font-size: 15px; color: #666; text-align: center; margin-bottom: 24px;">Hi ${user.firstName || user.name}, your account is scheduled for permanent deletion.</p>
-        ${activeOrders.length > 0 ? `<p style="font-size: 14px; color: #dc2626; text-align: center; margin-bottom: 16px;">${activeOrders.length} active order${activeOrders.length > 1 ? 's were' : ' was'} cancelled and ₦${(totalRefund / 100).toLocaleString()} has been refunded to your wallet.</p>` : ''}
-        <div style="background: #f5f3f0; border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 24px;">
-          <div style="font-size: 14px; color: #999; margin-bottom: 4px;">Your data will be permanently deleted on</div>
-          <div style="font-size: 20px; font-weight: 700; color: #dc2626;">${deletionDate.toLocaleDateString('en-NG', { year: 'numeric', month: 'long', day: 'numeric' })}</div>
-        </div>
-        <p style="font-size: 14px; color: #666; text-align: center; margin-bottom: 8px;">Changed your mind? Contact our support team before the deletion date to reinstate your account.</p>
-        <p style="font-size: 14px; color: #666; text-align: center; margin-bottom: 24px;">Email: <a href="mailto:support@nitro.ng" style="color: #c47d8e; text-decoration: none;">support@nitro.ng</a></p>
-        <div style="margin-top: 30px; padding-top: 16px; border-top: 1px solid #eee; text-align: center;">
-          <p style="font-size: 12px; color: #bbb;">Nitro — Premium SMM Services</p>
-        </div>
-      </div>
-    `;
+    const userHtml = accountDeletionEmail(user.firstName || user.name, 30);
 
     sendEmail(user.email, 'Your Nitro account is scheduled for deletion', userHtml).catch(err =>
       log.error('DeleteAccount', `User email failed: ${err.message}`)
