@@ -174,48 +174,56 @@ function PlaceholderPage({ title, subtitle, dark, t }) {
 /* ═══════════════════════════════════════════ */
 /* ═══ RIGHT SIDEBAR                       ═══ */
 /* ═══════════════════════════════════════════ */
-function AdminRightSidebar({ data, dark, t }) {
+function AdminRightSidebar({ data, dark, t, active }) {
+  const showTickets = active === "overview";
+  const showProviderColors = ["orders", "services", "menu-builder", "pricing", "finance"].includes(active);
+  const showActivity = !["leaderboard"].includes(active);
+
   return (
     <>
-      <div className="adm-rs-title" style={{ color: t.textMuted }}>Open Tickets</div>
-      {(data.openTickets || []).length > 0 ? (data.openTickets || []).slice(0, 4).map((tk, i) => (
-        <div key={tk.id || i} className="adm-rs-ticket" style={{ background: dark ? "rgba(255,255,255,.03)" : "rgba(255,255,255,.85)", border: `0.5px solid ${t.cardBorder}` }}>
-          <div className="adm-rs-ticket-top">
-            <span style={{ fontSize: 13, color: t.accent }}>{tk.id}</span>
-            <span style={{ fontSize: 12, color: t.textMuted }}>{tk.created ? fD(tk.created) : ""}</span>
+      {showTickets && (<>
+        <div className="adm-rs-title" style={{ color: t.textMuted }}>Open Tickets</div>
+        {(data.openTickets || []).length > 0 ? (data.openTickets || []).slice(0, 4).map((tk, i) => (
+          <div key={tk.id || i} className="adm-rs-ticket" style={{ background: dark ? "rgba(255,255,255,.03)" : "rgba(255,255,255,.85)", border: `0.5px solid ${t.cardBorder}` }}>
+            <div className="adm-rs-ticket-top">
+              <span style={{ fontSize: 13, color: t.accent }}>{tk.id}</span>
+              <span style={{ fontSize: 12, color: t.textMuted }}>{tk.created ? fD(tk.created) : ""}</span>
+            </div>
+            <div style={{ fontSize: 14, fontWeight: 500, color: t.text, marginTop: 3 }}>{tk.subject}</div>
+            <div style={{ fontSize: 13, color: t.textMuted, marginTop: 2 }}>{tk.user || "user"}</div>
           </div>
-          <div style={{ fontSize: 14, fontWeight: 500, color: t.text, marginTop: 3 }}>{tk.subject}</div>
-          <div style={{ fontSize: 13, color: t.textMuted, marginTop: 2 }}>{tk.user || "user"}</div>
+        )) : (
+          <div style={{ fontSize: 14, color: t.textMuted, padding: "8px 4px" }}>No open tickets</div>
+        )}
+        <div className="adm-rs-divider" style={{ background: t.sidebarBorder }} />
+      </>)}
+
+      {showProviderColors && (<>
+        <div className="adm-rs-title" style={{ color: t.textMuted }}>Provider Colors</div>
+        <div style={{ display: "flex", gap: 12, padding: "4px 0" }}>
+          {[["MTP", "#ef4444"], ["JAP", "#3b82f6"], ["DAO", "#22c55e"]].map(([name, color]) => (
+            <div key={name} style={{ display: "flex", alignItems: "center", gap: 5 }}>
+              <span style={{ width: 7, height: 7, borderRadius: "50%", background: color }} />
+              <span style={{ fontSize: 12, color: t.textMuted, fontWeight: 500 }}>{name}</span>
+            </div>
+          ))}
         </div>
-      )) : (
-        <div style={{ fontSize: 14, color: t.textMuted, padding: "8px 4px" }}>No open tickets</div>
-      )}
+        <div className="adm-rs-divider" style={{ background: t.sidebarBorder }} />
+      </>)}
 
-      <div className="adm-rs-divider" style={{ background: t.sidebarBorder }} />
-
-      <div className="adm-rs-title" style={{ color: t.textMuted }}>Provider Colors</div>
-      <div style={{ display: "flex", gap: 12, padding: "4px 0" }}>
-        {[["MTP", "#ef4444"], ["JAP", "#3b82f6"], ["DAO", "#22c55e"]].map(([name, color]) => (
-          <div key={name} style={{ display: "flex", alignItems: "center", gap: 5 }}>
-            <span style={{ width: 7, height: 7, borderRadius: "50%", background: color }} />
-            <span style={{ fontSize: 12, color: t.textMuted, fontWeight: 500 }}>{name}</span>
+      {showActivity && (<>
+        <div className="adm-rs-title" style={{ color: t.textMuted }}>Recent Activity</div>
+        {(data.activity || []).slice(0, 6).map((a, i) => (
+          <div key={i} className="adm-rs-activity">
+            <div className="adm-rs-dot" style={{ background: a.type === "order" ? t.green : a.type === "user" ? t.blue : a.type === "deposit" ? t.green : a.type === "ticket" ? t.amber : t.accent }} />
+            <div>
+              <div style={{ fontSize: 14, color: t.text, fontWeight: 450 }}>{a.action}</div>
+              <div style={{ fontSize: 13, color: t.textMuted }}>{a.detail} · {a.time ? fD(a.time) : ""}</div>
+            </div>
           </div>
         ))}
-      </div>
-
-      <div className="adm-rs-divider" style={{ background: t.sidebarBorder }} />
-
-      <div className="adm-rs-title" style={{ color: t.textMuted }}>Recent Activity</div>
-      {(data.activity || []).slice(0, 6).map((a, i) => (
-        <div key={i} className="adm-rs-activity">
-          <div className="adm-rs-dot" style={{ background: a.type === "order" ? t.green : a.type === "user" ? t.blue : a.type === "deposit" ? t.green : a.type === "ticket" ? t.amber : t.accent }} />
-          <div>
-            <div style={{ fontSize: 14, color: t.text, fontWeight: 450 }}>{a.action}</div>
-            <div style={{ fontSize: 13, color: t.textMuted }}>{a.detail} · {a.time ? fD(a.time) : ""}</div>
-          </div>
-        </div>
-      ))}
-      {(data.activity || []).length === 0 && <div style={{ fontSize: 14, color: t.textMuted, padding: "8px 4px" }}>No recent activity</div>}
+        {(data.activity || []).length === 0 && <div style={{ fontSize: 14, color: t.textMuted, padding: "8px 4px" }}>No recent activity</div>}
+      </>)}
     </>
   );
 }
@@ -494,7 +502,7 @@ function AdminDashboardInner() {
         </main>
 
         <div className="dash-right" style={{ background: t.sidebarBg, borderLeft: `0.5px solid ${t.sidebarBorder}` }}>
-          {active === "leaderboard" ? <AdminLeaderboardSidebar dark={dark} t={t} /> : <AdminRightSidebar data={data} dark={dark} t={t} />}
+          {active === "leaderboard" ? <AdminLeaderboardSidebar dark={dark} t={t} /> : <AdminRightSidebar data={data} dark={dark} t={t} active={active} />}
         </div>
       </div>
     </div>
