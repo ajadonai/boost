@@ -147,7 +147,6 @@ export function SharedFooter() {
 export function SharedStyles() {
   return (
     <style>{`
-      @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;450;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap');
       *{box-sizing:border-box;margin:0;padding:0}
       button,a{cursor:pointer;font-family:inherit;border:none;text-decoration:none}
       .serif{font-family:'Cormorant Garamond',serif}
