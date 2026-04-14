@@ -32,6 +32,22 @@ export async function POST(req) {
     if (lastName) { const lnCheck = checkName(lastName); if (lnCheck.blocked) return error(lnCheck.reason); }
 
     if (!validateEmail(email)) return error('Please enter a valid email address');
+
+    // Check for common email domain typos
+    const domain = email.split('@')[1]?.toLowerCase();
+    const DOMAIN_TYPOS = {
+      'gmail.com': ['gmsil.com', 'gmial.com', 'gmal.com', 'gmil.com', 'gmaill.com', 'gamil.com', 'gnail.com', 'gmaul.com', 'gmali.com', 'gmail.co', 'gmaio.com', 'gmqil.com'],
+      'yahoo.com': ['yaho.com', 'yahooo.com', 'yaboo.com', 'yhoo.com', 'yahoo.co', 'yaoo.com', 'yahho.com'],
+      'hotmail.com': ['hotmal.com', 'hotmial.com', 'hotmai.com', 'hotmil.com', 'hotmaill.com', 'hotmall.com'],
+      'outlook.com': ['outlok.com', 'outloo.com', 'outllok.com', 'outlookm.com'],
+      'icloud.com': ['iclou.com', 'icoud.com', 'iclould.com', 'icloude.com'],
+    };
+    for (const [correct, typos] of Object.entries(DOMAIN_TYPOS)) {
+      if (typos.includes(domain)) {
+        return error(`Did you mean ${email.split('@')[0]}@${correct}?`);
+      }
+    }
+
     if (!validatePassword(password)) return error('Password must be 6-128 characters');
 
     // Check if user exists
