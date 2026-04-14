@@ -176,8 +176,40 @@ function PlaceholderPage({ title, subtitle, dark, t }) {
 /* ═══════════════════════════════════════════ */
 function AdminRightSidebar({ data, dark, t, active }) {
   const showTickets = active === "overview";
-  const showProviderColors = ["orders", "services", "menu-builder", "pricing", "finance"].includes(active);
+  const showProviderColors = ["orders", "services", "menu-builder", "pricing", "finance", "payments"].includes(active);
   const showActivity = !["leaderboard"].includes(active);
+
+  // Filter activity by active tab
+  const activityTypeMap = {
+    overview: null, // show all
+    orders: ["order"],
+    finance: ["order", "payment", "user"],
+    users: ["user"],
+    blog: ["blog"],
+    tickets: ["ticket"],
+    services: ["service"],
+    "menu-builder": ["service"],
+    pricing: ["service", "settings"],
+    payments: ["payment"],
+    team: ["admin"],
+    coupons: ["coupon"],
+    alerts: ["alert"],
+    settings: ["settings", "maintenance"],
+    notifications: ["notification"],
+    maintenance: ["maintenance"],
+    api: ["settings"],
+  };
+  const allowedTypes = activityTypeMap[active] || null;
+  const filteredActivity = allowedTypes
+    ? (data.activity || []).filter(a => allowedTypes.includes(a.type))
+    : (data.activity || []);
+  const activityLabel = {
+    orders: "Order Activity", finance: "Financial Activity", users: "User Activity",
+    blog: "Blog Activity", tickets: "Ticket Activity", services: "Service Activity",
+    "menu-builder": "Service Activity", pricing: "Pricing Activity", payments: "Payment Activity",
+    team: "Team Activity", coupons: "Coupon Activity", alerts: "Alert Activity",
+    notifications: "Notification Activity", maintenance: "Maintenance Activity",
+  }[active] || "Recent Activity";
 
   return (
     <>
@@ -212,17 +244,17 @@ function AdminRightSidebar({ data, dark, t, active }) {
       </>)}
 
       {showActivity && (<>
-        <div className="adm-rs-title" style={{ color: t.textMuted }}>Recent Activity</div>
-        {(data.activity || []).slice(0, 6).map((a, i) => (
+        <div className="adm-rs-title" style={{ color: t.textMuted }}>{activityLabel}</div>
+        {filteredActivity.slice(0, 6).map((a, i) => (
           <div key={i} className="adm-rs-activity">
-            <div className="adm-rs-dot" style={{ background: a.type === "order" ? t.green : a.type === "user" ? t.blue : a.type === "deposit" ? t.green : a.type === "ticket" ? t.amber : t.accent }} />
+            <div className="adm-rs-dot" style={{ background: a.type === "order" ? t.green : a.type === "user" ? t.blue : a.type === "deposit" || a.type === "payment" ? t.green : a.type === "ticket" ? t.amber : a.type === "blog" ? (dark ? "#a5b4fc" : "#4f46e5") : t.accent }} />
             <div>
               <div style={{ fontSize: 14, color: t.text, fontWeight: 450 }}>{a.action}</div>
               <div style={{ fontSize: 13, color: t.textMuted }}>{a.detail} · {a.time ? fD(a.time) : ""}</div>
             </div>
           </div>
         ))}
-        {(data.activity || []).length === 0 && <div style={{ fontSize: 14, color: t.textMuted, padding: "8px 4px" }}>No recent activity</div>}
+        {filteredActivity.length === 0 && <div style={{ fontSize: 14, color: t.textMuted, padding: "8px 4px" }}>No recent activity</div>}
       </>)}
     </>
   );
