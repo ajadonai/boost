@@ -135,19 +135,8 @@ export async function PATCH(req) {
       }
 
       const newOrderId = `ORD-${Date.now().toString(36).toUpperCase()}`;
-      let apiOrderId = null;
-      if (order.service.apiId) {
-        try {
-          const provider = order.service.provider || 'mtp';
-          const { calculateDripFeed } = await import('@/lib/drip-feed');
-          const dripFeed = calculateDripFeed(order.service.category, order.quantity);
-          const extra = {};
-          if (dripFeed) { extra.runs = dripFeed.runs; extra.interval = dripFeed.interval; }
-          const result = await placeOrder(provider, order.service.apiId, order.link, order.quantity, extra);
-          apiOrderId = result.order ? String(result.order) : null;
-        } catch (err) { log.error('Reorder', err.message); }
-      }
 
+      // Step 1: Deduct balance FIRST
       const newOrder = await prisma.$transaction(async (tx) => {
         const updated = await tx.$executeRaw`UPDATE users SET balance = balance - ${charge} WHERE id = ${session.id} AND balance >= ${charge}`;
         if (updated === 0) throw new Error('INSUFFICIENT_BALANCE');
@@ -156,7 +145,7 @@ export async function PATCH(req) {
             orderId: newOrderId, userId: session.id, serviceId: order.serviceId,
             tierId: order.tierId, link: order.link, quantity: order.quantity,
             charge, cost,
-            status: apiOrderId ? 'Processing' : 'Pending', apiOrderId,
+            status: 'Pending', apiOrderId: null,
           },
         });
         await tx.transaction.create({
@@ -169,9 +158,26 @@ export async function PATCH(req) {
         return created;
       });
 
+      // Step 2: Place on provider AFTER balance secured
+      let apiOrderId = null;
+      if (order.service.apiId) {
+        try {
+          const provider = order.service.provider || 'mtp';
+          const { calculateDripFeed } = await import('@/lib/drip-feed');
+          const dripFeed = calculateDripFeed(order.service.category, order.quantity);
+          const extra = {};
+          if (dripFeed) { extra.runs = dripFeed.runs; extra.interval = dripFeed.interval; }
+          const result = await placeOrder(provider, order.service.apiId, order.link, order.quantity, extra);
+          apiOrderId = result.order ? String(result.order) : null;
+          if (apiOrderId) {
+            await prisma.order.update({ where: { id: newOrder.id }, data: { apiOrderId, status: 'Processing' } });
+          }
+        } catch (err) { log.error('Reorder', err.message); }
+      }
+
       return Response.json({
         success: true,
-        order: { id: newOrderId, service: order.service.name, quantity: order.quantity, charge: charge / 100, status: newOrder.status },
+        order: { id: newOrderId, service: order.service.name, quantity: order.quantity, charge: charge / 100, status: apiOrderId ? 'Processing' : 'Pending' },
       });
     }
 

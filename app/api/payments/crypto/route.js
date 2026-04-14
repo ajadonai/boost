@@ -142,8 +142,8 @@ export async function GET(req) {
     }
 
     if (npStatus === 'expired' || npStatus === 'failed') {
-      await prisma.transaction.update({ where: { id: tx.id }, data: { status: 'Canceled' } });
-      return Response.json({ status: 'Canceled', reference });
+      await prisma.transaction.update({ where: { id: tx.id }, data: { status: 'Cancelled' } });
+      return Response.json({ status: 'Cancelled', reference });
     }
 
     return Response.json({
