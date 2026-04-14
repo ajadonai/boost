@@ -67,12 +67,14 @@ const TS = {
 /* ═══ ORDER FORM                          ═══ */
 /* ═══════════════════════════════════════════ */
 export function OrderForm({ selSvc, selTier, platform, qty, setQty, link, setLink, dark, t, onClose, compact, onSubmit, orderLoading, comments, setComments, orderResult, loyaltyDiscount = 0, loyaltyTier = null }) {
-  const basePrice = selTier ? Math.round((qty / 1000) * selTier.price) : 0;
+  const basePrice = selTier ? Math.round((qtyNum / 1000) * selTier.price) : 0;
   const discountAmount = loyaltyDiscount > 0 ? Math.round(basePrice * (loyaltyDiscount / 100)) : 0;
   const price = Math.max(0, basePrice - discountAmount);
   const s = selTier ? TS[selTier.tier] : null;
   const minQty = selTier?.min || 100;
   const maxQty = selTier?.max || 50000;
+  const qtyNum = Number(qty) || 0;
+  const qtyOutOfRange = qty !== "" && qtyNum > 0 && (qtyNum < minQty || qtyNum > maxQty);
   const [linkError, setLinkError] = useState("");
 
   /* Link validation */
@@ -178,7 +180,8 @@ export function OrderForm({ selSvc, selTier, platform, qty, setQty, link, setLin
         )}
         <div className="no-form-field">
           <label className="no-form-label" style={{ color: t.textMuted }}>Quantity</label>
-          <input type="number" value={qty} onChange={e => setQty(Math.max(minQty, Math.min(maxQty, Number(e.target.value))))} className="m no-form-input" style={{ borderColor: dark ? "rgba(255,255,255,.1)" : "rgba(0,0,0,.12)", background: dark ? "#0d1020" : "#fff", color: t.text }} />
+          <input type="number" value={qty} onChange={e => setQty(e.target.value === "" ? "" : e.target.value)} className="m no-form-input" style={{ borderColor: qtyOutOfRange ? (dark ? "rgba(220,38,38,.4)" : "rgba(220,38,38,.3)") : (dark ? "rgba(255,255,255,.1)" : "rgba(0,0,0,.12)"), background: dark ? "#0d1020" : "#fff", color: t.text }} />
+          {qtyOutOfRange && <div style={{ fontSize: 11, color: dark ? "#fca5a5" : "#dc2626", marginTop: 3 }}>{qtyNum < minQty ? `Minimum: ${minQty.toLocaleString()}` : `Maximum: ${maxQty.toLocaleString()}`}</div>}
           <div className="no-form-presets">
             {[500, 1000, 2500, 5000, 10000].map(q => (
               <button key={q} onClick={() => setQty(q)} className="m no-form-preset" style={{ borderColor: qty === q ? t.accent : t.cardBorder, background: qty === q ? (dark ? "#2a1a22" : "#fdf2f4") : "transparent", color: qty === q ? t.accent : t.textMuted }}>{q >= 1000 ? `${q / 1000}K` : q}</button>
@@ -187,7 +190,7 @@ export function OrderForm({ selSvc, selTier, platform, qty, setQty, link, setLin
         </div>
         <div className="no-form-summary" style={{ background: dark ? "rgba(255,255,255,.02)" : "rgba(0,0,0,.02)", borderColor: t.cardBorder }}>
           <div className="no-form-sum-row" style={{ color: t.textMuted }}><span>Rate</span><span>₦{selTier.price.toLocaleString()} / {selTier.per}</span></div>
-          <div className="no-form-sum-row" style={{ color: t.textMuted }}><span>Quantity</span><span>{qty.toLocaleString()}</span></div>
+          <div className="no-form-sum-row" style={{ color: t.textMuted }}><span>Quantity</span><span>{qtyNum.toLocaleString()}</span></div>
           {discountAmount > 0 && <div className="no-form-sum-row" style={{ color: dark ? "#6ee7b7" : "#059669" }}><span>{loyaltyTier} discount ({loyaltyDiscount}%)</span><span>-₦{discountAmount.toLocaleString()}</span></div>}
           <div className="no-form-sum-total" style={{ borderColor: t.cardBorder }}>
             <span style={{ color: t.textMuted, fontWeight: 600 }}>Total</span>
@@ -201,7 +204,7 @@ export function OrderForm({ selSvc, selTier, platform, qty, setQty, link, setLin
         {orderResult?.type === "error" && (
           <div style={{ padding: "8px 12px", borderRadius: 8, marginBottom: 10, background: dark ? "rgba(220,38,38,.08)" : "#fef2f2", border: `1px solid ${dark ? "rgba(220,38,38,.2)" : "#fecaca"}`, color: dark ? "#fca5a5" : "#dc2626", fontSize: 13 }}>⚠️ {orderResult.message}</div>
         )}
-        <button onClick={onSubmit} data-tour="no-submit-btn" disabled={!linkValid || ((needsComments || needsUsernames) && !(comments || "").trim()) || (needsAnswer && !(comments || "").trim()) || orderLoading} className="no-form-submit" style={{ opacity: linkValid && (!(needsComments || needsUsernames || needsAnswer) || (comments || "").trim()) && !orderLoading ? 1 : .5 }}>{orderLoading ? "Placing..." : "Place Order"}</button>
+        <button onClick={onSubmit} data-tour="no-submit-btn" disabled={!linkValid || qtyOutOfRange || qtyNum <= 0 || ((needsComments || needsUsernames) && !(comments || "").trim()) || (needsAnswer && !(comments || "").trim()) || orderLoading} className="no-form-submit" style={{ opacity: linkValid && !qtyOutOfRange && qtyNum > 0 && (!(needsComments || needsUsernames || needsAnswer) || (comments || "").trim()) && !orderLoading ? 1 : .5 }}>{orderLoading ? "Placing..." : "Place Order"}</button>
       </>}
     </div>
   );
