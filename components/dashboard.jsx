@@ -112,15 +112,18 @@ function OverviewPage({ user, orders, alerts, dark, t, setActive }) {
   const processing = orders.filter(o => o.status === "Processing" || o.status === "Pending").length;
   const completed = orders.filter(o => o.status === "Completed").length;
   const rate = total > 0 ? Math.round(completed / total * 100) : 0;
+  const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+  const weekOrders = orders.filter(o => o.created && new Date(o.created) > weekAgo).length;
+  const weekSpent = orders.filter(o => o.created && new Date(o.created) > weekAgo).reduce((s, o) => s + (o.charge || 0), 0);
 
   return (
     <>
       {/* Stat cards */}
       <div className="dash-stats">
         {[
-          ["Balance", balance, t.green, "+₦2,000 this week"],
-          ["Orders", String(total), dark ? "#a5b4fc" : "#4f46e5", "3 this week"],
-          ["In Progress", String(processing), dark ? "#e0a458" : "#d97706", "Est. 1-2 hrs"],
+          ["Balance", balance, t.green, weekSpent > 0 ? `-₦${Math.round(weekSpent / 100).toLocaleString()} this week` : "No spend this week"],
+          ["Orders", String(total), dark ? "#a5b4fc" : "#4f46e5", weekOrders > 0 ? `${weekOrders} this week` : "None this week"],
+          ["In Progress", String(processing), dark ? "#e0a458" : "#d97706", processing > 0 ? "Est. 1-2 hrs" : "All clear"],
           ["Delivered", String(completed), dark ? "#6ee7b7" : "#059669", rate + "% success"],
         ].map(([label, val, color, sub]) => (
           <div key={label} className="dash-stat-card" style={{ background: dark ? "rgba(255,255,255,.04)" : "rgba(255,255,255,.85)", border: `0.5px solid ${dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)"}` }}>
