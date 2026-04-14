@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect, useRef } from "react";
 import { fN } from "../lib/format";
+import { useToast } from "./toast";
 
 /* ═══════════════════════════════════════════ */
 /* ═══ PLATFORM DATA — 35 platforms        ═══ */
@@ -66,7 +67,7 @@ const TS = {
 /* ═══════════════════════════════════════════ */
 /* ═══ ORDER FORM                          ═══ */
 /* ═══════════════════════════════════════════ */
-export function OrderForm({ selSvc, selTier, platform, qty, setQty, link, setLink, dark, t, onClose, compact, onSubmit, orderLoading, comments, setComments, orderResult, loyaltyDiscount = 0, loyaltyTier = null }) {
+export function OrderForm({ selSvc, selTier, platform, qty, setQty, link, setLink, dark, t, onClose, compact, onSubmit, orderLoading, comments, setComments, loyaltyDiscount = 0, loyaltyTier = null }) {
   const minQty = selTier?.min || 100;
   const maxQty = selTier?.max || 50000;
   const qtyNum = Number(qty) || 0;
@@ -201,9 +202,6 @@ export function OrderForm({ selSvc, selTier, platform, qty, setQty, link, setLin
           <span className="m no-form-tag" style={{ borderColor: t.cardBorder, color: t.textMuted }}>refill: {selTier.refill}</span>
           <span className="m no-form-tag" style={{ borderColor: t.cardBorder, color: t.textMuted }}>speed: {selTier.speed || "Instant"}</span>
         </div>
-        {orderResult?.type === "error" && (
-          <div style={{ padding: "8px 12px", borderRadius: 8, marginBottom: 10, background: dark ? "rgba(220,38,38,.08)" : "#fef2f2", border: `1px solid ${dark ? "rgba(220,38,38,.2)" : "#fecaca"}`, color: dark ? "#fca5a5" : "#dc2626", fontSize: 13 }}>⚠️ {orderResult.message}</div>
-        )}
         <button onClick={onSubmit} data-tour="no-submit-btn" disabled={!linkValid || qtyOutOfRange || qtyNum <= 0 || ((needsComments || needsUsernames) && !(comments || "").trim()) || (needsAnswer && !(comments || "").trim()) || orderLoading} className="no-form-submit" style={{ opacity: linkValid && !qtyOutOfRange && qtyNum > 0 && (!(needsComments || needsUsernames || needsAnswer) || (comments || "").trim()) && !orderLoading ? 1 : .5 }}>{orderLoading ? "Placing..." : "Place Order"}</button>
       </>}
     </div>
@@ -214,6 +212,7 @@ export function OrderForm({ selSvc, selTier, platform, qty, setQty, link, setLin
 /* ═══ NEW ORDER PAGE                      ═══ */
 /* ═══════════════════════════════════════════ */
 export default function NewOrderPage({ dark, t, user, onOrderSuccess, platform, setPlatform, selSvc, setSelSvc, selTier, setSelTier, qty, setQty, link, setLink, comments, setComments, catModal, setCatModal }) {
+  const toast = useToast();
   const [filterType, setFilterType] = useState("all");
   const [search, setSearch] = useState("");
   const [orderModal, setOrderModal] = useState(false);
@@ -221,7 +220,6 @@ export default function NewOrderPage({ dark, t, user, onOrderSuccess, platform, 
   const [menuLoading, setMenuLoading] = useState(true);
   const [menuError, setMenuError] = useState("");
   const [orderLoading, setOrderLoading] = useState(false);
-  const [orderResult, setOrderResult] = useState(null);
 
   /* Fetch real services from API */
   useEffect(() => {
@@ -279,7 +277,7 @@ export default function NewOrderPage({ dark, t, user, onOrderSuccess, platform, 
   const price = selTier ? Math.round(((Number(qty) || 0) / 1000) * selTier.price) : 0;
   const activePlat = PLATFORMS.find(p => p.id === platform);
 
-  useEffect(() => { setSelSvc(null); setSelTier(null); setFilterType("all"); setOrderModal(false); setOrderResult(null); setSearch(""); }, [platform]);
+  useEffect(() => { setSelSvc(null); setSelTier(null); setFilterType("all"); setOrderModal(false); setSearch(""); }, [platform]);
 
   /* Click outside any card → collapse */
   const listRef = useRef(null);
@@ -332,7 +330,7 @@ export default function NewOrderPage({ dark, t, user, onOrderSuccess, platform, 
   /* Place order */
   const submitOrder = async () => {
     if (!selTier?.id || !link || orderLoading) return;
-    setOrderLoading(true); setOrderResult(null);
+    setOrderLoading(true);
     try {
       const res = await fetch("/api/orders", {
         method: "POST",
@@ -341,13 +339,13 @@ export default function NewOrderPage({ dark, t, user, onOrderSuccess, platform, 
         signal: AbortSignal.timeout(30000),
       });
       const data = await res.json();
-      if (!res.ok) { setOrderResult({ type: "error", message: data.error || "Order failed" }); setOrderLoading(false); return; }
-      setOrderResult({ type: "success", message: `Order placed! ${data.order?.id || ""}`, order: data.order });
+      if (!res.ok) { toast.error("Order failed", data.error || "Something went wrong"); setOrderLoading(false); return; }
+      toast.success("Order placed!", `${data.order?.id || ""} — ${selSvc?.name || "Service"}`);
       setLink(""); setSelSvc(null); setSelTier(null); setOrderModal(false);
       if (onOrderSuccess) onOrderSuccess();
     } catch (err) {
-      const msg = err?.name === "TimeoutError" ? "Request timed out. Check your connection." : "Network error. Check your internet and try again.";
-      setOrderResult({ type: "error", message: msg });
+      const msg = err?.name === "TimeoutError" ? "Request timed out" : "Network error";
+      toast.error(msg, "Check your connection and try again.");
     }
     setOrderLoading(false);
   };
@@ -427,14 +425,6 @@ export default function NewOrderPage({ dark, t, user, onOrderSuccess, platform, 
         <div className="no-subtitle" style={{ color: t.textMuted }}>{menuData ? `${allGroups.length} services across ${Object.keys(platformCounts).length} platforms — prices per 1,000` : "Browse and order social media services"}</div>
         <div className="page-divider" style={{ background: t.cardBorder }} />
       </div>
-
-      {/* Order result toast */}
-      {orderResult && (
-        <div style={{ padding: "10px 16px", borderRadius: 10, marginBottom: 12, background: orderResult.type === "success" ? (dark ? "rgba(110,231,183,.08)" : "#ecfdf5") : (dark ? "rgba(220,38,38,.08)" : "#fef2f2"), border: `1px solid ${orderResult.type === "success" ? (dark ? "rgba(110,231,183,.2)" : "#a7f3d0") : (dark ? "rgba(220,38,38,.2)" : "#fecaca")}`, color: orderResult.type === "success" ? (dark ? "#6ee7b7" : "#059669") : (dark ? "#fca5a5" : "#dc2626"), fontSize: 14, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <span>{orderResult.type === "success" ? "✓" : "⚠️"} {orderResult.message}</span>
-          <button onClick={() => setOrderResult(null)} style={{ background: "none", color: "inherit", fontSize: 16, border: "none", cursor: "pointer" }}>✕</button>
-        </div>
-      )}
 
       {/* Mobile/tablet guide */}
       <div className="no-mobile-guide">
@@ -549,7 +539,7 @@ export default function NewOrderPage({ dark, t, user, onOrderSuccess, platform, 
       {orderModal && hasOrder && (
         <div className="no-modal-overlay" onClick={() => setOrderModal(false)}>
           <div className="no-modal" onClick={e => e.stopPropagation()} style={{ background: dark ? "#0e1120" : "#ffffff", borderWidth: 1, borderStyle: "solid", borderColor: t.cardBorder }}>
-            <OrderForm selSvc={selSvc} selTier={selTier} platform={platform} qty={qty} setQty={setQty} link={link} setLink={setLink} comments={comments} setComments={setComments} dark={dark} t={t} onClose={() => setOrderModal(false)} onSubmit={submitOrder} orderLoading={orderLoading} orderResult={orderResult} loyaltyDiscount={menuData?.loyaltyDiscount || 0} loyaltyTier={menuData?.loyaltyTier || null} />
+            <OrderForm selSvc={selSvc} selTier={selTier} platform={platform} qty={qty} setQty={setQty} link={link} setLink={setLink} comments={comments} setComments={setComments} dark={dark} t={t} onClose={() => setOrderModal(false)} onSubmit={submitOrder} orderLoading={orderLoading} loyaltyDiscount={menuData?.loyaltyDiscount || 0} loyaltyTier={menuData?.loyaltyTier || null} />
           </div>
         </div>
       )}

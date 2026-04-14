@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from "react";
 import { useConfirm } from "./confirm-dialog";
+import { useToast } from "./toast";
 import { PlatformIcon } from "./platform-icon";
 import { fN, fD } from "../lib/format";
 
@@ -66,27 +67,26 @@ export default function OrdersPage({ orders: initialOrders, txs, dark, t }) {
   const [oPage, setOPage] = useState(1);
   const [tPage, setTPage] = useState(1);
   const [actionLoading, setActionLoading] = useState(null);
-  const [orderMsg, setOrderMsg] = useState({}); // { [orderId]: { type, text } }
+  const toast = useToast();
 
   useEffect(() => { setOrders(initialOrders); }, [initialOrders]);
 
   const doAction = async (orderId, action) => {
     setActionLoading(orderId);
-    setOrderMsg(prev => { const n = { ...prev }; delete n[orderId]; return n; });
     try {
       const res = await fetch("/api/orders", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action, orderId }) });
       const data = await res.json();
-      if (!res.ok) { setOrderMsg(prev => ({ ...prev, [orderId]: { type: "error", text: data.error || "Action failed" } })); setActionLoading(null); return; }
+      if (!res.ok) { toast.error("Action failed", data.error || "Something went wrong"); setActionLoading(null); return; }
       if (action === "check") {
         if (data.status) setOrders(prev => prev.map(o => (o.id === orderId ? { ...o, status: data.status } : o)));
-        setOrderMsg(prev => ({ ...prev, [orderId]: { type: "success", text: `${data.status}${data.remains != null ? " · " + data.remains + " remaining" : ""}` } }));
+        toast.info("Status checked", `${data.status}${data.remains != null ? " · " + data.remains + " remaining" : ""}`);
       } else if (action === "cancel") {
         setOrders(prev => prev.map(o => (o.id === orderId ? { ...o, status: "Cancelled" } : o)));
-        setOrderMsg(prev => ({ ...prev, [orderId]: { type: "success", text: `Cancelled${data.refunded ? " · ₦" + data.refunded.toLocaleString() + " refunded" : ""}` } }));
+        toast.success("Order cancelled", data.refunded ? `₦${data.refunded.toLocaleString()} refunded to wallet` : "Cancelled successfully");
       } else if (action === "reorder") {
-        setOrderMsg(prev => ({ ...prev, [orderId]: { type: "success", text: `Reorder placed — ${data.order?.id || ""}` } }));
+        toast.success("Reorder placed", data.order?.id || "");
       }
-    } catch { setOrderMsg(prev => ({ ...prev, [orderId]: { type: "error", text: "Request failed" } })); }
+    } catch { toast.error("Request failed", "Check your connection and try again"); }
     setActionLoading(null);
   };
 
@@ -198,12 +198,6 @@ export default function OrdersPage({ orders: initialOrders, txs, dark, t }) {
                   {o.status === "Completed" && (
                     <div className="ord-actions">
                       <button onClick={async () => { const ok = await confirm({ title: "Reorder", message: `Reorder ${o.service}? ₦${o.charge?.toLocaleString()} will be charged from your wallet.`, confirmLabel: "Place Reorder" }); if (ok) doAction(o.id, "reorder"); }} disabled={actionLoading === o.id} className="m ord-action-btn" style={{ borderColor: t.cardBorder, color: t.accent }}>{actionLoading === o.id ? "..." : "Reorder"}</button>
-                    </div>
-                  )}
-                  {orderMsg[o.id] && (
-                    <div style={{ marginTop: 8, padding: "6px 10px", borderRadius: 6, fontSize: 13, background: orderMsg[o.id].type === "success" ? (dark ? "rgba(110,231,183,.08)" : "#ecfdf5") : (dark ? "rgba(220,38,38,.08)" : "#fef2f2"), color: orderMsg[o.id].type === "success" ? (dark ? "#6ee7b7" : "#059669") : (dark ? "#fca5a5" : "#dc2626"), display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                      <span>{orderMsg[o.id].type === "success" ? "✓" : "⚠️"} {orderMsg[o.id].text}</span>
-                      <button onClick={() => setOrderMsg(prev => { const n = { ...prev }; delete n[o.id]; return n; })} style={{ background: "none", color: "inherit", border: "none", cursor: "pointer", fontSize: 12 }}>✕</button>
                     </div>
                   )}
                 </div>
