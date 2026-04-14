@@ -341,7 +341,7 @@ export default function NewOrderPage({ dark, t, user, onOrderSuccess, platform, 
       const data = await res.json();
       if (!res.ok) { toast.error("Order failed", data.error || "Something went wrong"); setOrderLoading(false); return; }
       toast.success("Order placed!", `${data.order?.id || ""} — ${selSvc?.name || "Service"}`);
-      setLink(""); setSelSvc(null); setSelTier(null); setOrderModal(false);
+      setLink(""); setOrderModal(false);
       if (onOrderSuccess) onOrderSuccess();
     } catch (err) {
       const msg = err?.name === "TimeoutError" ? "Request timed out" : "Network error";

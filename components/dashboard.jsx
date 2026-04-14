@@ -121,7 +121,7 @@ function OverviewPage({ user, orders, alerts, dark, t, setActive }) {
       {/* Stat cards */}
       <div className="dash-stats">
         {[
-          ["Balance", balance, t.green, weekSpent > 0 ? `-₦${Math.round(weekSpent / 100).toLocaleString()} this week` : "No spend this week"],
+          ["Balance", balance, t.green, weekSpent > 0 ? `-₦${Math.round(weekSpent).toLocaleString()} this week` : "No spend this week"],
           ["Orders", String(total), dark ? "#a5b4fc" : "#4f46e5", weekOrders > 0 ? `${weekOrders} this week` : "None this week"],
           ["In Progress", String(processing), dark ? "#e0a458" : "#d97706", processing > 0 ? "Est. 1-2 hrs" : "All clear"],
           ["Delivered", String(completed), dark ? "#6ee7b7" : "#059669", rate + "% success"],
