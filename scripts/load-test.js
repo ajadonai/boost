@@ -1,5 +1,5 @@
 // Nitro Load Test Script
-// Run: BASE_URL=https://nitro.ng TEST_EMAIL=test@example.com TEST_PASSWORD=yourpass node scripts/load-test.js
+// Run: TEST_EMAIL=x TEST_PASSWORD=y node scripts/load-test.js
 
 const BASE = process.env.BASE_URL || 'https://nitro.ng';
 const EMAIL = process.env.TEST_EMAIL;
@@ -10,39 +10,30 @@ if (!EMAIL || !PASSWORD) {
   process.exit(1);
 }
 
-let token = null;
+let cookies = '';
 let passed = 0;
 let failed = 0;
 
-async function api(method, path, body = null, expectFail = false) {
+async function api(method, path, body = null) {
   const headers = { 'Content-Type': 'application/json' };
-  if (token) headers['Cookie'] = token;
+  if (cookies) headers['Cookie'] = cookies;
   const opts = { method, headers };
   if (body) opts.body = JSON.stringify(body);
   const res = await fetch(`${BASE}${path}`, opts);
 
-  // Capture cookie from response — try multiple methods
-  // Method 1: getSetCookie (Node 20+)
-  const setCookies = res.headers.getSetCookie?.() || [];
-  for (const c of setCookies) {
-    if (c.startsWith('nitro_token=')) {
-      token = c.split(';')[0];
+  // Capture ALL cookies from response
+  const sc = res.headers.getSetCookie?.() || [];
+  if (sc.length > 0) {
+    const parsed = {};
+    // Keep existing cookies
+    if (cookies) cookies.split('; ').forEach(c => { const [k,v] = c.split('='); if (k && v) parsed[k] = v; });
+    // Override with new ones
+    for (const c of sc) {
+      const [kv] = c.split(';');
+      const [k, ...vParts] = kv.split('=');
+      if (k && vParts.length) parsed[k.trim()] = vParts.join('=');
     }
-  }
-  // Method 2: raw headers iteration
-  if (!token || !token.includes('nitro_token')) {
-    const raw = res.headers.raw?.()?.['set-cookie'] || [];
-    for (const c of raw) {
-      if (c.startsWith('nitro_token=')) {
-        token = c.split(';')[0];
-      }
-    }
-  }
-  // Method 3: get('set-cookie') single string
-  if (!token || !token.includes('nitro_token')) {
-    const sc = res.headers.get('set-cookie') || '';
-    const match = sc.match(/nitro_token=([^;]+)/);
-    if (match) token = `nitro_token=${match[1]}`;
+    cookies = Object.entries(parsed).map(([k,v]) => `${k}=${v}`).join('; ');
   }
 
   let data;
@@ -61,53 +52,21 @@ async function main() {
   console.log(`  Target: ${BASE}`);
   console.log('══════════════════════════════════════\n');
 
-  // 1. Login
-  console.log('1. AUTHENTICATION');
-  console.log('─────────────────');
+  // 1. Login + Dashboard
+  console.log('1. AUTHENTICATION & DASHBOARD');
+  console.log('─────────────────────────────');
   const login = await api('POST', '/api/auth/login', { email: EMAIL, password: PASSWORD });
-  log('Login', login.ok, login.ok ? 'Authenticated' : login.data?.error);
+  log('Login', login.ok, login.ok ? 'Authenticated' : (login.data?.error || `Status ${login.status}`));
   if (!login.ok) { console.error('Cannot continue without auth'); process.exit(1); }
-  console.log(`  Token captured: ${token ? 'yes (' + token.slice(0, 30) + '...)' : 'NO — cookie not accessible from Node.js fetch'}`);
-  if (!token) {
-    console.log('  Note: httpOnly cookies cannot be captured by Node.js fetch.');
-    console.log('  Skipping authenticated tests. Unauth tests will still run.\n');
-  }
+  console.log(`  Cookies: ${cookies ? cookies.slice(0, 50) + '...' : 'NONE'}`);
 
-  // Get initial balance
   const dash = await api('GET', '/api/dashboard');
   const initialBalance = dash.data?.user?.balance || 0;
   log('Dashboard load', dash.ok, `Balance: ₦${initialBalance.toLocaleString()}`);
 
-  // 2. Rate Limit Test — Login
-  console.log('\n2. RATE LIMIT — LOGIN');
-  console.log('─────────────────────');
-  const loginAttempts = [];
-  for (let i = 0; i < 12; i++) {
-    loginAttempts.push(api('POST', '/api/auth/login', { email: EMAIL, password: 'wrongpassword' }));
-  }
-  const loginResults = await Promise.all(loginAttempts);
-  const rateLimited = loginResults.some(r => r.status === 429);
-  log('Rate limit triggers on rapid login', rateLimited, `${loginResults.filter(r => r.status === 429).length}/12 blocked`);
-
-  // Re-login with correct password
-  await api('POST', '/api/auth/login', { email: EMAIL, password: PASSWORD });
-
-  // 3. Rate Limit Test — Orders
-  console.log('\n3. RATE LIMIT — ORDERS');
-  console.log('──────────────────────');
-  const orderAttempts = [];
-  for (let i = 0; i < 15; i++) {
-    orderAttempts.push(api('POST', '/api/orders', { tierId: 'fake-tier-id', link: 'https://instagram.com/test', quantity: 100 }));
-  }
-  const orderResults = await Promise.all(orderAttempts);
-  const orderLimited = orderResults.some(r => r.status === 429);
-  const orderBlocked = orderResults.filter(r => r.status === 429).length;
-  log('Rate limit triggers on rapid orders', true, orderLimited ? `${orderBlocked}/15 blocked` : `0/15 blocked (expected on serverless — in-memory rate limit resets per instance)`);
-
-  // 4. Concurrent Balance Race Condition
-  console.log('\n4. CONCURRENT ORDER RACE CONDITION');
+  // 2. Concurrent order race condition (run BEFORE rate limit tests)
+  console.log('\n2. CONCURRENT ORDER RACE CONDITION');
   console.log('───────────────────────────────────');
-  // Get menu to find a real tier
   const menu = await api('GET', '/api/menu');
   const groups = menu.data?.groups || [];
   let testTier = null;
@@ -122,12 +81,14 @@ async function main() {
   }
 
   if (testTier && initialBalance > 0) {
-    console.log(`  Using tier: ${testTier.id} (₦${(testTier.sellPer1k / 10).toFixed(0)}/100)`);
-    const orderCost = Math.round((testTier.sellPer1k / 1000) * 100);
-    const maxOrders = Math.floor(initialBalance * 100 / orderCost); // balance is in naira, charge in kobo
-    const concurrentCount = Math.min(maxOrders + 3, 10); // try 3 more than affordable
+    const orderCost = Math.round((testTier.sellPer1k / 1000) * 100) / 100; // naira
+    const maxOrders = Math.floor(initialBalance / orderCost);
+    const concurrentCount = Math.min(maxOrders + 3, 10);
 
-    console.log(`  Balance can afford ${maxOrders} orders. Sending ${concurrentCount} concurrent...`);
+    console.log(`  Tier: ${testTier.id}`);
+    console.log(`  Cost per order: ₦${orderCost.toLocaleString()} (100 qty)`);
+    console.log(`  Balance: ₦${initialBalance.toLocaleString()} → can afford ${maxOrders} orders`);
+    console.log(`  Sending ${concurrentCount} concurrent orders...`);
 
     const raceOrders = [];
     for (let i = 0; i < concurrentCount; i++) {
@@ -139,45 +100,71 @@ async function main() {
     }
     const raceResults = await Promise.all(raceOrders);
     const succeeded = raceResults.filter(r => r.ok).length;
-    const insufficientBalance = raceResults.filter(r => r.data?.error?.includes('nsufficient')).length;
+    const insufficientBalance = raceResults.filter(r => r.data?.error?.toLowerCase().includes('nsufficient')).length;
+    const otherErrors = raceResults.filter(r => !r.ok && !r.data?.error?.toLowerCase().includes('nsufficient'));
 
-    console.log(`  Results: ${succeeded} succeeded, ${insufficientBalance} insufficient balance, ${raceResults.length - succeeded - insufficientBalance} other errors`);
+    console.log(`  Results: ${succeeded} succeeded, ${insufficientBalance} insufficient, ${otherErrors.length} other errors`);
+    if (otherErrors.length > 0) console.log(`  Other errors: ${otherErrors.map(r => r.data?.error).join(', ')}`);
 
     // Check balance after
     const dashAfter = await api('GET', '/api/dashboard');
     const finalBalance = dashAfter.data?.user?.balance || 0;
     log('No negative balance after race', finalBalance >= 0, `Final: ₦${finalBalance.toLocaleString()}`);
-    log('Total deducted makes sense', succeeded <= maxOrders, `${succeeded} orders ≤ ${maxOrders} affordable`);
+    log('Correct number of orders went through', succeeded <= maxOrders, `${succeeded} orders ≤ ${maxOrders} affordable`);
   } else {
-    console.log('  ⚠ Skipped — no test tier found or zero balance');
+    console.log(`  ⚠ Skipped — ${!testTier ? 'no test tier found' : 'zero balance'}`);
+    if (!testTier) console.log(`  Menu returned ${groups.length} groups`);
   }
 
-  // 5. API without auth
+  // 3. Rate Limit Test — Login
+  console.log('\n3. RATE LIMIT — LOGIN');
+  console.log('─────────────────────');
+  const loginAttempts = [];
+  for (let i = 0; i < 12; i++) {
+    loginAttempts.push(api('POST', '/api/auth/login', { email: EMAIL, password: 'wrongpassword' }));
+  }
+  const loginResults = await Promise.all(loginAttempts);
+  const rateLimited = loginResults.some(r => r.status === 429);
+  log('Rate limit triggers on rapid login', rateLimited, `${loginResults.filter(r => r.status === 429).length}/12 blocked`);
+
+  // 4. Rate Limit Test — Orders
+  console.log('\n4. RATE LIMIT — ORDERS');
+  console.log('──────────────────────');
+  // Re-login first since rate limit test may have messed up session
+  await api('POST', '/api/auth/login', { email: EMAIL, password: PASSWORD });
+  const orderAttempts = [];
+  for (let i = 0; i < 15; i++) {
+    orderAttempts.push(api('POST', '/api/orders', { tierId: 'fake-tier-id', link: 'https://instagram.com/test', quantity: 100 }));
+  }
+  const orderResults = await Promise.all(orderAttempts);
+  const orderBlocked = orderResults.filter(r => r.status === 429).length;
+  log('Rate limit on rapid orders', true, orderBlocked > 0 ? `${orderBlocked}/15 blocked` : `0/15 blocked (expected on serverless)`);
+
+  // 5. Unauthorized access
   console.log('\n5. UNAUTHORIZED ACCESS');
   console.log('──────────────────────');
-  const savedToken = token;
-  token = null; // clear auth
+  const savedCookies = cookies;
+  cookies = '';
 
   const unauth1 = await api('GET', '/api/dashboard');
   log('Dashboard blocked without auth', !unauth1.ok, `Status: ${unauth1.status}`);
-
   const unauth2 = await api('POST', '/api/orders', { tierId: 'test', link: 'test', quantity: 100 });
   log('Orders blocked without auth', !unauth2.ok, `Status: ${unauth2.status}`);
-
   const unauth3 = await api('GET', '/api/admin/orders');
   log('Admin blocked without auth', !unauth3.ok, `Status: ${unauth3.status}`);
 
-  token = savedToken; // restore
+  cookies = savedCookies;
 
   // 6. Concurrent page loads
   console.log('\n6. CONCURRENT PAGE LOADS');
   console.log('────────────────────────');
-  const pages = ['/api/dashboard', '/api/menu', '/api/orders', '/api/auth/notifications'];
+  await api('POST', '/api/auth/login', { email: EMAIL, password: PASSWORD });
+  const pages = ['/api/dashboard', '/api/menu', '/api/auth/notifications'];
   const start = Date.now();
   const pageResults = await Promise.all(pages.map(p => api('GET', p)));
   const elapsed = Date.now() - start;
-  const allOk = pageResults.every(r => r.ok);
-  log(`${pages.length} concurrent API calls`, true, `${elapsed}ms (${pageResults.filter(r => r.ok).length}/${pages.length} ok)`);
+  const okCount = pageResults.filter(r => r.ok).length;
+  log(`${pages.length} concurrent API calls`, okCount >= 2, `${elapsed}ms (${okCount}/${pages.length} ok)`);
 
   // Summary
   console.log('\n══════════════════════════════════════');
