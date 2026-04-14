@@ -372,14 +372,15 @@ function FinanceOverviewTab({ dark, t }) {
 
   // Render chart when data is ready
   useEffect(() => {
-    if (!stats?.chartData?.length) return;
-    const tryRender = () => {
-      if (!chartRef.current) return;
+    if (!stats?.chartData?.length || !chartRef.current) return;
+    let destroyed = false;
+    import("chart.js/auto").then(({ default: Chart }) => {
+      if (destroyed || !chartRef.current) return;
       if (chartInstance.current) chartInstance.current.destroy();
       const cd = stats.chartData;
       const gridColor = dark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)";
       const tickColor = dark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.4)";
-      chartInstance.current = new window.Chart(chartRef.current, {
+      chartInstance.current = new Chart(chartRef.current, {
         type: "bar",
         data: {
           labels: cd.map(d => { const dt = new Date(d.date); return dt.toLocaleDateString("en-GB", { day: "numeric", month: "short" }); }),
@@ -399,14 +400,8 @@ function FinanceOverviewTab({ dark, t }) {
           },
         },
       });
-    };
-    if (window.Chart) { tryRender(); } else {
-      const s = document.createElement("script");
-      s.src = "https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js";
-      s.onload = tryRender;
-      document.head.appendChild(s);
-    }
-    return () => { if (chartInstance.current) { chartInstance.current.destroy(); chartInstance.current = null; } };
+    });
+    return () => { destroyed = true; if (chartInstance.current) { chartInstance.current.destroy(); chartInstance.current = null; } };
   }, [stats, dark]);
 
   const changeRange = (r) => { setRange(r); load(r); };
