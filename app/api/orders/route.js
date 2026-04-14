@@ -69,7 +69,7 @@ export async function PATCH(req) {
     }
 
     if (action === 'cancel') {
-      if (order.status === 'Completed' || order.status === 'Cancelled' || order.status === 'Canceled' || order.status === 'Partial') {
+      if (order.status === 'Completed' || order.status === 'Cancelled' || order.status === 'Partial') {
         return Response.json({ error: `Cannot cancel ${order.status.toLowerCase()} order` }, { status: 400 });
       }
       if (order.apiOrderId) {
@@ -298,38 +298,8 @@ export async function POST(req) {
     // Generate order ID
     const orderId = `ORD-${Date.now().toString(36).toUpperCase()}`;
 
-    // Place order on provider (MTP, JAP, or DaoSMM)
-    let apiOrderId = null;
-    if (service.apiId) {
-      try {
-        const provider = service.provider || 'mtp';
-        const sType = (serviceType || tier?.group?.type || "").toLowerCase();
-        const sName = (tier?.group?.name || service?.name || "").toLowerCase();
-        const extra = {};
-        if (comments) {
-          const safeComments = comments.trim().slice(0, 5000);
-          if (sName.includes("mention")) extra.usernames = safeComments;
-          else if (sName.includes("poll") || sName.includes("vote")) extra.answer_number = safeComments;
-          else extra.comments = safeComments;
-        }
-        // Drip-feed: spread delivery over time based on platform + quantity
-        const { calculateDripFeed } = await import('@/lib/drip-feed');
-        const dripFeed = calculateDripFeed(service.category, qty);
-        if (dripFeed) {
-          extra.runs = dripFeed.runs;
-          extra.interval = dripFeed.interval;
-        }
-        const result = await placeOrder(provider, service.apiId, trimmedLink, qty, extra);
-        apiOrderId = result.order ? String(result.order) : null;
-      } catch (err) {
-        log.error('Order Place', err.message);
-      }
-    }
-
-    // Atomic balance check + deduct — prevents race condition where two
-    // simultaneous orders both pass a balance check then both deduct
+    // Step 1: Atomic balance deduct FIRST — before sending to provider
     const result = await prisma.$transaction(async (tx) => {
-      // Atomically deduct balance only if sufficient
       const updated = await tx.$executeRaw`UPDATE users SET balance = balance - ${charge} WHERE id = ${session.id} AND balance >= ${charge}`;
       if (updated === 0) {
         throw new Error('INSUFFICIENT_BALANCE');
@@ -344,8 +314,8 @@ export async function POST(req) {
           quantity: qty,
           charge,
           cost,
-          status: apiOrderId ? 'Processing' : 'Pending',
-          apiOrderId,
+          status: 'Pending',
+          apiOrderId: null,
         },
       });
       await tx.transaction.create({
@@ -362,6 +332,38 @@ export async function POST(req) {
       return order;
     });
 
+    // Step 2: Place on provider AFTER balance is secured
+    let apiOrderId = null;
+    if (service.apiId) {
+      try {
+        const provider = service.provider || 'mtp';
+        const sType = (serviceType || tier?.group?.type || "").toLowerCase();
+        const sName = (tier?.group?.name || service?.name || "").toLowerCase();
+        const extra = {};
+        if (comments) {
+          const safeComments = comments.trim().slice(0, 5000);
+          if (sName.includes("mention")) extra.usernames = safeComments;
+          else if (sName.includes("poll") || sName.includes("vote")) extra.answer_number = safeComments;
+          else extra.comments = safeComments;
+        }
+        const { calculateDripFeed } = await import('@/lib/drip-feed');
+        const dripFeed = calculateDripFeed(service.category, qty);
+        if (dripFeed) {
+          extra.runs = dripFeed.runs;
+          extra.interval = dripFeed.interval;
+        }
+        const provResult = await placeOrder(provider, service.apiId, trimmedLink, qty, extra);
+        apiOrderId = provResult.order ? String(provResult.order) : null;
+        // Update order with provider ID and set to Processing
+        if (apiOrderId) {
+          await prisma.order.update({ where: { id: result.id }, data: { apiOrderId, status: 'Processing' } });
+        }
+      } catch (err) {
+        log.error('Order Place', err.message);
+        // Order stays Pending — can be retried or refunded via admin
+      }
+    }
+
     return Response.json({
       success: true,
       order: {
@@ -369,7 +371,7 @@ export async function POST(req) {
         service: tierName,
         quantity: qty,
         charge: charge / 100,
-        status: result.status,
+        status: apiOrderId ? 'Processing' : 'Pending',
         ...(loyaltyDiscount > 0 ? { loyaltyDiscount: loyaltyDiscount / 100, loyaltyTier: loyaltyTierName } : {}),
       },
     });
