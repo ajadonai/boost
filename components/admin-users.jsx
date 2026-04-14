@@ -26,6 +26,8 @@ export default function AdminUsersPage({ dark, t }) {
 
   const filtered = users.filter(u => {
     if (filter === "active" && u.status !== "Active") return false;
+    if (filter === "verified" && (u.status !== "Active" || !u.verified)) return false;
+    if (filter === "unverified" && (u.status !== "Active" || u.verified)) return false;
     if (filter === "suspended" && u.status !== "Suspended") return false;
     if (filter === "deleted" && u.status !== "Deleted" && u.status !== "PendingDeletion") return false;
     if (filter === "pending-deletion" && u.status !== "PendingDeletion") return false;
@@ -116,7 +118,7 @@ export default function AdminUsersPage({ dark, t }) {
           backgroundImage: `url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='${dark ? "%23666" : "%23999"}' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E")`,
           backgroundRepeat: "no-repeat", backgroundPosition: "right 8px center",
         }}>
-          {[["all", "All", users.length], ["active", "Active", users.filter(u => u.status === "Active").length], ["suspended", "Banned", users.filter(u => u.status === "Suspended").length], ["pending-deletion", "Pending Del.", users.filter(u => u.status === "PendingDeletion").length], ["deleted", "Deleted", users.filter(u => u.status === "Deleted").length]].map(([id, label, count]) => (
+          {[["all", "All", users.length], ["verified", "Verified", users.filter(u => u.status === "Active" && u.verified).length], ["unverified", "Unverified", users.filter(u => u.status === "Active" && !u.verified).length], ["suspended", "Banned", users.filter(u => u.status === "Suspended").length], ["pending-deletion", "Pending Del.", users.filter(u => u.status === "PendingDeletion").length], ["deleted", "Deleted", users.filter(u => u.status === "Deleted").length]].map(([id, label, count]) => (
             <option key={id} value={id}>{label} ({count})</option>
           ))}
         </select>
