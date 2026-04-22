@@ -30,9 +30,16 @@ export async function GET(req) {
     }
 
     // List posts
+    const search = searchParams.get('search');
     const where = { published: true };
     if (howto) where.showInHowTo = true;
     if (category) where.category = category;
+    if (search) {
+      where.OR = [
+        { title: { contains: search, mode: 'insensitive' } },
+        { excerpt: { contains: search, mode: 'insensitive' } },
+      ];
+    }
 
     const [posts, total] = await Promise.all([
       prisma.blogPost.findMany({

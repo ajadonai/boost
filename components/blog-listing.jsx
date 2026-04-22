@@ -6,6 +6,7 @@ export default function BlogListing({ initialPosts, initialCategories, initialTo
   const [posts, setPosts] = useState(initialPosts);
   const [categories, setCategories] = useState(initialCategories);
   const [activeCat, setActiveCat] = useState("all");
+  const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
   const [dark, setDark] = useState(false);
   const [page, setPage] = useState(1);
@@ -20,8 +21,8 @@ export default function BlogListing({ initialPosts, initialCategories, initialTo
 
   const toggle = () => { const n = !dark; setDark(n); localStorage.setItem("nitro-theme", n ? "night" : "day"); };
 
-  const fetchPosts = useCallback((p, cat) => {
-    if (p === 1 && cat === 'all') {
+  const fetchPosts = useCallback((p, cat, q) => {
+    if (p === 1 && cat === 'all' && !q) {
       setPosts(initialPosts);
       setCategories(initialCategories);
       setTotalPages(initialTotalPages);
@@ -30,6 +31,7 @@ export default function BlogListing({ initialPosts, initialCategories, initialTo
     setLoading(true);
     const params = new URLSearchParams({ page: p });
     if (cat && cat !== 'all') params.set('category', cat);
+    if (q) params.set('search', q);
     fetch("/api/blog?" + params).then(r => r.json()).then(d => {
       setPosts(d.posts || []);
       setCategories(d.categories || []);
@@ -38,9 +40,14 @@ export default function BlogListing({ initialPosts, initialCategories, initialTo
     }).catch(() => setLoading(false));
   }, [initialPosts, initialCategories, initialTotalPages]);
 
-  useEffect(() => { fetchPosts(page, activeCat); }, [page, activeCat, fetchPosts]);
+  useEffect(() => {
+    const delay = search ? 300 : 0;
+    const t = setTimeout(() => fetchPosts(page, activeCat, search), delay);
+    return () => clearTimeout(t);
+  }, [page, activeCat, search, fetchPosts]);
 
   const changeCat = (cat) => { setActiveCat(cat); setPage(1); };
+  const onSearch = (e) => { setSearch(e.target.value); setPage(1); };
 
   const v = {
     bg: dark ? "#080b14" : "#f4f1ed",
@@ -82,6 +89,17 @@ export default function BlogListing({ initialPosts, initialCategories, initialTo
       <div className="text-center max-w-[600px] mx-auto" style={{ padding: "clamp(30px,5vw,56px) 20px clamp(16px,2vw,28px)" }}>
         <h1 className="font-semibold mb-2.5 leading-tight" style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "clamp(30px,5vw,44px)", color: v.txt }}>The Nitro Blog</h1>
         <p className="text-base leading-relaxed m-0" style={{ color: v.mut }}>Tips, guides, and updates to help you grow your social media presence.</p>
+        <div className="relative mt-5 max-w-[400px] mx-auto">
+          <input
+            type="text"
+            value={search}
+            onChange={onSearch}
+            placeholder="Search articles..."
+            className="w-full py-2.5 pl-10 pr-4 rounded-xl text-sm outline-none font-[inherit]"
+            style={{ background: v.card, border: "1px solid " + v.bdr, color: v.txt }}
+          />
+          <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={v.sft} strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </div>
       </div>
       {categories.length > 1 && (
         <div className="flex gap-1.5 justify-center px-5 pb-6 flex-wrap">
