@@ -730,6 +730,10 @@ Evaluated, intentionally not in Phase 1. Filed in `/docs/DEFERRED.md`.
 | Budget sub-brand | 3 | Pricing + UI spin-off |
 | Marketer account type | 3 | Full dashboard + attribution system |
 | Ticket assignment system | 3 | Post-launch support scaling |
+| Admin custom pages grant write access | 2 | Permissions model refinement; low exposure with small team |
+| Manual deposit coupon bypass | 2 | Admin-mediated path skips coupon validation; tighten post-launch |
+| Crypto deposit coupon not applied | Payment | Bonus stored but never credited; fix when crypto flow finalized |
+| Unsupported gateway creates pending records | Payment | Only if unconfigured gateway enabled; fix when providers confirmed |
 
 **Not on this list (intentionally not in any phase):** KYC, AML, formal SLO contracts, formal DR RTO/RPO, third-party status page service. An SMM panel at this scale doesn't need them.
 
