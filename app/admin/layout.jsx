@@ -1,5 +1,5 @@
 export const metadata = {
-  title: 'Admin — Nitro',
+  title: 'Admin',
   robots: { index: false, follow: false },
 };
 

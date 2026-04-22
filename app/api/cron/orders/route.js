@@ -1,6 +1,7 @@
 import prisma from '@/lib/prisma';
 import { log } from '@/lib/logger';
 import { checkOrder } from '@/lib/smm';
+import { sendEmail, emailWrap } from '@/lib/email';
 
 // Polls provider APIs for order status updates
 // Auto-refunds failed/cancelled orders
@@ -140,38 +141,29 @@ async function refundOrder(order, amount = null) {
   });
 
   // Send refund email notification
-  if (userEmail && process.env.BREVO_API_KEY && user?.notifEmail !== false && user?.notifOrders !== false) {
+  if (userEmail && user?.notifEmail !== false && user?.notifOrders !== false) {
     try {
       const isPartial = amount && amount !== order.charge;
       const nairaAmount = (refundAmount / 100).toLocaleString();
-      await fetch('https://api.brevo.com/v3/smtp/email', {
-        method: 'POST',
-        headers: { 'api-key': process.env.BREVO_API_KEY, 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          sender: { name: 'Nitro', email: 'noreply@nitro.ng' },
-          to: [{ email: userEmail }],
-          subject: isPartial ? `Partial Refund — ₦${nairaAmount} returned to your wallet` : `Order Refund — ₦${nairaAmount} returned to your wallet`,
-          htmlContent: `
-            <div style="font-family:system-ui,sans-serif;max-width:480px;margin:0 auto;padding:24px">
-              <div style="text-align:center;margin-bottom:20px">
-                <div style="display:inline-block;width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#c47d8e,#8b5e6b);color:#fff;font-size:22px;font-weight:700;line-height:40px">N</div>
-              </div>
-              <h2 style="font-size:18px;font-weight:600;color:#1a1a1a;margin:0 0 8px;text-align:center">${isPartial ? 'Partial Refund Processed' : 'Order Refund Processed'}</h2>
-              <p style="font-size:14px;color:#666;text-align:center;margin:0 0 20px">Your wallet has been credited.</p>
-              <div style="background:#f8f8f8;border-radius:12px;padding:16px;margin-bottom:20px">
-                <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13px"><span style="color:#888">Order</span><span style="color:#333;font-weight:500">${order.orderId}</span></div>
-                <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13px"><span style="color:#888">Refund amount</span><span style="color:#22c55e;font-weight:600">₦${nairaAmount}</span></div>
-                <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13px"><span style="color:#888">Status</span><span style="color:#333;font-weight:500">${isPartial ? 'Partial delivery' : 'Cancelled'}</span></div>
-              </div>
-              <p style="font-size:13px;color:#888;text-align:center">The refund has been automatically credited to your Nitro wallet. No action needed.</p>
-              <div style="text-align:center;margin-top:20px">
-                <a href="https://nitro.ng/dashboard" style="display:inline-block;padding:10px 24px;background:#c47d8e;color:#fff;border-radius:8px;text-decoration:none;font-size:13px;font-weight:500">View Dashboard</a>
-              </div>
-              <p style="font-size:11px;color:#bbb;text-align:center;margin-top:24px">Nitro — nitro.ng</p>
-            </div>
-          `,
-        }),
+      const subject = isPartial ? `Partial Refund — ₦${nairaAmount} returned to your wallet` : `Order Refund — ₦${nairaAmount} returned to your wallet`;
+      const html = emailWrap({
+        label: isPartial ? 'Partial Refund' : 'Refund',
+        labelBg: 'rgba(34,197,94,.1)',
+        labelColor: '#22c55e',
+        title: isPartial ? 'Partial Refund Processed' : 'Order Refund Processed',
+        body: `
+          <p style="font-size:14px;color:#666;margin:0 0 20px;">Your wallet has been credited.</p>
+          <div style="background:#f8f8f8;border-radius:12px;padding:16px;margin-bottom:20px;">
+            <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13px;"><span style="color:#888;">Order</span><span style="color:#333;font-weight:500;">${order.orderId}</span></div>
+            <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13px;"><span style="color:#888;">Refund amount</span><span style="color:#22c55e;font-weight:600;">₦${nairaAmount}</span></div>
+            <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13px;"><span style="color:#888;">Status</span><span style="color:#333;font-weight:500;">${isPartial ? 'Partial delivery' : 'Cancelled'}</span></div>
+          </div>
+          <p style="font-size:13px;color:#888;margin:0 0 20px;">The refund has been automatically credited to your Nitro wallet. No action needed.</p>
+          <div style="text-align:center;">
+            <a href="https://nitro.ng/dashboard" style="display:inline-block;padding:10px 24px;background:#c47d8e;color:#fff;border-radius:8px;text-decoration:none;font-size:13px;font-weight:500;">View Dashboard</a>
+          </div>`,
       });
+      sendEmail(userEmail, subject, html).catch(err => log.warn(`Refund email ${order.orderId}`, err.message));
     } catch (emailErr) {
       log.warn(`Refund email ${order.orderId}`, emailErr.message);
     }

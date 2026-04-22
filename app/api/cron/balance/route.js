@@ -1,6 +1,7 @@
 import prisma from '@/lib/prisma';
 import { log } from '@/lib/logger';
 import { getBalance } from '@/lib/smm';
+import { sendEmail, emailWrap } from '@/lib/email';
 
 // Checks provider API balances and sends admin alert if below threshold
 // Runs every 6 hours via Vercel Cron
@@ -73,20 +74,20 @@ export async function GET(req) {
 
         // Send email alert to admin
         try {
-          const brevoKey = process.env.BREVO_API_KEY;
           const adminEmail = process.env.ADMIN_EMAIL || 'admin@nitro.ng';
-          if (brevoKey) {
-            await fetch('https://api.brevo.com/v3/smtp/email', {
-              method: 'POST',
-              headers: { 'api-key': brevoKey, 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                sender: { name: 'Nitro System', email: 'noreply@nitro.ng' },
-                to: [{ email: adminEmail }],
-                subject: '⚠️ Low Provider Balance Alert',
-                htmlContent: `<h2>Provider Balance Alert</h2><p>The following providers have low balances:</p><ul>${alerts.map(a => `<li><strong>${a.provider}</strong>: $${a.balance.toFixed(2)} (threshold: $${a.threshold})</li>`).join('')}</ul><p>Please top up to avoid order failures.</p><p>— Nitro System</p>`,
-              }),
-            });
-          }
+          const html = emailWrap({
+            label: 'System Alert',
+            labelBg: 'rgba(245,158,11,.12)',
+            labelColor: '#f59e0b',
+            title: 'Low Provider Balance',
+            body: `
+              <p style="font-size:14px;color:#666;margin:0 0 16px;">The following providers have low balances:</p>
+              <div style="background:#f8f8f8;border-radius:12px;padding:16px;margin-bottom:16px;">
+                ${alerts.map(a => `<div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13px;"><span style="color:#888;">${a.provider}</span><span style="color:#ef4444;font-weight:600;">$${a.balance.toFixed(2)} <span style="color:#888;font-weight:400;">(min $${a.threshold})</span></span></div>`).join('')}
+              </div>
+              <p style="font-size:13px;color:#888;margin:0;">Please top up to avoid order failures.</p>`,
+          });
+          sendEmail(adminEmail, 'Low Provider Balance Alert', html).catch(err => log.warn('Balance alert email', err.message));
         } catch (emailErr) {
           log.warn('Balance alert email', emailErr.message);
         }

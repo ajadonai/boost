@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic';
 
 export const metadata = {
-  title: 'Dashboard — Nitro',
+  title: 'Dashboard',
 };
 
 export default function DashboardLayout({ children }) {
