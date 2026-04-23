@@ -23,7 +23,10 @@ function LinkServiceInline({ tierId, services, dark, t, inputStyle, markupSettin
 
   return (
     <div className="flex flex-col gap-1">
-      <input placeholder="Search MTP services..." value={search} onChange={e => setSearch(e.target.value)} autoFocus className="w-full py-[5px] px-2 rounded-lg text-[13px] outline-none" style={{ ...inputStyle }} />
+      <div className="relative">
+        <input aria-label="Search MTP services" placeholder="Search MTP services..." value={search} onChange={e => setSearch(e.target.value)} autoFocus className="w-full py-[5px] px-2 pr-7 rounded-lg text-[13px] outline-none" style={{ ...inputStyle }} />
+        {search && <button aria-label="Clear search" onClick={() => setSearch("")} className="absolute right-1.5 top-1/2 -translate-y-1/2 w-4 h-4 flex items-center justify-center rounded-full text-[10px] cursor-pointer border-none" style={{ background: dark ? "rgba(255,255,255,.1)" : "rgba(0,0,0,.08)", color: t.textMuted }}>✕</button>}
+      </div>
       <div className="max-h-[120px] overflow-y-auto rounded-md" style={{ border: `1px solid ${dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)"}`, background: dark ? "#0d1020" : "#fff" }}>
         {filtered.map(s => (
           <div key={s.id} role="button" tabIndex={0} onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();e.currentTarget.click()}}} onClick={async () => { setLinking(true); await onLink(s.id); setLinking(false); setOpen(false); }} className="py-[5px] px-2 text-xs cursor-pointer" style={{ color: t.text, borderBottom: `1px solid ${dark ? "rgba(255,255,255,.03)" : "rgba(0,0,0,.03)"}` }}>
@@ -194,7 +197,10 @@ export default function AdminServiceGroupsPage({ dark, t }) {
 
       {/* Filters */}
       <div className="flex gap-2.5 mb-4 flex-wrap items-center">
-        <input placeholder="Search groups..." value={search} onChange={e => setSearch(e.target.value)} className={`${inputCls} flex-1 min-w-[160px]`} style={inputStyle} />
+        <div className="relative flex-1 min-w-[160px]">
+          <input aria-label="Search groups" placeholder="Search groups..." value={search} onChange={e => setSearch(e.target.value)} className={`${inputCls} w-full pr-7`} style={inputStyle} />
+          {search && <button aria-label="Clear search" onClick={() => setSearch("")} className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 flex items-center justify-center rounded-full text-[10px] cursor-pointer border-none" style={{ background: dark ? "rgba(255,255,255,.1)" : "rgba(0,0,0,.08)", color: t.textMuted }}>✕</button>}
+        </div>
         <select value={platFilter} onChange={e => setPlatFilter(e.target.value)} className={`${inputCls} w-[140px]`} style={inputStyle}>
           <option value="all">All Platforms</option>
           {platforms.map(p => <option key={p} value={p}>{p}</option>)}
@@ -234,7 +240,10 @@ export default function AdminServiceGroupsPage({ dark, t }) {
               <div className="text-sm font-semibold mb-1" style={{ color: t.text }}>Add Tier to {g.name}</div>
               <div className="text-[11px] mb-2" style={{ color: t.textMuted, fontFamily: "'JetBrains Mono',monospace" }}>Markup: {Object.keys(markupSettings).length > 0 ? `DB (${markupSettings.markup_standard || "?"}% std)` : "⚠️ defaults (no DB settings)"}</div>
               <div className="mb-2">
-                <input placeholder="Search MTP services..." value={tierSvcSearch} onChange={e => setTierSvcSearch(e.target.value)} className={`${inputCls} w-full mb-1.5`} style={inputStyle} />
+                <div className="relative mb-1.5">
+                  <input aria-label="Search MTP services" placeholder="Search MTP services..." value={tierSvcSearch} onChange={e => setTierSvcSearch(e.target.value)} className={`${inputCls} w-full pr-7`} style={inputStyle} />
+                  {tierSvcSearch && <button aria-label="Clear search" onClick={() => setTierSvcSearch("")} className="absolute right-1.5 top-1/2 -translate-y-1/2 w-4 h-4 flex items-center justify-center rounded-full text-[10px] cursor-pointer border-none" style={{ background: dark ? "rgba(255,255,255,.1)" : "rgba(0,0,0,.08)", color: t.textMuted }}>✕</button>}
+                </div>
                 {tierSvcSearch && (
                   <div className="max-h-[150px] overflow-y-auto rounded-lg" style={{ border: `1px solid ${dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)"}` }}>
                     {filteredSvcs.map(s => (

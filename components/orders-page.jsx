@@ -132,7 +132,10 @@ export default function OrdersPage({ orders: initialOrders, txs, dark, t }) {
       {/* ═══ ORDERS TAB ═══ */}
       {tab === "orders" && <>
         {/* Search */}
-        <input placeholder="Search by order ID or service..." value={search} onChange={e => { setSearch(e.target.value); setOPage(1); }} className="w-full py-2 desktop:py-2.5 px-3 desktop:px-3.5 rounded-[10px] border text-[13px] desktop:text-sm font-[inherit] outline-none mb-2.5 desktop:mb-3.5 box-border" style={{ borderColor: t.cardBorder, background: dark ? "rgba(255,255,255,.03)" : "#fff", color: t.text }} />
+        <div className="relative mb-2.5 desktop:mb-3.5">
+          <input placeholder="Search by order ID or service..." value={search} onChange={e => { setSearch(e.target.value); setOPage(1); }} className="w-full py-2 desktop:py-2.5 px-3 desktop:px-3.5 pr-8 rounded-[10px] border text-[13px] desktop:text-sm font-[inherit] outline-none box-border" style={{ borderColor: t.cardBorder, background: dark ? "rgba(255,255,255,.03)" : "#fff", color: t.text }} />
+          {search && <button aria-label="Clear search" onClick={() => { setSearch(""); setOPage(1); }} className="absolute right-2.5 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center rounded-full text-xs cursor-pointer border-none" style={{ background: dark ? "rgba(255,255,255,.1)" : "rgba(0,0,0,.08)", color: t.textMuted }}>✕</button>}
+        </div>
 
         {/* Status filters */}
         <div className="flex gap-1 desktop:gap-1.5 mb-2 desktop:mb-3 flex-wrap justify-end">

@@ -512,7 +512,10 @@ export default function NewOrderPage({ dark, t, user, onOrderSuccess, onViewOrde
       </div>
 
       {/* ═══ SEARCH ═══ */}
-      <input placeholder={`Search ${activePlat?.label || ""} services...`} value={search} onChange={e => setSearch(e.target.value)} className="w-full py-[9px] px-3 desktop:py-2.5 desktop:px-3.5 rounded-[10px] border border-solid text-[13px] desktop:text-sm font-[inherit] outline-none mb-3.5 box-border focus:ring-2 focus:ring-[#c47d8e]/20 transition-[border-color,box-shadow] duration-200" style={{ borderColor: t.cardBorder, background: dark ? "rgba(255,255,255,.03)" : "#fff", color: t.text }} />
+      <div className="relative mb-3.5">
+        <input aria-label="Search services" placeholder={`Search ${activePlat?.label || ""} services...`} value={search} onChange={e => setSearch(e.target.value)} className="w-full py-[9px] px-3 pr-8 desktop:py-2.5 desktop:px-3.5 rounded-[10px] border border-solid text-[13px] desktop:text-sm font-[inherit] outline-none box-border focus:ring-2 focus:ring-[#c47d8e]/20 transition-[border-color,box-shadow] duration-200" style={{ borderColor: t.cardBorder, background: dark ? "rgba(255,255,255,.03)" : "#fff", color: t.text }} />
+        {search && <button aria-label="Clear search" onClick={() => setSearch("")} className="absolute right-2.5 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center rounded-full text-xs cursor-pointer border-none" style={{ background: dark ? "rgba(255,255,255,.1)" : "rgba(0,0,0,.08)", color: t.textMuted }}>✕</button>}
+      </div>
 
       {/* ═══ SERVICE CARDS ═══ */}
       <div className="flex flex-col gap-2" data-tour="no-service-list" ref={listRef}>

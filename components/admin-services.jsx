@@ -140,8 +140,9 @@ export default function AdminServicesPage({ dark, t }) {
       {inUseDisabledCount > 0 && <div className="py-2.5 px-3.5 rounded-lg mb-3 text-[13px] leading-[1.5]" style={{ background: dark ? "rgba(224,164,88,.06)" : "rgba(217,119,6,.04)", border: `1px solid ${dark ? "rgba(224,164,88,.15)" : "rgba(217,119,6,.1)"}`, color: dark ? "#e0a458" : "#92400e" }}>⚠️ {inUseDisabledCount} service{inUseDisabledCount > 1 ? "s" : ""} used by Menu Builder {inUseDisabledCount > 1 ? "are" : "is"} disabled. Users can see {inUseDisabledCount > 1 ? "them" : "it"} in the menu but orders may fail.</div>}
 
       {/* Search */}
-      <div className="mb-2.5">
-        <input value={search} onChange={e => { setSearch(e.target.value); setPage(1); }} placeholder="Search services..." className="w-full py-2 px-3 rounded-lg border text-sm outline-none" style={{ borderColor: t.cardBorder, background: dark ? "#0d1020" : "#fff", color: t.text }} />
+      <div className="relative mb-2.5">
+        <input value={search} onChange={e => { setSearch(e.target.value); setPage(1); }} placeholder="Search services..." className="w-full py-2 px-3 pr-8 rounded-lg border text-sm outline-none" style={{ borderColor: t.cardBorder, background: dark ? "#0d1020" : "#fff", color: t.text }} />
+        {search && <button aria-label="Clear search" onClick={() => { setSearch(""); setPage(1); }} className="absolute right-2.5 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center rounded-full text-xs cursor-pointer border-none" style={{ background: dark ? "rgba(255,255,255,.1)" : "rgba(0,0,0,.08)", color: t.textMuted }}>✕</button>}
       </div>
 
       {/* Filters */}

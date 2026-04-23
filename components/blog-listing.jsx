@@ -95,10 +95,11 @@ export default function BlogListing({ initialPosts, initialCategories, initialTo
             value={search}
             onChange={onSearch}
             placeholder="Search articles..."
-            className="w-full py-2.5 pl-10 pr-4 rounded-xl text-sm outline-none font-[inherit]"
+            className="w-full py-2.5 pl-10 pr-8 rounded-xl text-sm outline-none font-[inherit]"
             style={{ background: v.card, border: "1px solid " + v.bdr, color: v.txt }}
           />
           <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={v.sft} strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          {search && <button aria-label="Clear search" onClick={() => { setSearch(""); setPage(1); }} className="absolute right-2.5 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center rounded-full text-xs cursor-pointer border-none" style={{ background: v.tbtn, color: v.mut }}>✕</button>}
         </div>
       </div>
       {categories.length > 1 && (

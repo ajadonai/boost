@@ -147,8 +147,9 @@ export function AdminPaymentsPage({ dark, t }) {
       {/* ═══ DEPOSITS TAB ═══ */}
       {tab === "deposits" && (<>
         {/* Search */}
-        <div className="mb-2.5">
-          <input value={search} onChange={e => setSearch(e.target.value)} onKeyDown={e => e.key === "Enter" && doSearch()} placeholder="Search ref, user, email..." className="w-full py-2 px-3 rounded-lg text-[13px] outline-none font-[inherit] box-border" style={{ border: `1px solid ${t.cardBorder}`, background: dark ? "rgba(255,255,255,.04)" : "#fff", color: t.text }} />
+        <div className="relative mb-2.5">
+          <input value={search} onChange={e => setSearch(e.target.value)} onKeyDown={e => e.key === "Enter" && doSearch()} placeholder="Search ref, user, email..." className="w-full py-2 px-3 pr-8 rounded-lg text-[13px] outline-none font-[inherit] box-border" style={{ border: `1px solid ${t.cardBorder}`, background: dark ? "rgba(255,255,255,.04)" : "#fff", color: t.text }} />
+          {search && <button aria-label="Clear search" onClick={() => { setSearch(""); }} className="absolute right-2.5 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center rounded-full text-xs cursor-pointer border-none" style={{ background: dark ? "rgba(255,255,255,.1)" : "rgba(0,0,0,.08)", color: t.textMuted }}>✕</button>}
         </div>
         {/* Filters */}
         <div className={`flex gap-2 flex-wrap items-center justify-end ${dateRange === "custom" ? "mb-2" : "mb-3.5"}`}>
