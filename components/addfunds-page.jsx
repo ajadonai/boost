@@ -6,10 +6,10 @@ import { fN, fD } from "../lib/format";
 const PRESETS = [1000, 2000, 5000, 10000, 20000, 50000];
 
 const ACCEPTED_TYPES = [
-  { label: "Cards", icon: "💳" },
-  { label: "Bank Transfer", icon: "🏦" },
-  { label: "Crypto", icon: "₿" },
-  { label: "Mobile Money", icon: "📱" },
+  { label: "Cards", short: "Cards", icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> },
+  { label: "Bank Transfer", short: "Transfer", icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 14v3M12 14v3M16 14v3"/></svg> },
+  { label: "Crypto", short: "Crypto", icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11.767 19.089c4.924.868 6.14-6.025 1.216-6.894m-1.216 6.894L5.86 18.047m5.908 1.042-.347 1.97m1.563-8.864c4.924.869 6.14-6.025 1.215-6.893m-1.215 6.893-6.083-1.072m6.083 1.072.347-1.969M7.116 16.676l-2.576-.454M9.21 4.835l-.347 1.97m0 0-2.576-.455"/></svg> },
+  { label: "Mobile Money", short: "Mobile", icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg> },
 ];
 
 /* ═══════════════════════════════════════════ */
@@ -212,10 +212,12 @@ export default function AddFundsPage({ user, dark, t, paymentStatus, setPaymentS
   );
 
   const AcceptedRow = ({ centered }) => (
-    <div className={`flex items-center gap-1.5 flex-nowrap ${centered ? "justify-center mt-2.5" : ""}`}>
+    <div className={`flex items-center gap-1.5 flex-wrap ${centered ? "justify-center mt-4" : ""}`}>
       <span className={`text-[13px] ${centered ? "hidden" : "hidden desktop:inline"}`} style={{ color: t.textMuted }}>We accept:</span>
-      {ACCEPTED_TYPES.map(({ label, icon }) => (
-        <span key={label} className="text-xs py-[3px] px-2 rounded-md font-medium whitespace-nowrap" style={{ background: dark ? "rgba(255,255,255,.04)" : "rgba(255,255,255,.8)", border: `1px solid ${t.cardBorder}`, color: dark ? "rgba(255,255,255,.55)" : "rgba(0,0,0,.45)" }}>{icon} {label}</span>
+      {ACCEPTED_TYPES.map(({ label, short, icon }) => (
+        <span key={label} className="text-xs py-[3px] px-2 rounded-md font-medium whitespace-nowrap inline-flex items-center gap-1" style={{ background: dark ? "rgba(255,255,255,.04)" : "rgba(255,255,255,.8)", border: `1px solid ${t.cardBorder}`, color: dark ? "rgba(255,255,255,.55)" : "rgba(0,0,0,.45)" }}>
+          {icon}<span className="max-md:hidden">{label}</span><span className="hidden max-md:inline">{short}</span>
+        </span>
       ))}
     </div>
   );
