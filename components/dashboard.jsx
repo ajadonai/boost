@@ -498,17 +498,18 @@ function DashboardInner({ initialData }) {
   };
   const notifRef = useRef(null);
 
-  // Compute notification item IDs for bell badge
-  const notifItemIds = useMemo(() => {
-    const ids = [];
+  // Compute bell badge count — must match NotifDropdown filtering exactly
+  const bellUnread = useMemo(() => {
     const cutoff = notifClearedAt ? new Date(notifClearedAt) : null;
-    orders.filter(o => o.status === "Completed").filter(o => !cutoff || (o.created && new Date(o.created) > cutoff)).forEach(o => ids.push(`ord-${o.id}`));
-    orders.filter(o => o.status === "Processing" || o.status === "Pending").filter(o => !cutoff || (o.created && new Date(o.created) > cutoff)).forEach(o => ids.push(`proc-${o.id}`));
-    orders.filter(o => o.status === "Cancelled").filter(o => !cutoff || (o.created && new Date(o.created) > cutoff)).forEach(o => ids.push(`cancel-${o.id}`));
-    txs.filter(tx => tx.type === "deposit" && tx.status === "Completed").filter(tx => !cutoff || (tx.date && new Date(tx.date) > cutoff)).forEach(tx => ids.push(`dep-${tx.id || tx.reference}`));
-    return ids;
-  }, [orders, txs, notifClearedAt]);
-  const bellUnread = notifItemIds.filter(id => !readNotifIds.has(id) && !clearedNotifIds.has(id)).length;
+    const afterCutoff = (ts) => !cutoff || (ts && new Date(ts) > cutoff);
+    const ids = [];
+    orders.filter(o => o.status === "Completed" && afterCutoff(o.created)).forEach(o => ids.push(`ord-${o.id}`));
+    orders.filter(o => (o.status === "Processing" || o.status === "Pending") && afterCutoff(o.created)).forEach(o => ids.push(`proc-${o.id}`));
+    orders.filter(o => o.status === "Cancelled" && afterCutoff(o.created)).forEach(o => ids.push(`cancel-${o.id}`));
+    txs.filter(tx => tx.type === "deposit" && tx.status === "Completed" && afterCutoff(tx.date)).forEach(tx => ids.push(`dep-${tx.id || tx.reference}`));
+    txs.filter(tx => (tx.type === "bonus" || tx.type === "admin_credit") && afterCutoff(tx.date)).forEach(tx => ids.push(`bonus-${tx.id || tx.reference}`));
+    return ids.filter(id => !readNotifIds.has(id) && !clearedNotifIds.has(id)).length;
+  }, [orders, txs, notifClearedAt, readNotifIds, clearedNotifIds]);
 
   /* Services/Order state (lifted so sidebars can access) */
   const [noPlatform, setNoPlatform] = useState("instagram");

@@ -178,6 +178,7 @@ export async function GET() {
         id: tx.id, type: tx.type,
         reference: tx.reference || null,
         amount: tx.amount / 100,
+        status: tx.status,
         method: tx.method || tx.type,
         date: tx.createdAt.toISOString(),
         description: tx.note,
