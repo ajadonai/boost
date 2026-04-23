@@ -261,7 +261,7 @@ Here is an honest look at the main options:
 
 | Panel | Currency | Platforms | Strengths | Weaknesses |
 | --- | --- | --- | --- | --- |
-| [Nitro](https://nitro.ng) | NGN | 35+ | Naira-native, modern UI, refill guarantees | Newer, smaller catalogue than global giants |
+| [Nitro](https://nitro.ng) | NGN | {{platform_count}}+ | Naira-native, modern UI, refill guarantees | Newer, smaller catalogue than global giants |
 | InterSMM | USD/NGN | 40+ | Large catalogue, established | USD pricing on most services, older interface |
 | SMMRush | USD | 30+ | Competitive pricing | No Naira, slow support |
 | JustAnotherPanel | USD | 50+ | Massive service range, API | Dollar-only, complex interface |

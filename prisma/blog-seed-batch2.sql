@@ -113,7 +113,7 @@ For a deeper dive on safety, read our guide on [whether buying followers is safe
 [Nitro](https://nitro.ng) is Nigeria''s premium SMM panel, built specifically for the local market:
 
 - **Naira pricing** — no dollar conversion headaches
-- **35+ platforms** supported
+- **{{platform_count}}+ platforms** supported
 - **Instant delivery** on most services
 - **Refill guarantees** on follower services
 - **Clean, modern dashboard** — place orders in seconds
@@ -164,7 +164,7 @@ Before comparing specific panels, here are the criteria that matter most for Nig
 
 **Strengths:**
 - Native Naira pricing — no conversion needed
-- 35+ platforms with multiple quality tiers per service
+- {{platform_count}}+ platforms with multiple quality tiers per service
 - Modern, mobile-friendly dashboard that feels premium
 - Instant delivery on most services
 - Refill guarantees on all follower services
