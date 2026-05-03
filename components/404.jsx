@@ -44,7 +44,7 @@ function NotFoundInner() {
   }));
 
   return (
-    <div className="min-h-dvh flex flex-col relative overflow-hidden" style={{ background: bg, fontFamily: "'Outfit',system-ui,sans-serif" }}>
+    <div className="min-h-dvh flex flex-col relative overflow-hidden" style={{ background: bg, fontFamily: "'Plus Jakarta Sans',system-ui,sans-serif" }}>
       <style>{`
         @keyframes nf-float { 0%,100% { transform: translateY(100vh) scale(0); opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { transform: translateY(-10vh) scale(1); opacity: 0; } }
         @keyframes nf-glitch { 0% { clip-path: inset(40% 0 60% 0); transform: translate(-2px, 1px); } 20% { clip-path: inset(10% 0 80% 0); transform: translate(2px, -1px); } 40% { clip-path: inset(60% 0 10% 0); transform: translate(-1px, 2px); } 60% { clip-path: inset(30% 0 50% 0); transform: translate(1px, -2px); } 80% { clip-path: inset(80% 0 5% 0); transform: translate(2px, 1px); } 100% { clip-path: inset(0); transform: translate(0); } }

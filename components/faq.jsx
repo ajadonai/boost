@@ -32,7 +32,7 @@ function FAQInner() {
   return (
     <>
       <SharedStyles />
-      <div className="min-h-dvh flex flex-col font-[Outfit,system-ui,sans-serif]" style={{ background: t.bg }}>
+      <div className="min-h-dvh flex flex-col font-[Plus Jakarta Sans,system-ui,sans-serif]" style={{ background: t.bg }}>
         <SharedNav />
         <main className="flex-1 py-12 px-6 pb-20 max-w-[720px] mx-auto w-full">
 

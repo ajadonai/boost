@@ -240,7 +240,7 @@ export function AdminPaymentsPage({ dark, t }) {
                   onChange={e => setConfigFields(prev => ({ ...prev, [key]: e.target.value }))}
                   placeholder={`Enter ${FIELD_LABELS[key] || key}`}
                   className="w-full py-2.5 px-3 rounded-lg text-sm outline-none box-border"
-                  style={{ border: `1px solid ${t.cardBorder}`, background: dark ? "rgba(255,255,255,.08)" : "rgba(0,0,0,.06)", color: t.text, fontFamily: isSecret ? "'JetBrains Mono', monospace" : "'Outfit', sans-serif" }}
+                  style={{ border: `1px solid ${t.cardBorder}`, background: dark ? "rgba(255,255,255,.08)" : "rgba(0,0,0,.06)", color: t.text, fontFamily: isSecret ? "'JetBrains Mono', monospace" : "'Plus Jakarta Sans', sans-serif" }}
                 />
               </div>
               );

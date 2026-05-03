@@ -26,7 +26,7 @@ export default function LoadingScreen() {
   const particle = dark ? "rgba(196,125,142,.15)" : "rgba(196,125,142,.1)";
 
   return (
-    <div className="h-dvh flex items-center justify-center relative overflow-hidden" style={{ background:bg, fontFamily:"'Outfit',sans-serif" }}>
+    <div className="h-dvh flex items-center justify-center relative overflow-hidden" style={{ background:bg, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>
       <style>{`
         @keyframes breathe{0%,100%{transform:scale(1);filter:brightness(1)}50%{transform:scale(1.05);filter:brightness(1.15)}}
         @keyframes pulse-ring{0%{transform:scale(1);opacity:.3}50%{transform:scale(1.15);opacity:.08}100%{transform:scale(1);opacity:.3}}

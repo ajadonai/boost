@@ -194,7 +194,7 @@ export function OrderForm({ selSvc, selTier, platform, qty, setQty, link, setLin
         <div className="text-[17px] font-semibold mb-1 max-md:text-base" style={{ color: t.text }}>{selSvc?.name}</div>
         {s && <div className="flex items-center gap-1.5 text-sm mb-1.5">
           <span className="inline-flex items-center gap-1 font-semibold py-0.5 px-2 rounded-md text-[12px]" style={{ background: dark ? s.bgD : s.bg, color: s.text }}>{s.label} {selTier.tier}</span>
-          <span style={{ color: t.textMuted }}>₦{selTier.price.toLocaleString()}/{selTier.per}</span>
+          <span style={{ color: t.textMuted, fontFamily: "'JetBrains Mono', monospace", fontSize: 13 }}>₦{selTier.price.toLocaleString()}/{selTier.per}</span>
         </div>}
         <div className="text-xs" style={{ color: t.textMuted }}>{refillLabel(selTier.tier)} · {selTier.speed || "Instant"} delivery</div>
       </div>
@@ -203,7 +203,7 @@ export function OrderForm({ selSvc, selTier, platform, qty, setQty, link, setLin
       <div className="p-5 max-md:p-3.5">
       {selTier && <>
         <div className="mb-3" data-tour="no-link-input">
-          <label className="text-sm block mb-[5px]" style={{ color: t.textMuted }}>{linkLabel}</label>
+          <label className="text-[11px] tracking-[0.5px] uppercase font-semibold block mb-[6px]" style={{ color: t.textMuted }}>{linkLabel}</label>
           <div className="flex rounded-lg overflow-hidden" style={{ border: `1px solid ${linkError ? (dark ? "#f87171" : "#dc2626") : !link.trim() ? t.accent : dark ? "rgba(255,255,255,.18)" : "rgba(0,0,0,.19)"}`, background: !link.trim() ? (dark ? "rgba(196,125,142,.14)" : "rgba(196,125,142,.08)") : (dark ? "#0d1020" : "#fff") }}>
             <span className="inline-flex items-center px-3 text-sm font-semibold shrink-0 select-none" style={{ borderRight: `1px solid ${dark ? "rgba(255,255,255,.1)" : "rgba(0,0,0,.1)"}`, color: t.textMuted }}>https://</span>
             <input type="url" inputMode="url" aria-label={linkLabel} disabled={orderLoading} placeholder={linkPlaceholder} value={link} onChange={e => validateLink(e.target.value)} className="m w-full py-2 px-3 text-[15px] outline-none box-border font-[inherit] disabled:opacity-50 border-0" style={{ background: "transparent", color: t.text }} />
@@ -212,21 +212,21 @@ export function OrderForm({ selSvc, selTier, platform, qty, setQty, link, setLin
         </div>
         {needsComments && (
           <div className="mb-3.5">
-            <label className="text-sm block mb-[5px]" style={{ color: t.textMuted }}>{isReview ? "Reviews" : "Comments"} <span className="font-normal text-[11px]">(one per line)</span></label>
+            <label className="text-[11px] tracking-[0.5px] uppercase font-semibold block mb-[6px]" style={{ color: t.textMuted }}>{isReview ? "Reviews" : "Comments"} <span className="font-normal normal-case tracking-normal text-[11px]">(one per line)</span></label>
             <textarea disabled={orderLoading} placeholder={isReview ? "Great service, highly recommend!\nFast delivery and excellent quality\nBest experience I've had, 5 stars" : "Great content!\nLove this post!\nAmazing work, keep it up\nThis is fire"} value={comments || ""} onChange={e => setComments(e.target.value)} rows={4} className="m w-full py-2.5 px-3 rounded-lg border border-solid text-[13px] leading-[1.5] outline-none box-border font-[inherit] resize-y disabled:opacity-50" style={{ borderColor: dark ? "rgba(255,255,255,.18)" : "rgba(0,0,0,.19)", background: dark ? "#0d1020" : "#fff", color: t.text, fontFamily: "'JetBrains Mono', monospace" }} />
             <div className="text-[11px] mt-1" style={{ color: t.textMuted }}>{(comments || "").split("\n").filter(l => l.trim()).length} {isReview ? "reviews" : "comments"} entered · we'll cycle through them</div>
           </div>
         )}
         {needsUsernames && (
           <div className="mb-3.5">
-            <label className="text-sm block mb-[5px]" style={{ color: t.textMuted }}>Usernames to mention <span className="font-normal text-[11px]">(one per line, without @)</span></label>
+            <label className="text-[11px] tracking-[0.5px] uppercase font-semibold block mb-[6px]" style={{ color: t.textMuted }}>Usernames to mention <span className="font-normal normal-case tracking-normal text-[11px]">(one per line, without @)</span></label>
             <textarea disabled={orderLoading} placeholder={"username1\nusername2\nusername3"} value={comments || ""} onChange={e => setComments(e.target.value)} rows={4} className="m w-full py-2.5 px-3 rounded-lg border border-solid text-[13px] leading-[1.5] outline-none box-border font-[inherit] resize-y disabled:opacity-50" style={{ borderColor: dark ? "rgba(255,255,255,.18)" : "rgba(0,0,0,.19)", background: dark ? "#0d1020" : "#fff", color: t.text, fontFamily: "'JetBrains Mono', monospace" }} />
             <div className="text-[11px] mt-1" style={{ color: t.textMuted }}>{(comments || "").split("\n").filter(l => l.trim()).length} usernames entered</div>
           </div>
         )}
         {needsAnswer && (
           <div className="mb-3.5">
-            <label className="text-sm block mb-[5px]" style={{ color: t.textMuted }}>Answer option number</label>
+            <label className="text-[11px] tracking-[0.5px] uppercase font-semibold block mb-[6px]" style={{ color: t.textMuted }}>Answer option</label>
             <div className="flex gap-1.5">
               {[1, 2, 3, 4].map(n => (
                 <button key={n} type="button" disabled={orderLoading} onClick={() => setComments(String(n))} className="flex-1 py-2.5 px-0 rounded-lg text-sm font-semibold cursor-pointer border border-solid disabled:opacity-40 transition-transform duration-200 hover:-translate-y-px" style={{ borderColor: (comments || "") === String(n) ? t.accent : (dark ? "rgba(255,255,255,.18)" : "rgba(0,0,0,.18)"), background: (comments || "") === String(n) ? (dark ? "#2a1a22" : "#fdf2f4") : "transparent", color: (comments || "") === String(n) ? t.accent : t.textMuted }}>Option {n}</button>
@@ -236,7 +236,7 @@ export function OrderForm({ selSvc, selTier, platform, qty, setQty, link, setLin
           </div>
         )}
         <div className="mb-3">
-          <label className="text-sm block mb-[5px]" style={{ color: t.textMuted }}>Quantity</label>
+          <label className="text-[11px] tracking-[0.5px] uppercase font-semibold block mb-[6px]" style={{ color: t.textMuted }}>Quantity</label>
           <input type="number" aria-label="Quantity" disabled={orderLoading} value={qty} onChange={e => setQty(e.target.value === "" ? "" : e.target.value)} onKeyDown={e => { if (e.key === "ArrowUp" || e.key === "ArrowDown") e.preventDefault(); }} className="m w-full py-2 px-3 rounded-lg border border-solid text-[15px] outline-none box-border font-[inherit] disabled:opacity-50" style={{ borderColor: qtyOutOfRange ? (dark ? "rgba(220,38,38,.4)" : "rgba(220,38,38,.38)") : (dark ? "rgba(255,255,255,.18)" : "rgba(0,0,0,.19)"), background: dark ? "#0d1020" : "#fff", color: t.text }} />
           {qtyOutOfRange && <div className="text-[11px] mt-[3px]" style={{ color: dark ? "#fca5a5" : "#dc2626" }}>{qtyNum < minQty ? `Minimum: ${minQty.toLocaleString()}` : `Maximum: ${maxQty.toLocaleString()}`}</div>}
           <div className="flex gap-1 mt-1.5">
@@ -246,12 +246,12 @@ export function OrderForm({ selSvc, selTier, platform, qty, setQty, link, setLin
           </div>
         </div>
         <div className="rounded-[10px] p-2.5 mb-3 border border-solid" style={{ background: dark ? "rgba(255,255,255,.04)" : "rgba(0,0,0,.04)", borderColor: t.cardBorder }}>
-          <div className="flex justify-between mb-1 text-sm" style={{ color: t.textMuted }}><span>Rate</span><span>₦{selTier.price.toLocaleString()} / {selTier.per}</span></div>
-          <div className="flex justify-between mb-1 text-sm" style={{ color: t.textMuted }}><span>Quantity</span><span>{qtyNum.toLocaleString()}</span></div>
-          {discountAmount > 0 && <div className="flex justify-between mb-1 text-sm" style={{ color: dark ? "#6ee7b7" : "#059669" }}><span>{loyaltyTier} discount ({loyaltyDiscount}%)</span><span>-₦{discountAmount.toLocaleString()}</span></div>}
-          <div className="border-t border-solid pt-1.5 flex justify-between items-baseline" style={{ borderColor: t.cardBorder }}>
-            <span className="font-semibold" style={{ color: t.textMuted }}>Total</span>
-            <span className="m text-lg font-semibold" style={{ color: t.accent }}>₦{price.toLocaleString()}</span>
+          <div className="flex justify-between mb-1 text-[13px]" style={{ color: t.textMuted }}><span>Rate</span><span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 12 }}>₦{selTier.price.toLocaleString()} / {selTier.per}</span></div>
+          <div className="flex justify-between mb-1 text-[13px]" style={{ color: t.textMuted }}><span>Quantity</span><span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 12 }}>{qtyNum.toLocaleString()}</span></div>
+          {discountAmount > 0 && <div className="flex justify-between mb-1 text-[13px]" style={{ color: dark ? "#6ee7b7" : "#059669" }}><span>{loyaltyTier} discount ({loyaltyDiscount}%)</span><span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 12 }}>-₦{discountAmount.toLocaleString()}</span></div>}
+          <div className="border-t border-solid pt-2 mt-1 flex justify-between items-baseline" style={{ borderColor: t.cardBorder }}>
+            <span className="text-[13px] font-semibold" style={{ color: t.textMuted }}>Total</span>
+            <span className="font-bold text-[20px]" style={{ color: t.accent, fontFamily: "'JetBrains Mono', monospace" }}>₦{price.toLocaleString()}</span>
           </div>
         </div>
         {showDripNote(platform, qtyNum) && (
@@ -690,19 +690,19 @@ export default function NewOrderPage({ dark, t, user, onOrderSuccess, onViewOrde
       <div role="button" tabIndex={0} onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();e.currentTarget.click()}}} onClick={() => pickService(svc)} className={`no-svc-card rounded-xl desktop:rounded-[14px] py-3 px-3.5 md:py-3.5 md:px-4 desktop:py-4 desktop:px-5 cursor-pointer border border-solid transition-all duration-150 ease-in-out hover:border-[rgba(196,125,142,.19)]${isSel ? " relative z-[1]" : ""}`} style={{ borderColor: isSel ? (svc.ng ? (dark ? "#4ade80" : "#16a34a") : t.accent) : t.cardBorder, borderLeftWidth: isSel ? 4 : svc.ng ? 3 : undefined, borderLeftColor: isSel ? (svc.ng ? (dark ? "#4ade80" : "#16a34a") : "#c47d8e") : svc.ng ? "#4ade80" : undefined, background: isSel ? (svc.ng ? (dark ? "#122a1c" : "#d0f0db") : (dark ? "#2a1828" : "#f5e4e8")) : svc.ng ? (dark ? "rgba(30,80,60,.24)" : "#e8f5ee") : t.cardBg, opacity: selSvc && !isSel ? (dark ? .3 : .45) : 1, transform: isSel ? "scale(1.01)" : "scale(1)", boxShadow: isSel ? (svc.ng ? "0 4px 20px rgba(22,163,74,.31), 0 0 0 1.5px rgba(22,163,74,.28)" : "0 4px 20px rgba(196,125,142,.38), 0 0 0 1.5px rgba(196,125,142,.31)") : undefined }}>
         <div className="flex items-start justify-between gap-3 max-md:flex-wrap max-md:gap-1.5">
           <div className="flex-1 min-w-0 max-md:basis-[60%]">
-            <div className="text-sm md:text-[15px] desktop:text-base font-medium mb-1" style={{ color: svc.ng ? (dark ? "#5dcaa5" : "#0F6E56") : t.text }}>{svc.name}</div>
+            <div className="text-sm md:text-[15px] desktop:text-base font-semibold mb-1" style={{ color: svc.ng ? (dark ? "#5dcaa5" : "#0F6E56") : t.text }}>{svc.name}</div>
             {/* Only show badges when NOT expanded — chips replace them */}
             {!isSel && (
               <div className="flex gap-[3px] flex-wrap">
                 {svc.tiers.map(tier => (
-                  <span key={tier.tier} className="m text-xs py-0.5 px-[7px] rounded font-semibold border border-solid" style={{ background: dark ? TS[tier.tier].bgD : TS[tier.tier].bg, color: TS[tier.tier].text, borderColor: dark ? TS[tier.tier].borderD : TS[tier.tier].border }}>{tier.tier}</span>
+                  <span key={tier.tier} className="m text-[10px] py-0.5 px-[7px] rounded font-bold tracking-wide border border-solid" style={{ background: dark ? TS[tier.tier].bgD : TS[tier.tier].bg, color: TS[tier.tier].text, borderColor: dark ? TS[tier.tier].borderD : TS[tier.tier].border }}>{tier.tier}</span>
                 ))}
               </div>
             )}
           </div>
           <div className="text-right shrink-0">
             <div className="text-[10px] desktop:text-[11px] mb-0.5" style={{ color: t.textMuted }}>{activeTier ? activeTier.tier : "from"}</div>
-            <div className="m text-[15px] md:text-base desktop:text-lg font-bold" style={{ color: t.accent }}>₦{(activeTier ? activeTier.price : lowestPrice).toLocaleString()}<span className="text-[11px] font-normal" style={{ color: t.textMuted }}>/{activeTier ? activeTier.per : lowestPer}</span></div>
+            <div className="m text-[15px] md:text-base desktop:text-lg font-bold" style={{ color: t.accent, fontFamily: "'JetBrains Mono', monospace" }}>₦{(activeTier ? activeTier.price : lowestPrice).toLocaleString()}<span className="text-[11px] font-normal" style={{ color: t.textMuted }}>/{activeTier ? activeTier.per : lowestPer}</span></div>
           </div>
         </div>
         {/* Tier selection chips — always shown when expanded (single or multi) */}
@@ -718,7 +718,7 @@ export default function NewOrderPage({ dark, t, user, onOrderSuccess, onViewOrde
         {isSel && activeTier && (
           <div className="mt-2.5 py-2.5 px-3 desktop:py-3 desktop:px-3.5 rounded-[10px] flex items-center justify-between gap-3 border border-solid" style={{ background: dark ? `${TS[activeTier.tier].text}08` : `${TS[activeTier.tier].text}06`, borderColor: dark ? `${TS[activeTier.tier].text}18` : `${TS[activeTier.tier].text}12` }}>
             <div className="text-xs" style={{ color: t.textMuted }}>{refillLabel(activeTier.tier)} · {activeTier.speed} · Min {(activeTier.min || 100).toLocaleString()}</div>
-            {orderMode === "bulk" && <div className="m text-[15px] font-bold" style={{ color: TS[activeTier.tier].text }}>₦{activeTier.price.toLocaleString()}<span className="text-[11px] font-normal" style={{ color: t.textMuted }}>/{activeTier.per}</span></div>}
+            {orderMode === "bulk" && <div className="m text-[15px] font-bold" style={{ color: TS[activeTier.tier].text, fontFamily: "'JetBrains Mono', monospace" }}>₦{activeTier.price.toLocaleString()}<span className="text-[11px] font-normal" style={{ color: t.textMuted }}>/{activeTier.per}</span></div>}
           </div>
         )}
       </div>

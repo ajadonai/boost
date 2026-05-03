@@ -23,6 +23,7 @@
     "@fontsource/cormorant-garamond": "^5.2.11",
     "@fontsource/jetbrains-mono": "^5.2.8",
     "@fontsource/outfit": "^5.2.8",
+    "@fontsource/plus-jakarta-sans": "^5.2.8",
     "@prisma/client": "^6.19.2",
     "@sentry/nextjs": "^10.47.0",
     "@tailwindcss/postcss": "^4.2.2",

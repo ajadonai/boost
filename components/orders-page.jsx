@@ -56,7 +56,7 @@ function ProgressBar({ order, dark, detailed }) {
           <span>{waiting ? "Waiting to start" : `${delivered.toLocaleString()} / ${qty.toLocaleString()} delivered`}</span>
           {!waiting && <span style={{ color }}>{pct}%</span>}
         </div>
-        <div className="max-w-[220px] h-1.5 rounded-full overflow-hidden" style={{ background: dark ? "rgba(255,255,255,.1)" : "rgba(0,0,0,.08)" }}>
+        <div className="h-1.5 rounded-full overflow-hidden" style={{ background: dark ? "rgba(255,255,255,.1)" : "rgba(0,0,0,.08)" }}>
           {waiting
             ? <div className="h-full w-1/3 rounded-full" style={{ background: `${color}40`, animation: "progress-pulse 1.8s ease-in-out infinite" }} />
             : <div className="h-full rounded-full transition-[width] duration-500" style={{ width: `${pct}%`, background: color }} />}

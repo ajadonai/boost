@@ -25,7 +25,7 @@ export default function BannedPage() {
   };
 
   return (
-    <div className="min-h-dvh flex flex-col relative overflow-hidden" style={{ background: t.bg, fontFamily: "'Outfit',system-ui,sans-serif" }}>
+    <div className="min-h-dvh flex flex-col relative overflow-hidden" style={{ background: t.bg, fontFamily: "'Plus Jakarta Sans',system-ui,sans-serif" }}>
 
       {/* Ambient glow */}
       <div className="absolute w-[400px] h-[400px] rounded-full blur-[100px] pointer-events-none" style={{ top: "10%", right: "-5%", background: dark ? "rgba(220,38,38,.03)" : "rgba(220,38,38,.015)" }} />

@@ -84,7 +84,7 @@ export default function BlogListing({ initialPosts, initialCategories, initialTo
   );
 
   return (
-    <div className="min-h-screen" style={{ background: v.bg, fontFamily: "'Outfit',sans-serif" }}>
+    <div className="min-h-screen" style={{ background: v.bg, fontFamily: "'Plus Jakarta Sans',sans-serif" }}>
       <Hdr />
       <div className="text-center max-w-[600px] mx-auto" style={{ padding: "clamp(30px,5vw,56px) 20px clamp(16px,2vw,28px)" }}>
         <h1 className="font-semibold mb-2.5 leading-tight" style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "clamp(30px,5vw,44px)", color: v.txt }}>The Nitro Blog</h1>

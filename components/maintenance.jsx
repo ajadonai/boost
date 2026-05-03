@@ -71,7 +71,7 @@ function MaintenanceInner() {
   }));
 
   return (
-    <div className="min-h-dvh flex flex-col relative overflow-hidden" style={{ background: bg, fontFamily: "'Outfit',system-ui,sans-serif" }}>
+    <div className="min-h-dvh flex flex-col relative overflow-hidden" style={{ background: bg, fontFamily: "'Plus Jakarta Sans',system-ui,sans-serif" }}>
       <style>{`
         @keyframes mt-float { 0%,100% { transform: translateY(100vh) scale(0); opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { transform: translateY(-10vh) scale(1); opacity: 0; } }
         @keyframes mt-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }

@@ -2,7 +2,7 @@
 
 export default function Error({ error, reset }) {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#080b14]" style={{ fontFamily: 'Outfit, system-ui, sans-serif' }}>
+    <div className="min-h-screen flex items-center justify-center bg-[#080b14]" style={{ fontFamily: 'Plus Jakarta Sans, system-ui, sans-serif' }}>
       <div className="text-center py-10 px-5 max-w-[400px]">
         <div className="w-12 h-12 rounded-[13px] bg-[linear-gradient(135deg,#c47d8e,#8b5e6b)] flex items-center justify-center mx-auto mb-5 text-white text-[26px] font-extrabold">N</div>
         <h1 className="text-[22px] font-bold text-white mb-2">Something went wrong</h1>

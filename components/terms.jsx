@@ -29,7 +29,7 @@ function TermsInner(){
 function LegalLayout({label,title,titleAccent,date,sections,emailField,relatedLinks,action}){
   const {t}=useTheme();
   return(
-    <div className="min-h-dvh flex flex-col font-[Outfit,system-ui,sans-serif] transition-[background] duration-500" style={{background:t.bg}}>
+    <div className="min-h-dvh flex flex-col font-[Plus Jakarta Sans,system-ui,sans-serif] transition-[background] duration-500" style={{background:t.bg}}>
       <SharedStyles/>
       <SharedNav action={action}/>
       <div className="flex-1 max-w-[780px] mx-auto w-full py-12 px-6 pb-[60px]">

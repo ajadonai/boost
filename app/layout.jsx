@@ -1,7 +1,8 @@
 import './globals.css';
-import '@fontsource/outfit/latin-400.css';
-import '@fontsource/outfit/latin-500.css';
-import '@fontsource/outfit/latin-600.css';
+import '@fontsource/plus-jakarta-sans/latin-400.css';
+import '@fontsource/plus-jakarta-sans/latin-500.css';
+import '@fontsource/plus-jakarta-sans/latin-600.css';
+import '@fontsource/plus-jakarta-sans/latin-700.css';
 import '@fontsource/jetbrains-mono/latin-400.css';
 import '@fontsource/jetbrains-mono/latin-600.css';
 import '@fontsource/cormorant-garamond/latin-400.css';

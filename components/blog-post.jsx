@@ -17,7 +17,7 @@ function BlogPostInner({ post }) {
   const thumbBg = dark ? "#111" : "#eee";
 
   return (
-    <div className="min-h-screen" style={{ background: t.bg, fontFamily: "'Outfit',sans-serif" }}>
+    <div className="min-h-screen" style={{ background: t.bg, fontFamily: "'Plus Jakarta Sans',sans-serif" }}>
       <SharedNav action="back" />
       <article className="max-w-[680px] mx-auto" style={{ padding: "clamp(24px,4vw,40px) clamp(16px,3vw,24px) 48px" }}>
         <a href="/blog" className="inline-block text-[13px] no-underline mb-7" style={{ color: t.accent }}>{"\u2190"} All posts</a>
