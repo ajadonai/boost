@@ -5,19 +5,14 @@ import { getCurrentUser } from '@/lib/auth';
 
 const NP_KEY = process.env.NOWPAYMENTS_API_KEY;
 const NP_URL = 'https://api.nowpayments.io/v1';
-const NGN_TO_USD = 1600; // fallback rate — we'll fetch live rate
+const FALLBACK_RATE = 1600;
 
 async function getNgnToUsd() {
   try {
-    const res = await fetch('https://api.nowpayments.io/v1/estimate?amount=1&currency_from=usd&currency_to=usdttrc20', {
-      headers: { 'x-api-key': NP_KEY },
-    });
-    // We just need a rough NGN→USD rate. Use a fixed rate for now.
-    // In production, integrate a forex API or admin-configurable rate.
-    return NGN_TO_USD;
-  } catch (err) {
-    log.warn('NGN→USD rate fetch', err.message);
-    return NGN_TO_USD;
+    const setting = await prisma.setting.findUnique({ where: { key: 'markup_usd_rate' } });
+    return Number(setting?.value) || FALLBACK_RATE;
+  } catch {
+    return FALLBACK_RATE;
   }
 }
 
