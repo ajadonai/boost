@@ -277,10 +277,6 @@
 .dash-social-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 7px 0; border-radius: 8px; font-size: 14px; font-weight: 500; text-decoration: none; border-width: 1px; border-style: solid; transition: transform .2s cubic-bezier(.4,0,.2,1), background .2s ease, border-color .2s ease, box-shadow .2s ease; }
 .dash-social-btn:hover { transform: translateY(-2px); }
 .dash-social-btn:active { transform: translateY(0) scale(.97); }
-.dash-social-wa { background: rgba(37,211,102,.12); color: #25d366; border-color: rgba(37,211,102,.25); }
-.dash-social-wa:hover { background: rgba(37,211,102,.2); border-color: rgba(37,211,102,.35); box-shadow: 0 4px 12px rgba(37,211,102,.15); }
-.dash-social-tg { background: rgba(0,136,204,.12); color: #0088cc; border-color: rgba(0,136,204,.25); }
-.dash-social-tg:hover { background: rgba(0,136,204,.2); border-color: rgba(0,136,204,.35); box-shadow: 0 4px 12px rgba(0,136,204,.15); }
 
 /* Overlay */
 .dash-overlay { display: none; position: absolute; inset: 0; background: rgba(0,0,0,.3); z-index: 10; }
