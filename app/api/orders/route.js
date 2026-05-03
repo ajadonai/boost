@@ -76,8 +76,13 @@ export async function PATCH(req) {
           const status = await checkOrder(provider, order.apiOrderId);
           const statusMap = { 'Completed': 'Completed', 'In progress': 'Processing', 'Processing': 'Processing', 'Pending': 'Pending', 'Partial': 'Partial', 'Canceled': 'Cancelled', 'Refunded': 'Cancelled' };
           const newStatus = statusMap[status.status] || order.status;
-          if (newStatus !== order.status) {
-            await prisma.order.update({ where: { id: order.id }, data: { status: newStatus } });
+          const updateData = {
+            ...(newStatus !== order.status && { status: newStatus }),
+            ...(status.start_count != null && { startCount: Number(status.start_count) }),
+            ...(status.remains != null && { remains: Number(status.remains) }),
+          };
+          if (Object.keys(updateData).length > 0) {
+            await prisma.order.update({ where: { id: order.id }, data: updateData });
           }
           return Response.json({ success: true, status: newStatus, remains: status.remains, startCount: status.start_count });
         } catch (e) {
