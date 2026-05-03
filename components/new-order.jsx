@@ -521,13 +521,13 @@ export default function NewOrderPage({ dark, t, user, onOrderSuccess, onViewOrde
         signal: AbortSignal.timeout(30000),
       });
       const data = await res.json();
-      if (!res.ok) { toast.error("Order failed", data.error || "Something went wrong", { position: "bottom" }); setOrderLoading(false); return; }
+      if (!res.ok) { toast.error("Order failed", data.error || "Something went wrong"); setOrderLoading(false); return; }
       setOrderSuccess({ ...data.order, platform: platform ? platform.charAt(0).toUpperCase() + platform.slice(1) : "Service" });
       setLink("");
       if (onOrderSuccess) onOrderSuccess();
     } catch (err) {
       const msg = err?.name === "TimeoutError" ? "Request timed out" : "Network error";
-      toast.error(msg, "Check your connection and try again.", { position: "bottom" });
+      toast.error(msg, "Check your connection and try again.");
     }
     setOrderLoading(false);
   };

@@ -130,10 +130,10 @@ export default function AddFundsPage({ user, txs, walletSummary, dark, t, paymen
           }, 15000);
           setTimeout(() => { clearInterval(poll); setCryptoPolling(false); }, 30 * 60 * 1000);
         } else {
-          toast.error("Payment failed", data.error || "Failed to create crypto payment", { position: "bottom" });
+          toast.error("Payment failed", data.error || "Failed to create crypto payment");
         }
       } catch (err) {
-        toast.error(err?.name === "TimeoutError" ? "Timed out" : "Network error", "Check your connection", { position: "bottom" });
+        toast.error(err?.name === "TimeoutError" ? "Timed out" : "Network error", "Check your connection");
       }
       setLoading(false); payingRef.current = false;
       return;
@@ -153,9 +153,9 @@ export default function AddFundsPage({ user, txs, walletSummary, dark, t, paymen
           setManualDone(false);
           setManualRef("");
         } else {
-          toast.error("Transfer failed", data.error || "Failed to create request", { position: "bottom" });
+          toast.error("Transfer failed", data.error || "Failed to create request");
         }
-      } catch { toast.error("Network error", "Check your connection", { position: "bottom" }); }
+      } catch { toast.error("Network error", "Check your connection"); }
       setLoading(false); payingRef.current = false;
       return;
     }
@@ -172,11 +172,11 @@ export default function AddFundsPage({ user, txs, walletSummary, dark, t, paymen
       if (data.authorization_url) {
         window.location.href = data.authorization_url;
       } else {
-        toast.error("Payment failed", data.error || "Initialization failed", { position: "bottom" });
+        toast.error("Payment failed", data.error || "Initialization failed");
         setLoading(false); payingRef.current = false;
       }
     } catch (err) {
-      toast.error(err?.name === "TimeoutError" ? "Timed out" : "Network error", "Check your connection", { position: "bottom" });
+      toast.error(err?.name === "TimeoutError" ? "Timed out" : "Network error", "Check your connection");
       setLoading(false); payingRef.current = false;
     }
   };
@@ -535,8 +535,8 @@ export default function AddFundsPage({ user, txs, walletSummary, dark, t, paymen
                     try {
                       const res = await fetch("/api/payments/manual", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ reference: manualModal.reference, senderRef: manualModal.reference }) });
                       if (res.ok) setManualDone(true);
-                      else { const d = await res.json(); toast.error("Failed", d.error || "Something went wrong", { position: "bottom" }); }
-                    } catch { toast.error("Network error", "Check your connection", { position: "bottom" }); }
+                      else { const d = await res.json(); toast.error("Failed", d.error || "Something went wrong"); }
+                    } catch { toast.error("Network error", "Check your connection"); }
                     setManualSubmitting(false);
                   }} disabled={manualSubmitting} className="flex-1 py-2.5 rounded-lg border-none bg-gradient-to-br from-[#c47d8e] to-[#8b5e6b] text-white text-sm font-semibold cursor-pointer transition-[transform,box-shadow] duration-200 hover:-translate-y-px hover:shadow-[0_6px_20px_rgba(196,125,142,.31)]" style={{ fontFamily: "inherit", opacity: manualSubmitting ? .5 : 1 }}>{manualSubmitting ? "Submitting..." : "I've sent the money"}</button>
                 </div>
