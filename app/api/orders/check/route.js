@@ -46,6 +46,15 @@ export async function POST(req) {
 
       const newStatus = statusMap[providerStatus.status] || order.status;
 
+      // Always persist delivery progress from provider
+      const progressData = {
+        ...(providerStatus.start_count != null && { startCount: Number(providerStatus.start_count) }),
+        ...(providerStatus.remains != null && { remains: Number(providerStatus.remains) }),
+      };
+      if (newStatus === order.status && Object.keys(progressData).length > 0) {
+        await prisma.order.update({ where: { id: order.id }, data: progressData });
+      }
+
       // Update if status changed
       if (newStatus !== order.status) {
         if (newStatus === 'Cancelled' && order.status !== 'Cancelled' && order.charge > 0) {
@@ -93,7 +102,11 @@ export async function POST(req) {
         } else {
           await prisma.order.update({
             where: { id: order.id },
-            data: { status: newStatus },
+            data: {
+              status: newStatus,
+              ...(providerStatus.start_count != null && { startCount: Number(providerStatus.start_count) }),
+              ...(providerStatus.remains != null && { remains: Number(providerStatus.remains) }),
+            },
           });
         }
       }
