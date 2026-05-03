@@ -13,6 +13,7 @@ const TX_META = {
   admin_gift:   { label: "Gift",          icon: "✦", clr: dk => dk ? "#f0abfc" : "#a855f7" },
 };
 function txClr(type, dk) { return (TX_META[type] || TX_META.order).clr(dk); }
+function fNShort(v) { const a = Math.abs(v); if (a >= 1e8) return `₦${(a/1e6).toFixed(1).replace(/\.0$/,"")}M`; if (a >= 1e6) return `₦${(a/1e6).toFixed(2).replace(/\.?0+$/,"")}M`; if (a >= 1e5) return `₦${(a/1e3).toFixed(1).replace(/\.0$/,"")}K`; return fN(v); }
 function txIcon(type) { return (TX_META[type] || TX_META.order).icon; }
 function txLabel(type) { return (TX_META[type] || { label: type }).label; }
 function txDesc(tx) {
@@ -599,11 +600,11 @@ function WalletHistory({ txs, walletSummary, dark, t }) {
       <div className="grid grid-cols-2 gap-2 mb-3">
         <div className="py-2.5 px-3 rounded-xl text-center" style={{ background: dark ? "rgba(110,231,183,.06)" : "rgba(5,150,105,.04)", border: `1px solid ${dark ? "rgba(110,231,183,.15)" : "rgba(5,150,105,.1)"}` }}>
           <div className="text-[11px] uppercase tracking-[1px] mb-0.5" style={{ color: t.textMuted }}>Funded</div>
-          <div className="m text-[15px] font-bold" style={{ color: dark ? "#6ee7b7" : "#059669" }}>+{fN(totalIn)}</div>
+          <div className="m text-[15px] font-bold" style={{ color: dark ? "#6ee7b7" : "#059669" }}>+{fNShort(totalIn)}</div>
         </div>
         <div className="py-2.5 px-3 rounded-xl text-center" style={{ background: dark ? "rgba(252,165,165,.06)" : "rgba(220,38,38,.04)", border: `1px solid ${dark ? "rgba(252,165,165,.15)" : "rgba(220,38,38,.1)"}` }}>
           <div className="text-[11px] uppercase tracking-[1px] mb-0.5" style={{ color: t.textMuted }}>Spent</div>
-          <div className="m text-[15px] font-bold" style={{ color: dark ? "#fca5a5" : "#dc2626" }}>-{fN(totalOut)}</div>
+          <div className="m text-[15px] font-bold" style={{ color: dark ? "#fca5a5" : "#dc2626" }}>-{fNShort(totalOut)}</div>
         </div>
       </div>
 

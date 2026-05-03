@@ -490,7 +490,7 @@ function AdminDashboardInner() {
     <div className="dash-root" style={{ background: t.bg }}>
 
       {/* ═══ TOP NAV ═══ */}
-      <nav className="dash-nav" style={{ background: dark ? "rgba(9,12,21,.85)" : "rgba(240,237,232,.85)", borderBottom: `0.5px solid ${t.sidebarBorder}`, backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)" }}>
+      <nav className="dash-nav" style={{ background: dark ? "rgba(9,12,21,.9)" : "rgba(248,245,241,.92)", borderBottom: `0.5px solid ${dark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)"}`, backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)" }}>
         <div className="dash-nav-left">
           <button className="dash-menu-btn" onClick={() => setLeftOpen(!leftOpen)}>
             <div className="dash-hamburger-bars" style={{ opacity: leftOpen ? 0 : 1, position: leftOpen ? "absolute" : "relative" }}>
@@ -519,9 +519,8 @@ function AdminDashboardInner() {
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
             {ticketCount > 0 && <div className="dash-bell-badge">{ticketCount > 10 ? "10+" : ticketCount}</div>}
           </button>
-          <button onClick={() => { setActive("settings"); setLeftOpen(false); }} className="dash-avatar-btn">
+          <button onClick={() => { setActive("settings"); setLeftOpen(false); }} className="dash-avatar-btn" aria-label="Profile">
             <Avatar size={30} rounded={10} />
-            <span className="dash-nav-name" style={{ color: t.text, textTransform: "uppercase" }}>{admin.name}</span>
           </button>
         </div>
       </nav>
@@ -538,8 +537,8 @@ function AdminDashboardInner() {
               {si > 0 && <div className="h-px my-1 mx-3" style={{ background: t.sidebarBorder }} />}
               <div className="adm-nav-section" style={{ color: t.textMuted }}>{section.section}</div>
               {visibleItems.map(item => (
-                <button key={item.id} onClick={() => { setActive(item.id); setLeftOpen(false); }} className="dash-nav-item" style={{ background: active === item.id ? t.navActive : "transparent", color: active === item.id ? t.accent : t.textSoft, fontWeight: active === item.id ? 600 : 500, borderLeft: active === item.id ? `3px solid ${t.accent}` : "3px solid transparent" }}>
-                  <span className="shrink-0" style={{ opacity: active === item.id ? 1 : .8 }}>{item.icon}</span>
+                <button key={item.id} onClick={() => { setActive(item.id); setLeftOpen(false); }} className="dash-nav-item" style={{ background: active === item.id ? (dark ? "rgba(196,125,142,.12)" : "rgba(196,125,142,.08)") : "transparent", color: active === item.id ? t.accent : t.textSoft, fontWeight: active === item.id ? 600 : 450 }}>
+                  <span className="shrink-0" style={{ opacity: active === item.id ? 1 : .55, color: active === item.id ? t.accent : t.textMuted }}>{item.icon}</span>
                   {item.label}
                   {item.badge && ticketCount > 0 && <span className="m dash-nav-badge">{ticketCount}</span>}
                 </button>

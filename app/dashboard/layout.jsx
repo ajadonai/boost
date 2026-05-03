@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic';
 
 export const metadata = {
-  title: { absolute: 'The Nitro NG' },
+  title: { absolute: 'Nitro' },
 };
 
 export default function DashboardLayout({ children }) {

@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 
 export default function CookieBanner() {
   const [show, setShow] = useState(false);
+  const [exiting, setExiting] = useState(false);
   const [dark, setDark] = useState(true);
 
   useEffect(() => {
@@ -31,20 +32,15 @@ export default function CookieBanner() {
     return () => { window.removeEventListener('storage', check); observer.disconnect(); clearInterval(interval); };
   }, []);
 
-  const accept = () => {
-    localStorage.setItem('nitro-cookie-consent', 'accepted');
-    setShow(false);
-  };
-
-  const decline = () => {
-    localStorage.setItem('nitro-cookie-consent', 'declined');
-    setShow(false);
+  const dismiss = (choice) => {
+    localStorage.setItem('nitro-cookie-consent', choice);
+    setExiting(true);
   };
 
   if (!show) return null;
 
   return (
-    <div className="fixed bottom-0 inset-x-0 z-[9999] p-2.5 sm:px-3.5 animate-[cookieSlideUp_.4s_ease-out]">
+    <div className="fixed bottom-0 inset-x-0 z-[9999] p-2.5 sm:px-3.5" style={{ animation: exiting ? "cookieSlideDown .35s ease-in forwards" : "cookieSlideUp .4s ease-out" }} onAnimationEnd={() => { if (exiting) setShow(false); }}>
       <div
         className="max-w-[680px] mx-auto flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3 p-3.5 sm:py-3 sm:px-4 rounded-r-xl border-l-[3px] border-l-accent"
         style={{
@@ -64,7 +60,7 @@ export default function CookieBanner() {
         </div>
         <div className="flex gap-2 shrink-0">
           <button
-            onClick={decline}
+            onClick={() => dismiss('declined')}
             className="flex-1 sm:flex-none py-[7px] px-[18px] rounded-lg text-xs font-medium cursor-pointer bg-transparent transition-transform duration-200 hover:-translate-y-px"
             style={{
               color: dark ? 'rgba(255,255,255,.7)' : 'rgba(28,27,25,.75)',
@@ -72,7 +68,7 @@ export default function CookieBanner() {
             }}
           >Decline</button>
           <button
-            onClick={accept}
+            onClick={() => dismiss('accepted')}
             className="flex-1 sm:flex-none py-[7px] px-[18px] rounded-lg text-xs font-medium cursor-pointer bg-accent text-white transition-transform duration-200 hover:-translate-y-px"
           >Accept</button>
         </div>

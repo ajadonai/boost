@@ -13,30 +13,30 @@ import CookieBanner from '@/components/cookie-banner';
 
 export const metadata = {
   title: {
-    default: 'The Nitro NG — #1 SMM Panel in Nigeria',
-    template: '%s | The Nitro NG',
+    default: 'Nitro — Grow Your Socials | Nigeria',
+    template: '%s | Nitro',
   },
-  description: 'Buy Instagram followers, TikTok views, YouTube subscribers and more. Instant delivery, real engagement, cheapest rates in Nigeria. 35+ platforms supported.',
-  keywords: ['SMM panel', 'buy Instagram followers Nigeria', 'buy TikTok views', 'YouTube subscribers', 'social media marketing', 'SMM panel Nigeria', 'buy followers', 'buy likes', 'Nigerian SMM', 'cheap followers', 'instant delivery'],
-  authors: [{ name: 'The Nitro NG', url: 'https://nitro.ng' }],
-  creator: 'The Nitro NG',
-  publisher: 'The Nitro NG',
+  description: 'Grow your Instagram, TikTok, YouTube and 35+ platforms with real engagement. Instant delivery, Naira pricing, 24/7 support. Built for Nigerian creators and businesses.',
+  keywords: ['SMM panel', 'buy Instagram followers Nigeria', 'buy TikTok views', 'YouTube subscribers', 'social media marketing', 'SMM panel Nigeria', 'buy followers', 'buy likes', 'Nigerian SMM', 'social media growth Nigeria', 'instant delivery'],
+  authors: [{ name: 'Nitro', url: 'https://nitro.ng' }],
+  creator: 'Nitro',
+  publisher: 'Nitro',
   metadataBase: new URL('https://nitro.ng'),
   alternates: {
     canonical: '/',
   },
   openGraph: {
-    title: 'The Nitro NG — #1 SMM Panel in Nigeria',
-    description: 'Buy Instagram followers, TikTok views, YouTube subscribers and more. Instant delivery, real engagement, 35+ platforms.',
+    title: 'Nitro — Your Socials Deserve Better Numbers',
+    description: 'Grow your Instagram, TikTok, YouTube and 35+ platforms. Instant delivery, Naira pricing, built for Nigerian creators.',
     url: 'https://nitro.ng',
-    siteName: 'The Nitro NG',
+    siteName: 'Nitro',
     locale: 'en_NG',
     type: 'website',
   },
   twitter: {
     card: 'summary',
-    title: 'The Nitro NG — #1 SMM Panel in Nigeria',
-    description: 'Buy Instagram followers, TikTok views, YouTube subscribers and more. Instant delivery, real engagement.',
+    title: 'Nitro — Your Socials Deserve Better Numbers',
+    description: 'We handle the numbers so you can handle the content. 35+ platforms, Naira pricing, instant delivery.',
     creator: '@TheNitroNG',
     site: '@TheNitroNG',
   },
@@ -80,10 +80,10 @@ export default function RootLayout({ children }) {
   const orgSchema = {
     "@context": "https://schema.org",
     "@type": "Organization",
-    name: "The Nitro NG",
+    name: "Nitro",
     url: "https://nitro.ng",
     logo: "https://nitro.ng/icon-512.png",
-    description: "Nigeria's #1 SMM Panel. Buy Instagram followers, TikTok views, YouTube subscribers and more.",
+    description: "Digital growth company built for the Nigerian market. Grow your social media presence across Instagram, TikTok, YouTube and 35+ platforms with instant delivery and Naira pricing.",
     sameAs: [
       "https://instagram.com/Nitro.ng",
       "https://instagram.com/TheNitroNg",
@@ -100,7 +100,7 @@ export default function RootLayout({ children }) {
   const websiteSchema = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: "The Nitro NG",
+    name: "Nitro",
     url: "https://nitro.ng",
     potentialAction: {
       "@type": "SearchAction",

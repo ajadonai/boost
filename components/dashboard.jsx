@@ -689,13 +689,12 @@ function DashboardInner({ initialData }) {
 
   // Trigger order tour on first visit to services page
   useEffect(() => {
-    if (isServices && !orderTourChecked.current && user) {
-      orderTourChecked.current = true;
-      const orderDone = user.orderTourCompleted || localStorage.getItem("nitro-order-tour-done");
-      if (!orderDone) {
-        const timer = setTimeout(() => setShowOrderTour(true), 800);
-        return () => clearTimeout(timer);
-      }
+    if (!isServices || orderTourChecked.current || !user) return;
+    orderTourChecked.current = true;
+    const orderDone = user.orderTourCompleted || localStorage.getItem("nitro-order-tour-done");
+    if (!orderDone) {
+      const timer = setTimeout(() => setShowOrderTour(true), 600);
+      return () => clearTimeout(timer);
     }
   }, [isServices, user]);
 
@@ -957,7 +956,7 @@ function DashboardInner({ initialData }) {
       case "overview":
         return <OverviewPage user={user} orders={orders} alerts={alerts} dark={dark} t={t} setActive={setActive} a2hs={{ ready: a2hsReady, isIos, dismissed: a2hsDismissed, onInstall: handleA2hsInstall, onDismiss: dismissA2hs }} />;
       case "services":
-        return <NewOrderPage dark={dark} t={t} user={user} onOrderSuccess={refreshDashboard} onViewOrders={() => setActive("orders")} onTopUp={() => setActive("add-funds")} platform={noPlatform} setPlatform={setNoPlatform} selSvc={noSelSvc} setSelSvc={setNoSelSvc} selTier={noSelTier} setSelTier={setNoSelTier} qty={noQty} setQty={setNoQty} link={noLink} setLink={setNoLink} comments={noComments} setComments={setNoComments} catModal={noCatModal} setCatModal={setNoCatModal} />;
+        return <NewOrderPage dark={dark} t={t} user={user} onOrderSuccess={refreshDashboard} onViewOrders={() => setActive("orders")} onTopUp={() => setActive("add-funds")} platform={noPlatform} setPlatform={setNoPlatform} selSvc={noSelSvc} setSelSvc={setNoSelSvc} selTier={noSelTier} setSelTier={setNoSelTier} qty={noQty} setQty={setNoQty} link={noLink} setLink={setNoLink} comments={noComments} setComments={setNoComments} catModal={noCatModal} setCatModal={setNoCatModal} tourActive={showOrderTour} />;
       case "orders":
         return <OrdersPage orders={orders} txs={enrichedTxs} dark={dark} t={t} />;
       case "referrals":
@@ -1021,7 +1020,7 @@ function DashboardInner({ initialData }) {
           {/* Balance pill — desktop only */}
           <button onClick={() => setActive("add-funds")} className="max-desktop:hidden flex items-center gap-1.5 h-[34px] px-3 rounded-[10px] cursor-pointer bg-transparent" style={{ border: `0.5px solid ${dark ? "rgba(110,231,183,.15)" : "rgba(5,150,105,.12)"}`, background: dark ? "rgba(110,231,183,.06)" : "rgba(5,150,105,.04)", transition: "background .2s ease" }}>
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={t.green} strokeWidth="2" strokeLinecap="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-            <span className="m text-[12px] font-semibold" style={{ color: t.green }}>{fN(user?.balance || 0)}</span>
+            <span className="m text-[12px] font-semibold" style={{ color: t.green }}>₦{Math.round(user?.balance || 0).toLocaleString()}</span>
           </button>
           {/* Theme toggle */}
           <button onClick={toggleTheme} className="dash-theme-toggle" aria-label={dark ? "Switch to light mode" : "Switch to dark mode"} style={{ background: dark ? "rgba(99,102,241,.28)" : "rgba(0,0,0,.12)", border: `0.5px solid ${dark ? "rgba(99,102,241,.24)" : "rgba(0,0,0,.14)"}` }}>
@@ -1043,7 +1042,6 @@ function DashboardInner({ initialData }) {
           {/* Avatar → Settings */}
           <button onClick={() => { setActive("settings"); setLeftOpen(false); }} className="dash-avatar-btn" aria-label="Profile">
             <Avatar size={30} rounded={10} />
-            <span className="dash-nav-name" style={{ color: t.text }}>{firstName}</span>
           </button>
         </div>
       </nav>

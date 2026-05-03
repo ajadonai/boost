@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation';
 
 export const metadata = {
   title: 'Create Account',
-  description: 'Create a free Nitro account. Buy Instagram followers, TikTok views, YouTube subscribers and more at the cheapest rates in Nigeria.',
+  description: 'Create your free Nitro account and start growing your social media presence in minutes. Naira pricing, instant delivery, 35+ platforms.',
   alternates: { canonical: '/signup' },
 };
 

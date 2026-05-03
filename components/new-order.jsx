@@ -139,6 +139,9 @@ function saveCart(rows) {
 /* ═══════════════════════════════════════════ */
 /* ═══ ORDER FORM                          ═══ */
 /* ═══════════════════════════════════════════ */
+const CONSERVATIVE = ['instagram','tiktok','facebook','twitter','snapchat','threads'];
+const showDripNote = (plat, qty) => { const p = (plat || '').toLowerCase(); return CONSERVATIVE.some(c => p.includes(c)) ? qty > 100 : qty > 500; };
+
 export function OrderForm({ selSvc, selTier, platform, qty, setQty, link, setLink, dark, t, onClose, compact, onSubmit, orderLoading, comments, setComments, loyaltyDiscount = 0, loyaltyTier = null }) {
   const minQty = selTier?.min || 100;
   const maxQty = selTier?.max || 50000;
@@ -149,6 +152,7 @@ export function OrderForm({ selSvc, selTier, platform, qty, setQty, link, setLin
   const price = Math.max(0, basePrice - discountAmount);
   const s = selTier ? TS[selTier.tier] : null;
   const [linkError, setLinkError] = useState("");
+  const [dripOpen, setDripOpen] = useState(false);
 
   /* Link validation */
   const validateLink = (val) => {
@@ -250,6 +254,18 @@ export function OrderForm({ selSvc, selTier, platform, qty, setQty, link, setLin
             <span className="m text-lg font-semibold" style={{ color: t.accent }}>₦{price.toLocaleString()}</span>
           </div>
         </div>
+        {showDripNote(platform, qtyNum) && (
+          <div className="rounded-lg mb-3 overflow-hidden" style={{ background: dark ? "rgba(110,231,183,.05)" : "rgba(5,150,105,.04)", border: `0.5px solid ${dark ? "rgba(110,231,183,.1)" : "rgba(5,150,105,.08)"}` }}>
+            <button type="button" onClick={() => setDripOpen(!dripOpen)} className="flex items-center gap-[7px] w-full py-2 px-2.5 bg-transparent border-none cursor-pointer text-left" style={{ fontFamily: "inherit" }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={dark ? "#6ee7b7" : "#059669"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              <span className="flex-1 text-xs font-semibold" style={{ color: dark ? "#a09b95" : "#555250" }}>Your account stays safe</span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={dark ? "#706c68" : "#757170"} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 transition-transform duration-200" style={{ transform: dripOpen ? "rotate(180deg)" : "rotate(0)" }}><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div className="transition-all duration-200 overflow-hidden" style={{ maxHeight: dripOpen ? 60 : 0, padding: dripOpen ? "0 10px 8px" : "0 10px 0" }}>
+              <div className="text-xs leading-[1.5]" style={{ color: dark ? "#706c68" : "#757170" }}>Large orders are delivered gradually, not all at once. This keeps activity looking natural and protects your account from flags.</div>
+            </div>
+          </div>
+        )}
         <button onClick={onSubmit} data-tour="no-submit-btn" disabled={!linkValid || qtyOutOfRange || qtyNum <= 0 || ((needsComments || needsUsernames) && !(comments || "").trim()) || (needsAnswer && !(comments || "").trim()) || orderLoading} className="w-full py-2.5 rounded-lg border-none bg-gradient-to-br from-[#c47d8e] to-[#8b5e6b] text-white text-[15px] font-semibold cursor-pointer transition-[transform,box-shadow] duration-200 hover:-translate-y-px hover:shadow-[0_6px_20px_rgba(196,125,142,.38)]" style={{ opacity: linkValid && !qtyOutOfRange && qtyNum > 0 && (!(needsComments || needsUsernames || needsAnswer) || (comments || "").trim()) && !orderLoading ? 1 : .5 }}>{orderLoading ? "Placing..." : "Place Order"}</button>
       </>}
       </div>
@@ -260,7 +276,7 @@ export function OrderForm({ selSvc, selTier, platform, qty, setQty, link, setLin
 /* ═══════════════════════════════════════════ */
 /* ═══ NEW ORDER PAGE                      ═══ */
 /* ═══════════════════════════════════════════ */
-export default function NewOrderPage({ dark, t, user, onOrderSuccess, onViewOrders, onTopUp, platform, setPlatform, selSvc, setSelSvc, selTier, setSelTier, qty, setQty, link, setLink, comments, setComments, catModal, setCatModal }) {
+export default function NewOrderPage({ dark, t, user, onOrderSuccess, onViewOrders, onTopUp, platform, setPlatform, selSvc, setSelSvc, selTier, setSelTier, qty, setQty, link, setLink, comments, setComments, catModal, setCatModal, tourActive }) {
   const toast = useToast();
   const [filterType, setFilterType] = useState("all");
   const [search, setSearch] = useState("");
@@ -824,7 +840,7 @@ export default function NewOrderPage({ dark, t, user, onOrderSuccess, onViewOrde
       </div>
 
       {/* Fixed bottom bar — mobile/tablet — single mode only */}
-      {orderMode === "single" && hasOrder && !orderModal && !orderSuccess && (
+      {orderMode === "single" && hasOrder && tourActive && (
         <div className="no-bottom-bar flex fixed bottom-0 left-0 right-0 backdrop-blur-[16px] py-2.5 px-5 max-md:px-4 items-center justify-between z-30 gap-3" data-tour="no-order-bar" style={{ background: dark ? "rgba(8,11,20,.97)" : "rgba(244,241,237,.97)", borderTop: `1px solid ${t.cardBorder}` }}>
           <div className="min-w-0 flex-1">
             <div className="text-[15px] max-md:text-sm font-semibold whitespace-nowrap overflow-hidden text-ellipsis" style={{ color: t.text }}>{selSvc?.name}</div>
