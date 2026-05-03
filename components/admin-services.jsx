@@ -148,20 +148,19 @@ export default function AdminServicesPage({ dark, t }) {
         </div>
         {providers.length > 1 && (
           <FilterDropdown dark={dark} t={t} value={providerFilter} onChange={(v) => { setProviderFilter(v); setPage(1); }} options={[
-            { value: "all", label: `All providers (${services.length})` },
+            { value: "all", label: "All providers" },
             ...providers.map(p => {
-              const count = services.filter(s => (s.provider || "mtp") === p).length;
               const label = p === "mtp" ? "MTP" : p === "jap" ? "JAP" : p === "dao" ? "DaoSMM" : p.toUpperCase();
-              return { value: p, label: `${label} (${count})` };
+              return { value: p, label };
             }),
           ]} />
         )}
         <FilterDropdown dark={dark} t={t} value={statusFilter} onChange={(v) => { setStatusFilter(v); setPage(1); }} options={
-          [["all", `All (${services.length})`], ["active", `Active (${activeCount})`], ["inactive", `Inactive (${inactiveCount})`], ["in-use", `In Use (${inUseCount})`], ...(inUseDisabledCount > 0 ? [["in-use-disabled", `In Use + Disabled (${inUseDisabledCount})`]] : [])].map(([val, label]) => ({ value: val, label }))
+          [["all", "All"], ["active", "Active"], ["inactive", "Inactive"], ["in-use", "In Use"], ...(inUseDisabledCount > 0 ? [["in-use-disabled", "In Use + Disabled"]] : [])].map(([val, label]) => ({ value: val, label }))
         } />
         <FilterDropdown dark={dark} t={t} value={catFilter} onChange={(v) => { setCatFilter(v); setPage(1); }} options={[
-          { value: "all", label: `All platforms (${services.length})` },
-          ...categories.map(cat => ({ value: cat, label: `${cat} (${services.filter(s => s.category === cat).length})` })),
+          { value: "all", label: "All platforms" },
+          ...categories.map(cat => ({ value: cat, label: cat })),
         ]} />
       </div>
 

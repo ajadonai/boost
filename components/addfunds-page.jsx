@@ -590,8 +590,8 @@ function WalletHistory({ txs, walletSummary, dark, t }) {
         <div className="flex gap-1.5 flex-wrap">
           <DateRangePicker dark={dark} t={t} value={dateRange} onChange={(v) => { setDateRange(v); setPage(1); }} />
           <FilterDropdown dark={dark} t={t} value={filter} onChange={(v) => { setFilter(v); setPage(1); }} options={[
-            { value: "all", label: `All (${allTxs.length})` },
-            ...txTypes.map(f => ({ value: f, label: `${txLabel(f)} (${allTxs.filter(tx => tx.type === f).length})` })),
+            { value: "all", label: "All" },
+            ...txTypes.map(f => ({ value: f, label: txLabel(f) })),
           ]} />
         </div>
       </div>

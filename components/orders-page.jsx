@@ -420,7 +420,7 @@ export default function OrdersPage({ orders: initialOrders, txs, dark, t }) {
           <DateRangePicker dark={dark} t={t} value={dateRange} onChange={(v) => { setDateRange(v); setOPage(1); }} />
           <FilterDropdown dark={dark} t={t} value={filter} onChange={(v) => { setFilter(v); setOPage(1); setExpanded(null); }} options={
             ["all", "Completed", "Processing", "Pending", "Partial", "Cancelled"].map(f => ({
-              value: f, label: f === "all" ? `All (${orders.length})` : `${f} (${counts[f] || 0})`,
+              value: f, label: f === "all" ? "All" : f,
             }))
           } />
         </div>

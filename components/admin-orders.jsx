@@ -163,7 +163,7 @@ export default function AdminOrdersPage({ dark, t }) {
         </div>
         <FilterDropdown dark={dark} t={t} value={filter} onChange={(v) => { setFilter(v); setPage(1); }} options={
           ["all", "Completed", "Processing", "Pending", "Partial", "Cancelled"].map(f => ({
-            value: f, label: f === "all" ? `All (${orders.length})` : `${f} (${counts[f] || 0})`,
+            value: f, label: f === "all" ? "All" : f,
           }))
         } />
       </div>

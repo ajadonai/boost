@@ -89,8 +89,8 @@ export function AdminActivityPage({ dark, t }) {
       {tab === "admin" && <>
         <div className="adm-filters flex justify-end">
           <FilterDropdown dark={dark} t={t} value={filter} onChange={(v) => { setFilter(v); setPage(0); }} options={[
-            { value: "all", label: `All (${logs.length})` },
-            ...typeEntries.map(([label, count]) => ({ value: label, label: `${label} (${count})` })),
+            { value: "all", label: "All" },
+            ...typeEntries.map(([label]) => ({ value: label, label })),
           ]} />
         </div>
 
@@ -146,8 +146,8 @@ export function AdminActivityPage({ dark, t }) {
       {tab === "system" && <>
         <div className="adm-filters flex justify-end">
           <FilterDropdown dark={dark} t={t} value={sysFilter} onChange={(v) => { setSysFilter(v); setSysPage(0); setExpandedEvent(null); }} options={[
-            { value: "all", label: `All (${sysEvents.length})` },
-            ...Object.entries(SYS_META).map(([key, m]) => ({ value: key, label: `${m.label} (${sysCounts[key] || 0})` })),
+            { value: "all", label: "All" },
+            ...Object.entries(SYS_META).map(([key, m]) => ({ value: key, label: m.label })),
           ]} />
         </div>
 
